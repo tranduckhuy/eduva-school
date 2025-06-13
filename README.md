@@ -1,1 +1,1 @@
-# eduva-school
+# eduva-admin

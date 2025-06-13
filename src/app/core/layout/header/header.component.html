@@ -1,0 +1,44 @@
+<header
+  class="fixed left-0 right-0 top-0 z-50 flex h-[70px] items-center border-b border-b-gray-100 bg-white py-3 pr-5 dark:border-b dark:border-dark-500 dark:bg-dark-200 sm:h-auto"
+  [ngClass]="{
+    'pl-0': isSmallScreen,
+    'pl-[250px]': !isSmallScreen && isManuallyToggled,
+    'pl-[80px]': !isSmallScreen && !isManuallyToggled,
+  }">
+  <div class="mt-[-2px] flex flex-1 items-center justify-between">
+    <div class="flex items-center justify-center gap-6">
+      <div class="flex items-center">
+        <a
+          href="/"
+          class="hidden h-[70px] shrink-0 items-center gap-2 py-[14px] pl-5 md:flex">
+          <img
+            src="./images/logo.png"
+            alt="EDUVA"
+            class="size-9 rounded-md object-contain" />
+        </a>
+        <button
+          class="mt-[5px] pl-5 text-primary md:mr-8"
+          style="position: static"
+          (click)="toggleSidebar.emit()">
+          <span class="pi pi-bars"></span>
+        </button>
+      </div>
+
+      <!-- ? Search Input -->
+      <div
+        class="relative flex h-11 w-[275px] items-center rounded-sm bg-transparent py-6 md:mr-6 md:w-full">
+        <input
+          type="text"
+          class="dark: relative block h-10 w-full max-w-[275px] rounded border border-[#e9edf6] py-[10px] pl-[10px] pr-10 text-black outline-0 placeholder:font-medium placeholder:tracking-wide placeholder:text-gray-500 dark:border-dark-500 dark:bg-dark-400 dark:text-white dark:placeholder:text-gray-400 md:pl-4"
+          placeholder="Tìm kiếm..." />
+        <button
+          class="absolute right-0 top-0 mt-[5px] h-10 pl-2 pr-3 text-primary">
+          <i class="material-symbols-outlined !text-xl"> search </i>
+        </button>
+      </div>
+    </div>
+
+    <!-- ? User Information -->
+    <header-user-actions />
+  </div>
+</header>

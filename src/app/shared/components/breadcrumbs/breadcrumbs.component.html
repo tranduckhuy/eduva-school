@@ -1,0 +1,23 @@
+<p-breadcrumb [model]="breadcrumbs()">
+  <ng-template #item let-item>
+    <a
+      class="p-breadcrumb-item-link flex cursor-pointer items-center gap-1 pr-0"
+      [ngClass]="item.routerLink ? 'hover:text-primary' : ''"
+      [routerLink]="item.routerLink"
+      [href]="!item.routerLink ? item.url : ''">
+      <span
+        *ngIf="item.icon"
+        [ngClass]="[item.icon, 'relative bottom-[1px] text-primary']"></span>
+      <span
+        class="text-gray-800 transition-colors duration-200 hover:text-primary dark:text-gray-500 dark:hover:text-primary">
+        {{ item.label }}
+      </span>
+    </a>
+  </ng-template>
+  <ng-template #separator>
+    <i
+      class="material-symbols-rounded relative top-[1px] text-lg leading-none text-gray-500">
+      chevron_right
+    </i>
+  </ng-template>
+</p-breadcrumb>

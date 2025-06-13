@@ -1,0 +1,48 @@
+<h1
+  class="absolute left-0 top-0 z-[2] w-full border-b border-b-gray-100 bg-white dark:border-dark-500 dark:bg-dark-200">
+  <a href="/" class="flex h-[70px] items-center gap-2 px-5 py-[14px] md:hidden">
+    <img
+      src="./images/logo.png"
+      alt="EDUVA"
+      class="size-9 rounded-md object-contain" />
+    @if (!isSidebarCollapsed()) {
+      <span class="text-[22px] font-extrabold leading-none dark:text-white"
+        >EDUVA</span
+      >
+    }
+  </a>
+</h1>
+
+<nav
+  class="h-full overflow-x-hidden overflow-y-scroll px-4 pb-5 pt-[90px] dark:bg-dark-200 md:pt-5"
+  [ngClass]="{
+    'flex flex-col items-center pl-5 pr-4': isSidebarCollapsed(),
+  }">
+  @for (section of navConfigs; track $index) {
+    @if (isSidebarCollapsed()) {
+      <div>
+        <span
+          class="material-symbols-outlined mb-3 mt-6 text-xs font-extrabold">
+          fiber_manual_record
+        </span>
+      </div>
+    } @else {
+      <h3
+        *ngIf="section.section"
+        class="mb-3 mt-6 text-xs font-medium uppercase text-gray-400 first:mt-0">
+        {{ section.section }}
+      </h3>
+    }
+
+    @for (item of section.navItems; track $index) {
+      <navbar-accordion-item
+        [label]="item.label"
+        [link]="item.link || '#!'"
+        [icon]="item.icon"
+        [type]="item.type"
+        [isActive]="item.isActive"
+        [submenuItems]="item.submenuItems"
+        [isSidebarCollapsed]="isSidebarCollapsed()" />
+    }
+  }
+</nav>

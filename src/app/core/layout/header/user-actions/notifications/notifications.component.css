@@ -1,0 +1,21 @@
+.notify-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
+  cursor: pointer;
+}
+
+.notify-item:not(:last-child) {
+  border-bottom: 1px dashed #f3f4f6;
+}
+
+.notify-item__icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #4936f50d;
+}
