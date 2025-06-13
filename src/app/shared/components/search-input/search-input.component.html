@@ -1,0 +1,16 @@
+<div
+  class="relative flex h-11 w-[300px] items-center rounded-sm bg-transparent py-6 md:mr-6 md:w-full {{
+    customClasses()
+  }}">
+  <input
+    type="text"
+    class="block h-11 w-full max-w-[300px] rounded border border-[#e9edf6] py-[10px] pl-10 pr-[10px] text-black outline-0 placeholder:font-medium placeholder:tracking-wide placeholder:text-gray-500 dark:relative dark:border-dark-500 dark:bg-dark-400 dark:text-white dark:placeholder:text-gray-400 md:pr-4"
+    [placeholder]="placeholder()"
+    [(ngModel)]="searchTerm"
+    (keypress)="onSearch()" />
+  <button
+    class="absolute left-0 top-0 mt-[5px] h-10 pl-3 pr-2"
+    (click)="onSearch()">
+    <i class="material-symbols-outlined !text-xl"> search </i>
+  </button>
+</div>

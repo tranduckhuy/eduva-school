@@ -1,0 +1,117 @@
+<div
+  class="rounded border border-gray-100 bg-white p-6 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <div class="mb-2 flex items-center justify-between">
+    <h2 class="text-base font-medium">Thông tin trường học</h2>
+  </div>
+  <div
+    class="rounded border border-gray-200 p-6 dark:border-dark-500 dark:bg-dark-200">
+    <div class="e-row e-row-cols-2 e-row-cols-md-1 e-g-4">
+      <div class="e-col">
+        <app-form-control
+          label="Tên trường"
+          type="text"
+          [name]="'name'"
+          [(ngModel)]="name"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+      <div class="e-col">
+        <app-form-control
+          label="Mã trường"
+          type="text"
+          [name]="'code'"
+          [(ngModel)]="code"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+      <div class="e-col">
+        <app-form-control
+          label="Email liên hệ"
+          type="email"
+          [name]="'email'"
+          [(ngModel)]="contactEmail"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+      <div class="e-col">
+        <app-form-control
+          label="Số điện thoại"
+          type="tel"
+          [name]="'phone'"
+          [(ngModel)]="phoneNumber"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+    </div>
+
+    <div class="e-row e-row-cols-1 !mt-6">
+      <div class="e-col">
+        <app-form-control
+          label="Địa chỉ website"
+          type="url"
+          [name]="'website'"
+          [(ngModel)]="websiteUrl"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+    </div>
+
+    <div class="e-row e-row-cols-3 e-row-cols-lg-2 e-row-cols-md-1 !mt-6">
+      <div class="e-col">
+        <app-form-control
+          label="Trạng thái hoạt động"
+          type="text"
+          [name]="'status'"
+          [(ngModel)]="status"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+      <div class="e-col e-gy-md-4">
+        <app-form-control
+          label="Ngày tạo"
+          type="text"
+          [name]="'createdAt'"
+          [(ngModel)]="createdAt"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+      <div class="e-col e-gy-lg-4">
+        <app-form-control
+          label="Lần chỉnh sửa cuối cùng"
+          type="text"
+          [name]="'lastModifiedAt'"
+          [(ngModel)]="lastModifiedAt"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-2 mt-10 flex items-center justify-between">
+    <h2 class="text-base font-medium">Thông tin quản lý</h2>
+    <app-button><a routerLink="#!">Xem chi tiết</a></app-button>
+  </div>
+  <div
+    class="rounded border border-gray-200 p-6 dark:border-dark-500 dark:bg-dark-200">
+    <div class="e-row e-row-cols-2 e-row-cols-md-1 e-g-4">
+      <div class="e-col">
+        <app-form-control
+          label="Tên"
+          type="text"
+          [name]="'schoolAdminName'"
+          [(ngModel)]="schoolAdminName"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+      <div class="e-col">
+        <app-form-control
+          label="Email liên hệ"
+          type="email"
+          [name]="'schoolAdminEmail'"
+          [(ngModel)]="schoolAdminEmail"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+    </div>
+  </div>
+</div>

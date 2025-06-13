@@ -1,0 +1,81 @@
+<div class="w-full overflow-hidden">
+  <div class="w-full text-left">
+    <div class="flex justify-between">
+      <label class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+        {{ label() }}
+      </label>
+      @if (redirectLink()) {
+        <a
+          routerLink="{{ redirectLink().href }}"
+          class="mb-2 block font-semibold text-[#f33a58]"
+          >{{ redirectLink().value }}</a
+        >
+      }
+    </div>
+
+    <div
+      class="relative flex h-[44px] overflow-hidden rounded-md border-[1.5px] bg-white dark:bg-dark-300"
+      [ngClass]="{
+        'border-[#f33a58] dark:border-[#f33a58]':
+          control.invalid && control.touched,
+        'focus-within:border-[#f33a58] dark:border-[#f33a58]':
+          control.invalid && control.touched,
+        'border-gray-200 dark:border-gray-900': !(
+          control.invalid && control.touched
+        ),
+      }"
+      [style.backgroundColor]="
+        control.invalid && control.touched ? '#ff00001a' : ''
+      ">
+      <input
+        [readOnly]="readOnly()"
+        [value]="value()"
+        class="flex w-full items-center border-none bg-transparent py-3 pl-4 pr-[42px] leading-none outline-none placeholder:text-black/60 dark:text-white dark:placeholder:text-[#64748b]"
+        [class.text-[#f33a58]]="
+          control.invalid && control.touched && control.dirty
+        "
+        [type]="inputType()"
+        [placeholder]="placeholder()"
+        [formControl]="control"
+        (blur)="handleTouched()" />
+      @if (control.invalid && control.touched && type() !== 'password') {
+        <i
+          class="fa-solid fa-triangle-exclamation absolute right-[14px] top-[20%] block animate-shake text-base text-[#f33a58]"></i>
+      } @else if (type() === 'password') {
+        @if (isShowPassword()) {
+          <span
+            class="material-symbols-outlined absolute right-[14px] top-[17%] block cursor-pointer text-lg text-[#64748b]"
+            (mousedown)="$event.preventDefault()"
+            (click)="
+              toggleShowPassword();
+              $event.stopPropagation();
+              $event.preventDefault()
+            ">
+            visibility
+          </span>
+        } @else {
+          <span
+            class="material-symbols-outlined absolute right-[14px] top-[17%] block cursor-pointer text-lg text-[#64748b]"
+            (mousedown)="$event.preventDefault()"
+            (click)="
+              toggleShowPassword();
+              $event.stopPropagation();
+              $event.preventDefault()
+            ">
+            visibility_off
+          </span>
+        }
+      }
+    </div>
+
+    @if (control.invalid && control.touched) {
+      <div class="ml-2 mt-2 font-medium leading-normal text-[#f33a58]">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <div
+      class="input-container"
+      [class.invalid]="control.invalid && control.touched"></div>
+  </div>
+</div>

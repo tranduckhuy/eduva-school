@@ -1,0 +1,15 @@
+<div class="my-6 flex items-center justify-between">
+  <h2 class="text-lg">{{ heading() }}</h2>
+  @if (heading() && showDate()) {
+    <div
+      class="flex items-center rounded-md border border-[#605dff] bg-[#ECF0FF] px-4 py-1 text-[#605dff]">
+      <span class="pi pi-calendar mb-[1px]"></span>
+      <span class="ml-2">Hôm nay&nbsp;-&nbsp;</span>
+      <span>{{ currentDate() }}</span>
+    </div>
+  }
+
+  @if (heading() && !showDate()) {
+    <app-breadcrumbs />
+  }
+</div>
