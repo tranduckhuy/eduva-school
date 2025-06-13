@@ -1,0 +1,6 @@
+::ng-deep .p-breadcrumb {
+  background-color: transparent !important;
+  padding-right: 0 !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}

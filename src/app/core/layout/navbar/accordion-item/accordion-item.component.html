@@ -1,0 +1,59 @@
+@if (type() === 'link') {
+  <div
+    class="accordion-item whitespace-nowrap text-textBlack dark:text-white"
+    [class.active]="isActive()">
+    <a
+      [href]="link()"
+      class="accordion-button flex w-full items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors ease-linear">
+      <i
+        class="material-symbols-rounded text-[22px] leading-none text-gray-500 dark:text-dark-100">
+        {{ icon() }}
+      </i>
+      @if (!isSidebarCollapsed()) {
+        <span>{{ label() }}</span>
+      }
+    </a>
+  </div>
+}
+
+@if (type() === 'accordion') {
+  <div
+    class="accordion-item whitespace-nowrap text-textBlack dark:text-white"
+    [class.active]="isActive()">
+    <button
+      class="accordion-button flex w-full items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors duration-200 ease-linear"
+      (click)="toggleAccordion()">
+      <i
+        class="material-symbols-rounded text-[22px] leading-none text-gray-500 dark:text-dark-100">
+        {{ icon() }}
+      </i>
+      @if (!isSidebarCollapsed()) {
+        <span class="flex grow items-center justify-between">
+          {{ label() }}
+          <i
+            class="material-symbols-rounded text-lg leading-none text-gray-500 dark:text-dark-100"
+            [class.rotate-90]="isOpen()">
+            chevron_right
+          </i>
+        </span>
+      }
+    </button>
+    <div class="accordion-collapse mt-1" [class.hidden]="!isOpen()">
+      <ul>
+        @for (item of submenuItems(); track $index) {
+          <li>
+            <a
+              [href]="item.link"
+              class="submenu-link flex w-full items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors duration-200 ease-linear"
+              [class.active]="item.active">
+              <i class="material-symbols-rounded" style="font-size: 12px">
+                radio_button_unchecked
+              </i>
+              <span>{{ item.label }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+}

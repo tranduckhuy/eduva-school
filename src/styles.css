@@ -1,0 +1,200 @@
+@import '@angular/cdk/overlay-prebuilt.css';
+@import 'primeicons/primeicons.css';
+@import 'ckeditor5/ckeditor5.css';
+
+@import './assets/css/grid.css';
+@import './assets/fonts/Nunito/stylesheet.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  :root {
+    --color-orange-50: #fff5ed;
+    --color-orange-100: #ffe8d4;
+    --color-orange-200: #ffcea9;
+    --color-orange-300: #ffaa72;
+    --color-orange-400: #fe7a36;
+    --color-orange-500: #fd5812;
+    --color-orange-600: #ee3e08;
+    --color-orange-700: #c52b09;
+    --color-orange-800: #9c2410;
+
+    --color-purple-50: #faf5ff;
+    --color-purple-100: #f3e8ff;
+    --color-purple-200: #e9d5ff;
+    --color-purple-300: #d7b5fd;
+    --color-purple-400: #bf85fb;
+    --color-purple-500: #ad63f6;
+    --color-purple-600: #9135e8;
+    --color-purple-700: #7c24cc;
+
+    --color-gray-50: #f6f7f9;
+    --color-gray-100: #eceef2;
+    --color-gray-200: #d5d9e2;
+    --color-gray-300: #b1bbc8;
+    --color-gray-400: #8695aa;
+    --color-gray-500: #64748b;
+    --color-gray-600: #526077;
+    --color-gray-700: #434e61;
+    --color-gray-800: #3a4252;
+    --color-gray-900: #23272e;
+
+    --color-black: #3a4252;
+    --color-white: #ffffff;
+
+    --color-dark: #000000;
+
+    --color-primary-50: #f0f9ff;
+    --color-primary-100: #d9f0fb;
+    --color-primary-200: #b6e4f7;
+    --color-primary-300: #81d2f1;
+    --color-primary-400: #4dbfe9;
+    --color-primary-500: #2093e7;
+    --color-primary-600: #157cd9;
+    --color-primary-700: #115fb8;
+    --color-primary-800: #0e4b92;
+
+    --color-secondary-50: #f3f7ff;
+    --color-secondary-100: #e2ebfd;
+    --color-secondary-200: #cddcfb;
+    --color-secondary-300: #aed9f9;
+    --color-secondary-400: #7dc1f6;
+    --color-secondary-500: #3371ed;
+    --color-secondary-600: #265cd6;
+    --color-secondary-700: #1d48b3;
+    --color-secondary-800: #163990;
+
+    --color-success-50: #e6f4e9;
+    --color-success-100: #c1e6bd;
+    --color-success-200: #8edc82;
+    --color-success-300: #5ecc4a;
+    --color-success-400: #39b82b;
+    --color-success-500: #22c03c;
+    --color-success-600: #1b9c2f;
+    --color-success-700: #157824;
+    --color-success-900: #0d4a15;
+
+    --color-danger-50: #fff2f0;
+    --color-danger-100: #ffe1dd;
+    --color-danger-200: #ffc8c0;
+    --color-danger-300: #ffa294;
+    --color-danger-400: #ff6d57;
+    --color-danger-500: #ff4023;
+    --color-danger-600: #ec1f00;
+    --color-danger-700: #d71c00;
+
+    --color-warning-50: #fff8e1;
+    --color-warning-200: #ffe082;
+    --color-warning-400: #ffca28;
+    --color-warning-500: #ffc107;
+    --color-warning-600: #ffb300;
+    --color-warning-700: #ffa000;
+
+    --color-info-50: #e1f7fe;
+    --color-info-100: #b3ecfc;
+    --color-info-200: #80e0fa;
+    --color-info-300: #48d3f5;
+    --color-info-400: #0dcaf0;
+    --color-info-500: #00c1eb;
+    --color-info-600: #00b1d7;
+    --color-info-700: #009cbb;
+
+    /* Light Theme Colors */
+    --color-bg-primary: var(--color-white);
+    --color-bg-secondary: var(--color-gray-50);
+    --color-bg-third: var(--color-gray-50);
+
+    --color-border-primary: #f3f3f3;
+    --color-border-secondary: #e9edf6;
+
+    --color-text-primary: var(--color-dark);
+    --color-text-secondary: var(--color-gray-500);
+
+    --color-hover-primary: var(--color-primary-50);
+    --color-hover-secondary: var(--color-white);
+
+    --color-placeholder-primary: var(--color-gray-500);
+
+    --color-heading: var(--color-black);
+  }
+
+  html {
+    font-family: 'Nunito', sans-serif;
+  }
+
+  html.dark {
+    --color-bg-primary: #001027;
+    --color-bg-secondary: #15203c;
+    --color-bg-third: #071932;
+
+    --color-border-primary: #172036;
+    --color-border-secondary: #15203c;
+
+    --color-text-primary: var(--color-white);
+    --color-text-secondary: var(--color-gray-400);
+
+    --color-hover-primary: #15203c;
+    --color-hover-secondary: var(--color-dark);
+
+    --color-placeholder-primary: var(--color-gray-400);
+
+    --color-heading: var(--color-white);
+  }
+
+  html *::-webkit-scrollbar {
+    border-radius: 0;
+    width: 8px;
+    height: 8px;
+  }
+
+  html *::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  html *::-webkit-scrollbar-track {
+    border-radius: 0;
+    background-color: rgba(0, 0, 0, 0);
+  }
+
+  body {
+    font-size: 14px;
+    color: var(--color-black);
+    background-color: var(--color-bg-third);
+    line-height: 1.6;
+    text-rendering: optimizeSpeed;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .dark body {
+    color: #64748b;
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--color-heading);
+    font-weight: 700;
+  }
+}

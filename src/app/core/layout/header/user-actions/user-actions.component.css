@@ -1,0 +1,9 @@
+.action-btn {
+  position: relative;
+  top: 4px;
+  transition: color 0.2s ease;
+}
+
+.action-btn:hover .action-btn-icon {
+  color: var(--color-primary-500);
+}
