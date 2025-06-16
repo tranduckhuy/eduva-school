@@ -1,0 +1,95 @@
+<div
+  class="rounded border border-gray-100 bg-white p-4 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <div class="mb-2 flex items-center justify-between">
+    <h2 class="text-base font-medium">Thông tin giáo viên</h2>
+  </div>
+
+  <div
+    class="rounded border border-gray-200 p-6 dark:border-dark-500 dark:bg-dark-200">
+    <div class="e-row items-center">
+      <div class="e-col-2 e-col-xl-12 e-row-cols-md-1 lg:mb-4">
+        <div class="flex flex-col">
+          <div
+            class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+            Avatar
+          </div>
+          <img
+            [src]="teacher.avatarUrl"
+            alt="Avatar"
+            class="size-[140px] rounded object-cover" />
+        </div>
+      </div>
+
+      <div class="e-col-10 e-col-xl-12">
+        <div class="e-row e-row-cols-2 e-row-cols-md-1 e-gy-4">
+          <div class="e-col">
+            <app-form-control
+              label="Tên"
+              type="text"
+              [name]="'name'"
+              [(ngModel)]="name"
+              [readOnly]="true">
+            </app-form-control>
+          </div>
+          <div class="e-col">
+            <app-form-control
+              label="Email"
+              type="email"
+              [name]="'email'"
+              [(ngModel)]="email"
+              [readOnly]="true">
+            </app-form-control>
+          </div>
+          <div class="e-col">
+            <app-form-control
+              label="Số điện thoại"
+              type="tel"
+              [name]="'phone'"
+              [(ngModel)]="phoneNumber"
+              [readOnly]="true">
+            </app-form-control>
+          </div>
+          <div class="e-col">
+            <app-form-control
+              label="Ngày sinh"
+              type="text"
+              [name]="'dob'"
+              [(ngModel)]="dob"
+              [readOnly]="true">
+            </app-form-control>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="e-row e-row-cols-3 e-row-cols-lg-2 e-row-cols-md-1 !mt-6">
+      <div class="e-col">
+        <app-form-control
+          label="Trạng thái hoạt động"
+          type="text"
+          [name]="'status'"
+          [(ngModel)]="status"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+      <div class="e-col e-gy-md-4">
+        <app-form-control
+          label="Ngày tạo"
+          type="text"
+          [name]="'createdAt'"
+          [(ngModel)]="createdAt"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+      <div class="e-col e-gy-lg-4">
+        <app-form-control
+          label="Lần chỉnh sửa cuối cùng"
+          type="text"
+          [name]="'lastModifiedAt'"
+          [(ngModel)]="lastModifiedAt"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+    </div>
+  </div>
+</div>
