@@ -11,6 +11,17 @@ export const teachersRoute: Routes = [
     },
   },
   {
+    path: ':teacherId/update',
+    loadComponent: () =>
+      import('./update-teacher/update-teacher.component').then(
+        mod => mod.UpdateTeacherComponent
+      ),
+    data: {
+      heading: 'Cập nhật thông tin giáo viên',
+      breadcrumb: 'Cập nhật giáo viên',
+    },
+  },
+  {
     path: ':teacherId',
     loadComponent: () =>
       import('./teacher/teacher.component').then(mod => mod.TeacherComponent),
