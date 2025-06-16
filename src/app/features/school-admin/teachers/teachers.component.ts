@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 import { BadgeComponent } from '../../../shared/components/badge/badge.component';
@@ -6,6 +11,8 @@ import { ButtonComponent } from '../../../shared/components/button/button.compon
 import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
 import { TooltipModule } from 'primeng/tooltip';
 import { RouterLink } from '@angular/router';
+import { GlobalModalService } from '../../../shared/services/global-modal/global-modal.service';
+import { AddTeacherModalComponent } from './add-teacher-modal/add-teacher-modal.component';
 
 @Component({
   selector: 'app-teachers',
@@ -221,11 +228,16 @@ export class TeachersComponent {
       lastModifiedAt: new Date('2023-05-05'),
     },
   ];
+  private readonly globalModalService = inject(GlobalModalService);
 
   totalRecords = signal<number>(this.teachers.length);
   loading = signal<boolean>(false);
   first = signal<number>(0);
   rows = signal<number>(10);
+
+  get pagedTeachers() {
+    return this.teachers.slice(this.first(), this.first() + this.rows());
+  }
 
   loadProductsLazy(event: TableLazyLoadEvent) {}
 
@@ -258,7 +270,7 @@ export class TeachersComponent {
     return this.teachers ? this.first() === 0 : true;
   }
 
-  get pagedTeachers() {
-    return this.teachers.slice(this.first(), this.first() + this.rows());
+  openAddTeacherModal() {
+    this.globalModalService.open(AddTeacherModalComponent);
   }
 }

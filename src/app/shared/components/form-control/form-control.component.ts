@@ -51,13 +51,13 @@ export class FormControlComponent implements OnInit, ControlValueAccessor {
   value = input<string>('');
   readOnly = input<boolean>(false);
   isTextarea = input<boolean>(false);
-  rows = input<number>(3); // Thêm số dòng mặc định cho textarea
+  rows = input<number>(3);
   redirectLink = input<{ value: string; href: string }>({
     value: '',
     href: '#!',
   });
   placeholder = input<string>('');
-  options = input<Array<{ label: string; value: string }>>([]); // Thêm input options
+  options = input<Array<{ label: string; value: string }>>([]);
 
   // Custom select search state
   searchTerm = signal<string>('');
