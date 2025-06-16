@@ -12,13 +12,13 @@
     [lazy]="true"
     [first]="first()"
     [showCurrentPageReport]="true"
-    (onLazyLoad)="loadProductsLazy($event)"
+    [loading]="loading()"
     [totalRecords]="totalRecords()"
+    (onLazyLoad)="loadSchoolsLazy($event)"
+    (onPage)="pageChange($event)"
     currentPageReportTemplate="
       Hiển thị {first} đến {last} trên {totalRecords} trường
-    "
-    (onPage)="pageChange($event)"
-    [loading]="loading()">
+    ">
     <ng-template #header>
       <tr>
         <th scope="col" class="!text-center">STT</th>
@@ -38,11 +38,9 @@
         <td class="!text-center">
           <app-badge
             class="whitespace-nowrap"
-            [variant]="school.status === 'active' ? 'success' : 'destructive'"
-            >{{
-              school.status === 'active' ? 'Đang hoạt động' : 'Vô hiệu hóa'
-            }}</app-badge
-          >
+            [variant]="school.status === 'active' ? 'success' : 'destructive'">
+            {{ school.status === 'active' ? 'Đang hoạt động' : 'Vô hiệu hóa' }}
+          </app-badge>
         </td>
         <td class="!text-center">
           <div class="mr-4 flex items-center justify-center gap-2">
@@ -51,24 +49,24 @@
                 pTooltip="Xem chi tiết"
                 tooltipPosition="top"
                 [variant]="'light'"
-                class="material-symbols-outlined px-[8px] pb-[1px] pt-[6px] text-lg"
-                >visibility</app-button
-              >
+                class="material-symbols-outlined px-[8px] pb-[1px] pt-[6px] text-lg">
+                visibility
+              </app-button>
             </a>
             <app-button
               pTooltip="Chỉnh sửa"
               tooltipPosition="top"
               [variant]="'light'"
-              class="material-symbols-outlined px-[8px] pb-[1px] pt-[6px] text-lg"
-              >edit</app-button
-            >
+              class="material-symbols-outlined px-[8px] pb-[1px] pt-[6px] text-lg">
+              edit
+            </app-button>
             <app-button
               pTooltip="Vô hiệu hóa"
               tooltipPosition="top"
               [variant]="'light-danger'"
-              class="material-symbols-outlined px-[8px] pb-[1px] pt-[6px] text-lg"
-              >unarchive</app-button
-            >
+              class="material-symbols-outlined px-[8px] pb-[1px] pt-[6px] text-lg">
+              unarchive
+            </app-button>
           </div>
         </td>
       </tr>

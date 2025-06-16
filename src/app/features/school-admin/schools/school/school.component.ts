@@ -1,17 +1,18 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  input,
-  LOCALE_ID,
   OnInit,
+  input,
   signal,
+  LOCALE_ID,
 } from '@angular/core';
-import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
-import { FormsModule } from '@angular/forms';
-import { DatePipe, registerLocaleData } from '@angular/common';
-import localeVi from '@angular/common/locales/vi';
-import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import localeVi from '@angular/common/locales/vi';
+import { DatePipe, registerLocaleData } from '@angular/common';
+
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 
 const school = {
   id: 1,
@@ -33,7 +34,7 @@ registerLocaleData(localeVi);
 @Component({
   selector: 'app-school',
   standalone: true,
-  imports: [FormControlComponent, FormsModule, ButtonComponent, RouterLink],
+  imports: [RouterLink, FormsModule, FormControlComponent, ButtonComponent],
   templateUrl: './school.component.html',
   styleUrl: './school.component.css',
   providers: [DatePipe, { provide: LOCALE_ID, useValue: 'vi' }],

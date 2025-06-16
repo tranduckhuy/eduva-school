@@ -4,26 +4,30 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
+import { RouterLink } from '@angular/router';
+
+import { TooltipModule } from 'primeng/tooltip';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { School } from '../../../shared/models/school/school.model';
+
 import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
+
+import { School } from '../../../shared/models/school/school.model';
+
 import { BadgeComponent } from '../../../shared/components/badge/badge.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
-import { TooltipModule } from 'primeng/tooltip';
-import { RouterLink } from '@angular/router';
+import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 
 @Component({
   selector: 'app-schools',
   standalone: true,
   imports: [
-    SearchInputComponent,
+    RouterLink,
     TableModule,
+    TooltipModule,
     LeadingZeroPipe,
+    SearchInputComponent,
     BadgeComponent,
     ButtonComponent,
-    TooltipModule,
-    RouterLink,
   ],
   templateUrl: './schools.component.html',
   styleUrl: './schools.component.css',
@@ -323,7 +327,7 @@ export class SchoolsComponent implements OnInit {
     this.totalRecords.set(this.schools.length);
   }
 
-  loadProductsLazy(event: TableLazyLoadEvent) {
+  loadSchoolsLazy(event: TableLazyLoadEvent) {
     // const rows = event.rows ?? 10;
     // const first = event.first ?? 0;
     // const page = first / rows;

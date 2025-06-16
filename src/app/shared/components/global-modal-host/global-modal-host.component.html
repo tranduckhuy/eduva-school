@@ -1,0 +1,17 @@
+<div
+  class="fixed inset-0 z-[999] flex items-center justify-center overflow-x-hidden bg-[#00000080] transition-all"
+  [ngClass]="{
+    'invisible opacity-0': !isOpen,
+    'visible opacity-100': isOpen,
+  }"
+  (click)="close()">
+  <div
+    class="mx-auto flex max-h-[calc(100vh-40px)] min-h-full max-w-[550px] items-center transition-all"
+    [ngClass]="{
+      '-translate-y-2': !isOpen,
+      'translate-y-0': isOpen,
+    }"
+    (click)="$event.stopPropagation()">
+    <ng-container *ngComponentOutlet="component; injector: injector()" />
+  </div>
+</div>
