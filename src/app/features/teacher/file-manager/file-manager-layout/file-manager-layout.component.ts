@@ -9,12 +9,12 @@ import { FileManagerSidebarComponent } from './file-manager-sidebar/file-manager
   imports: [RouterOutlet, FileManagerSidebarComponent],
   template: `
     <div class="e-container-fluid px-0">
-      <div class="e-row">
-        <div class="e-col-3">
+      <div class="e-row e-g-lg-2">
+        <div class="e-col-3 e-col-lg-12">
           <file-manager-sidebar />
         </div>
 
-        <div class="e-col-9">
+        <div class="e-col-9 e-col-lg-12">
           <router-outlet />
         </div>
       </div>

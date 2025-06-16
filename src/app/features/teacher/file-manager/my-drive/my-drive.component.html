@@ -8,8 +8,9 @@
   <div
     class="rounded-lg bg-white px-0 shadow-main dark:border-dark-500 dark:bg-dark-200">
     <div class="p-[25px]">
-      <div class="flex items-center justify-between">
-        <div>
+      <div
+        class="flex items-center justify-between xs:flex-col xs:items-start xs:gap-y-2">
+        <div class="xs:w-full">
           <app-search-input (search)="onSearchTriggered(currentView())" />
         </div>
 
@@ -30,7 +31,7 @@
               <app-button
                 [variant]="'outline'"
                 (clicked)="backToLessonList()"
-                class="mr-3 border-primary bg-transparent !text-primary shadow-none hover:bg-primary hover:!text-white">
+                class="mr-3 border-primary bg-transparent !text-primary shadow-none hover:bg-primary hover:!text-white lg:mr-2 sm:mr-3">
                 <div class="flex items-center gap-2">
                   <span class="pi pi-angle-left"></span>
                   <span>Quay lại</span>
