@@ -1,13 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  HostListener,
   input,
   output,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { UserActionsComponent } from './user-actions/user-actions.component';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-header',
@@ -19,12 +18,6 @@ import { CommonModule } from '@angular/common';
 })
 export class HeaderComponent {
   isManuallyToggled = input<boolean>(true);
+  isSmallScreen = input<boolean>(false);
   toggleSidebar = output();
-
-  isSmallScreen: boolean = window.innerWidth < 992;
-
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    this.isSmallScreen = event.target.innerWidth < 992;
-  }
 }
