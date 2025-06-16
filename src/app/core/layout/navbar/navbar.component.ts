@@ -59,6 +59,14 @@ export class NavbarComponent {
           submenuItems: [],
         },
         {
+          label: 'Quản lý giáo viên',
+          icon: 'co_present',
+          link: '/school-admin/teachers',
+          type: 'link',
+          isActive: false,
+          submenuItems: [],
+        },
+        {
           label: 'Quản lý tài liệu',
           icon: 'folder_open',
           link: '/teacher/file-manager',

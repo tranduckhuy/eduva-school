@@ -9,25 +9,21 @@ export const schoolAdminRoutes: Routes = [
       ),
     children: [
       {
-        path: 'schools',
+        path: 'teachers',
         data: {
-          heading: 'School List',
-          breadcrumb: 'Schools',
+          heading: 'Danh sách giáo viên',
+          breadcrumb: 'Danh sách giáo viên',
         },
         loadComponent: () =>
-          import('./schools/schools.component').then(
-            mod => mod.SchoolsComponent
+          import('./teachers/teachers.component').then(
+            mod => mod.TeachersComponent
           ),
         children: [
           {
-            path: ':schoolId',
-            data: {
-              heading: 'School Detail',
-              breadcrumb: 'School Detail',
-            },
-            loadComponent: () =>
-              import('./schools/school/school.component').then(
-                mod => mod.SchoolComponent
+            path: 'teachers',
+            loadChildren: () =>
+              import('./teachers/teachers.routes').then(
+                mod => mod.teachersRoute
               ),
           },
         ],
