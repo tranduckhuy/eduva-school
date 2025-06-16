@@ -1,0 +1,8 @@
+.file-type-block {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 20px;
+  border-radius: 8px;
+  color: var(--color-heading);
+}

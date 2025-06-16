@@ -1,0 +1,73 @@
+<p-table
+  [value]="lessons()"
+  [tableStyle]="{ 'min-width': '50rem' }"
+  [paginator]="true"
+  [rows]="10"
+  [lazy]="true"
+  [scrollable]="true"
+  [scrollHeight]="'600px'"
+  [first]="first()"
+  [showCurrentPageReport]="true"
+  [totalRecords]="totalRecords()"
+  [loading]="loading()"
+  (onLazyLoad)="loadDataLazy($event)"
+  (onPage)="pageChange($event)"
+  currentPageReportTemplate="
+      Hiển thị {first} đến {last} trên {totalRecords} bài học
+    ">
+  <ng-template #header>
+    <tr>
+      <th scope="col" class="!min-w-[300px]" pFrozenColumn>Thư mục bài học</th>
+      <th scope="col" class="!min-w-[200px]">Người sở hữu</th>
+      <th scope="col" class="!min-w-[180px]">Lần sửa đổi cuối cùng</th>
+      <th scope="col" class="!min-w-[150px] !text-center">Kích thước tệp</th>
+      <th scope="col" class="!min-w-[180px] !text-center">Hành động</th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-lesson let-i="rowIndex">
+    <tr>
+      <td pFrozenColumn>
+        <div
+          (click)="viewMaterials.emit(lesson)"
+          class="group flex cursor-pointer select-none items-center gap-2">
+          <i class="material-symbols-outlined text-warning-500">folder</i>
+          <span class="transition-colors group-hover:text-primary">
+            {{ lesson.name }}
+          </span>
+        </div>
+      </td>
+      <td>{{ lesson.owner }}</td>
+      <td>{{ lesson.lastModified }}</td>
+      <td class="!text-center">--</td>
+      <td class="!text-center">
+        <div class="flex items-center justify-center gap-2">
+          <app-button
+            pTooltip="Xem chi tiết"
+            tooltipPosition="top"
+            [variant]="'outline'"
+            [size]="'xs'"
+            (clicked)="viewMaterials.emit(lesson)"
+            class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
+            visibility
+          </app-button>
+          <app-button
+            pTooltip="Chỉnh sửa"
+            tooltipPosition="top"
+            [variant]="'outline'"
+            [size]="'xs'"
+            class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-gray shadow-none hover:bg-transparent">
+            edit
+          </app-button>
+          <app-button
+            pTooltip="Chuyển vào thùng rác"
+            tooltipPosition="top"
+            [variant]="'outline'"
+            [size]="'xs'"
+            class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-danger shadow-none hover:bg-transparent">
+            delete
+          </app-button>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

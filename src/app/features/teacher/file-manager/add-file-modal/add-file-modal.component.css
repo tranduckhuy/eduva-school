@@ -1,0 +1,4 @@
+::ng-deep .p-fileupload-advanced {
+  border: 1px solid var(--color-border-secondary);
+  background-color: var(--color-bg-forth);
+}

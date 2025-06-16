@@ -18,6 +18,7 @@ import { LayoutHeadingService } from '../../../shared/services/layout-heading/la
 import { HeaderComponent } from '../header/header.component';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { LayoutHeadingComponent } from '../layout-heading/layout-heading.component';
+import { GlobalModalHostComponent } from '../../../shared/components/global-modal-host/global-modal-host.component';
 
 @Component({
   selector: 'app-main-layout',
@@ -29,6 +30,7 @@ import { LayoutHeadingComponent } from '../layout-heading/layout-heading.compone
     HeaderComponent,
     NavbarComponent,
     LayoutHeadingComponent,
+    GlobalModalHostComponent,
   ],
   template: `
     <div [ngClass]="isSidebarCollapsed() ? 'sidebar-collapsed' : ''">
@@ -56,11 +58,14 @@ import { LayoutHeadingComponent } from '../layout-heading/layout-heading.compone
         <main routeMetadata class="e-container-fluid mb-10 mt-[94px]">
           <div class="px-3">
             <app-layout-heading [heading]="heading()" />
+
             <router-outlet />
           </div>
         </main>
       </div>
     </div>
+
+    <app-global-modal-host />
   `,
   styleUrl: './main-layout.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

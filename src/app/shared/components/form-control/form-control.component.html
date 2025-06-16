@@ -1,15 +1,18 @@
 <div class="w-full overflow-hidden">
   <div class="w-full text-left">
     <div class="flex justify-between">
-      <label class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
-        {{ label() }}
-      </label>
+      @if (label()) {
+        <label
+          class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+          {{ label() }}
+        </label>
+      }
       @if (redirectLink()) {
         <a
           routerLink="{{ redirectLink().href }}"
-          class="mb-2 block font-semibold text-[#f33a58]"
-          >{{ redirectLink().value }}</a
-        >
+          class="mb-2 block font-semibold text-[#f33a58]">
+          {{ redirectLink().value }}
+        </a>
       }
     </div>
 

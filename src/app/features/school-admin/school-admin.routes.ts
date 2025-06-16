@@ -5,30 +5,32 @@ export const schoolAdminRoutes: Routes = [
     path: '',
     loadComponent: () =>
       import('../../core/layout/main-layout/main-layout.component').then(
-        (mod) => mod.MainLayoutComponent,
+        mod => mod.MainLayoutComponent
       ),
     children: [
       {
         path: 'schools',
-        loadComponent: () =>
-          import('./schools/schools.component').then(
-            (mod) => mod.SchoolsComponent,
-          ),
         data: {
           heading: 'School List',
           breadcrumb: 'Schools',
         },
-      },
-      {
-        path: 'schools/:schoolId',
         loadComponent: () =>
-          import('./schools/school/school.component').then(
-            (mod) => mod.SchoolComponent,
+          import('./schools/schools.component').then(
+            mod => mod.SchoolsComponent
           ),
-        data: {
-          heading: 'School Detail',
-          breadcrumb: 'School Detail',
-        },
+        children: [
+          {
+            path: ':schoolId',
+            data: {
+              heading: 'School Detail',
+              breadcrumb: 'School Detail',
+            },
+            loadComponent: () =>
+              import('./schools/school/school.component').then(
+                mod => mod.SchoolComponent
+              ),
+          },
+        ],
       },
     ],
   },
@@ -36,7 +38,7 @@ export const schoolAdminRoutes: Routes = [
     path: '',
     loadComponent: () =>
       import('../../core/layout/blank-layout/blank-layout.component').then(
-        (mod) => mod.BlankLayoutComponent,
+        mod => mod.BlankLayoutComponent
       ),
     children: [],
   },

@@ -1,0 +1,9 @@
+<div class="mt-5">
+  @if (currentView() === 'lesson') {
+    <lesson-table
+      [lessons]="lessons"
+      (viewMaterials)="viewChanged.emit('material')" />
+  } @else {
+    <material-table [materials]="materials" />
+  }
+</div>
