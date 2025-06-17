@@ -84,7 +84,7 @@ export class ButtonComponent {
     const variantClasses: Record<ButtonVariant, string> = {
       default: 'rounded',
       outline:
-        'border border-current bg-transparent hover:bg-current hover:text-white',
+        'border border-primary bg-white dark:bg-dark-200 !text-primary hover:!bg-primary hover:!text-white',
       rounded: 'rounded-full',
       light:
         'bg-primary-500/20 hover:!text-gray-50 !text-primary-500 hover:bg-primary-500',

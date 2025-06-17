@@ -49,6 +49,10 @@ export class GlobalModalHostComponent {
     return this.modalService.data();
   }
 
+  get modalClass() {
+    return this.modalService.modalClass();
+  }
+
   close() {
     this.modalService.close();
   }

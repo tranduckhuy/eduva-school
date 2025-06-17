@@ -10,6 +10,7 @@ import {
 interface ModalState {
   component: Type<unknown>;
   data?: unknown;
+  modalClass?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -28,12 +29,16 @@ export class GlobalModalService {
   private readonly _injector = signal<Injector | undefined>(undefined);
   readonly injector = this._injector.asReadonly();
 
+  private readonly _modalClass = signal<string>('');
+  readonly modalClass = this._modalClass.asReadonly();
+
   private lastComponent: Type<unknown> | null = null;
   private lastData: unknown = null;
 
-  open<T>(component: Type<T>, data?: unknown) {
+  open<T>(component: Type<T>, data?: unknown, modalClass?: string) {
     this._component.set(component);
     this._data.set(data ?? null);
+    this._modalClass.set(modalClass ?? '');
     this._isOpen.set(true);
 
     // Cache injector
