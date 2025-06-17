@@ -82,9 +82,11 @@ export class UpdateTeacherComponent {
     this.avatarUrl.set(this.teacher.avatarUrl);
     this.status.set(this.teacher.status);
     this.createdAt.set(this.formatDateVi(new Date(this.teacher.createdAt)));
-    this.lastModifiedAt.set(
-      this.formatDateVi(new Date(this.teacher.lastModifiedAt))
-    );
+    if (this.teacher.lastModifiedAt) {
+      this.lastModifiedAt.set(
+        this.formatDateVi(new Date(this.teacher.lastModifiedAt))
+      );
+    }
     this.selectedAvatarFile.set(null);
     this.selectedAvatarUrl.set(null);
   }

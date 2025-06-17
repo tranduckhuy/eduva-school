@@ -5,7 +5,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { GlobalModalService } from '../../../../shared/services/global-modal/global-modal.service';
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';

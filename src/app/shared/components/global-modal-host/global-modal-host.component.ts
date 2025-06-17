@@ -1,11 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Injector,
   DestroyRef,
   inject,
   effect,
-  Type,
 } from '@angular/core';
 import { NgComponentOutlet, CommonModule } from '@angular/common';
 

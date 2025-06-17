@@ -129,7 +129,7 @@ export class ImportAccountModalsComponent {
 
     const formData = new FormData();
     const blob = this.fileBlob()!;
-    const fileName = this.file()?.name || 'imported_data';
+    const fileName = this.file()?.name ?? 'imported_data';
 
     formData.append('file', blob, fileName);
 

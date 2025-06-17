@@ -66,8 +66,10 @@ export class TeacherComponent {
       this.teacher.status === 'active' ? 'Đang hoạt động' : 'Vô hiệu hóa'
     );
     this.createdAt.set(this.formatDateVi(new Date(this.teacher.createdAt!)));
-    this.lastModifiedAt.set(
-      this.formatDateVi(new Date(this.teacher.lastModifiedAt!))
-    );
+    if (this.teacher.lastModifiedAt) {
+      this.lastModifiedAt.set(
+        this.formatDateVi(new Date(this.teacher.lastModifiedAt))
+      );
+    }
   }
 }

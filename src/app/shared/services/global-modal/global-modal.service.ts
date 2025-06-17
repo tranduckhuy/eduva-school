@@ -1,11 +1,4 @@
-import {
-  Injectable,
-  Injector,
-  Type,
-  computed,
-  inject,
-  signal,
-} from '@angular/core';
+import { Injectable, Injector, Type, inject, signal } from '@angular/core';
 
 interface ModalState {
   component: Type<unknown>;
