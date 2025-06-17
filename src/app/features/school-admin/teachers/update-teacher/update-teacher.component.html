@@ -3,7 +3,7 @@
   <form #updateForm="ngForm" (ngSubmit)="onSubmit(updateForm)">
     <div class="mb-2 flex items-center justify-between">
       <h2 class="text-base font-medium">Thông tin giáo viên</h2>
-      <app-button [variant]="'light'" [type]="'submit'"
+      <app-button [variant]="'outline'" [type]="'submit'"
         >Lưu thông tin</app-button
       >
     </div>
@@ -146,6 +146,21 @@
             [(ngModel)]="lastModifiedAt"
             [readOnly]="true">
           </app-form-control>
+        </div>
+        <div class="e-col-12 form-group">
+          <div class="checkbox flex flex-col text-left">
+            <input
+              type="checkbox"
+              id="isContentModerator"
+              name="isContentModerator"
+              [(ngModel)]="isContentModerator"
+              hidden />
+            <label
+              class="relative ml-1 flex items-center gap-[6px] pt-2 font-semibold"
+              for="isContentModerator">
+              <span for="isContentModerator">Trở thành content moderator</span>
+            </label>
+          </div>
         </div>
       </div>
     </div>

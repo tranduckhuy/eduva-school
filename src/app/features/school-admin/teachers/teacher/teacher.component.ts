@@ -9,13 +9,15 @@ import { DatePipe, registerLocaleData } from '@angular/common';
 import localeVi from '@angular/common/locales/vi';
 import { FormsModule } from '@angular/forms';
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { RouterLink } from '@angular/router';
 
 registerLocaleData(localeVi);
 
 @Component({
   selector: 'app-teacher',
   standalone: true,
-  imports: [FormControlComponent, FormsModule],
+  imports: [FormControlComponent, FormsModule, ButtonComponent, RouterLink],
   templateUrl: './teacher.component.html',
   styleUrl: './teacher.component.css',
   providers: [DatePipe, { provide: LOCALE_ID, useValue: 'vi' }],
@@ -34,6 +36,7 @@ export class TeacherComponent {
     status: 'active',
     createdAt: new Date('2020-01-15'),
     lastModifiedAt: new Date('2023-04-10'),
+    isContentModerator: true,
   };
 
   teacherId = input.required<string>();
@@ -48,6 +51,7 @@ export class TeacherComponent {
   status = signal<string>('');
   createdAt = signal<string>('');
   lastModifiedAt = signal<string>('');
+  isContentModerator = signal<boolean>(false);
 
   constructor(private readonly datePipe: DatePipe) {}
 
@@ -71,5 +75,6 @@ export class TeacherComponent {
         this.formatDateVi(new Date(this.teacher.lastModifiedAt))
       );
     }
+    this.isContentModerator.set(this.teacher.isContentModerator);
   }
 }

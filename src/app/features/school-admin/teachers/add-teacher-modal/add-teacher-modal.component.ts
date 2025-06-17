@@ -27,6 +27,7 @@ export class AddTeacherModalComponent {
   email = signal<string>('');
   password = signal<string>('');
   confirmPassword = signal<string>('');
+  isContentModerator = signal<boolean>(false);
 
   // function
   onSubmit(form: NgForm) {

@@ -42,6 +42,7 @@ export class UpdateTeacherComponent {
     status: 'active',
     createdAt: new Date('2020-01-15'),
     lastModifiedAt: new Date('2023-04-10'),
+    isContentModerator: true,
   };
 
   teacherId = input.required<string>();
@@ -56,6 +57,7 @@ export class UpdateTeacherComponent {
   status = signal<string>('');
   createdAt = signal<string>('');
   lastModifiedAt = signal<string>('');
+  isContentModerator = signal<boolean>(false);
 
   submitted = signal<boolean>(false);
 
@@ -89,6 +91,7 @@ export class UpdateTeacherComponent {
     }
     this.selectedAvatarFile.set(null);
     this.selectedAvatarUrl.set(null);
+    this.isContentModerator.set(this.teacher.isContentModerator);
   }
 
   onAvatarChange(event: Event) {
