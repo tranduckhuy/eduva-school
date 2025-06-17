@@ -23,9 +23,9 @@
         accept=".xlsx,.xls,.csv" />
 
       <div
-        class="flex w-[550px] flex-col items-center justify-center gap-4 p-8">
-        <i class="pi pi-upload text-4xl text-gray-400"></i>
-        <p class="text-center text-gray-600">
+        class="flex w-[550px] flex-col items-center justify-center gap-4 p-8 sm:w-full">
+        <i class="pi pi-upload text-4xl text-gray-400 dark:text-dark-100"></i>
+        <p class="text-center text-gray-600 dark:text-dark-100">
           Kéo và thả file vào đây hoặc
           <button
             type="button"
@@ -34,16 +34,19 @@
             chọn file
           </button>
         </p>
-        <p class="text-sm text-gray-400">
+        <p class="text-sm text-gray-400 dark:text-dark-100">
           Chấp nhận file .xlsx, .xls hoặc .csv
         </p>
       </div>
     </div>
 
     @if (file()) {
-      <div class="mt-4 flex items-center gap-2 rounded bg-gray-50 p-3">
+      <div
+        class="mt-4 flex items-center gap-2 rounded bg-gray-50 p-3 dark:bg-dark-200">
         <i class="pi pi-file text-xl text-gray-600"></i>
-        <span class="flex-1 truncate">{{ file()?.name }}</span>
+        <span class="flex-1 truncate dark:text-dark-100">{{
+          file()?.name
+        }}</span>
         <button
           type="button"
           class="text-red-500 hover:text-red-600"
@@ -61,7 +64,7 @@
   </div>
 
   <div
-    class="sticky bottom-0 left-0 z-[1] flex justify-end gap-2 bg-white p-[25px] dark:bg-dark-300">
+    class="sticky bottom-0 left-0 z-[1] flex justify-end gap-2 rounded bg-white p-[25px] dark:bg-dark-300">
     <p-button
       label="Hủy"
       variant="outlined"
