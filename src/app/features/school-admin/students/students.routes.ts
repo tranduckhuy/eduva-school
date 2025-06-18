@@ -10,17 +10,17 @@ export const studentsRoute: Routes = [
       breadcrumb: 'Danh sách học sinh',
     },
   },
-  // {
-  //   path: ':studentId/update',
-  //   loadComponent: () =>
-  //     import('./update-student/update-student.component').then(
-  //       mod => mod.UpdateStudentComponent
-  //     ),
-  //   data: {
-  //     heading: 'Cập nhật thông tin học sinh',
-  //     breadcrumb: 'Cập nhật học sinh',
-  //   },
-  // },
+  {
+    path: ':studentId/update',
+    loadComponent: () =>
+      import('./update-student/update-student.component').then(
+        mod => mod.UpdateStudentComponent
+      ),
+    data: {
+      heading: 'Cập nhật thông tin học sinh',
+      breadcrumb: 'Cập nhật học sinh',
+    },
+  },
   {
     path: ':studentId',
     loadComponent: () =>
