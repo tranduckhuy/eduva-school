@@ -67,6 +67,14 @@ export class NavbarComponent {
           submenuItems: [],
         },
         {
+          label: 'Quản lý học sinh',
+          icon: 'person_edit',
+          link: '/school-admin/students',
+          type: 'link',
+          isActive: false,
+          submenuItems: [],
+        },
+        {
           label: 'Quản lý tài liệu',
           icon: 'folder_open',
           link: '/teacher/file-manager',
