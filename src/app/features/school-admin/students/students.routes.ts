@@ -21,13 +21,13 @@ export const studentsRoute: Routes = [
   //     breadcrumb: 'Cập nhật học sinh',
   //   },
   // },
-  // {
-  //   path: ':studentId',
-  //   loadComponent: () =>
-  //     import('./student/student.component').then(mod => mod.StudentComponent),
-  //   data: {
-  //     heading: 'Chi tiết học sinh',
-  //     breadcrumb: 'Chi tiết học sinh',
-  //   },
-  // },
+  {
+    path: ':studentId',
+    loadComponent: () =>
+      import('./student/student.component').then(mod => mod.StudentComponent),
+    data: {
+      heading: 'Chi tiết học sinh',
+      breadcrumb: 'Chi tiết học sinh',
+    },
+  },
 ];

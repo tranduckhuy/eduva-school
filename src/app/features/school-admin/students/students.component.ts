@@ -13,6 +13,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { RouterLink } from '@angular/router';
 import { GlobalModalService } from '../../../shared/services/global-modal/global-modal.service';
 import { ImportAccountsComponent } from '../../../shared/components/import-accounts/import-accounts.component';
+import { AddStudentModalComponent } from './add-student-modal/add-student-modal.component';
 
 @Component({
   selector: 'app-students',
@@ -271,7 +272,7 @@ export class StudentsComponent {
     return this.students ? this.first() === 0 : true;
   }
 
-  openAddTeacherModal() {
-    // this.globalModalService.open();
+  openAddStudentModal() {
+    this.globalModalService.open(AddStudentModalComponent);
   }
 }
