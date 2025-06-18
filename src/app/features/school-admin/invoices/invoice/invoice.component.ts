@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, LOCALE_ID } from '@angular/core';
 import { CurrencyPipe, DatePipe, registerLocaleData } from '@angular/common';
 import localeVi from '@angular/common/locales/vi';
 import { TableModule } from 'primeng/table';
+import { ExportInvoicePdfComponent } from '../export-invoice-pdf/export-invoice-pdf.component';
 
 interface Invoice {
   id: number;
@@ -37,7 +38,7 @@ registerLocaleData(localeVi);
 @Component({
   selector: 'app-invoice',
   standalone: true,
-  imports: [CurrencyPipe, DatePipe, TableModule],
+  imports: [CurrencyPipe, DatePipe, TableModule, ExportInvoicePdfComponent],
   templateUrl: './invoice.component.html',
   styleUrl: './invoice.component.css',
   providers: [DatePipe, { provide: LOCALE_ID, useValue: 'vi' }],
