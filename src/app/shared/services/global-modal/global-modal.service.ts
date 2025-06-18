@@ -1,4 +1,5 @@
 import { Injectable, Injector, Type, inject, signal } from '@angular/core';
+import { MODAL_DATA } from '../../constants/modal-data.token';
 
 interface ModalState {
   component: Type<unknown>;
@@ -38,7 +39,7 @@ export class GlobalModalService {
     if (this.lastComponent !== component || this.lastData !== data) {
       this._injector.set(
         Injector.create({
-          providers: [{ provide: 'MODAL_DATA', useValue: data }],
+          providers: [{ provide: MODAL_DATA, useValue: data }],
           parent: this.rootInjector,
         })
       );

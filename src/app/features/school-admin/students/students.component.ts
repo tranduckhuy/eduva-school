@@ -26,6 +26,7 @@ import { AddStudentModalComponent } from './add-student-modal/add-student-modal.
     LeadingZeroPipe,
     TooltipModule,
     RouterLink,
+    ImportAccountsComponent,
   ],
   templateUrl: './students.component.html',
   styleUrl: './students.component.css',

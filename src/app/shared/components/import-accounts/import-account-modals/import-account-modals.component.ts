@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { GlobalModalService } from '../../../services/global-modal/global-modal.service';
 import { ButtonModule } from 'primeng/button';
+import { MODAL_DATA } from '../../../constants/modal-data.token';
 
 @Component({
   selector: 'app-import-account-modals',
@@ -19,7 +20,7 @@ import { ButtonModule } from 'primeng/button';
 })
 export class ImportAccountModalsComponent {
   private readonly globalModalService = inject(GlobalModalService);
-
+  readonly modalData = inject(MODAL_DATA);
   // View references
   fileInput = viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
 

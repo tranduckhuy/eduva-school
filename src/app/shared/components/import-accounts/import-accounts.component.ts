@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+} from '@angular/core';
 import { ButtonComponent } from '../button/button.component';
 import { GlobalModalService } from '../../services/global-modal/global-modal.service';
 import { ImportAccountModalsComponent } from './import-account-modals/import-account-modals.component';
@@ -14,10 +19,14 @@ import { ImportAccountModalsComponent } from './import-account-modals/import-acc
 export class ImportAccountsComponent {
   private readonly globalModalService = inject(GlobalModalService);
 
+  // input
+  readonly title = input<string>();
   openModal() {
     this.globalModalService.open(
       ImportAccountModalsComponent,
-      '',
+      {
+        title: this.title(),
+      },
       'max-w-[800px]'
     );
   }
