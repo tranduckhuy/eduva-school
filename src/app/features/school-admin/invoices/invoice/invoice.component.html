@@ -1,0 +1,160 @@
+<div class="e-row e-g-4 e-g-md-6">
+  <div class="e-col-12">
+    <div
+      class="rounded border border-gray-100 bg-white shadow-main dark:border-dark-500 dark:bg-dark-200">
+      <div
+        class="flex items-center justify-between border-b border-gray-100 p-5 dark:border-gray-800">
+        <a href="/" class="flex items-center gap-2">
+          <img
+            src="./images/logo.png"
+            alt="EDUVA"
+            class="size-8 rounded-md object-contain" />
+          <span class="text-base font-bold leading-none dark:text-white"
+            >EDUVA INVOICE:
+            <span class="text-primary">#{{ invoice.id }}</span></span
+          >
+        </a>
+      </div>
+
+      <div class="p-5">
+        <div class="e-row mb-6">
+          <div
+            class="e-col-4 e-col-xl-5 e-col-lg-6 e-col-md-12 dark:text-[#ffffff80]">
+            <p class="mb-2 text-[15px] font-semibold dark:text-[#ffffffB3]">
+              Hóa đơn từ:
+            </p>
+            <p class="mb-2 text-[15px] font-bold text-dark-900 dark:text-white">
+              EDUVA
+            </p>
+            <p class="mb-2 text-[15px]">
+              <span class="font-semibold dark:text-[#ffffffB3]">Địa chỉ:</span>
+              thành phố Quy Nhơn, tỉnh Bình Định
+            </p>
+            <p class="mb-2 text-[15px]">
+              <span class="font-semibold dark:text-[#ffffffB3]"
+                >Số điện thoại:</span
+              >
+              01234543234
+            </p>
+            <p class="mb-2 text-[15px]">
+              <span class="font-semibold dark:text-[#ffffffB3]">Email:</span>
+              eduva&#64;gmail.com
+            </p>
+          </div>
+          <div
+            class="e-col-4 e-col-xl-5 e-col-lg-6 e-col-md-12 ml-auto dark:text-[#ffffff80]">
+            <p class="mb-2 text-[15px] font-semibold dark:text-[#ffffffB3]">
+              Hóa đơn đến:
+            </p>
+            <p class="mb-2 text-[15px] font-bold text-dark-900 dark:text-white">
+              {{ invoice.client.name }}
+            </p>
+            <p class="mb-2 text-[15px]">
+              <span class="font-semibold dark:text-[#ffffffB3]"
+                >Số điện thoại:</span
+              >
+              {{ invoice.client.phoneNumber }}
+            </p>
+            <p class="mb-2 text-[15px]">
+              <span class="font-semibold dark:text-[#ffffffB3]">Email:</span>
+              {{ invoice.client.email }}
+            </p>
+            <p class="mb-2 text-[15px]">
+              <span class="font-semibold dark:text-[#ffffffB3]">Trường:</span>
+              {{ invoice.school.name }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="e-row e-row-cols-4 e-row-cols-md-12 e-row-cols-lg-2 e-g-4 mb-6 dark:text-[#ffffff80]">
+          <div class="e-col">
+            <p class="mb-2 text-[15px] font-semibold dark:text-[#ffffffB3]">
+              Mã hóa đơn:
+            </p>
+            <p class="mb-2 text-[15px]">#{{ invoice.id }}</p>
+          </div>
+          <div class="e-col">
+            <p class="mb-2 text-[15px] font-semibold dark:text-[#ffffffB3]">
+              Ngày bắt đầu:
+            </p>
+            <p class="mb-2 text-[15px]">
+              {{ invoice.startDate | date: 'medium' }}
+            </p>
+          </div>
+          <div class="e-col">
+            <p class="mb-2 text-[15px] font-semibold dark:text-[#ffffffB3]">
+              Ngày kết thúc:
+            </p>
+            <p class="mb-2 text-[15px]">
+              {{ invoice.endDate | date: 'mediumDate' }}
+            </p>
+          </div>
+          <div class="e-col">
+            <p class="mb-2 text-[15px] font-semibold dark:text-[#ffffffB3]">
+              Tổng tiền:
+            </p>
+            <p class="mb-2 text-[15px]">
+              {{
+                invoice.amount | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN'
+              }}
+            </p>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table
+            class="table w-full min-w-[800px] table-auto text-left dark:text-[#ffffffB3]">
+            <thead>
+              <tr>
+                <th class="w-[5%] whitespace-nowrap !text-center">STT</th>
+                <th class="w-[15%] whitespace-nowrap">Tên gói</th>
+                <th class="w-[10%] whitespace-nowrap">Lưu trữ</th>
+                <th class="w-[10%] whitespace-nowrap">Tài khoản</th>
+                <th class="w-[10%] whitespace-nowrap">Credit</th>
+                <th class="w-[10%] whitespace-nowrap">Loại</th>
+                <th class="w-[10%] whitespace-nowrap">Giá</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-center">01</td>
+                <td>{{ invoice.pricingPlan.name }}</td>
+                <td>{{ invoice.pricingPlan.storageLimit }}</td>
+                <td>{{ invoice.pricingPlan.maxAccounts }}</td>
+                <td>{{ invoice.pricingPlan.creditLimit }}</td>
+                <td>
+                  {{
+                    invoice.pricingPlan.billingCycle === 'monthly'
+                      ? 'Tháng'
+                      : 'Năm'
+                  }}
+                </td>
+                <td>
+                  {{
+                    invoice.pricingPlan.price
+                      | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN'
+                  }}
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Tổng:</td>
+                <td class="text-lg font-bold text-success-500">
+                  {{
+                    invoice.pricingPlan.price
+                      | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN'
+                  }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="e-col-3 e-col-lg-12"></div>
+  </div>
+</div>

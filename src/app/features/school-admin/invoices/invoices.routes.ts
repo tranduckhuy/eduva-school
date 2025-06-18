@@ -10,13 +10,13 @@ export const invoicesRoute: Routes = [
       breadcrumb: 'Danh sách hóa đơn',
     },
   },
-  // {
-  //   path: ':invoiceId',
-  //   loadComponent: () =>
-  //     import('./invoice/invoice.component').then(mod => mod.InvoiceComponent),
-  //   data: {
-  //     heading: 'Chi tiết hóa đơn',
-  //     breadcrumb: 'Chi tiết hóa đơn',
-  //   },
-  // },
+  {
+    path: ':invoiceId',
+    loadComponent: () =>
+      import('./invoice/invoice.component').then(mod => mod.InvoiceComponent),
+    data: {
+      heading: 'Chi tiết hóa đơn',
+      breadcrumb: 'Chi tiết hóa đơn',
+    },
+  },
 ];
