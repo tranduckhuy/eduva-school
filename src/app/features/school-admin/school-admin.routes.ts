@@ -18,6 +18,11 @@ export const schoolAdminRoutes: Routes = [
         loadChildren: () =>
           import('./students/students.routes').then(mod => mod.studentsRoute),
       },
+      {
+        path: 'invoices',
+        loadChildren: () =>
+          import('./invoices/invoices.routes').then(mod => mod.invoicesRoute),
+      },
     ],
   },
   {

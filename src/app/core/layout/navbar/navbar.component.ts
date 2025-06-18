@@ -75,6 +75,14 @@ export class NavbarComponent {
           submenuItems: [],
         },
         {
+          label: 'Quản lý hóa đơn',
+          icon: 'receipt_long',
+          link: '/school-admin/invoices',
+          type: 'link',
+          isActive: false,
+          submenuItems: [],
+        },
+        {
           label: 'Quản lý tài liệu',
           icon: 'folder_open',
           link: '/teacher/file-manager',
