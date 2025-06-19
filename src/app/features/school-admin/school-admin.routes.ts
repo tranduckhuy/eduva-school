@@ -28,6 +28,13 @@ export const schoolAdminRoutes: Routes = [
         loadChildren: () =>
           import('./lessons/lessons.routes').then(mod => mod.lessonsRoute),
       },
+      {
+        path: 'moderate-lessons',
+        loadChildren: () =>
+          import('./moderate-lessons/moderate-lessons.routes').then(
+            mod => mod.moderateLessonsRoute
+          ),
+      },
     ],
   },
   {
