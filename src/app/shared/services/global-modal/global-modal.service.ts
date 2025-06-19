@@ -1,5 +1,7 @@
 import { Injectable, Injector, Type, inject, signal } from '@angular/core';
 
+import { MODAL_DATA } from '../../constants/modal-data.token';
+
 @Injectable({ providedIn: 'root' })
 export class GlobalModalService {
   private readonly rootInjector = inject(Injector);
@@ -22,7 +24,7 @@ export class GlobalModalService {
   private lastComponent: Type<unknown> | null = null;
   private lastData: unknown = null;
 
-  open<T, D = unknown>(component: Type<T>, data?: D) {
+  open<T, D = unknown>(component: Type<T>, data?: D, modalClass?: string) {
     this._component.set(component);
     this._data.set(data ?? null);
     this._modalClass.set(modalClass ?? '');

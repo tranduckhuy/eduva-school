@@ -28,6 +28,7 @@ type UploadModalData = {
 })
 export class UploadResourcesModalComponent {
   private readonly modalService = inject(GlobalModalService);
+
   fileUploaded = output<{ fileName: string; lastModified: number }>();
 
   get modalData(): UploadModalData {
