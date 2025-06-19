@@ -1,50 +1,96 @@
 <div class="w-full overflow-hidden">
   <div class="w-full text-left">
     <div class="flex justify-between">
-      @if (label()) {
-        <label
-          class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
-          {{ label() }}
-        </label>
-      }
+      <label class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+        {{ label() }}
+      </label>
       @if (redirectLink()) {
         <a
           routerLink="{{ redirectLink().href }}"
-          class="mb-2 block font-semibold text-[#f33a58]">
-          {{ redirectLink().value }}
-        </a>
+          class="mb-2 block font-semibold text-[#f33a58]"
+          >{{ redirectLink().value }}</a
+        >
       }
     </div>
-
     <div
-      class="relative flex h-[44px] overflow-hidden rounded-md border-[1.5px] bg-white dark:bg-dark-300"
+      class="relative flex overflow-hidden rounded-md border-[1.5px] bg-white dark:bg-dark-300"
       [ngClass]="{
+        'h-[44px]': !isTextarea(),
         'border-[#f33a58] dark:border-[#f33a58]':
-          control.invalid && control.touched,
+          control.invalid && (control.touched || submitted()),
         'focus-within:border-[#f33a58] dark:border-[#f33a58]':
-          control.invalid && control.touched,
+          control.invalid && (control.touched || submitted()),
         'border-gray-200 dark:border-gray-900': !(
-          control.invalid && control.touched
+          control.invalid &&
+          (control.touched || submitted())
         ),
+        'focus-within:border-primary':
+          !control.invalid || (!control.touched && !submitted()),
+        'bg-[#e1e6f2]': readOnly() === true,
       }"
       [style.backgroundColor]="
-        control.invalid && control.touched ? '#ff00001a' : ''
+        control.invalid && (control.touched || submitted()) ? '#ff00001a' : ''
       ">
-      <input
-        [readOnly]="readOnly()"
-        [value]="value()"
-        class="flex w-full items-center border-none bg-transparent py-3 pl-4 pr-[42px] leading-none outline-none placeholder:text-black/60 dark:text-white dark:placeholder:text-[#64748b]"
-        [class.text-[#f33a58]]="
-          control.invalid && control.touched && control.dirty
-        "
-        [type]="inputType()"
-        [placeholder]="placeholder()"
-        [formControl]="control"
-        (blur)="handleTouched()" />
-      @if (control.invalid && control.touched && type() !== 'password') {
+      @if (options() && options().length > 0) {
+        <div class="custom-options-container relative w-full">
+          <input
+            *ngIf="showSearchBox"
+            type="text"
+            class="mb-2 w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary dark:bg-dark-200 dark:text-white"
+            placeholder="Tìm kiếm..."
+            [value]="searchTerm()"
+            (input)="onSearchInput($event)" />
+          <select
+            [formControl]="control"
+            class="custom-select flex w-full items-center border-none bg-transparent py-3 pl-4 pr-[42px] leading-none outline-none placeholder:text-black/60 dark:!bg-dark-400 dark:!text-white dark:text-white dark:placeholder:text-[#64748b]"
+            (blur)="handleTouched()">
+            <option value="" disabled selected hidden>
+              {{ placeholder() }}
+            </option>
+            <option
+              *ngFor="let opt of filteredOptions()"
+              [value]="opt.value"
+              class="custom-option-inner !rounded-none !border-none dark:!bg-dark-400 dark:!text-white">
+              {{ opt.label }}
+            </option>
+          </select>
+        </div>
+      } @else if (isTextarea()) {
+        <textarea
+          [readOnly]="readOnly()"
+          [value]="value()"
+          class="flex max-h-[300px] min-h-[120px] w-full resize-y overflow-y-auto border-none bg-transparent py-3 pl-4 pr-[42px] leading-normal outline-none placeholder:text-black/60 dark:text-white dark:placeholder:text-[#64748b]"
+          [class.text-[#f33a58]]="
+            control.invalid && control.touched && control.dirty
+          "
+          [placeholder]="placeholder()"
+          [formControl]="control"
+          [rows]="rows()"
+          (blur)="handleTouched()"></textarea>
+      } @else {
+        <input
+          [readOnly]="readOnly()"
+          [value]="value()"
+          class="flex w-full items-center border-none bg-transparent py-3 pl-4 pr-[42px] leading-none outline-none placeholder:text-black/60 dark:text-white dark:placeholder:text-[#64748b]"
+          [class.text-[#f33a58]]="
+            control.invalid && control.touched && control.dirty
+          "
+          [type]="inputType()"
+          [placeholder]="placeholder()"
+          [formControl]="control"
+          (blur)="handleTouched()" />
+      }
+      @if (
+        control.invalid &&
+        (control.touched || submitted()) &&
+        type() !== 'password' &&
+        (!options() || options().length === 0)
+      ) {
         <i
           class="fa-solid fa-triangle-exclamation absolute right-[14px] top-[20%] block animate-shake text-base text-[#f33a58]"></i>
-      } @else if (type() === 'password') {
+      } @else if (
+        type() === 'password' && (!options() || options().length === 0)
+      ) {
         @if (isShowPassword()) {
           <span
             class="material-symbols-outlined absolute right-[14px] top-[17%] block cursor-pointer text-lg text-[#64748b]"
@@ -71,14 +117,12 @@
       }
     </div>
 
-    @if (control.invalid && control.touched) {
-      <div class="ml-2 mt-2 font-medium leading-normal text-[#f33a58]">
+    @if (
+      (control.invalid && control.touched) || (control.invalid && submitted())
+    ) {
+      <div class="mt-2 font-medium leading-normal text-[#f33a58]">
         {{ errorMessage }}
       </div>
     }
-
-    <div
-      class="input-container"
-      [class.invalid]="control.invalid && control.touched"></div>
   </div>
 </div>

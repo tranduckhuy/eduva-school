@@ -1,0 +1,153 @@
+<div
+  class="rounded border border-gray-100 bg-white p-4 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <form #updateForm="ngForm" (ngSubmit)="onSubmit(updateForm)">
+    <div class="mb-2 flex items-center justify-between">
+      <h2 class="text-base font-medium">Chỉnh sửa thông tin học sinh</h2>
+      <app-button [variant]="'outline'" [type]="'submit'"
+        >Lưu thông tin</app-button
+      >
+    </div>
+
+    <div
+      class="rounded border border-gray-200 p-6 dark:border-dark-500 dark:bg-dark-200">
+      <div class="e-row items-center">
+        <div class="e-col-2 e-col-xl-12 e-row-cols-md-1 lg:mb-4">
+          <div class="relative flex max-w-[140px] flex-col">
+            <div
+              class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+              Avatar
+            </div>
+            <img
+              *ngIf="!selectedAvatarUrl; else previewBlock"
+              [src]="student.avatarUrl"
+              alt="Avatar"
+              class="size-[140px] rounded object-cover" />
+            <ng-template #previewBlock>
+              <div class="relative">
+                <img
+                  [src]="selectedAvatarUrl() || student.avatarUrl"
+                  alt="Avatar preview"
+                  class="size-[140px] rounded object-cover" />
+                @if (selectedAvatarUrl()) {
+                  <button
+                    pTooltip="Bỏ chọn"
+                    tooltipPosition="top"
+                    type="button"
+                    (click)="removeSelectedAvatar()"
+                    class="absolute right-0 top-0 rounded rounded-br-none rounded-tl-none bg-gray-100 p-1 px-[6px] leading-none shadow transition-opacity duration-200 hover:opacity-90">
+                    <span
+                      class="material-symbols-outlined relative bottom-[-2px] text-sm leading-none dark:text-dark-800"
+                      >close</span
+                    >
+                  </button>
+                }
+              </div>
+            </ng-template>
+            <input
+              type="file"
+              #avatarInput
+              accept="image/*"
+              class="hidden"
+              (change)="onAvatarChange($event)" />
+            <div
+              pTooltip="Chọn ảnh"
+              tooltipPosition="top"
+              class="absolute bottom-0 right-0 flex cursor-pointer items-center justify-center rounded rounded-bl-none rounded-tr-none bg-gray-100 px-[6px] py-[4px] transition-opacity duration-200 hover:opacity-90"
+              (click)="avatarInput.click()">
+              <span
+                class="material-symbols-outlined relative top-[2px] text-sm dark:text-dark-800">
+                edit
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="e-col-10 e-col-xl-12">
+          <div class="e-row e-row-cols-2 e-row-cols-md-1 e-gy-4">
+            <div class="e-col">
+              <app-form-control
+                label="Tên"
+                type="text"
+                [name]="'name'"
+                [(ngModel)]="name"
+                [required]="true"
+                [placeholder]="'Nhập tên ...'"
+                [submitted]="submitted()"
+                #nameCtrl="ngModel">
+              </app-form-control>
+            </div>
+            <div class="e-col">
+              <app-form-control
+                label="Email"
+                type="email"
+                [name]="'email'"
+                [required]="true"
+                [email]="true"
+                [placeholder]="'Nhập email...'"
+                [submitted]="submitted()"
+                #emailCtrl="ngModel"
+                [(ngModel)]="email">
+              </app-form-control>
+            </div>
+            <div class="e-col">
+              <app-form-control
+                label="Số điện thoại"
+                type="tel"
+                [name]="'phone'"
+                [required]="true"
+                [phone]="true"
+                [placeholder]="'Nhập số điện thoại...'"
+                [submitted]="submitted()"
+                #phoneCtrl="ngModel"
+                [(ngModel)]="phoneNumber">
+              </app-form-control>
+            </div>
+            <div class="e-col">
+              <app-form-control
+                label="Ngày sinh"
+                type="date"
+                [placeholder]="'Chọn ngày sinh...'"
+                [name]="'dob'"
+                [submitted]="submitted()"
+                #dobCtrl="ngModel"
+                [(ngModel)]="dob">
+              </app-form-control>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="e-row e-row-cols-3 e-row-cols-lg-2 e-row-cols-md-1 !mt-6">
+        <div class="e-col">
+          <app-form-control
+            label="Trạng thái hoạt động"
+            type="text"
+            [name]="'status'"
+            [submitted]="submitted()"
+            #statusCtrl="ngModel"
+            [options]="statusOptions"
+            [(ngModel)]="status">
+          </app-form-control>
+        </div>
+        <div class="e-col e-gy-md-4">
+          <app-form-control
+            label="Ngày tạo"
+            type="text"
+            [name]="'createdAt'"
+            [(ngModel)]="createdAt"
+            [readOnly]="true">
+          </app-form-control>
+        </div>
+        <div class="e-col e-gy-lg-4">
+          <app-form-control
+            label="Lần chỉnh sửa cuối cùng"
+            type="text"
+            [name]="'lastModifiedAt'"
+            [(ngModel)]="lastModifiedAt"
+            [readOnly]="true">
+          </app-form-control>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

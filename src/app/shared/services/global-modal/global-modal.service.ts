@@ -16,18 +16,22 @@ export class GlobalModalService {
   private readonly _injector = signal<Injector | undefined>(undefined);
   readonly injector = this._injector.asReadonly();
 
+  private readonly _modalClass = signal<string>('');
+  readonly modalClass = this._modalClass.asReadonly();
+
   private lastComponent: Type<unknown> | null = null;
   private lastData: unknown = null;
 
   open<T, D = unknown>(component: Type<T>, data?: D) {
     this._component.set(component);
     this._data.set(data ?? null);
+    this._modalClass.set(modalClass ?? '');
     this._isOpen.set(true);
 
     if (this.lastComponent !== component || this.lastData !== data) {
       this._injector.set(
         Injector.create({
-          providers: [{ provide: 'MODAL_DATA', useValue: data }],
+          providers: [{ provide: MODAL_DATA, useValue: data }],
           parent: this.rootInjector,
         })
       );
