@@ -72,12 +72,12 @@ export class NavbarComponent {
           type: 'accordion',
           isActive: false,
           submenuItems: [
-            { label: 'Subject List', link: '#!', active: true },
-            { label: 'Subject Detail', link: '#!' },
-            { label: 'Lesson Preview', link: '#!' },
-            { label: 'Create Subject', link: '#!' },
-            { label: 'Edit Subject', link: '#!' },
-            { label: 'Instructors', link: '#!' },
+            { label: 'Danh sách lớp học', link: '#!', active: true },
+            {
+              label: 'Tạo bài giảng tự động',
+              link: '/teacher/generate-lesson',
+            },
+            { label: 'Duyệt nội dung bài giảng', link: '#!' },
           ],
         },
       ],

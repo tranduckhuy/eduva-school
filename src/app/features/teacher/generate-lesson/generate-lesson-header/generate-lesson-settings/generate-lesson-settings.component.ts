@@ -8,21 +8,22 @@ import {
 } from '@angular/core';
 
 import { SubmenuDirective } from '../../../../../shared/directives/submenu/submenu.directive';
+
 import { ThemeService } from '../../../../../shared/services/theme/theme.service';
 
 @Component({
-  selector: 'header-information',
+  selector: 'generate-lesson-settings',
   standalone: true,
   imports: [SubmenuDirective],
-  templateUrl: './information.component.html',
-  styleUrl: './information.component.css',
+  templateUrl: './generate-lesson-settings.component.html',
+  styleUrl: './generate-lesson-settings.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InformationComponent {
+export class GenerateLessonSettingsComponent {
   isFullScreen = input(false);
 
-  clickOutside = output();
-  toggleFullSCreen = output();
+  clickOutside = output<void>();
+  toggleFullSCreen = output<void>();
 
   private readonly themeService = inject(ThemeService);
 

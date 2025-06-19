@@ -15,16 +15,29 @@
           <span class="font-medium text-textBlack dark:text-white">
             Quy Nguyen
           </span>
-          <span class="text-xs">Frontend Developer</span>
+          <span class="flex items-center gap-1 text-xs">
+            Bạn có: 9.523
+            <span class="material-symbols-outlined text-xs text-yellow-500">
+              paid
+            </span>
+          </span>
         </div>
       </div>
       <ul>
         <li>
-          <a href="#!" class="information-link py-3">
+          <a href="#!" class="settings-link py-3">
             <span class="material-symbols-outlined dark:text-white">
               account_circle
             </span>
             <span class="dark:text-white">Trang cá nhân</span>
+          </a>
+        </li>
+        <li>
+          <a href="#!" class="settings-link">
+            <span class="material-symbols-outlined dark:text-white">
+              credit_card
+            </span>
+            <span class="dark:text-white">Nạp xu</span>
           </a>
         </li>
       </ul>
@@ -32,8 +45,8 @@
       <div class="separator dark:border-b-dark-500"></div>
 
       <ul>
-        <li class="hidden sm:block">
-          <button (click)="toggleDarkMode()" class="information-link pb-2 pt-3">
+        <li>
+          <button (click)="toggleDarkMode()" class="settings-link pb-2 pt-3">
             <span
               class="material-symbols-outlined action-btn-icon dark:text-white">
               {{ isDarkMode() ? 'light_mode' : 'dark_mode' }}
@@ -43,10 +56,10 @@
             </span>
           </button>
         </li>
-        <li class="hidden sm:block">
+        <li>
           <button
             (click)="toggleFullSCreen.emit()"
-            class="information-link pb-2 pt-3">
+            class="settings-link pb-2 pt-3">
             <span
               class="material-symbols-rounded action-btn-icon dark:text-white">
               {{ isFullScreen() ? 'fullscreen_exit' : 'fullscreen' }}
@@ -56,8 +69,13 @@
             </span>
           </button>
         </li>
+      </ul>
+
+      <div class="separator dark:border-b-dark-500"></div>
+
+      <ul>
         <li>
-          <a href="#!" class="information-link pb-2 pt-3">
+          <a href="#!" class="settings-link pb-2 pt-3">
             <span class="material-symbols-outlined dark:text-white">
               settings
             </span>
@@ -65,7 +83,7 @@
           </a>
         </li>
         <li>
-          <a href="#!" class="information-link pt-2">
+          <a href="#!" class="settings-link !pb-0 pt-2">
             <span class="material-symbols-outlined dark:text-white">
               logout
             </span>

@@ -1,0 +1,133 @@
+<section
+  class="h-[calc(100vh-80px)] rounded-2xl bg-white shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <!-- ? Section Header -->
+  <div class="flex h-12 items-center border-b border-[#dde1eb] px-4">
+    <h2 class="text-base font-medium dark:border-[#37383b]">Tài liệu</h2>
+  </div>
+
+  <!-- ? Section Content -->
+  <div class="mt-4 h-[calc(100%-50px)] px-4">
+    <!-- ? Add Button -->
+    <button
+      pTooltip="Tài liệu cho AI tạo bài giảng"
+      tooltipPosition="bottom"
+      class="flex h-10 w-full items-center justify-center rounded-full border border-[#dde1eb] text-[#5f6368] shadow-transparent transition-colors ease-in hover:bg-[#ecf2fc] dark:text-[#e6e6e6] dark:hover:bg-dark-400"
+      [ngClass]="{ 'pointer-events-none opacity-80': currentCount() >= 5 }"
+      (click)="openUploadModal()">
+      <div class="flex items-center gap-2">
+        <span
+          class="pi"
+          [ngClass]="currentCount() < 5 ? 'pi-plus' : 'pi-ban'"></span>
+        <span class="select-none">
+          {{
+            currentCount() < 5
+              ? 'Thêm tài liệu mới'
+              : 'Đã đạt số lượng tối đa (5 tài liệu)'
+          }}
+        </span>
+      </div>
+    </button>
+
+    <!-- ? Select All Sources -->
+    @if (sourceList().length > 0) {
+      <div class="mt-5 flex items-center justify-between px-2">
+        <label
+          for="all"
+          class="cursor-pointer select-none font-semibold text-[#585b60] dark:text-white">
+          Chọn toàn bộ tài liệu
+        </label>
+        <p-checkbox
+          [binary]="true"
+          inputId="all"
+          size="small"
+          styleClass="relative bottom-[3px]"
+          [ngModel]="selectAll()"
+          (onChange)="toggleAll($event.checked)" />
+      </div>
+    }
+
+    <!-- ? Sources List -->
+    <div class="mt-4 h-[calc(100%-130px)] overflow-y-auto">
+      @for (item of sourceList(); track item.id) {
+        <div
+          class="source-item text-[#585b60] hover:bg-primary-50 dark:text-white dark:hover:bg-dark-300">
+          <!-- ? Icons -->
+          <span
+            class="type-icon material-symbols-rounded select-none"
+            [ngClass]="{
+              'text-orange': item.type === 'pdf',
+              'text-primary': item.type === 'txt',
+              'opacity-80': item.isUploading,
+            }">
+            {{ item.type === 'pdf' ? 'picture_as_pdf' : 'description' }}
+          </span>
+          <span
+            pTooltip="Thêm"
+            tooltipPosition="bottom"
+            class="more-icon material-symbols-rounded select-none"
+            [ngClass]="{
+              'pointer-events-none opacity-80 hover:opacity-80':
+                item.isUploading,
+            }"
+            (click)="toggleMenu(item.id)">
+            more_vert
+          </span>
+          <!-- ? File Name -->
+          <label
+            [pTooltip]="item.name"
+            [for]="item.id"
+            tooltipPosition="bottom"
+            class="mx-2 flex-1 cursor-pointer select-none text-[#1f1f1f] dark:text-white">
+            {{ item.name }}
+          </label>
+          @if (!item.isUploading) {
+            <p-checkbox
+              size="small"
+              styleClass="relative bottom-[3px]"
+              [binary]="true"
+              [inputId]="item.id"
+              [ngModel]="item.checked"
+              [disabled]="item.isUploading!"
+              (onChange)="toggleItem(item.id, $event.checked)" />
+          } @else {
+            <p-progress-spinner
+              ariaLabel="loading"
+              styleClass="relative top-[2px] !h-[30px] !w-[30px]" />
+          }
+          <!-- ? Submenu -->
+          @if (openedMenuId() === item.id) {
+            <div
+              class="absolute -bottom-[30px] left-0 z-[1] flex min-w-[112px] max-w-[280px] origin-top-left animate-scaleIn flex-col overflow-hidden rounded bg-[#f0f4f9] dark:bg-dark-400"
+              clickOutsideSubmenu
+              (clickOutside)="toggleMenu(item.id)">
+              <button
+                class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
+                (click)="removeItem(item.id)">
+                <span class="pi pi-trash"></span>
+                <span>Xóa tài liệu</span>
+              </button>
+            </div>
+          }
+        </div>
+      } @empty {
+        <div class="h-full">
+          <div class="flex h-full flex-col items-center justify-center">
+            <span
+              class="material-symbols-rounded select-none text-5xl text-[#585b60] dark:text-white">
+              description
+            </span>
+            <p class="mt-3">
+              <strong class="text-[#585b60] dark:text-white">
+                Các tài liệu đã tải lên sẽ hiển thị tại đây
+              </strong>
+            </p>
+            <p class="mt-1 text-center text-[#585b60] dark:text-white">
+              Hiện bạn chưa tải lên tài liệu nào. Nhấn vào nút “Thêm tài liệu”
+              phía trên để chọn tệp PDF hoặc DOC từ thiết bị của bạn.
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>

@@ -1,16 +1,4 @@
-import {
-  Injectable,
-  Injector,
-  Type,
-  computed,
-  inject,
-  signal,
-} from '@angular/core';
-
-interface ModalState {
-  component: Type<unknown>;
-  data?: unknown;
-}
+import { Injectable, Injector, Type, inject, signal } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class GlobalModalService {
@@ -31,12 +19,11 @@ export class GlobalModalService {
   private lastComponent: Type<unknown> | null = null;
   private lastData: unknown = null;
 
-  open<T>(component: Type<T>, data?: unknown) {
+  open<T, D = unknown>(component: Type<T>, data?: D) {
     this._component.set(component);
     this._data.set(data ?? null);
     this._isOpen.set(true);
 
-    // Cache injector
     if (this.lastComponent !== component || this.lastData !== data) {
       this._injector.set(
         Injector.create({
