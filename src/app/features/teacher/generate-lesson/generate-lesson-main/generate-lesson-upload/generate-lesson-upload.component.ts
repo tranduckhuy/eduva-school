@@ -3,7 +3,6 @@ import {
   Component,
   inject,
   signal,
-  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,7 +12,10 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 import { SubmenuDirective } from '../../../../../shared/directives/submenu/submenu.directive';
+
 import { GlobalModalService } from '../../../../../shared/services/global-modal/global-modal.service';
+import { ResourcesStateService } from '../services/resources-state.service';
+
 import { UploadResourcesModalComponent } from './upload-resources-modal/upload-resources-modal.component';
 
 interface SourceItem {
@@ -41,17 +43,18 @@ interface SourceItem {
 })
 export class GenerateLessonUploadComponent {
   private readonly modalService = inject(GlobalModalService);
+  private readonly resourcesStateService = inject(ResourcesStateService);
 
   readonly selectAll = signal(false);
   readonly openedMenuId = signal<string | null>(null);
-  readonly sourceList = signal<SourceItem[]>([]);
 
-  readonly currentCount = computed(() => this.sourceList().length);
+  readonly sourceList = this.resourcesStateService.sourceList;
+  readonly currentCount = this.resourcesStateService.totalSources;
   readonly maxCount = 5;
 
   toggleAll(checked: boolean) {
     this.selectAll.set(checked);
-    this.sourceList.update(items =>
+    this.resourcesStateService.updateSourceList(items =>
       items.map(item => (item.isUploading ? item : { ...item, checked }))
     );
   }
@@ -60,8 +63,7 @@ export class GenerateLessonUploadComponent {
     const items = this.sourceList();
     const target = items.find(item => item.id === id);
     if (target?.isUploading) return;
-
-    this.sourceList.update(items =>
+    this.resourcesStateService.updateSourceList(items =>
       items.map(item => (item.id === id ? { ...item, checked } : item))
     );
 
@@ -88,10 +90,10 @@ export class GenerateLessonUploadComponent {
           isUploading: true,
         };
 
-        this.sourceList.update(list => [...list, newItem]);
+        this.resourcesStateService.updateSourceList(list => [...list, newItem]);
 
         setTimeout(() => {
-          this.sourceList.update(list =>
+          this.resourcesStateService.updateSourceList(list =>
             list.map(item =>
               item.id === newItem.id ? { ...item, isUploading: false } : item
             )
@@ -104,7 +106,9 @@ export class GenerateLessonUploadComponent {
   }
 
   removeItem(id: string) {
-    this.sourceList.update(items => items.filter(item => item.id !== id));
+    this.resourcesStateService.updateSourceList(items =>
+      items.filter(item => item.id !== id)
+    );
 
     const current = this.sourceList();
     const allChecked = current

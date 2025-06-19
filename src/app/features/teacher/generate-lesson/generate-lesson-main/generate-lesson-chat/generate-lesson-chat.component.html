@@ -1,5 +1,5 @@
 <section
-  class="min-h-[calc(100vh-80px)] rounded-2xl bg-white shadow-main dark:border-dark-500 dark:bg-dark-200">
+  class="h-[calc(100vh-80px)] rounded-2xl bg-white shadow-main dark:border-dark-500 dark:bg-dark-200">
   <!-- ? Section Header -->
   <div
     class="flex h-12 items-center justify-between border-b border-[#dde1eb] px-4">
@@ -7,5 +7,115 @@
   </div>
 
   <!-- ? Section Content -->
-  <div class="mt-4 px-4"></div>
+  <div class="mt-4 h-[calc(100%-65px)] px-4">
+    <div class="flex h-full flex-col">
+      <div
+        #scrollContainer
+        class="h-[calc(100%-250px)] grow overflow-auto scroll-smooth">
+        <div class="pb-20 pr-4">
+          <div class="w-full">
+            <h2 class="text-3xl font-medium">Nhập yêu cầu cho bài giảng</h2>
+            <p class="text-[#4a4b4d] dark:text-[#e6e6e6]">
+              {{ totalUploaded() }} tài liệu
+            </p>
+            <p class="mt-2 text-[#4a4b4d] dark:text-[#e6e6e6]">
+              Hãy nhập nội dung bạn muốn <strong>hệ thống AI</strong> hỗ trợ tạo
+              thành bài giảng <strong>dưới dạng slide</strong>. Đây có thể là
+              bất kỳ chủ đề nào phù hợp với chương trình học, ví dụ: “Tạo bài
+              giảng về các hệ thức lượng trong tam giác cho học sinh lớp 10”
+              hoặc “Tạo bài giảng phân tích về hình tượng người lính trong bài
+              thơ Tây Tiến cho học sinh lớp 12”. <strong>Hệ thống AI</strong> sẽ
+              sử dụng yêu cầu bạn nhập để xây dựng bài giảng trực quan, rõ ràng
+              và phù hợp với <strong>học sinh cấp 3</strong>. Nếu bạn đã
+              <strong>tải lên tài liệu</strong>, AI cũng sẽ kết hợp nội dung từ
+              các tài liệu đó để tăng độ chính xác và sát với nội dung học tập
+              hơn.
+            </p>
+          </div>
+          <div class="mt-8">
+            @for (msg of messages(); track $index) {
+              <chat-message
+                [sender]="msg.sender"
+                [content]="msg.content"
+                [isLoading]="msg.isLoading ?? false" />
+            }
+          </div>
+        </div>
+      </div>
+      <div
+        class="relative mb-4 rounded-2xl border border-[#909299] bg-white dark:border-white dark:bg-dark-200">
+        <div
+          class="absolute -top-12 left-[50%] z-[1] -translate-x-[50%] transition-all duration-300 ease-in-out"
+          [ngClass]="{
+            'invisible translate-y-4 opacity-0': !showScrollButton(),
+            'visible translate-y-0 opacity-100': showScrollButton(),
+          }">
+          <p-button
+            label="Cuộn xuống cuối"
+            size="small"
+            icon="pi pi-arrow-down"
+            iconPos="left"
+            [rounded]="true"
+            styleClass="h-[32px]"
+            (onClick)="scrollToBottom()" />
+        </div>
+        <div class="flex">
+          <div class="max-w-full grow-[2.5]">
+            <form
+              [formGroup]="form"
+              (ngSubmit)="submitMessage()"
+              class="flex w-full items-center px-4">
+              <textarea
+                pTextarea
+                formControlName="query"
+                placeholder="Nhập yêu cầu..."
+                [autoResize]="true"
+                (keydown.enter)="onEnterKey($event)"
+                class="require-text grow resize-none text-[#4a4b4d] placeholder:text-[#4a4b4d]"></textarea>
+              <div class="flex items-center">
+                <span class="px-4 dark:text-white">
+                  {{ totalChecked() }} tài liệu
+                </span>
+                <p-button
+                  [rounded]="true"
+                  styleClass="my-2"
+                  [styleClass]="
+                    form.invalid || isLoading()
+                      ? 'pointer-events-none cursor-default opacity-50'
+                      : ''
+                  "
+                  (onClick)="submitMessage()">
+                  <ng-template #icon>
+                    <span class="material-symbols-outlined text-white">
+                      send
+                    </span>
+                  </ng-template>
+                </p-button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="chip-btn-group flex w-full items-center gap-2 pb-2 pt-1">
+          <p-carousel
+            [value]="buttons"
+            [responsiveOptions]="responsiveOptions"
+            [showIndicators]="false"
+            [circular]="true"
+            [numVisible]="2"
+            [numScroll]="1"
+            contentClass="w-[calc(100%-20px)]">
+            <ng-template #item let-button>
+              <button
+                type="button"
+                class="chip-btn border border-[#dde1eb] bg-transparent hover:!bg-[#f0f1f1] dark:text-[#e6e6e6] dark:hover:!bg-dark-400"
+                [disabled]="isLoading()"
+                (click)="handleChipClick(button.title)">
+                Tạo bài giảng về {{ button.title }}
+              </button>
+            </ng-template>
+          </p-carousel>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>

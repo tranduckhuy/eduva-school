@@ -77,7 +77,7 @@
             [pTooltip]="item.name"
             [for]="item.id"
             tooltipPosition="bottom"
-            class="mx-2 flex-1 cursor-pointer select-none text-[#1f1f1f] dark:text-white">
+            class="mx-2 line-clamp-1 max-w-[245px] flex-1 cursor-pointer select-none break-words text-[#1f1f1f] dark:text-white">
             {{ item.name }}
           </label>
           @if (!item.isUploading) {
