@@ -1,0 +1,68 @@
+<div
+  class="rounded border border-gray-100 bg-white p-5 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <div class="mb-5 flex items-center justify-between">
+    <app-search-input (search)="onSearchTriggered($event)" />
+  </div>
+
+  <p-table
+    [value]="pagedInvoices"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    [paginator]="true"
+    [rows]="10"
+    [lazy]="true"
+    [first]="first()"
+    [showCurrentPageReport]="true"
+    (onLazyLoad)="loadProductsLazy($event)"
+    [totalRecords]="totalRecords()"
+    currentPageReportTemplate="
+      Hiển thị {first} đến {last} trên {totalRecords} hóa đơn
+    "
+    (onPage)="pageChange($event)"
+    [loading]="loading()">
+    <ng-template #header>
+      <tr>
+        <th scope="col" class="!w-[5%] !text-center">STT</th>
+        <th scope="col">Mã đơn</th>
+        <th scope="col">Ngày bắt đầu</th>
+        <th scope="col">Giá</th>
+        <th scope="col">Ngày kết thúc</th>
+        <th scope="col" class="!w-[10%] !text-center">Trạng thái</th>
+        <th scope="col" class="!w-[15%] !pr-4 !text-center">Hành động</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-invoice let-i="rowIndex">
+      <tr>
+        <td class="!text-center">{{ i + 1 | leadingZero }}</td>
+        <td class="uppercase text-primary">#{{ invoice.id }}</td>
+        <td>{{ invoice.startDate | date: 'mediumDate' }}</td>
+        <td>
+          {{ invoice.amount | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN' }}
+        </td>
+        <td>{{ invoice.endDate | date: 'mediumDate' }}</td>
+        <td class="!text-center">
+          <app-badge
+            class="whitespace-nowrap"
+            [variant]="invoice.status === 'paid' ? 'success' : 'destructive'"
+            >{{
+              invoice.status === 'paid' ? 'Thành công' : 'Thất bại'
+            }}</app-badge
+          >
+        </td>
+        <td class="!text-center">
+          <div class="flex items-center justify-center gap-2">
+            <a [routerLink]="['/school-admin/invoices', invoice.id]">
+              <app-button
+                pTooltip="Xem chi tiết"
+                tooltipPosition="top"
+                [variant]="'light'"
+                [size]="'xs'"
+                class="material-symbols-outlined rounded-full px-[7px] pb-[6px] pt-[8px] text-lg leading-none"
+                >visibility</app-button
+              >
+            </a>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

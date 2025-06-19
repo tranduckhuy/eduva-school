@@ -1,11 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Injector,
   DestroyRef,
   inject,
   effect,
-  Type,
 } from '@angular/core';
 import { NgComponentOutlet, CommonModule } from '@angular/common';
 
@@ -47,6 +45,10 @@ export class GlobalModalHostComponent {
 
   get data() {
     return this.modalService.data();
+  }
+
+  get modalClass() {
+    return this.modalService.modalClass();
   }
 
   close() {

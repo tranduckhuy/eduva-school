@@ -26,6 +26,8 @@
     "@primeng/themes": "^18.0.2",
     "chart.js": "^4.4.9",
     "ckeditor5": "^45.1.0",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "ngx-cookie-service": "^18.0.0",
     "ngxtension": "^5.0.0",
     "primeicons": "^7.0.0",
