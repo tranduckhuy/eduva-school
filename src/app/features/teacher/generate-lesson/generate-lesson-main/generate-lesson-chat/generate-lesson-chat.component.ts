@@ -79,11 +79,11 @@ export class GenerateLessonChatComponent implements AfterViewInit {
   form!: FormGroup;
 
   messages = signal<ChatMessage[]>([]);
-  isLoading = signal(false);
   showScrollButton = signal(false);
 
   readonly totalUploaded = this.resourcesStateService.totalSources;
   readonly totalChecked = this.resourcesStateService.checkedSources;
+  readonly isLoading = this.resourcesStateService.isLoading;
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
@@ -110,6 +110,8 @@ export class GenerateLessonChatComponent implements AfterViewInit {
     const content = this.form.value.query.trim();
     if (!content) return;
 
+    this.resourcesStateService.updateHasInteracted(true);
+
     this.messages.update(prev => [...prev, { sender: 'user', content }]);
     this.form.reset();
 
@@ -118,6 +120,8 @@ export class GenerateLessonChatComponent implements AfterViewInit {
 
   handleChipClick(title: string) {
     if (this.isLoading()) return;
+
+    this.resourcesStateService.updateHasInteracted(true);
 
     const content = `Tạo bài giảng về ${title}`;
     this.messages.update(prev => [...prev, { sender: 'user', content }]);
@@ -146,7 +150,7 @@ export class GenerateLessonChatComponent implements AfterViewInit {
   }
 
   private fakeSystemResponse() {
-    this.isLoading.set(true);
+    this.resourcesStateService.updateIsLoading(true);
 
     this.messages.update(prev => [
       ...prev,
@@ -175,7 +179,7 @@ export class GenerateLessonChatComponent implements AfterViewInit {
         return updated;
       });
 
-      this.isLoading.set(false);
+      this.resourcesStateService.updateIsLoading(false);
       this.scrollToBottom();
     }, delay);
   }
