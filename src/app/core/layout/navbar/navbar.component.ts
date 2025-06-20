@@ -96,12 +96,15 @@ export class NavbarComponent {
           type: 'accordion',
           isActive: false,
           submenuItems: [
-            { label: 'Subject List', link: '#!', active: true },
-            { label: 'Subject Detail', link: '#!' },
-            { label: 'Lesson Preview', link: '#!' },
-            { label: 'Create Subject', link: '#!' },
-            { label: 'Edit Subject', link: '#!' },
-            { label: 'Instructors', link: '#!' },
+            {
+              label: 'Danh sách bài học',
+              link: '/school-admin/lessons',
+              active: true,
+            },
+            {
+              label: 'Kiểm duyệt nội dung',
+              link: '/school-admin/moderate-lessons',
+            },
           ],
         },
       ],
