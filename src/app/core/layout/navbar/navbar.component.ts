@@ -96,12 +96,20 @@ export class NavbarComponent {
           type: 'accordion',
           isActive: false,
           submenuItems: [
+            {
+              label: 'Danh sách bài học',
+              link: '/school-admin/lessons',
+              active: true,
+            },
+            {
+              label: 'Kiểm duyệt nội dung',
+              link: '/school-admin/moderate-lessons',
+            },
             { label: 'Danh sách lớp học', link: '#!', active: true },
             {
               label: 'Tạo bài giảng tự động',
               link: '/teacher/generate-lesson',
             },
-            { label: 'Duyệt nội dung bài giảng', link: '#!' },
           ],
         },
       ],
