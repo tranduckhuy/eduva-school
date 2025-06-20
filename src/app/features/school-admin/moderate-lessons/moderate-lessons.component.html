@@ -28,7 +28,9 @@
   <ng-template #body let-material let-i="rowIndex">
     <tr>
       <td pFrozenColumn>
-        <a href="#!" class="group flex items-center gap-2">
+        <a
+          [routerLink]="[material.id, 'preview']"
+          class="group flex items-center gap-2">
           @if (material.contentType === 0) {
             <i class="material-symbols-outlined text-purple">movie</i>
           } @else if (material.contentType === 1) {
@@ -58,14 +60,16 @@
       </td>
       <td class="!text-center">
         <div class="flex items-center justify-center gap-2">
-          <app-button
-            pTooltip="Xem chi tiết"
-            tooltipPosition="top"
-            [variant]="'light'"
-            [size]="'xs'"
-            class="material-symbols-outlined rounded-full px-[7px] pb-[6px] pt-[8px] text-lg leading-none"
-            >visibility</app-button
-          >
+          <a [routerLink]="[material.id, 'preview']">
+            <app-button
+              pTooltip="Xem chi tiết"
+              tooltipPosition="top"
+              [variant]="'light'"
+              [size]="'xs'"
+              class="material-symbols-outlined rounded-full px-[7px] pb-[6px] pt-[8px] text-lg leading-none"
+              >visibility</app-button
+            >
+          </a>
           <app-button
             pTooltip="Vô hiệu hóa"
             tooltipPosition="top"

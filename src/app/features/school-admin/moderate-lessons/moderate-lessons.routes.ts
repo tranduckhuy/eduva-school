@@ -12,4 +12,15 @@ export const moderateLessonsRoute: Routes = [
       breadcrumb: 'Danh sách kiểm duyệt',
     },
   },
+  {
+    path: ':lessonId/preview',
+    loadComponent: () =>
+      import('./preview-lesson/preview-lesson.component').then(
+        mod => mod.PreviewLessonComponent
+      ),
+    data: {
+      heading: 'Kiểm duyệt nội dung',
+      breadcrumb: 'Kiểm duyệt nội dung',
+    },
+  },
 ];
