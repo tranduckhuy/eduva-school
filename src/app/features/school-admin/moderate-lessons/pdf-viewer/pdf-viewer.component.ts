@@ -17,5 +17,5 @@ import {
 export class PdfViewerComponent {
   lessonMaterial = input.required<any>();
 
-  constructor(private pdfService: NgxExtendedPdfViewerService) {}
+  constructor(private readonly pdfService: NgxExtendedPdfViewerService) {}
 }

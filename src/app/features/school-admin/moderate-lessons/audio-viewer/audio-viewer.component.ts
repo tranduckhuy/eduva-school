@@ -2,10 +2,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  HostListener,
   ElementRef,
-  inject,
-  signal,
   ViewChild,
   input,
   computed,

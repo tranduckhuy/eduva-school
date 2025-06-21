@@ -29,11 +29,6 @@
   color: var(--color-primary-500);
 }
 
-/* :host ::ng-deep .lesson-content h2 {
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.3em;
-} */
-
 :host ::ng-deep .lesson-content p {
   margin: 16px 0;
   font-size: 14px;

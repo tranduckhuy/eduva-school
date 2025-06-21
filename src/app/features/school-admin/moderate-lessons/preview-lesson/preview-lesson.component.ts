@@ -85,8 +85,8 @@ export class PreviewLessonComponent implements OnInit {
   };
 
   // Injection
-  private sanitizer = inject(DomSanitizer);
-  private globalModalService = inject(GlobalModalService);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly globalModalService = inject(GlobalModalService);
 
   desc = viewChild<ElementRef>('desc');
   preview = viewChild<ElementRef>('preview');
