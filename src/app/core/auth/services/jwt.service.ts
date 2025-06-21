@@ -5,7 +5,7 @@ import { CookieService } from 'ngx-cookie-service';
 import {
   TOKEN_KEY,
   REFRESH_TOKEN_KEY,
-} from '../../../shared/constants/token.constants';
+} from '../../../shared/constants/jwt.constant';
 
 @Injectable({
   providedIn: 'root',
