@@ -13,6 +13,9 @@ import { CommonModule } from '@angular/common';
 import { DocViewerComponent } from '../doc-viewer/doc-viewer.component';
 import { VideoViewerComponent } from '../video-viewer/video-viewer.component';
 import { AudioViewerComponent } from '../audio-viewer/audio-viewer.component';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { GlobalModalService } from '../../../../shared/services/global-modal/global-modal.service';
+import { ModerateReasonModalComponent } from '../moderate-reason-modal/moderate-reason-modal.component';
 
 interface Owner {
   name: string;
@@ -48,6 +51,7 @@ interface LessonMaterial {
     DocViewerComponent,
     VideoViewerComponent,
     AudioViewerComponent,
+    ButtonComponent,
   ],
   templateUrl: './preview-lesson.component.html',
   styleUrl: './preview-lesson.component.css',
@@ -82,11 +86,13 @@ export class PreviewLessonComponent implements OnInit {
 
   // Injection
   private sanitizer = inject(DomSanitizer);
+  private globalModalService = inject(GlobalModalService);
 
   desc = viewChild<ElementRef>('desc');
   preview = viewChild<ElementRef>('preview');
 
   safeDescription = signal<SafeHtml>('');
+  isApprovedLesson = signal<boolean>(false);
 
   ngOnInit(): void {
     this.safeDescription.set(
@@ -121,5 +127,21 @@ export class PreviewLessonComponent implements OnInit {
       const hashes = '#'.repeat(hashCount); // Create the hashes
       return `<${tag}><span>${hashes}</span> ${content}</${tag}>`; // Return the new header with hashes
     });
+  }
+
+  openAddStudentModal() {
+    this.globalModalService.open(ModerateReasonModalComponent, {
+      isApproved: this.isApprovedLesson(),
+    });
+  }
+
+  approveLesson() {
+    this.isApprovedLesson.set(true);
+    this.openAddStudentModal();
+  }
+
+  refuseLesson() {
+    this.isApprovedLesson.set(false);
+    this.openAddStudentModal();
   }
 }

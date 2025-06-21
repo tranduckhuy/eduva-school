@@ -23,9 +23,33 @@
   </div>
 
   <!-- Content -->
-  <h1 class="font-nold my-5 text-2xl">
-    {{ lessonMaterial.title }}
-  </h1>
+  <div class="my-5 flex items-center justify-between sm:flex-wrap">
+    <h1 class="font-nold text-2xl">
+      {{ lessonMaterial.title }}
+    </h1>
+    <div class="flex items-center gap-4 sm:mt-4">
+      <app-button
+        [variant]="'outline'"
+        class="flex items-center"
+        (clicked)="approveLesson()">
+        <span
+          class="material-symbols-outlined relative top-[3px] mr-1 text-lg leading-none">
+          check
+        </span>
+        <span>Duyệt</span>
+      </app-button>
+      <app-button
+        [variant]="'outline-danger'"
+        class="flex items-center"
+        (clicked)="refuseLesson()">
+        <span
+          class="material-symbols-outlined relative top-[3px] mr-1 text-lg leading-none">
+          close
+        </span>
+        <span>Từ chối</span>
+      </app-button>
+    </div>
+  </div>
   <p class="my-3 dark:text-white">
     {{ formatUpdateDate(lessonMaterial.lastModifiedAt) }}
   </p>
