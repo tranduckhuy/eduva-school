@@ -1,0 +1,302 @@
+/* ? Common CSS button for all button in controls bar */
+.btn {
+  width: 40px;
+  border: none;
+  font-size: inherit;
+  color: inherit;
+  background: rgba(0, 0, 0, 0);
+  line-height: inherit;
+  text-decoration: none;
+  text-transform: none;
+  transition: none;
+  overflow: visible;
+  cursor: pointer;
+}
+
+.big-btn {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  cursor: pointer;
+  translate: -50% -50%;
+  transition:
+    opacity 0.3s ease 0s,
+    visibility 0.3s ease 0s,
+    transform 0.2s ease 0s;
+}
+
+/* ? Big play button */
+.play-btn {
+  left: 50%;
+  border-radius: 50%;
+}
+
+/* ? Big play button that appear when first load page */
+.play-btn-first-load {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(
+    90deg,
+    rgb(94, 187, 255) 0%,
+    rgb(161, 116, 255) 100%
+  ) !important;
+}
+
+/* ? Big play button for mobile */
+.big-btn-mobile {
+  width: 50px;
+  height: 50px;
+  font-size: 30px;
+  color: #fff;
+}
+
+.play-btn-mobile {
+  border: 1px solid #fff;
+  background-color: transparent;
+}
+
+/* ? Big Rewind/Forward Buttons */
+.rewind-big-btn {
+  left: 26%;
+}
+
+.forward-big-btn {
+  left: 72%;
+}
+
+/* ? Video player event handler */
+.video-player:hover .play-btn-first-load {
+  transform: scale(1.2);
+}
+
+@media (min-width: 768px) {
+  .video-player:hover .progress-bar,
+  .video-player:hover .controls-bar,
+  .video-player.paused .progress-bar,
+  .video-player.paused .controls-bar {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* ? Custom Controls Bar for video */
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0);
+  cursor: pointer;
+  user-select: none;
+}
+
+.loading-spinner {
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 82px;
+  height: 82px;
+  margin-top: -43px;
+  margin-left: -45px;
+  border: 3px solid #fff;
+  border-top-color: rgba(255, 255, 255, 0.75);
+  border-radius: 50%;
+}
+
+.poster {
+  position: absolute;
+  inset: 0;
+  display: inline-block;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-size: contain;
+  cursor: pointer;
+  transition: opacity 0.5s ease;
+}
+
+.progress-bar {
+  position: absolute;
+  bottom: 35px;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  gap: 20px;
+  width: 96%;
+  height: 28px;
+  margin: 0 2%;
+  text-align: left;
+  background-color: transparent;
+  cursor: pointer;
+  transition:
+    opacity 0.3s ease 0s,
+    visibility 0.3s ease 0s;
+}
+
+.progress-holder {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 30px;
+  outline: 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.progress-holder::before {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  content: '';
+  height: 4px;
+  width: 100%;
+  border: 0;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.volume-panel,
+.progress-holder {
+  cursor: pointer;
+  user-select: none;
+}
+
+.play-progress,
+.load-progress {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  height: 4px;
+}
+
+.play-progress {
+  background-color: #128deb;
+}
+
+.play-progress::before {
+  position: absolute;
+  top: 1px;
+  right: 0;
+  content: '';
+  width: 2px;
+  height: 2px;
+  background: #fff;
+  border-radius: 50%;
+  opacity: 0;
+  transition:
+    transform 0.3s ease 0s,
+    opacity 0.3s ease 0s;
+  transform-origin: center;
+}
+
+.load-progress {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.progress-bar:hover .play-progress::before {
+  transform: scale(5);
+  opacity: 1;
+}
+
+.current-time,
+.duration-time {
+  line-height: normal;
+  text-shadow: 1px 1px 1px #000;
+  user-select: none;
+}
+
+.controls-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 40px;
+  padding: 0 2%;
+  background: transparent;
+  transition:
+    visibility 0.3s,
+    opacity 0.3s;
+}
+
+.control-btn {
+  width: 38px;
+  border: 0;
+  font-size: 18px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center center;
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  transition: text-shadow 0.2s ease 0s;
+}
+
+.volume-control {
+  width: 70px;
+  background-color: transparent;
+  opacity: 1;
+  transition:
+    visibility 0.3s,
+    opacity 0.3s,
+    width 0.3s;
+}
+
+.volume-panel {
+  position: relative;
+  width: 95%;
+  height: 4px;
+  padding: 0;
+  outline: 0;
+  background-color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+}
+
+.volume-level {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #128deb;
+}
+
+.volume-level::before {
+  position: absolute;
+  top: -1px;
+  right: -4px;
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.quality-btn > span {
+  position: relative;
+  padding: 0px 4px;
+  font-size: 13px;
+  text-shadow: rgb(0, 0, 0) 1px 1px 1px;
+}
+
+.hd-icon {
+  position: absolute;
+  top: -10px;
+  left: 40px;
+  width: auto;
+  padding: 1.5px 2px 0px;
+  border-radius: 2px;
+  margin-left: -5px;
+  margin-top: 8px;
+  font-size: 8px;
+  font-weight: bold;
+  color: rgb(255, 255, 255);
+  background-color: rgb(204, 0, 0);
+  line-height: 1.2em;
+  vertical-align: top;
+}

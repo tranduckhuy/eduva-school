@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { GlobalModalService } from '../../../services/global-modal/global-modal.service';
 import { ButtonModule } from 'primeng/button';
-import { MODAL_DATA } from '../../../constants/modal-data.token';
+import { MODAL_DATA } from '../../../services/global-modal/modal-data.token';
 
 @Component({
   selector: 'app-import-account-modals',

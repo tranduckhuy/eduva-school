@@ -67,7 +67,7 @@ export class StudentComponent {
     this.status.set(
       this.student.status === 'active' ? 'Đang hoạt động' : 'Vô hiệu hóa'
     );
-    this.createdAt.set(this.formatDateVi(new Date(this.student.createdAt!)));
+    this.createdAt.set(this.formatDateVi(new Date(this.student.createdAt)));
     if (this.student.lastModifiedAt) {
       this.lastModifiedAt.set(
         this.formatDateVi(new Date(this.student.lastModifiedAt))
