@@ -36,11 +36,18 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/ngx-extended-pdf-viewer/assets/",
+                "output": "/assets/"
               }
             ],
             "styles": [
               "node_modules/@fortawesome/fontawesome-svg-core/styles.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+              "node_modules/@videogular/ngx-videogular/fonts/videogular.css",
+              "node_modules/plyr/dist/plyr.css",
               "node_modules/ckeditor5/dist/ckeditor5.css",
               "src/styles.css"
             ],
@@ -123,6 +130,11 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/ngx-extended-pdf-viewer/assets/",
+                "output": "/assets/"
               }
             ],
             "styles": [

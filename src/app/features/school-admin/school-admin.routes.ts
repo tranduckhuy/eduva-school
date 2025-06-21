@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { PricingComponent } from './pricing/pricing.component';
 
 export const schoolAdminRoutes: Routes = [
   {
@@ -43,6 +44,11 @@ export const schoolAdminRoutes: Routes = [
       import('../../core/layout/blank-layout/blank-layout.component').then(
         mod => mod.BlankLayoutComponent
       ),
-    children: [],
+    children: [
+      {
+        path: 'pricing',
+        component: PricingComponent,
+      },
+    ],
   },
 ];

@@ -1,0 +1,125 @@
+<div
+  clickOutsideSubmenu
+  class="menu-settings"
+  [ngClass]="{
+    'right-[60px]': type() === 'settings',
+    'right-[120px]': type() === 'quality',
+    active: isSettingsMenuOpen(),
+  }"
+  (clickOutside)="onClickOutside()">
+  @if (type() === 'quality') {
+    <div
+      class="max-h-300px h-auto w-[100px] transition-all duration-[0.25s] ease-linear will-change-[width]">
+      <!-- ? Quality -->
+      <div class="menu-settings-quality" [class.hidden]="type() !== 'quality'">
+        <div class="menu-title">
+          <span
+            class="block whitespace-nowrap text-center text-xs uppercase leading-[30px] text-white">
+            Chất lượng
+          </span>
+        </div>
+        <ul class="menu-content">
+          @for (quality of qualityOptions(); track $index) {
+            <li
+              class="menu-item menu-item--setting"
+              [class.active]="selectedQuality() === quality"
+              (click)="selectQuality(quality)">
+              <span class="pi pi-check" style="font-size: 10px"></span>
+              {{ quality }}p
+              @if (quality === '1440' || quality === '1080') {
+                <span class="hd-icon">HD</span>
+              }
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+
+  @if (type() === 'settings') {
+    <div
+      class="max-h-300px h-auto transition-all duration-[0.25s] ease-linear will-change-[width]"
+      [ngClass]="{
+        'w-[200px]': currentSettingsMenu() === 'home',
+        'w-[108px]': currentSettingsMenu() === 'subtitle',
+        'w-20': currentSettingsMenu() === 'speed',
+      }">
+      <!-- ? Settings Home -->
+      <div
+        class="menu-settings-home"
+        [class.hidden]="currentSettingsMenu() !== 'home'">
+        <div class="menu-title">
+          <span
+            class="block whitespace-nowrap text-center text-xs uppercase leading-[30px] text-white">
+            Cài đặt
+          </span>
+        </div>
+        <ul class="menu-content">
+          <li class="menu-item" (click)="navigate('subtitle')">
+            Phụ đề
+            <span class="ml-auto">
+              {{ selectedSubtitle() === 'vi' ? 'Tiếng Việt' : 'Tiếng Anh' }}
+            </span>
+            <span class="item-icon"></span>
+          </li>
+          <li class="menu-item" (click)="navigate('speed')">
+            Tốc độ
+            <span class="ml-auto">
+              {{ selectedRate() === 1 ? 'Bình thường' : selectedRate() + 'x' }}
+            </span>
+            <span class="item-icon"></span>
+          </li>
+        </ul>
+      </div>
+      <!-- ? Settings Subtitle -->
+      <div
+        class="menu-settings-subtitle"
+        [class.hidden]="currentSettingsMenu() !== 'subtitle'">
+        <div class="menu-title menu-back" (click)="backToHome()">
+          <span
+            class="block whitespace-nowrap text-center text-xs uppercase leading-[30px] text-white">
+            Phụ đề
+          </span>
+        </div>
+        <ul class="menu-content">
+          <li
+            class="menu-item menu-item--setting active"
+            [class.active]="selectedSubtitle() === 'vi'"
+            (click)="selectSubtitle('vi')">
+            <span class="pi pi-check" style="font-size: 10px"></span>
+            Tiếng Việt
+          </li>
+          <li
+            class="menu-item menu-item--setting"
+            [class.active]="selectedSubtitle() === 'en'"
+            (click)="selectSubtitle('en')">
+            <span class="pi pi-check" style="font-size: 10px"></span>
+            Tiếng Anh
+          </li>
+        </ul>
+      </div>
+      <!-- ? Settings Speed -->
+      <div
+        class="menu-settings-speed"
+        [class.hidden]="currentSettingsMenu() !== 'speed'">
+        <div class="menu-title menu-back" (click)="backToHome()">
+          <span
+            class="block whitespace-nowrap text-center text-xs uppercase leading-[30px] text-white">
+            Tốc độ
+          </span>
+        </div>
+        <ul class="menu-content">
+          @for (speedRate of rates(); track $index) {
+            <li
+              class="menu-item menu-item--setting"
+              [class.active]="selectedRate() === speedRate"
+              (click)="selectRate(speedRate)">
+              <span class="pi pi-check" style="font-size: 10px"></span>
+              {{ speedRate }}x
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+</div>

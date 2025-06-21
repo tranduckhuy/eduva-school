@@ -12,6 +12,7 @@ import { FileDurationFormatPipe } from '../../../shared/pipes/file-duration-form
 import { DatePipe, registerLocaleData } from '@angular/common';
 import localeVi from '@angular/common/locales/vi';
 import { TooltipModule } from 'primeng/tooltip';
+import { RouterLink } from '@angular/router';
 
 interface Owner {
   name: string;
@@ -51,6 +52,7 @@ registerLocaleData(localeVi);
     BadgeComponent,
     FileDurationFormatPipe,
     DatePipe,
+    RouterLink,
   ],
   templateUrl: './moderate-lessons.component.html',
   styleUrl: './moderate-lessons.component.css',

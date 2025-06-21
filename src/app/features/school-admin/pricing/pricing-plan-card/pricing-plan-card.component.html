@@ -1,0 +1,47 @@
+<div
+  class="rounded border border-gray-100 bg-white p-8 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <h3 class="mb-5 text-center text-lg font-semibold">
+    {{ pricingPlan().name }}
+  </h3>
+  <p class="mb-4 text-center text-lg font-medium dark:text-dark-100">
+    <span class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{
+      (isYearly() ? pricingPlan().pricePerYear : pricingPlan().priceMonthly)
+        | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN'
+    }}</span>
+    / trên {{ isYearly() ? 'năm' : 'tháng' }}
+  </p>
+  <p class="mx-auto mb-6 text-center dark:text-dark-100">
+    {{ pricingPlan().description }}
+  </p>
+  <app-button
+    [width]="'full'"
+    class="flex items-center gap-2 py-[10px] text-lg font-extrabold sm:py-2">
+    <span class="ml-1">Mua Ngay</span>
+    <span
+      class="material-symbols-outlined relative top-[5px] ml-1 text-xl leading-none">
+      arrow_outward
+    </span>
+  </app-button>
+  <ul class="mt-6 flex flex-col gap-3">
+    <li class="flex items-center gap-4">
+      <span class="material-symbols-outlined text-success-500"> check </span>
+      <span class="text-[15px] font-medium dark:text-dark-100"
+        >Dung lượng lưu trữ: {{ pricingPlan().storageLimitGB }} GB</span
+      >
+    </li>
+    <li class="flex items-center gap-4">
+      <span class="material-symbols-outlined text-success-500"> check </span>
+      <span class="text-[15px] font-medium dark:text-dark-100"
+        >Số lượng tài khoản: {{ pricingPlan().maxUsers }}</span
+      >
+    </li>
+    @for (option of pricingPlanOptions(); track option) {
+      <li class="flex items-center gap-4">
+        <span class="material-symbols-outlined text-success-500"> check </span>
+        <span class="text-[15px] font-medium dark:text-dark-100">{{
+          option
+        }}</span>
+      </li>
+    }
+  </ul>
+</div>

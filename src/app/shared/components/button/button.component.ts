@@ -23,6 +23,7 @@ type ButtonSize = 'default' | 'xs' | 'lg' | 'xl';
 type ButtonVariant =
   | 'default'
   | 'outline'
+  | 'outline-danger'
   | 'rounded'
   | 'light'
   | 'light-danger'
@@ -85,6 +86,8 @@ export class ButtonComponent {
       default: 'rounded',
       outline:
         'border border-primary bg-white dark:bg-dark-200 !text-primary hover:!bg-primary hover:!text-white',
+      'outline-danger':
+        'border border-danger bg-white dark:bg-dark-200 !text-danger hover:!bg-danger hover:!text-white',
       rounded: 'rounded-full',
       light:
         'bg-primary-500/20 hover:!text-gray-50 !text-primary-500 hover:bg-primary-500',
