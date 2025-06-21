@@ -1,9 +1,4 @@
-<div
-  class="aspect-[2/1] h-full w-full px-5"
-  [ngClass]="{
-    'sm:aspect-auto sm:h-[60vh] sm:w-[420px]':
-      lessonMaterial().contentType === 0,
-  }">
+<div class="absolute inset-0">
   <ngx-extended-pdf-viewer
     style="width: 100%; height: 100%; display: block"
     [showDownloadButton]="false"

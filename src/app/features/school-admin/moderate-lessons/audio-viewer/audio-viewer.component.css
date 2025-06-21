@@ -1,0 +1,15 @@
+/* Force settings menu to appear below controls */
+::ng-deep .plyr.plyr--full-ui.plyr--audio {
+  border-radius: 6px;
+}
+
+::ng-deep .plyr__menu__container {
+  top: 100%;
+  background-color: white;
+}
+
+::ng-deep [id^='plyr-settings'] {
+  background-color: white;
+  border: 1px solid #f3f3f3;
+  border-radius: 6px;
+}
