@@ -1,5 +1,5 @@
 import { Injectable, Injector, Type, inject, signal } from '@angular/core';
-import { MODAL_DATA } from '../../constants/modal-data.token';
+import { MODAL_DATA } from './modal-data.token';
 
 interface ModalState {
   component: Type<unknown>;

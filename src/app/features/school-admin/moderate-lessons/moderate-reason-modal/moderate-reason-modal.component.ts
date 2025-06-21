@@ -8,7 +8,7 @@ import { GlobalModalService } from '../../../../shared/services/global-modal/glo
 import { ButtonModule } from 'primeng/button';
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 import { FormsModule, NgForm } from '@angular/forms';
-import { MODAL_DATA } from '../../../../shared/constants/modal-data.token';
+import { MODAL_DATA } from '../../../../shared/services/global-modal/modal-data.token';
 
 interface ModerateReasonModalData {
   isApproved: boolean;
