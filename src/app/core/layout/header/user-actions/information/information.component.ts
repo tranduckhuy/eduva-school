@@ -2,13 +2,15 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
   input,
   output,
+  inject,
 } from '@angular/core';
 
 import { SubmenuDirective } from '../../../../../shared/directives/submenu/submenu.directive';
-import { ThemeService } from '../../../../../shared/services/theme/theme.service';
+
+import { ThemeService } from '../../../../../shared/services/core/theme/theme.service';
+import { AuthService } from '../../../../auth/services/auth.service';
 
 @Component({
   selector: 'header-information',
@@ -24,6 +26,7 @@ export class InformationComponent {
   clickOutside = output();
   toggleFullSCreen = output();
 
+  private readonly authService = inject(AuthService);
   private readonly themeService = inject(ThemeService);
 
   readonly isDarkMode = computed(() => {
@@ -32,5 +35,9 @@ export class InformationComponent {
 
   toggleDarkMode() {
     this.themeService.toggleDarkMode();
+  }
+
+  logout() {
+    this.authService.logout().subscribe();
   }
 }

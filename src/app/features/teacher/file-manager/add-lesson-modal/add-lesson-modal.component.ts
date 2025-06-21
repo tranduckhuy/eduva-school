@@ -9,7 +9,7 @@ import {
 
 import { ButtonModule } from 'primeng/button';
 
-import { GlobalModalService } from '../../../../shared/services/global-modal/global-modal.service';
+import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 
 @Component({
   selector: 'app-add-lesson-modal',

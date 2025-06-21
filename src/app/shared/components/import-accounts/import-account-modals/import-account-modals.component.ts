@@ -6,9 +6,9 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { GlobalModalService } from '../../../services/global-modal/global-modal.service';
+import { GlobalModalService } from '../../../services/layout/global-modal/global-modal.service';
 import { ButtonModule } from 'primeng/button';
-import { MODAL_DATA } from '../../../services/global-modal/modal-data.token';
+import { MODAL_DATA } from '../../../services/layout/global-modal/modal-data.token';
 
 @Component({
   selector: 'app-import-account-modals',

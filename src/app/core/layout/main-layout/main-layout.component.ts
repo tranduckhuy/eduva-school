@@ -11,10 +11,15 @@ import {
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { fromEvent } from 'rxjs';
 
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+
 import { RouteMetadataDirective } from '../../../shared/directives/route-metadata/route-metadata.directive';
-import { LayoutHeadingService } from '../../../shared/services/layout-heading/layout-heading.service';
+import { LayoutHeadingService } from '../../../shared/services/layout/layout-heading/layout-heading.service';
+
 import { HeaderComponent } from '../header/header.component';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { LayoutHeadingComponent } from '../layout-heading/layout-heading.component';
@@ -26,6 +31,8 @@ import { GlobalModalHostComponent } from '../../../shared/components/global-moda
   imports: [
     CommonModule,
     RouterOutlet,
+    ToastModule,
+    ConfirmDialogModule,
     RouteMetadataDirective,
     HeaderComponent,
     NavbarComponent,
@@ -66,6 +73,8 @@ import { GlobalModalHostComponent } from '../../../shared/components/global-moda
       </div>
     </div>
 
+    <p-toast />
+    <p-confirmdialog [baseZIndex]="1000" />
     <app-global-modal-host />
   `,
   styleUrl: './main-layout.component.css',
