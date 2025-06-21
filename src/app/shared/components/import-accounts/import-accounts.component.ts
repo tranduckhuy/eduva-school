@@ -22,12 +22,8 @@ export class ImportAccountsComponent {
   // input
   readonly title = input<string>();
   openModal() {
-    this.globalModalService.open(
-      ImportAccountModalsComponent,
-      {
-        title: this.title(),
-      },
-      'max-w-[800px]'
-    );
+    this.globalModalService.open(ImportAccountModalsComponent, {
+      title: this.title(),
+    });
   }
 }

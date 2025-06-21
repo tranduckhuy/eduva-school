@@ -1,0 +1,40 @@
+.require-text {
+  min-height: 40px;
+  max-height: 320px;
+  padding: 0 8px;
+  border: none !important;
+  outline: none !important;
+  font-size: 16px;
+  background-color: transparent !important;
+  align-content: center;
+  overflow: auto !important;
+  box-shadow: none !important;
+}
+
+.require-text:active {
+  border: none !important;
+}
+
+.require-text.p-textarea.ng-invalid.ng-dirty::placeholder {
+  color: currentColor !important;
+}
+
+.chip-btn-group ::ng-deep .p-carousel-content {
+  align-items: center;
+}
+
+.chip-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 20px 20px 4px 20px;
+  transition: background-color 0.2s ease-in;
+}
+
+.chip-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}

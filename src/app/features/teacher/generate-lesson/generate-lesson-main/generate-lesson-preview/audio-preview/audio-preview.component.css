@@ -1,0 +1,15 @@
+:host ::ng-deep .p-slider-handle {
+  cursor: pointer !important;
+}
+
+.volume-control ::ng-deep .p-slider-handle {
+  width: 14px !important;
+  height: 14px !important;
+  margin-top: -7px !important;
+  margin-left: -7px !important;
+}
+
+.volume-control ::ng-deep .p-slider-handle::before {
+  width: 10px !important;
+  height: 10px !important;
+}

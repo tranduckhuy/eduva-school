@@ -1,0 +1,28 @@
+.source-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 0 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.more-icon {
+  opacity: 0.8;
+  transition: opacity 0.15s ease-in;
+}
+
+.more-icon:hover {
+  opacity: 1;
+}
+
+.more-icon,
+.source-item:hover .type-icon {
+  display: none;
+}
+
+.source-item:hover .more-icon {
+  display: block;
+}
