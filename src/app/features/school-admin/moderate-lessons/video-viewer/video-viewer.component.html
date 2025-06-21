@@ -1,1 +1,178 @@
-<p>video-viewer works!</p>
+<div
+  class="video-player relative box-border block aspect-video h-full w-full overflow-hidden text-sm text-white"
+  [class.paused]="isPaused()">
+  <vg-player
+    (onPlayerReady)="onPlayerReady($event)"
+    class="absolute right-0 top-0 h-full w-full">
+    <video
+      #video
+      id="video-player"
+      [vgMedia]="$any(video)"
+      [preload]="preload()"
+      crossorigin>
+      <source [src]="videoSources()[selectedQuality()]" type="video/mp4" />
+      <!-- <source src="./videoplayback.webm" type="video/webm" /> -->
+      <!-- <track kind="subtitles" label="Tiếng Việt" srclang="vi" src="..." default />
+               <track kind="subtitles" label="English" srclang="en" src="..." /> -->
+    </video>
+  </vg-player>
+
+  <div class="overlay" (click)="togglePlayPause(); onMobileTap()"></div>
+
+  @if (!hasStarted()) {
+    <div class="poster">
+      <picture class="poster">
+        <img
+          src="https://files.fullstack.edu.vn/f8-prod/streamable-videos/766/4/6560267cb57a8.jpg"
+          alt=""
+          class="h-full w-full object-contain" />
+      </picture>
+    </div>
+  }
+
+  @if (showUiControls()) {
+    <!-- ? Progress Bar -->
+    <div
+      class="progress-bar invisible opacity-0"
+      [class.opacity-100]="showMobileControls()"
+      [class.visible]="showMobileControls()"
+      [class.opacity-0]="!showMobileControls()"
+      [class.invisible]="!showMobileControls()">
+      <span class="current-time">{{ formatTime(currentTime()) }}</span>
+      <div
+        class="progress-holder"
+        (mousedown)="startSeekDrag($event)"
+        (click)="seekTo($event)"
+        #progressBar>
+        <div class="load-progress" [style.width.%]="bufferedProgress()"></div>
+        <div class="play-progress" [style.width.%]="playedProgress()"></div>
+      </div>
+      <span class="duration-time">{{ formatTime(duration()) }}</span>
+    </div>
+
+    <!-- ? Controls Bar -->
+    <div
+      class="controls-bar invisible opacity-0"
+      [class.opacity-100]="showMobileControls()"
+      [class.visible]="showMobileControls()"
+      [class.opacity-0]="!showMobileControls()"
+      [class.invisible]="!showMobileControls()">
+      <div class="flex items-center">
+        <!-- ? Rewind -->
+        <button class="control-btn sm:hidden" (click)="rewind()">
+          <fa-icon [icon]="'rotate-left'"></fa-icon>
+        </button>
+        <!-- ? Play -->
+        <button
+          class="control-btn"
+          style="font-size: 22px"
+          (click)="togglePlayPause()">
+          <fa-icon [icon]="isPaused() ? 'play' : 'pause'"></fa-icon>
+        </button>
+        <!-- ? Forward -->
+        <button class="control-btn sm:hidden" (click)="forward()">
+          <fa-icon [icon]="'rotate-right'"></fa-icon>
+        </button>
+        <!-- ? Volume -->
+        <div class="flex items-center gap-1">
+          <button class="control-btn" (click)="toggleMute()">
+            <fa-icon
+              [icon]="
+                volumeLevel() === 0
+                  ? 'volume-xmark'
+                  : volumeLevel() <= 0.5
+                    ? 'volume-low'
+                    : 'volume-high'
+              "></fa-icon>
+          </button>
+          <!-- ? Volume Control -->
+          <div class="volume-control sm:hidden">
+            <div
+              class="volume-panel"
+              (mousedown)="startVolumeDrag($event)"
+              #volumeBar>
+              <div
+                class="volume-level"
+                [style.width.%]="volumeLevel() * 100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center">
+        <!-- ? Quality -->
+        <div
+          class="control-btn quality-btn flex select-none items-center"
+          (click)="onQualityBtnClick($event)">
+          <span>
+            {{ selectedQuality() }}p
+            @if (selectedQuality() === '1440' || selectedQuality() === '1080') {
+              <span class="hd-icon">HD</span>
+            }
+          </span>
+        </div>
+
+        <!-- ? Settings -->
+        <button class="control-btn ml-6" (click)="onSettingsBtnClick($event)">
+          <fa-icon [icon]="'gear'"></fa-icon>
+        </button>
+
+        <!-- ? Settings Menu -->
+        <video-settings-menu
+          [type]="menuType()"
+          [isSettingsMenuOpen]="isSettingsMenuOpen()"
+          [currentSettingsMenu]="currentSettingsMenu()"
+          (closed)="onMenuClosed()"
+          (menuChange)="onMenuChange($event)"
+          (subtitleChange)="onSubtitleChange($event)"
+          (playbackRateChange)="onRateChange($event)"
+          (qualityChange)="onQualityChange($event)" />
+
+        <!-- ? Expand -->
+        <button class="control-btn" (click)="toggleFullscreen()">
+          <fa-icon [icon]="'expand'"></fa-icon>
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (!hasStarted()) {
+    <button
+      class="btn big-btn play-btn play-btn-first-load"
+      (click)="playVideo()">
+      <fa-icon
+        [icon]="'play'"
+        class="relative left-[3px] text-[45px] text-white"></fa-icon>
+    </button>
+  }
+
+  @if (hasStarted()) {
+    <button
+      class="btn big-btn big-btn-mobile play-btn play-btn-mobile hidden sm:flex"
+      [class]="showingUiClass()"
+      (click)="togglePlayPause()">
+      <span
+        class="pi"
+        [class]="isPaused() ? 'pi-play relative left-[3px]' : 'pi-pause'"
+        style="font-size: 30px"></span>
+    </button>
+
+    <button
+      class="btn big-btn big-btn-mobile rewind-big-btn hidden sm:flex"
+      [class]="showingUiClass()"
+      (click)="rewind()">
+      <fa-icon [icon]="'rotate-left'"></fa-icon>
+    </button>
+
+    <button
+      class="btn big-btn big-btn-mobile forward-big-btn hidden sm:flex"
+      [class]="showingUiClass()"
+      (click)="forward()">
+      <fa-icon [icon]="'rotate-right'"></fa-icon>
+    </button>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-spinner animate-spin"></div>
+  }
+</div>
