@@ -1,5 +1,5 @@
 <div
-  class="aspect-video h-full w-full"
+  class="aspect-[2/1] h-full w-full px-5"
   [ngClass]="{
     'sm:aspect-auto sm:h-[60vh] sm:w-[420px]':
       lessonMaterial().contentType === 0,
@@ -18,6 +18,6 @@
     [showDrawEditor]="false"
     [showStampEditor]="false"
     [language]="'vi'"
-    [src]="'https://vadimdez.github.io/ng2-pdf-viewer/assets/pdf-test.pdf'">
+    [src]="lessonMaterial().sourceUrl">
   </ngx-extended-pdf-viewer>
 </div>

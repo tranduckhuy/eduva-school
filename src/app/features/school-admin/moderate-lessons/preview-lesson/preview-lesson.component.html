@@ -1,14 +1,17 @@
 <div
-  class="rounded border border-gray-100 bg-white p-4 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  class="rounded border border-gray-100 bg-white p-5 shadow-main dark:border-dark-500 dark:bg-dark-200">
   <!-- Video -->
   <div
-    class="flex aspect-video w-full justify-center rounded bg-dark-900"
+    class="flex aspect-[2/1] w-full justify-center rounded bg-dark-900"
     [ngClass]="{
-      'sm:aspect-auto sm:h-[60vh]': lessonMaterial.contentType === 0,
+      'sm:aspect-auto sm:h-[60vh]':
+        lessonMaterial.contentType === 0 || lessonMaterial.contentType === 2,
     }"
     #preview>
     @if (lessonMaterial.contentType === 0) {
       <app-pdf-viewer [lessonMaterial]="lessonMaterial" />
+    } @else if (lessonMaterial.contentType === 2) {
+      <app-doc-viewer [lessonMaterial]="lessonMaterial" />
     }
   </div>
 

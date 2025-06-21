@@ -10,6 +10,8 @@ import {
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PdfViewerComponent } from '../pdf-viewer/pdf-viewer.component';
 import { CommonModule } from '@angular/common';
+import { DocViewerComponent } from '../doc-viewer/doc-viewer.component';
+import { VideoViewerComponent } from '../video-viewer/video-viewer.component';
 
 interface Owner {
   name: string;
@@ -39,7 +41,12 @@ interface LessonMaterial {
 @Component({
   selector: 'app-preview-lesson',
   standalone: true,
-  imports: [CommonModule, PdfViewerComponent],
+  imports: [
+    CommonModule,
+    PdfViewerComponent,
+    DocViewerComponent,
+    VideoViewerComponent,
+  ],
   templateUrl: './preview-lesson.component.html',
   styleUrl: './preview-lesson.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,12 +58,16 @@ export class PreviewLessonComponent implements OnInit {
     title: 'Giới thiệu về Trí tuệ nhân tạo',
     description:
       '<h2>Giới thiệu về Trí tuệ nhân tạo</h2> <p>Trí tuệ nhân tạo (AI) là lĩnh vực nghiên cứu và phát triển các hệ thống máy tính có khả năng thực hiện các nhiệm vụ thông minh.</p> <h3>Các khái niệm cơ bản</h3> <p>AI bao gồm nhiều kỹ thuật như học máy, xử lý ngôn ngữ tự nhiên, và thị giác máy tính.</p> <h3>Phân loại AI</h3> <p>AI có thể được phân loại thành AI yếu, AI mạnh và siêu AI dựa trên khả năng và phạm vi hoạt động.</p> <h2>Ứng dụng của AI</h2> <p>AI được ứng dụng rộng rãi trong nhiều lĩnh vực:</p> <ul> <li><strong>Y tế:</strong> Hỗ trợ chẩn đoán và điều trị bệnh.</li> <li><strong>Tài chính:</strong> Phân tích dữ liệu và dự báo thị trường.</li> <li><strong>Giao thông:</strong> Điều khiển xe tự động và quản lý giao thông thông minh.</li> </ul> <h2>Tương lai của AI</h2> <p>AI sẽ tiếp tục phát triển mạnh mẽ, mang lại nhiều cơ hội và thách thức trong xã hội.</p>',
-    contentType: 0,
+    contentType: 0, //video
+    // contentType: 3, //pdf
+    // contentType: 2, //doc
     tag: 'AI, Cơ bản',
     lessonStatus: 2,
     duration: 900,
     isAIContent: true,
-    sourceUrl: 'https://vadimdez.github.io/ng2-pdf-viewer/assets/pdf-test.pdf',
+    sourceUrl: 'https://vadimdez.github.io/ng2-pdf-viewer/assets/pdf-test.pdf', //pdf
+    // sourceUrl:
+    //   'https://eduva.blob.core.windows.net/eduva-storage/SU25QN15_AI%20System%20for%20Auto-generating%20Audio_Video%20Lessons%20from%20Text%20for%20Non-tech%20Teachers.docx?sp=r&st=2025-06-20T15:32:15Z&se=2025-06-20T23:32:15Z&spr=https&sv=2024-11-04&sr=c&sig=zfgnuDcsG2rH%2BKAo7%2FPXbQF3r6debdnuyJlBed2p7QI%3D', //doc
     visibility: 0,
     createdBy: 'user1',
     createdAt: '2024-05-01T10:00:00Z',
