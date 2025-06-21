@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class CacheService {
-  private cache = new Map<string, { body: any; expiry: number }>();
+  private readonly cache = new Map<string, { body: any; expiry: number }>();
 
-  get(url: string): any | null {
+  get(url: string): any {
     const cached = this.cache.get(url);
     if (!cached) return null;
     if (Date.now() > cached.expiry) {

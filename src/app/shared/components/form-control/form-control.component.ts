@@ -14,7 +14,6 @@ import {
 import {
   ControlValueAccessor,
   NG_VALUE_ACCESSOR,
-  NG_VALIDATORS,
   AbstractControl,
   Validators,
   ReactiveFormsModule,
@@ -22,7 +21,6 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { NgForOf, NgIf } from '@angular/common';
 
 import {
   strongPasswordValidator,
@@ -33,7 +31,7 @@ import {
 @Component({
   selector: 'app-form-control',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink, NgForOf, NgIf],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink],
   templateUrl: './form-control.component.html',
   styleUrl: './form-control.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -93,11 +91,13 @@ export class FormControlComponent
   }
 
   get inputType(): string {
-    return this.type() === 'password'
-      ? this.isShowPassword()
-        ? 'text'
-        : 'password'
-      : this.type();
+    const type = this.type();
+
+    if (type === 'password') {
+      return this.isShowPassword() ? 'text' : 'password';
+    }
+
+    return type;
   }
 
   get errorMessage(): string | null {

@@ -165,11 +165,13 @@ export class MainLayoutComponent {
 
     const mainEl = this.mainElement()?.nativeElement;
     if (mainEl) {
-      mainEl.style.paddingLeft = small
-        ? '0'
-        : this.isManuallyToggled()
-          ? '250px'
-          : '80px';
+      let paddingLeft = '0';
+
+      if (!small) {
+        paddingLeft = this.isManuallyToggled() ? '250px' : '80px';
+      }
+
+      mainEl.style.paddingLeft = paddingLeft;
     }
   }
 }

@@ -38,7 +38,11 @@ export function buildFormDataFromFormGroup(form: FormGroup): FormData {
         formData.append(key, value.item(i)!);
       }
     } else if (value !== null && value !== undefined) {
-      formData.append(key, value.toString());
+      const isPlainObject = typeof value === 'object';
+      formData.append(
+        key,
+        isPlainObject ? JSON.stringify(value) : value.toString()
+      );
     }
   }
 
