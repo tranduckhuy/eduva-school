@@ -1,0 +1,29 @@
+<section
+  class="min-h-[calc(100vh-80px)] rounded-2xl bg-white shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <!-- ? Section Header -->
+  <div
+    class="flex h-12 items-center justify-between border-b border-[#dde1eb] px-4">
+    <h2 class="text-base font-medium dark:border-[#37383b]">Xem trước</h2>
+  </div>
+
+  <!-- ? Section Content -->
+  <div class="mt-4">
+    <!-- ? Audio Overview -->
+    <div class="flex flex-col gap-1 p-4 pt-0">
+      <div class="flex h-12 items-center justify-between">
+        <h3 class="m-0 text-base font-medium">Xem trước Audio</h3>
+        <span
+          class="pi pi-info-circle cursor-pointer select-none dark:text-white"
+          style="font-size: 20px"></span>
+      </div>
+      <div class="w-full rounded-2xl border p-2">
+        <generated-audio-preview />
+      </div>
+    </div>
+
+    <div class="my-3 h-[1px] w-full bg-[#dde1eb]"></div>
+
+    <!-- ? Video Overview -->
+    <div class="flex flex-col gap-4 p-4 pt-0"></div>
+  </div>
+</section>

@@ -12,10 +12,10 @@
           alt="Quy Nguyen"
           class="h-[30px] w-[30px] rounded-[50%] object-contain outline outline-[#C2CDFF]" />
         <div class="flex flex-col">
-          <span class="font-medium text-textBlack dark:text-white"
-            >Quy Nguyen</span
-          >
-          <span class="text-xs">Frontend Developer</span>
+          <span class="font-medium text-textBlack dark:text-white">
+            Quy Nguyen
+          </span>
+          <span class="text-xs dark:text-[#e6e6e6]">Frontend Developer</span>
         </div>
       </div>
       <ul>
@@ -38,9 +38,9 @@
               class="material-symbols-outlined action-btn-icon dark:text-white">
               {{ isDarkMode() ? 'light_mode' : 'dark_mode' }}
             </span>
-            <span class="dark:text-white">{{
-              isDarkMode() ? 'Bật giao diện sáng' : 'Bật giao diện tối'
-            }}</span>
+            <span class="dark:text-white">
+              {{ isDarkMode() ? 'Bật giao diện sáng' : 'Bật giao diện tối' }}
+            </span>
           </button>
         </li>
         <li class="hidden sm:block">
@@ -51,9 +51,9 @@
               class="material-symbols-rounded action-btn-icon dark:text-white">
               {{ isFullScreen() ? 'fullscreen_exit' : 'fullscreen' }}
             </span>
-            <span class="dark:text-white">{{
-              isFullScreen() ? 'Thu nhỏ màn hình' : 'Toàn màn hình'
-            }}</span>
+            <span class="dark:text-white">
+              {{ isFullScreen() ? 'Thu nhỏ màn hình' : 'Toàn màn hình' }}
+            </span>
           </button>
         </li>
         <li>
@@ -61,15 +61,15 @@
             <span class="material-symbols-outlined dark:text-white">
               settings
             </span>
-            <span class="dark:text-white"> Cài đặt </span>
+            <span class="dark:text-white">Cài đặt</span>
           </a>
         </li>
         <li>
           <a href="#!" class="information-link pt-2">
-            <span class="material-symbols-outlined dark:text-white"
-              >logout
+            <span class="material-symbols-outlined dark:text-white">
+              logout
             </span>
-            <span class="dark:text-white"> Đăng xuất </span>
+            <span class="dark:text-white">Đăng xuất</span>
           </a>
         </li>
       </ul>

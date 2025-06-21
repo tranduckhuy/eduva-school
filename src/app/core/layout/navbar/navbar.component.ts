@@ -105,6 +105,11 @@ export class NavbarComponent {
               label: 'Kiểm duyệt nội dung',
               link: '/school-admin/moderate-lessons',
             },
+            { label: 'Danh sách lớp học', link: '#!', active: true },
+            {
+              label: 'Tạo bài giảng tự động',
+              link: '/teacher/generate-lesson',
+            },
           ],
         },
       ],

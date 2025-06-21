@@ -1,0 +1,57 @@
+<header class="flex h-16 items-center justify-between">
+  <h1 class="flex items-center gap-3">
+    <a href="/">
+      <img
+        src="./images/logo.png"
+        alt="EDUVA"
+        class="size-9 rounded-md object-contain" />
+    </a>
+    <a href="/" class="text-[#252526] dark:text-[#e6e6e6]">
+      Học, Học Nữa, Học Mãi
+    </a>
+  </h1>
+  <div class="flex items-center gap-3">
+    <!-- <div class="relative">
+      <button
+        class="flex h-8 items-center gap-1 rounded-full border border-[#dde1eb] bg-none px-5 text-[#252526] shadow-transparent transition-colors ease-in hover:bg-[#dde1eb] dark:text-[#e6e6e6]"
+        (click)="toggleMenu('settings')">
+        <span class="pi pi-cog"></span>
+        <span class="font-semibold">Cài đặt</span>
+      </button>
+
+      @if (headerSubmenuService.getActiveSubmenuMenu() === 'settings') {
+        <generate-lesson-settings
+          (clickOutside)="headerSubmenuService.close()"
+          [isFullScreen]="isFullscreen()"
+          (toggleFullSCreen)="toggleFullscreen()" />
+      }
+    </div> -->
+
+    <div class="relative">
+      <div
+        class="flex cursor-pointer items-center gap-2"
+        (click)="toggleMenu('information')">
+        <img
+          src="https://htmlcss.fullstack.edu.vn/assets/f8_icon.png"
+          alt="Quy Nguyen"
+          class="h-[30px] w-[30px] flex-shrink-0 rounded-[50%] object-contain outline outline-[#C2CDFF]" />
+        <div class="flex items-center gap-1 xs:hidden">
+          <span
+            class="select-none font-semibold text-textBlack dark:text-white">
+            Quy Nguyen
+          </span>
+          <span
+            class="material-symbols-outlined text-xl text-textBlack dark:text-white">
+            keyboard_arrow_down
+          </span>
+        </div>
+      </div>
+      @if (headerSubmenuService.getActiveSubmenuMenu() === 'information') {
+        <generate-lesson-settings
+          (clickOutside)="headerSubmenuService.close()"
+          [isFullScreen]="isFullscreen()"
+          (toggleFullSCreen)="toggleFullscreen()" />
+      }
+    </div>
+  </div>
+</header>

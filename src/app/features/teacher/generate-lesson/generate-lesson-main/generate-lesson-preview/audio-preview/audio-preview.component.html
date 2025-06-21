@@ -1,0 +1,108 @@
+<div class="flex flex-col">
+  @switch (audioState()) {
+    @case ('empty') {
+      <!-- ? Empty State -->
+      <div class="flex items-center gap-2">
+        <div
+          class="flex size-14 items-center justify-center rounded-full bg-[#ebf1fd] dark:bg-dark-400">
+          <span class="material-symbols-rounded select-none dark:text-white">
+            speaker
+          </span>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-semibold dark:text-white">
+            Chưa có Audio nào được tạo
+          </span>
+          <span class="text-gray-500 dark:text-gray-300">
+            Tải tài liệu hoặc nhập yêu cầu
+          </span>
+        </div>
+      </div>
+      <p-button
+        pTooltip="Hãy tải tài liệu hoặc nhập yêu cầu trước khi tạo"
+        tooltipPosition="bottom"
+        label="Tạo nội dung"
+        styleClass="mt-4"
+        [disabled]="disableGenerate()"
+        [rounded]="true"
+        [fluid]="true"
+        (onClick)="simulateAudioGeneration()" />
+    }
+
+    @case ('loading') {
+      <!-- ? Loading State -->
+      <div class="flex items-center gap-2">
+        <div
+          class="flex size-14 shrink-0 items-center justify-center rounded-full bg-[#ebf1fd] dark:bg-dark-400">
+          <p-progress-spinner
+            ariaLabel="loading"
+            styleClass="relative top-1 !h-[35px] !w-[35px]" />
+        </div>
+        <div class="flex flex-col">
+          <span class="font-semibold dark:text-white">
+            Đang tạo bài giảng dựa trên {{ totalResourcesChecked() }} tài liệu
+          </span>
+          <span class="text-gray-500 dark:text-gray-300">
+            Quá trình này sẽ mất vài phút. Bạn có thể làm việc khác trong lúc
+            chờ!
+          </span>
+        </div>
+      </div>
+    }
+
+    @case ('generated') {
+      <!-- ? Generated State -->
+      <div class="flex items-center justify-between">
+        <h3
+          [pTooltip]="audioName()"
+          tooltipPosition="top"
+          class="line-clamp-1 grow text-base font-semibold">
+          {{ audioName() }}
+        </h3>
+        <p-button icon="pi pi-ellipsis-v" [rounded]="true" [text]="true" />
+      </div>
+      <div class="mt-2 flex grow items-center gap-5 pb-5">
+        <audio
+          #audio
+          controls
+          src="./audioplayback.mp3"
+          style="display: none"
+          (loadedmetadata)="onMetadataLoaded()"></audio>
+        <p-button
+          [rounded]="true"
+          styleClass="!text-white"
+          (onClick)="togglePlayPause()">
+          <ng-template #icon>
+            <span class="material-symbols-rounded text-3xl">
+              {{ isPlaying() ? 'pause' : 'play_arrow' }}
+            </span>
+          </ng-template>
+        </p-button>
+        <div class="relative flex h-10 grow flex-col justify-center gap-2">
+          <p-slider
+            [max]="duration()"
+            [ngModel]="currentTime()"
+            (onSlideEnd)="onTimeChange($event.value)"
+            styleClass="w-full cursor-pointer" />
+          <div
+            class="absolute -bottom-5 left-0 flex w-full items-center justify-between">
+            <div class="volume-control flex items-center gap-4">
+              <span
+                class="material-symbols-rounded cursor-pointer select-none text-xl text-gray-500 dark:text-gray-300"
+                (click)="toggleMute()">
+                {{ volumeIcon }}
+              </span>
+              <p-slider
+                [ngModel]="volume()"
+                (onSlideEnd)="onVolumeChange($event.value)"
+                styleClass="w-20 cursor-pointer" />
+            </div>
+            <span class="select-none text-xs text-gray-500 dark:text-gray-300">
+              {{ formatTime(currentTime()) }} / {{ formatTime(duration()) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>
