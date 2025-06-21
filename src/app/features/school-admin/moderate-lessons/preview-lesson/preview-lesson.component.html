@@ -5,9 +5,10 @@
     class="relative flex w-full justify-center rounded bg-dark-900"
     [ngClass]="{
       'aspect-[2/1] sm:aspect-auto sm:h-[70vh]':
-        lessonMaterial.contentType === 3 || lessonMaterial.contentType === 2,
+        lessonMaterial.contentType === 3,
+      'aspect-[2/0.25] sm:aspect-[2/0.5]': lessonMaterial.contentType === 1,
       'aspect-video':
-        lessonMaterial.contentType === 0 || lessonMaterial.contentType === 1,
+        lessonMaterial.contentType === 0 || lessonMaterial.contentType === 2,
     }"
     #preview>
     @if (lessonMaterial.contentType === 3) {
@@ -16,6 +17,8 @@
       <app-doc-viewer [lessonMaterial]="lessonMaterial" />
     } @else if (lessonMaterial.contentType === 0) {
       <app-video-viewer />
+    } @else if (lessonMaterial.contentType === 1) {
+      <app-audio-viewer />
     }
   </div>
 
