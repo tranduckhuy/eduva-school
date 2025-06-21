@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
-  input,
   signal,
 } from '@angular/core';
 import { GlobalModalService } from '../../../../shared/services/global-modal/global-modal.service';
@@ -11,6 +10,9 @@ import { FormControlComponent } from '../../../../shared/components/form-control
 import { FormsModule, NgForm } from '@angular/forms';
 import { MODAL_DATA } from '../../../../shared/constants/modal-data.token';
 
+interface ModerateReasonModalData {
+  isApproved: boolean;
+}
 @Component({
   selector: 'app-moderate-reason-modal',
   standalone: true,
@@ -21,7 +23,7 @@ import { MODAL_DATA } from '../../../../shared/constants/modal-data.token';
 })
 export class ModerateReasonModalComponent {
   private readonly globalModalService = inject(GlobalModalService);
-  readonly modalData = inject(MODAL_DATA);
+  readonly modalData = inject<ModerateReasonModalData>(MODAL_DATA);
 
   reason = signal<string>('');
   submitted = signal<boolean>(false);
