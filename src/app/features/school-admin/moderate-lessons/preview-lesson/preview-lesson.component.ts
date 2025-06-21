@@ -130,9 +130,13 @@ export class PreviewLessonComponent implements OnInit {
   }
 
   openAddStudentModal() {
-    this.globalModalService.open(ModerateReasonModalComponent, {
-      isApproved: this.isApprovedLesson(),
-    });
+    this.globalModalService.open(
+      ModerateReasonModalComponent,
+      {
+        isApproved: this.isApprovedLesson(),
+      },
+      ''
+    );
   }
 
   approveLesson() {

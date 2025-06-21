@@ -28,7 +28,6 @@ export class ModerateReasonModalComponent {
 
   onSubmit(form: NgForm) {
     this.submitted.set(true);
-    console.log(123);
   }
 
   closeModal() {
