@@ -73,8 +73,10 @@ export class GenerateLessonChatComponent implements AfterViewInit {
     },
   ];
 
-  private readonly resourcesStateService = inject(ResourcesStateService);
   private readonly scrollContainer = viewChild<ElementRef>('scrollContainer');
+
+  private readonly fb = inject(FormBuilder);
+  private readonly resourcesStateService = inject(ResourcesStateService);
 
   form!: FormGroup;
 
@@ -85,7 +87,7 @@ export class GenerateLessonChatComponent implements AfterViewInit {
   readonly totalChecked = this.resourcesStateService.checkedSources;
   readonly isLoading = this.resourcesStateService.isLoading;
 
-  constructor(private fb: FormBuilder) {
+  constructor() {
     this.form = this.fb.group({
       query: ['', Validators.required],
     });

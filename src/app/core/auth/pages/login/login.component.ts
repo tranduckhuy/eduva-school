@@ -1,16 +1,32 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+
+import { AuthService } from '../../services/auth.service';
+
 import { AuthLayoutComponent } from '../../auth-layout/auth-layout.component';
+
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
-import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
+
+import { type LoginRequest } from './models/login-request.model';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
+    ReactiveFormsModule,
     AuthLayoutComponent,
     FormControlComponent,
-    FormsModule,
     ButtonComponent,
   ],
   templateUrl: './login.component.html',
@@ -18,8 +34,29 @@ import { ButtonComponent } from '../../../../shared/components/button/button.com
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
-  email = signal<string>('');
-  password = signal<string>('');
+  private readonly authService = inject(AuthService);
+  private readonly fb = inject(FormBuilder);
 
-  onSubmit() {}
+  form!: FormGroup;
+
+  submitted = signal<boolean>(false);
+
+  constructor() {
+    this.form = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+    });
+  }
+
+  onSubmit(): void {
+    this.submitted.set(true);
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    const request: LoginRequest = this.form.value;
+
+    this.authService.login(request).subscribe();
+  }
 }

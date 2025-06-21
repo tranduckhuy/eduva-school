@@ -8,16 +8,27 @@ import {
 } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 
-import { ThemeService } from '../../../shared/services/theme/theme.service';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+
+import { ThemeService } from '../../../shared/services/core/theme/theme.service';
+
 import { GlobalModalHostComponent } from '../../../shared/components/global-modal-host/global-modal-host.component';
 
 @Component({
   selector: 'app-blank-layout',
   standalone: true,
-  imports: [RouterOutlet, GlobalModalHostComponent],
+  imports: [
+    RouterOutlet,
+    ToastModule,
+    ConfirmDialogModule,
+    GlobalModalHostComponent,
+  ],
   template: `
     <router-outlet />
 
+    <p-toast />
+    <p-confirmDialog [baseZIndex]="1000" />
     <app-global-modal-host />
 
     @if (showThemeButton()) {

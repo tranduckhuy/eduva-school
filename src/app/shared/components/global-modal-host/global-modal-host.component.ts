@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { NgComponentOutlet, CommonModule } from '@angular/common';
 
-import { GlobalModalService } from '../../services/global-modal/global-modal.service';
+import { GlobalModalService } from '../../services/layout/global-modal/global-modal.service';
 
 @Component({
   selector: 'app-global-modal-host',

@@ -1,34 +1,37 @@
+// Updated FormControlComponent using @signal input() and output() APIs
 import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
-  input,
-  signal,
-  computed,
   forwardRef,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+  signal,
+  input,
+  output,
+  computed,
 } from '@angular/core';
 import {
-  FormControl,
-  AbstractControl,
-  ReactiveFormsModule,
   ControlValueAccessor,
-  Validators,
   NG_VALUE_ACCESSOR,
-  ValidationErrors,
+  AbstractControl,
+  Validators,
+  ReactiveFormsModule,
+  FormControl,
 } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 import {
   strongPasswordValidator,
   matchPasswordValidator,
   minWordCountValidator,
 } from '../../utils/form-validators';
-import { RouterLink } from '@angular/router';
-import { NgForOf, NgIf, CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-form-control',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink, NgForOf, NgIf],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink],
   templateUrl: './form-control.component.html',
   styleUrl: './form-control.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,15 +43,14 @@ import { NgForOf, NgIf, CommonModule } from '@angular/common';
     },
   ],
 })
-export class FormControlComponent implements OnInit, ControlValueAccessor {
-  // ? Form Control
+export class FormControlComponent
+  implements OnInit, OnChanges, ControlValueAccessor
+{
   control = new FormControl('');
 
-  // ? Input Tag Properties
   name = input<string>('');
   type = input<string>('text');
   label = input<string>('');
-  value = input<string>('');
   readOnly = input<boolean>(false);
   isTextarea = input<boolean>(false);
   rows = input<number>(3);
@@ -58,25 +60,6 @@ export class FormControlComponent implements OnInit, ControlValueAccessor {
   });
   placeholder = input<string>('');
   options = input<Array<{ label: string; value: string }>>([]);
-
-  // Custom select search state
-  searchTerm = signal<string>('');
-  filteredOptions = computed(() => {
-    const term = this.searchTerm().toLowerCase();
-    return this.options().filter(opt => opt.label.toLowerCase().includes(term));
-  });
-
-  // Optional: only show search box if options.length > 7
-  get showSearchBox() {
-    return this.options().length > 7;
-  }
-
-  onSearchInput(event: Event) {
-    const value = (event.target as HTMLInputElement)?.value ?? '';
-    this.searchTerm.set(value);
-  }
-
-  // ? Validators
   maxLength = input<number>(50);
   minLength = input<number>(0);
   max = input<number>(0);
@@ -89,118 +72,119 @@ export class FormControlComponent implements OnInit, ControlValueAccessor {
   errorMessages = input<{ [key: string]: string }>({});
   validatePassword = input<boolean>(false);
   confirmPassword = input<string | null>(null);
-
-  // ? State Management
-  isShowPassword = signal<boolean>(false);
-  readonly inputType = computed(() =>
-    this.type() === 'password'
-      ? this.isShowPassword()
-        ? 'text'
-        : 'password'
-      : this.type()
-  );
-
-  private onChange: (value: string) => void = () => {};
-  private onTouched: () => void = () => {};
-
-  // ? Submitted state from parent component
   submitted = input<boolean>(false);
+  value = input<string>('');
 
-  ngOnInit(): void {
-    const validators = this.buildValidators();
-    this.control.setValidators(validators);
+  valueChange = output<string>();
+  blur = output<void>();
 
-    this.control.valueChanges.subscribe(value => {
-      this.onChange(value ?? '');
-      this.onTouched();
-    });
+  isShowPassword = signal(false);
+  searchTerm = signal('');
+
+  filteredOptions = computed(() => {
+    const term = this.searchTerm().toLowerCase();
+    return this.options().filter(opt => opt.label.toLowerCase().includes(term));
+  });
+
+  get showSearchBox() {
+    return this.options().length > 7;
+  }
+
+  get inputType(): string {
+    const type = this.type();
+
+    if (type === 'password') {
+      return this.isShowPassword() ? 'text' : 'password';
+    }
+
+    return type;
   }
 
   get errorMessage(): string | null {
-    const errors = this.control.errors;
-    if (
-      errors &&
-      (this.control.dirty || this.control.touched || this.submitted())
-    ) {
-      const firstErrorKey = Object.keys(errors)[0];
+    const errors = this.control?.errors;
+    if (errors && (this.control.touched || this.submitted())) {
+      const firstKey = Object.keys(errors)[0];
       return (
-        this.errorMessages()[firstErrorKey] ||
-        this.getDefaultErrorMessage(firstErrorKey)
+        this.errorMessages()[firstKey] || this.getDefaultErrorMessage(firstKey)
       );
     }
     return null;
   }
 
-  toggleShowPassword(): void {
-    this.isShowPassword.set(!this.isShowPassword());
+  ngOnInit(): void {
+    const validators = this.buildValidators();
+    this.control.setValidators(validators);
+    this.control.setValue(this.value(), { emitEvent: false });
+    this.control.valueChanges.subscribe(val => {
+      this.valueChange.emit(val!);
+      this.onChange(val);
+      this.onTouched();
+    });
   }
 
-  writeValue(value: string): void {
-    this.control.setValue(value ?? '', { emitEvent: false });
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['value'] && !this.control.dirty) {
+      this.control.setValue(this.value(), { emitEvent: false });
+    }
   }
 
-  registerOnChange(fn: (value: string) => void): void {
+  writeValue(value: any): void {
+    this.control.setValue(value);
+  }
+
+  registerOnChange(fn: any): void {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: () => void): void {
+  registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
 
   handleTouched(): void {
     this.control.markAsTouched();
     this.onTouched();
+    this.blur.emit();
   }
+
+  onSearchInput(event: Event): void {
+    const value = (event.target as HTMLInputElement)?.value ?? '';
+    this.searchTerm.set(value);
+  }
+
+  toggleShowPassword(): void {
+    this.isShowPassword.set(!this.isShowPassword());
+  }
+
+  private onChange: (value: any) => void = () => {};
+  private onTouched: () => void = () => {};
+
   private buildValidators() {
-    const validators: Array<
-      (control: AbstractControl) => ValidationErrors | null
-    > = [];
-
-    // Skip validation for textarea
-    if (this.isTextarea()) {
-      return validators;
-    }
-
-    // ? Required
+    const validators = [];
     if (this.required()) validators.push(Validators.required);
-    // ? Match Phone Number (Vietnam)
-    if (this.phone()) {
-      // Vietnamese phone: starts with 0, 10 or 11 digits total
-      validators.push(Validators.pattern(/^0\d{9,10}$/));
-    } else if (this.pattern()) {
-      // ? Match Pattern
+    if (this.phone()) validators.push(Validators.pattern(/^0\d{9,10}$/));
+    else if (this.pattern())
       validators.push(Validators.pattern(this.pattern()!));
-    }
-    // ? Match Email Format
     if (this.email()) validators.push(Validators.email);
-    // ? Match Min Word Count
     if (this.minWords() > 0)
-      validators.push((ctrl: AbstractControl) =>
-        minWordCountValidator(ctrl, this.minWords())
+      validators.push((c: AbstractControl) =>
+        minWordCountValidator(c, this.minWords())
       );
-    // ? Match Min Value
     if (this.min() !== 0) validators.push(Validators.min(this.min()));
-    // ? Match Max Value
     if (this.max() !== 0) validators.push(Validators.max(this.max()));
-    // ? Match Max Length
     if (this.maxLength())
       validators.push(Validators.maxLength(this.maxLength()));
-    // ? Match Min Length
     if (this.minLength())
       validators.push(Validators.minLength(this.minLength()));
-    // ? Match Password Standard
     if (this.validatePassword()) validators.push(strongPasswordValidator);
-    // ? Confirm Password Value Match Password Value
     if (this.confirmPassword() !== null)
-      validators.push((ctrl: AbstractControl) =>
-        matchPasswordValidator(ctrl, this.confirmPassword()!)
+      validators.push((c: AbstractControl) =>
+        matchPasswordValidator(c, this.confirmPassword()!)
       );
-
     return validators;
   }
 
-  private getDefaultErrorMessage(error: string): string {
-    const defaultMessages: { [key: string]: string } = {
+  private getDefaultErrorMessage(key: string): string {
+    const defaults: { [key: string]: string } = {
       required: 'Trường này không được để trống',
       pattern: 'Định dạng không hợp lệ',
       maxlength: `Tối đa chỉ được phép nhập ${this.maxLength()} ký tự`,
@@ -216,10 +200,8 @@ export class FormControlComponent implements OnInit, ControlValueAccessor {
       missingNumber: 'Mật khẩu cần ít nhất một chữ số (0-9)',
       missingSpecialChar:
         'Mật khẩu cần ít nhất một ký tự đặc biệt (ví dụ: !@#$%)',
-
       passMismatch: 'Mật khẩu xác nhận không khớp',
     };
-
-    return defaultMessages[error] ?? 'Giá trị không hợp lệ';
+    return defaults[key] || 'Giá trị không hợp lệ';
   }
 }
