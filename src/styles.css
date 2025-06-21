@@ -126,6 +126,8 @@
     --color-placeholder-primary: var(--color-gray-500);
 
     --color-heading: var(--color-black);
+
+    --color-scrollbar: #b5c3d7;
   }
 
   html {
@@ -150,17 +152,23 @@
     --color-placeholder-primary: var(--color-gray-400);
 
     --color-heading: var(--color-white);
+
+    --color-scrollbar: #ffffff26;
   }
 
   html *::-webkit-scrollbar {
-    width: 0;
+    border-radius: 0px;
+    width: 4px;
+    height: 4px;
   }
 
   html *::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    background-color: var(--color-scrollbar);
   }
 
   html *::-webkit-scrollbar-track {
+    border-radius: 0;
     background-color: rgba(0, 0, 0, 0);
   }
 
@@ -170,6 +178,7 @@
     background-color: var(--color-bg-third);
     line-height: 1.6;
     text-rendering: optimizeSpeed;
+    overscroll-behavior: contain;
     direction: ltr;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

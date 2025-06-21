@@ -30,6 +30,14 @@ export const teacherRoutes: Routes = [
       import('../../core/layout/blank-layout/blank-layout.component').then(
         mod => mod.BlankLayoutComponent
       ),
-    children: [],
+    children: [
+      {
+        path: 'generate-lesson',
+        loadComponent: () =>
+          import(
+            './generate-lesson/generate-lesson-layout/generate-lesson-layout.component'
+          ).then(mod => mod.GenerateLessonLayoutComponent),
+      },
+    ],
   },
 ];

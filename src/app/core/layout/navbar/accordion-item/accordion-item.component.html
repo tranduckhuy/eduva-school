@@ -38,7 +38,9 @@
         </span>
       }
     </button>
-    <div class="accordion-collapse mt-1" [class.hidden]="!isOpen()">
+    <div
+      class="accordion-collapse mt-1"
+      [class.hidden]="!isOpen() || isSidebarCollapsed()">
       <ul>
         @for (item of submenuItems(); track $index) {
           <li>

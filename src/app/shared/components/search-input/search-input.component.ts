@@ -6,12 +6,13 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-search-input',
   standalone: true,
-  imports: [FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './search-input.component.html',
   styleUrl: './search-input.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,0 +1,163 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  viewChild,
+  inject,
+  signal,
+  effect,
+  computed,
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+import { SliderModule } from 'primeng/slider';
+import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
+import { ResourcesStateService } from '../../services/resources-state.service';
+
+@Component({
+  selector: 'generated-audio-preview',
+  standalone: true,
+  imports: [
+    FormsModule,
+    SliderModule,
+    ButtonModule,
+    TooltipModule,
+    ProgressSpinnerModule,
+  ],
+  templateUrl: './audio-preview.component.html',
+  styleUrl: './audio-preview.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class AudioPreviewComponent {
+  private readonly audio = viewChild<ElementRef<HTMLAudioElement>>('audio');
+
+  private readonly resourcesStateService = inject(ResourcesStateService);
+  totalResourcesChecked = this.resourcesStateService.checkedSources;
+
+  isPlaying = signal(false);
+  currentTime = signal(0);
+  duration = signal(0);
+  volume = signal(100);
+  audioName = signal('');
+  audioState = signal<'empty' | 'loading' | 'generated'>('empty');
+
+  readonly disableGenerate = computed(() => {
+    const uploading = this.resourcesStateService
+      .sourceList()
+      .some(x => x.isUploading);
+    return (
+      (this.resourcesStateService.totalSources() === 0 &&
+        !this.resourcesStateService.hasInteracted()) ||
+      this.resourcesStateService.isLoading() ||
+      uploading
+    );
+  });
+
+  private previousVolume = 100;
+
+  constructor() {
+    effect(() => {
+      if (!this.isPlaying()) return;
+      const interval = setInterval(() => {
+        const audioEl = this.audio()?.nativeElement;
+        if (audioEl) {
+          this.currentTime.set(Math.floor(audioEl.currentTime));
+        }
+      }, 500);
+      return () => clearInterval(interval);
+    });
+  }
+
+  get volumeIcon() {
+    const v = this.volume();
+    if (v === 0) return 'volume_off';
+    if (v < 50) return 'volume_down';
+    return 'volume_up';
+  }
+
+  togglePlayPause() {
+    const audioEl = this.audio()?.nativeElement;
+    if (!audioEl) return;
+
+    if (this.isPlaying()) {
+      audioEl.pause();
+      this.isPlaying.set(false);
+    } else {
+      audioEl.play().then(() => this.isPlaying.set(true));
+    }
+  }
+
+  toggleMute() {
+    const audioEl = this.audio()?.nativeElement;
+    if (!audioEl) return;
+
+    const currentVolume = this.volume();
+
+    if (currentVolume === 0) {
+      audioEl.volume = this.previousVolume / 100;
+      this.volume.set(this.previousVolume);
+    } else {
+      this.previousVolume = currentVolume;
+      audioEl.volume = 0;
+      this.volume.set(0);
+    }
+  }
+
+  onMetadataLoaded() {
+    const audioEl = this.audio()?.nativeElement;
+    if (audioEl) {
+      this.duration.set(Math.floor(audioEl.duration));
+
+      const src = audioEl.currentSrc || audioEl.src;
+      const fileName = src.split('/').pop() ?? '';
+      const nameWithoutExtension = fileName.replace(/\.[^/.]+$/, '');
+
+      this.audioName.set(nameWithoutExtension);
+    }
+  }
+
+  onTimeChange(value?: number) {
+    if (value === undefined) return;
+    const audioEl = this.audio()?.nativeElement;
+    if (audioEl) {
+      audioEl.currentTime = value;
+      this.currentTime.set(value);
+    }
+  }
+
+  onVolumeChange(value?: number) {
+    if (value === undefined) return;
+    const audioEl = this.audio()?.nativeElement;
+    if (audioEl) {
+      audioEl.volume = value / 100;
+      this.volume.set(value);
+    }
+  }
+
+  formatTime(seconds: number): string {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+
+    const pad = (n: number) => n.toString().padStart(2, '0');
+
+    if (h > 0) {
+      return `${h}:${pad(m)}:${pad(s)}`;
+    }
+    return `${pad(m)}:${pad(s)}`;
+  }
+
+  // ? Simulation
+  simulateAudioGeneration() {
+    this.audioState.set('loading');
+
+    const delay = 3000 + Math.floor(Math.random() * 2000); // 3-5s
+
+    setTimeout(() => {
+      this.audioState.set('generated');
+    }, delay);
+  }
+}

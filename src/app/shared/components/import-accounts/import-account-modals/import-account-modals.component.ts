@@ -21,6 +21,7 @@ import { MODAL_DATA } from '../../../services/global-modal/modal-data.token';
 export class ImportAccountModalsComponent {
   private readonly globalModalService = inject(GlobalModalService);
   readonly modalData = inject(MODAL_DATA);
+
   // View references
   fileInput = viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
 
