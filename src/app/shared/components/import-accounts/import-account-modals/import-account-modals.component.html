@@ -69,6 +69,7 @@
       label="Tải xuống template"
       variant="outlined"
       icon="pi pi-download"
+      [loading]="isLoading()"
       size="small"
       (onClick)="downloadTemplate()" />
     <div class="flex items-center gap-2">

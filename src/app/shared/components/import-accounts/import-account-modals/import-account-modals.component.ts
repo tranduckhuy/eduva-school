@@ -24,6 +24,8 @@ export class ImportAccountModalsComponent {
   readonly modalData = inject(MODAL_DATA);
   readonly downloadTemplateService = inject(DownloadTemplateServiceService);
 
+  isLoading = this.downloadTemplateService.isLoading;
+
   // View references
   fileInput = viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
 
