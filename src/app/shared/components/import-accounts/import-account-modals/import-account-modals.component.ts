@@ -52,7 +52,6 @@ export class ImportAccountModalsComponent {
   uploadProgress = signal<number>(0);
   isUploading = signal<boolean>(false);
 
-
   // Drag and drop handlers
   onDragOver(event: DragEvent) {
     event.preventDefault();
@@ -162,7 +161,7 @@ export class ImportAccountModalsComponent {
       let blob: Blob;
       blob = new Blob([file], { type: file.type });
       this.fileBlob.set(blob);
-    } catch (error) {
+    } catch {
       this.toastHandlingService.errorGeneral();
       this.isValid.set(false);
     }
