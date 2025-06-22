@@ -16,7 +16,7 @@ import { DownloadTemplateService } from '../services/download-template.service';
 
 import { MODAL_DATA } from '../../../services/layout/global-modal/modal-data.token';
 import {
-  MAX_FILE_SIZE,
+  MAX_IMPORT_FILE_SIZE,
   ALLOWED_IMPORT_EXTENSIONS,
 } from '../../../constants/common.constant';
 
@@ -133,10 +133,10 @@ export class ImportAccountModalsComponent {
     this.isValid.set(false);
 
     // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > MAX_IMPORT_FILE_SIZE) {
       this.toastHandlingService.error(
         'Lỗi',
-        `File quá lớn. Vui lòng chọn file nhỏ hơn ${MAX_FILE_SIZE / (1024 * 1024)}MB`
+        `File quá lớn. Vui lòng chọn file nhỏ hơn ${MAX_IMPORT_FILE_SIZE / (1024 * 1024)}MB`
       );
       return;
     }

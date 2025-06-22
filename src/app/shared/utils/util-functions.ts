@@ -1,3 +1,5 @@
+import { ContentType } from '../models/enum/content-type.enum';
+
 /**
  * Triggers the download of a file from a base64-encoded string.
  *
@@ -45,4 +47,26 @@ export const triggerBlobDownload = (fileName: string, blob: Blob): void => {
   a.download = fileName;
   a.click();
   window.URL.revokeObjectURL(url);
+};
+
+/**
+ * Maps a MIME type string to its corresponding `ContentType` enum value.
+ *
+ * Supported mappings:
+ * - video/* → ContentType.Video
+ * - audio/* → ContentType.Audio
+ * - application/pdf → ContentType.PDF
+ * - application/vnd.openxmlformats-officedocument.wordprocessingml.document → ContentType.DOCX
+ *
+ * @param mime - The MIME type string (e.g. "video/mp4", "application/pdf").
+ * @returns The corresponding `ContentType` enum value.
+ *
+ * @throws Error if the MIME type is not supported.
+ */
+export const getContentTypeFromMime = (mime: string): ContentType => {
+  if (mime.startsWith('video/')) return ContentType.Video;
+  if (mime.startsWith('audio/')) return ContentType.Audio;
+  if (mime === 'application/pdf') return ContentType.PDF;
+
+  return ContentType.DOCX;
 };

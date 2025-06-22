@@ -9,8 +9,8 @@
   </header>
 
   <div class="mt-[25px] px-[25px] pb-0">
-    <form (ngSubmit)="onSubmit()" [formGroup]="form">
-      <div class="w-[500px]">
+    <!-- <form [formGroup]="form"> -->
+    <!-- <div class="w-[500px]">
         <label for="title" class="font-bold dark:text-white">
           Tên tài liệu
         </label>
@@ -44,89 +44,92 @@
             {{ getErrorMessage('title') }}
           </div>
         }
-      </div>
+      </div> -->
 
-      <div class="mt-[25px]">
-        <label for="files" class="font-bold dark:text-white">
-          Chọn tệp từ thiết bị
-        </label>
-        <div class="mt-3">
-          <p-fileupload
-            name="files[]"
-            mode="advanced"
-            accept="video/*, audio/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            maxFileSize="1000000"
-            previewWidth="60"
-            [customUpload]="true"
-            [multiple]="true"
-            (onUpload)="onUpload($event)"
-            (onSelect)="onSelectFile($event)">
-            <ng-template
-              #header
-              let-files
-              let-chooseCallback="chooseCallback"
-              let-clearCallback="clearCallback">
+    <div class="mt-[25px] w-[550px]">
+      <label for="files" class="font-bold dark:text-white">
+        Chọn tệp từ thiết bị
+      </label>
+      <div class="mt-3">
+        <p-fileupload
+          name="files[]"
+          mode="advanced"
+          accept="video/*, audio/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          previewWidth="60"
+          [multiple]="true"
+          [maxFileSize]="maxUploadFileSize"
+          (onSelect)="onSelectFile($event)"
+          (onRemove)="onRemoveFile($event)">
+          <ng-template
+            #header
+            let-files
+            let-chooseCallback="chooseCallback"
+            let-clearCallback="clearCallback">
+            <div
+              class="flex flex-1 flex-wrap items-center justify-between gap-4">
+              <div class="flex gap-2">
+                <p-button
+                  pTooltip="Chọn tệp để tải lên"
+                  tooltipPosition="top"
+                  icon="pi pi-upload"
+                  size="small"
+                  [rounded]="true"
+                  [outlined]="true"
+                  (onClick)="chooseCallback()" />
+                <p-button
+                  pTooltip="Xóa tất cả tệp đã chọn"
+                  tooltipPosition="top"
+                  icon="pi pi-trash"
+                  severity="danger"
+                  size="small"
+                  [rounded]="true"
+                  [outlined]="true"
+                  [disabled]="!files || files.length === 0"
+                  (onClick)="clearCallback()" />
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #content let-files let-chooseCallback="chooseCallback">
+            <div *ngIf="files.length > 0; else empty">
               <div
-                class="flex flex-1 flex-wrap items-center justify-between gap-4">
-                <div class="flex gap-2">
-                  <p-button
-                    pTooltip="Chọn tệp để tải lên"
-                    tooltipPosition="top"
-                    icon="pi pi-upload"
-                    size="small"
-                    [rounded]="true"
-                    [outlined]="true"
-                    (onClick)="chooseCallback()" />
-                  <p-button
-                    pTooltip="Xóa tất cả tệp đã chọn"
-                    tooltipPosition="top"
-                    icon="pi pi-trash"
-                    severity="danger"
-                    size="small"
-                    [rounded]="true"
-                    [outlined]="true"
-                    [disabled]="!files || files.length === 0"
-                    (onClick)="clearCallback()" />
-                </div>
-              </div>
-            </ng-template>
-            <ng-template #content let-files let-chooseCallback="chooseCallback">
-              <div *ngIf="files.length > 0; else empty">
-                <div
-                  class="block h-[1px] w-full bg-[#e2e8f0] dark:bg-[#3f3f46]"></div>
-                <ul class="mt-3">
-                  <li *ngFor="let file of files" class="mt-1">
-                    Tệp tin: {{ file.name }} - {{ formatSize(file.size) }}
-                  </li>
-                </ul>
-              </div>
+                class="block h-[1px] w-full bg-[#e2e8f0] dark:bg-[#3f3f46]"></div>
+              <ul class="mt-3">
+                <li
+                  *ngFor="let file of selectedFiles()"
+                  pTooltip="{{ file.name }} - {{ formatSize(file.size) }}"
+                  tooltipPosition="bottom"
+                  class="mt-1 line-clamp-1 break-all">
+                  Tệp tin: {{ file.name }} - {{ formatSize(file.size) }}
+                </li>
+              </ul>
+            </div>
 
-              <ng-template #empty>
-                <div class="flex w-full flex-col items-center justify-center">
-                  <i
-                    class="pi pi-cloud-upload !rounded-full !border-2 !p-8 !text-4xl !text-gray-400"></i>
-                  <p class="mb-0 mt-4">Kéo và thả tệp vào đây để tải lên.</p>
-                  <p class="mb-0 mt-3 font-semibold">- Hoặc -</p>
-                  <p-button
-                    pTooltip="Chọn tệp để tải lên"
-                    tooltipPosition="bottom"
-                    label="Tải lên"
-                    variant="outlined"
-                    icon="pi pi-upload"
-                    size="small"
-                    styleClass="mt-3"
-                    (onClick)="chooseCallback()" />
-                  <p class="mt-12 text-gray-400">
-                    Các loại file được hỗ trợ: .pdf, .doc, .txt, Video (e.g.
-                    .mp4), Audio (e.g. .mp3)
-                  </p>
-                </div>
-              </ng-template>
+            <ng-template #empty>
+              <div class="flex w-full flex-col items-center justify-center">
+                <i
+                  class="pi pi-cloud-upload !rounded-full !border-2 !p-8 !text-4xl !text-gray-400"></i>
+                <p class="mb-0 mt-4">Kéo và thả tệp vào đây để tải lên.</p>
+                <p class="mb-0 mt-3 font-semibold">- Hoặc -</p>
+                <p-button
+                  pTooltip="Chọn tệp để tải lên"
+                  tooltipPosition="bottom"
+                  label="Tải lên"
+                  variant="outlined"
+                  icon="pi pi-upload"
+                  size="small"
+                  styleClass="mt-3"
+                  (onClick)="chooseCallback()" />
+                <p class="mt-12 text-gray-400">
+                  Các loại file được hỗ trợ: .pdf, .doc, .txt, Video (e.g.
+                  .mp4), Audio (e.g. .mp3)
+                </p>
+              </div>
             </ng-template>
-          </p-fileupload>
-        </div>
+          </ng-template>
+        </p-fileupload>
       </div>
-    </form>
+    </div>
+    <!-- </form> -->
   </div>
 
   <div
@@ -142,6 +145,9 @@
       label="Thêm tài liệu"
       variant="outlined"
       icon="pi pi-plus"
-      size="small" />
+      size="small"
+      [loading]="isLoading()"
+      [disabled]="selectedFiles().length === 0"
+      (onClick)="onSubmit()" />
   </div>
 </div>
