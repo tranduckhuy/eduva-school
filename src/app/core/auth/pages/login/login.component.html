@@ -2,17 +2,19 @@
   <h1 class="mb-2 text-center text-xl font-bold">Đăng Nhập</h1>
   <p class="mb-6 text-center text-[15px] opacity-80">Chào mừng bạn trở lại</p>
 
-  <form (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
     <app-form-control
+      formControlName="email"
       label="Email"
       type="email"
       placeholder="Email của bạn"
       [name]="'email'"
-      [(ngModel)]="email"
+      [submitted]="submitted()"
       [email]="true"
       [required]="true">
     </app-form-control>
     <app-form-control
+      formControlName="password"
       label="Mật khẩu"
       [redirectLink]="{
         value: 'Quên mật khẩu?',
@@ -21,21 +23,21 @@
       type="password"
       placeholder="Mật khẩu của bạn"
       [name]="'password'"
-      [(ngModel)]="password"
       [errorMessages]="{
         required: 'Vui lòng nhập mật khẩu hiện tại',
       }"
+      [submitted]="submitted()"
       [required]="true">
     </app-form-control>
-    <app-button [width]="'full'" class="mt-4" [type]="'submit'"
-      >Đăng nhập</app-button
-    >
+    <app-button [width]="'full'" class="mt-4" [type]="'submit'">
+      Đăng nhập
+    </app-button>
     <p
       class="mx-auto mt-1 text-center text-[12px] opacity-80 dark:text-[#64748b]">
       Việc bạn tiếp tục sử dụng trang web này đồng nghĩa bạn đồng ý với
-      <a href="#!" class="cursor-pointer text-primary underline"
-        >điều khoản sử dụng</a
-      >
+      <a href="#!" class="cursor-pointer text-primary underline">
+        điều khoản sử dụng
+      </a>
       của chúng tôi.
     </p>
   </form>

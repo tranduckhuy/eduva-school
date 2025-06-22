@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { BreadcrumbsService } from '../../services/breadcrumbs/breadcrumbs.service';
+import { BreadcrumbsService } from '../../services/layout/breadcrumbs/breadcrumbs.service';
 
 @Component({
   selector: 'app-breadcrumbs',

@@ -1,3 +1,6 @@
-<button (click)="onClick($event)">
+<button
+  class="h-full w-full border-none bg-transparent outline-none"
+  [type]="type()"
+  (click)="onClick($event)">
   <ng-content />
 </button>

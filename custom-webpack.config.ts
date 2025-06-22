@@ -1,8 +1,15 @@
-import { EnvironmentPlugin } from 'webpack';
-import { config } from 'dotenv';
+import Dotenv from 'dotenv-webpack';
+import { DefinePlugin } from 'webpack';
+import { resolve } from 'path';
 
-config();
-
-module.exports = {
-  plugins: [new EnvironmentPlugin(['API_URL'])],
-};
+export const plugins = [
+  new DefinePlugin({
+    BASE_API_URL: JSON.stringify(process.env?.['BASE_API_URL']),
+  }),
+  new Dotenv({
+    path: resolve(__dirname, '.env'),
+    systemvars: true,
+    safe: true,
+    allowEmptyValues: true,
+  }),
+];

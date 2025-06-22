@@ -64,20 +64,29 @@
   </div>
 
   <div
-    class="sticky bottom-0 left-0 z-[1] flex justify-end gap-2 rounded bg-white p-[25px] dark:bg-dark-300">
+    class="sticky bottom-0 left-0 z-[1] flex justify-between rounded bg-white p-[25px] dark:bg-dark-300">
     <p-button
-      label="Hủy"
+      label="Tải xuống template"
       variant="outlined"
-      severity="danger"
-      icon="pi pi-times"
+      icon="pi pi-download"
+      [loading]="isLoading()"
       size="small"
-      (onClick)="closeModal()" />
-    <p-button
-      label="Tải lên"
-      [disabled]="!file() || !isValid()"
-      variant="outlined"
-      icon="pi pi-upload"
-      size="small"
-      (onClick)="uploadData()" />
+      (onClick)="downloadTemplate()" />
+    <div class="flex items-center gap-2">
+      <p-button
+        label="Hủy"
+        variant="outlined"
+        severity="danger"
+        icon="pi pi-times"
+        size="small"
+        (onClick)="closeModal()" />
+      <p-button
+        label="Tải lên"
+        [disabled]="!file() || !isValid()"
+        variant="outlined"
+        icon="pi pi-upload"
+        size="small"
+        (onClick)="uploadData()" />
+    </div>
   </div>
 </div>

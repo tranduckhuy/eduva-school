@@ -1,11 +1,10 @@
 import {
   Component,
-  Input,
-  Output,
-  EventEmitter,
   forwardRef,
   HostBinding,
   ChangeDetectionStrategy,
+  input,
+  output,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -47,14 +46,15 @@ type ButtonWidth = 'default' | 'full' | 'xs' | 'sm' | 'md' | 'lg';
   ],
 })
 export class ButtonComponent {
-  @Input() variant: ButtonVariant = 'default';
-  @Input() size: ButtonSize = 'default';
-  @Input() theme: ButtonTheme = 'default';
-  @Input() width: ButtonWidth = 'default';
-  @Input() disabled = false;
-  @Input() type: 'button' | 'submit' | 'reset' = 'button';
-  @Input() asChild = false;
-  @Output() clicked = new EventEmitter<Event>();
+  variant = input<ButtonVariant>('default');
+  size = input<ButtonSize>('default');
+  theme = input<ButtonTheme>('default');
+  width = input<ButtonWidth>('default');
+  type = input<'button' | 'submit' | 'reset'>('button');
+  disabled = input<boolean>(false);
+  asChild = input<boolean>(false);
+
+  clicked = output<Event>();
 
   @HostBinding('class') get classes() {
     return this.buttonVariants();
@@ -106,11 +106,11 @@ export class ButtonComponent {
       full: 'w-full',
     };
 
-    return `${baseClasses} ${this.disabled && 'pointer-events-none opacity-70 '} ${themeClasses[this.theme]} ${variantClasses[this.variant]} ${sizeClasses[this.size]} ${widthClasses[this.width]}`;
+    return `${baseClasses} ${this.disabled() && 'pointer-events-none opacity-70 '} ${themeClasses[this.theme()]} ${variantClasses[this.variant()]} ${sizeClasses[this.size()]} ${widthClasses[this.width()]}`;
   }
 
   onClick(event: Event) {
-    if (!this.disabled) {
+    if (!this.disabled()) {
       this.clicked.emit(event);
     }
   }
