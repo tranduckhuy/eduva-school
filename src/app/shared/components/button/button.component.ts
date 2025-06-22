@@ -110,7 +110,7 @@ export class ButtonComponent {
   }
 
   onClick(event: Event) {
-    if (!this.disabled) {
+    if (!this.disabled()) {
       this.clicked.emit(event);
     }
   }
