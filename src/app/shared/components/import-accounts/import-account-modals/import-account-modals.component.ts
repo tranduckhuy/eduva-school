@@ -6,10 +6,19 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { GlobalModalService } from '../../../services/layout/global-modal/global-modal.service';
+
 import { ButtonModule } from 'primeng/button';
+
+import { GlobalModalService } from '../../../services/layout/global-modal/global-modal.service';
+import { ToastHandlingService } from '../../../services/core/toast/toast-handling.service';
+import { ImportUserAccountsService } from '../services/import-user-accounts.service';
+import { DownloadTemplateService } from '../services/download-template.service';
+
 import { MODAL_DATA } from '../../../services/layout/global-modal/modal-data.token';
-import { DownloadTemplateServiceService } from '../download-template-service.service';
+import {
+  MAX_FILE_SIZE,
+  ALLOWED_IMPORT_EXTENSIONS,
+} from '../../../constants/common.constant';
 
 @Component({
   selector: 'app-import-account-modals',
@@ -21,10 +30,16 @@ import { DownloadTemplateServiceService } from '../download-template-service.ser
 })
 export class ImportAccountModalsComponent {
   private readonly globalModalService = inject(GlobalModalService);
-  readonly modalData = inject(MODAL_DATA);
-  readonly downloadTemplateService = inject(DownloadTemplateServiceService);
+  private readonly toastHandlingService = inject(ToastHandlingService);
+  private readonly importUserAccountsService = inject(
+    ImportUserAccountsService
+  );
+  private readonly downloadTemplateService = inject(DownloadTemplateService);
 
-  isLoading = this.downloadTemplateService.isLoading;
+  readonly modalData = inject(MODAL_DATA);
+
+  isLoadingTemplate = this.downloadTemplateService.isLoading;
+  isLoadingUpload = this.importUserAccountsService.isLoading;
 
   // View references
   fileInput = viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
@@ -32,15 +47,10 @@ export class ImportAccountModalsComponent {
   // State signals
   file = signal<File | null>(null);
   fileBlob = signal<Blob | null>(null);
-  message = signal<string>('');
   isDragging = signal<boolean>(false);
   isValid = signal<boolean>(false);
   uploadProgress = signal<number>(0);
   isUploading = signal<boolean>(false);
-
-  // Constants
-  readonly MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
-  readonly ALLOWED_EXTENSIONS = ['xlsx', 'xls', 'csv'];
 
   // Drag and drop handlers
   onDragOver(event: DragEvent) {
@@ -66,11 +76,14 @@ export class ImportAccountModalsComponent {
     }
   }
 
+  closeModal() {
+    this.globalModalService.close();
+  }
+
   // File management
   removeFile() {
     this.file.set(null);
     this.fileBlob.set(null);
-    this.message.set('');
     this.isValid.set(false);
     this.uploadProgress.set(0);
     if (this.fileInput()) {
@@ -86,23 +99,54 @@ export class ImportAccountModalsComponent {
     await this.handleFile(file);
   }
 
+  // Upload methods
+  async uploadData() {
+    if (!this.fileBlob() || !this.isValid()) {
+      this.toastHandlingService.info(
+        'Thông tin',
+        'Vui lòng chọn file hợp lệ trước khi tải lên'
+      );
+      return;
+    }
+    this.isUploading.set(true);
+    this.uploadProgress.set(0);
+
+    const formData = new FormData();
+    const blob = this.fileBlob()!;
+    const fileName = this.file()?.name ?? 'imported_data';
+
+    formData.append('file', blob, fileName);
+
+    // Call API upload
+    this.importUserAccountsService.importUserAccountsJson(formData).subscribe({
+      next: () => {
+        this.closeModal();
+      },
+    });
+  }
+
+  downloadTemplate() {
+    this.downloadTemplateService.downloadTemplate().subscribe();
+  }
+
   private async handleFile(file: File) {
-    this.message.set('');
     this.isValid.set(false);
 
     // Validate file size
-    if (file.size > this.MAX_FILE_SIZE) {
-      this.message.set(
-        `File quá lớn. Vui lòng chọn file nhỏ hơn ${this.MAX_FILE_SIZE / (1024 * 1024)}MB`
+    if (file.size > MAX_FILE_SIZE) {
+      this.toastHandlingService.error(
+        'Lỗi',
+        `File quá lớn. Vui lòng chọn file nhỏ hơn ${MAX_FILE_SIZE / (1024 * 1024)}MB`
       );
       return;
     }
 
     // Validate file extension
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
-    if (!fileExtension || !this.ALLOWED_EXTENSIONS.includes(fileExtension)) {
-      this.message.set(
-        `Vui lòng chọn file Excel (.xlsx, .xls) hoặc CSV (.csv)`
+    if (!fileExtension || !ALLOWED_IMPORT_EXTENSIONS.includes(fileExtension)) {
+      this.toastHandlingService.info(
+        'Thông tin',
+        'Vui lòng chọn file Excel (.xlsx, .xls) hoặc CSV (.csv)'
       );
       return;
     }
@@ -117,36 +161,9 @@ export class ImportAccountModalsComponent {
       let blob: Blob;
       blob = new Blob([file], { type: file.type });
       this.fileBlob.set(blob);
-    } catch (error) {
-      console.error('File conversion error:', error);
-      this.message.set('Lỗi khi xử lý file: ' + (error as Error).message);
+    } catch {
+      this.toastHandlingService.errorGeneral();
       this.isValid.set(false);
     }
-  }
-
-  // Upload methods
-  async uploadData() {
-    if (!this.fileBlob() || !this.isValid()) {
-      this.message.set('Vui lòng chọn file hợp lệ trước khi tải lên');
-      return;
-    }
-    this.isUploading.set(true);
-    this.uploadProgress.set(0);
-
-    const formData = new FormData();
-    const blob = this.fileBlob()!;
-    const fileName = this.file()?.name ?? 'imported_data';
-
-    formData.append('file', blob, fileName);
-
-    // Call API upload
-  }
-
-  closeModal() {
-    this.globalModalService.close();
-  }
-
-  downloadTemplate() {
-    this.downloadTemplateService.downloadTemplate().subscribe();
   }
 }

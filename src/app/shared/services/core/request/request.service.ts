@@ -1,10 +1,10 @@
+import { Injectable, inject } from '@angular/core';
 import {
   HttpClient,
   HttpContext,
   HttpContextToken,
   HttpHeaders,
 } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
@@ -39,6 +39,20 @@ export class RequestService {
   }
 
   /**
+   * Sends a GET request to download a file (Blob) from the server.
+   *
+   * @param url The API endpoint to call.
+   * @param params Optional query parameters to be appended to the request.
+   * @returns An Observable emitting the binary Blob received from the server.
+   */
+  getFile(url: string, params?: Record<string, any>): Observable<Blob> {
+    return this.http.get(url, {
+      params: createRequestParams(params),
+      responseType: 'blob',
+    });
+  }
+
+  /**
    * Sends a POST request with JSON payload.
    *
    * @template T The expected data type within the BaseResponse.
@@ -66,6 +80,29 @@ export class RequestService {
     formData: FormData
   ): Observable<BaseResponse<T>> {
     return this.http.post<BaseResponse<T>>(url, formData);
+  }
+
+  /**
+   * Sends a POST request with FormData and expects a **binary file (Blob)** as the response.
+   *
+   * Use this method specifically when:
+   * - You are uploading a file using `FormData`, **and**
+   * - The server may respond with a file (e.g., Excel error file) instead of JSON.
+   *
+   * Common use cases include:
+   * - Import operations where the uploaded data may contain validation errors,
+   *   and the server returns an annotated error file for download.
+   *
+   * Use `postFormData<T>()` instead if the API returns a structured JSON response (`BaseResponse<T>`).
+   *
+   * @param url The target API endpoint.
+   * @param formData The FormData object containing the upload payload (e.g., a file).
+   * @returns An Observable emitting the file response as a Blob.
+   */
+  postFile(url: string, formData: FormData): Observable<Blob> {
+    return this.http.post(url, formData, {
+      responseType: 'blob',
+    });
   }
 
   /**

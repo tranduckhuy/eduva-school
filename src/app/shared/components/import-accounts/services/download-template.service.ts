@@ -1,16 +1,22 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { RequestService } from '../../services/core/request/request.service';
-import { ToastHandlingService } from '../../services/core/toast/toast-handling.service';
-import { map, Observable, finalize } from 'rxjs';
-import { StatusCode } from '../../constants/status-code.constant';
-import { environment } from '../../../../environments/environment';
-import { downloadTemplateResponse } from './models/download-template-response.model';
-import { triggerDownload } from '../../utils/triggerDownload';
+
+import { Observable, map, finalize } from 'rxjs';
+
+import { environment } from '../../../../../environments/environment';
+
+import { RequestService } from '../../../services/core/request/request.service';
+import { ToastHandlingService } from '../../../services/core/toast/toast-handling.service';
+
+import { StatusCode } from '../../../constants/status-code.constant';
+
+import { FileResponse } from '../../../models/api/response/file-response.model';
+
+import { triggerDownload } from '../../../utils/util-functions';
 
 @Injectable({
   providedIn: 'root',
 })
-export class DownloadTemplateServiceService {
+export class DownloadTemplateService {
   private readonly requestService = inject(RequestService);
   private readonly toastHandlingService = inject(ToastHandlingService);
 
@@ -23,7 +29,7 @@ export class DownloadTemplateServiceService {
   downloadTemplate(): Observable<boolean> {
     this.isLoadingSignal.set(true);
     return this.requestService
-      .get<downloadTemplateResponse>(this.GET_DOWNLOAD_TEMPLATE_API_URL)
+      .get<FileResponse>(this.GET_DOWNLOAD_TEMPLATE_API_URL)
       .pipe(
         map(res => {
           if (res.statusCode === StatusCode.SUCCESS && res.data) {
@@ -40,4 +46,12 @@ export class DownloadTemplateServiceService {
         })
       );
   }
+  /**
+   * if (responseBlob.size === 0) {
+    // Thành công và không có lỗi file → import thành công
+    this.toastHandlingService.success('Thành công', 'Tải lên thành công');
+  } else {
+    // Có lỗi → file lỗi được trả về
+    triggerBlobDownload(responseBlob)
+  } */
 }
