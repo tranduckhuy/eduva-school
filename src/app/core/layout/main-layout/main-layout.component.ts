@@ -14,11 +14,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { fromEvent } from 'rxjs';
 
 import { RouteMetadataDirective } from '../../../shared/directives/route-metadata/route-metadata.directive';
-import { LayoutHeadingService } from '../../../shared/services/layout-heading/layout-heading.service';
 import { HeaderComponent } from '../header/header.component';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { LayoutHeadingComponent } from '../layout-heading/layout-heading.component';
 import { GlobalModalHostComponent } from '../../../shared/components/global-modal-host/global-modal-host.component';
+import { LayoutHeadingService } from '../../../shared/services/layout/layout-heading/layout-heading.service';
 
 @Component({
   selector: 'app-main-layout',

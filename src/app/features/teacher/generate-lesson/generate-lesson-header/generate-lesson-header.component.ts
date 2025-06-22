@@ -8,9 +8,9 @@ import {
 } from '@angular/core';
 
 import { HeaderSubmenuService } from '../../../../core/layout/header/services/header-submenu.service';
-import { ThemeService } from '../../../../shared/services/theme/theme.service';
 
 import { GenerateLessonSettingsComponent } from './generate-lesson-settings/generate-lesson-settings.component';
+import { ThemeService } from '../../../../shared/services/core/theme/theme.service';
 
 @Component({
   selector: 'generate-lesson-header',

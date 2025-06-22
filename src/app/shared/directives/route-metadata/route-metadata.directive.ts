@@ -5,9 +5,9 @@ import { filter } from 'rxjs';
 
 import { MenuItem } from 'primeng/api';
 
-import { LayoutHeadingService } from '../../services/layout-heading/layout-heading.service';
-import { BreadcrumbsService } from '../../services/breadcrumbs/breadcrumbs.service';
 import { DateDisplayService } from '../../../core/layout/layout-heading/services/date-display.service';
+import { LayoutHeadingService } from '../../services/layout/layout-heading/layout-heading.service';
+import { BreadcrumbsService } from '../../services/layout/breadcrumbs/breadcrumbs.service';
 
 @Directive({
   selector: '[routeMetadata]',

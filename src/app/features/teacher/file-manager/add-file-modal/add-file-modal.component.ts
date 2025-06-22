@@ -15,8 +15,7 @@ import {
 } from 'primeng/fileupload';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
-
-import { GlobalModalService } from '../../../../shared/services/global-modal/global-modal.service';
+import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 
 @Component({
   selector: 'app-add-file-modal',

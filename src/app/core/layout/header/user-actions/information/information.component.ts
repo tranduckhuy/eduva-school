@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 
 import { SubmenuDirective } from '../../../../../shared/directives/submenu/submenu.directive';
-import { ThemeService } from '../../../../../shared/services/theme/theme.service';
+import { ThemeService } from '../../../../../shared/services/core/theme/theme.service';
 
 @Component({
   selector: 'header-information',

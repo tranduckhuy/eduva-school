@@ -11,9 +11,9 @@ import { ButtonComponent } from '../../../shared/components/button/button.compon
 import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
 import { TooltipModule } from 'primeng/tooltip';
 import { RouterLink } from '@angular/router';
-import { GlobalModalService } from '../../../shared/services/global-modal/global-modal.service';
 import { AddTeacherModalComponent } from './add-teacher-modal/add-teacher-modal.component';
 import { ImportAccountsComponent } from '../../../shared/components/import-accounts/import-accounts.component';
+import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
 
 @Component({
   selector: 'app-teachers',

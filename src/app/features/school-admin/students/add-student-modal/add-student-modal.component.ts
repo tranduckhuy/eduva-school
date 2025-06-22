@@ -7,8 +7,8 @@ import {
 } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { GlobalModalService } from '../../../../shared/services/global-modal/global-modal.service';
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
+import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 
 @Component({
   selector: 'app-add-student-modal',

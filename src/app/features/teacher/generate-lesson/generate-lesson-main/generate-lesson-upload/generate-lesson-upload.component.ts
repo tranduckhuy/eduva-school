@@ -13,10 +13,10 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 import { SubmenuDirective } from '../../../../../shared/directives/submenu/submenu.directive';
 
-import { GlobalModalService } from '../../../../../shared/services/global-modal/global-modal.service';
 import { ResourcesStateService } from '../services/resources-state.service';
 
 import { UploadResourcesModalComponent } from './upload-resources-modal/upload-resources-modal.component';
+import { GlobalModalService } from '../../../../../shared/services/layout/global-modal/global-modal.service';
 
 interface SourceItem {
   id: string;

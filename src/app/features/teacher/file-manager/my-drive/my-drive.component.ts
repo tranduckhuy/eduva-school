@@ -5,14 +5,13 @@ import {
   signal,
 } from '@angular/core';
 
-import { GlobalModalService } from '../../../../shared/services/global-modal/global-modal.service';
-
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
 import { FileTypeFilterComponent } from '../file-type-filter/file-type-filter.component';
 import { LessonMaterialViewComponent } from '../lesson-material-view/lesson-material-view.component';
 import { AddFileModalComponent } from '../add-file-modal/add-file-modal.component';
 import { AddLessonModalComponent } from '../add-lesson-modal/add-lesson-modal.component';
+import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 
 @Component({
   selector: 'app-my-drive',
