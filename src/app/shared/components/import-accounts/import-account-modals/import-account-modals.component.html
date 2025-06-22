@@ -16,11 +16,11 @@
       (dragleave)="onDragLeave($event)"
       (drop)="onDrop($event)">
       <input
-        type="file"
         #fileInput
+        type="file"
+        accept=".xlsx,.xls,.csv"
         class="hidden"
-        (change)="onFileSelected($event)"
-        accept=".xlsx,.xls,.csv" />
+        (change)="onFileSelected($event)" />
 
       <div
         class="flex w-[550px] flex-col items-center justify-center gap-4 p-8 sm:w-full">
@@ -55,12 +55,6 @@
         </button>
       </div>
     }
-
-    @if (message()) {
-      <p class="mt-4" [class]="message() ? 'text-red-500' : 'text-green-500'">
-        {{ message() }}
-      </p>
-    }
   </div>
 
   <div
@@ -69,8 +63,8 @@
       label="Tải xuống template"
       variant="outlined"
       icon="pi pi-download"
-      [loading]="isLoading()"
       size="small"
+      [loading]="isLoadingTemplate()"
       (onClick)="downloadTemplate()" />
     <div class="flex items-center gap-2">
       <p-button
@@ -86,6 +80,7 @@
         variant="outlined"
         icon="pi pi-upload"
         size="small"
+        [loading]="isLoadingUpload()"
         (onClick)="uploadData()" />
     </div>
   </div>
