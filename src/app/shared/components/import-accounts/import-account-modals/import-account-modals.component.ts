@@ -9,6 +9,7 @@ import {
 import { GlobalModalService } from '../../../services/layout/global-modal/global-modal.service';
 import { ButtonModule } from 'primeng/button';
 import { MODAL_DATA } from '../../../services/layout/global-modal/modal-data.token';
+import { DownloadTemplateServiceService } from '../download-template-service.service';
 
 @Component({
   selector: 'app-import-account-modals',
@@ -21,6 +22,9 @@ import { MODAL_DATA } from '../../../services/layout/global-modal/modal-data.tok
 export class ImportAccountModalsComponent {
   private readonly globalModalService = inject(GlobalModalService);
   readonly modalData = inject(MODAL_DATA);
+  readonly downloadTemplateService = inject(DownloadTemplateServiceService);
+
+  isLoading = this.downloadTemplateService.isLoading;
 
   // View references
   fileInput = viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
@@ -140,5 +144,9 @@ export class ImportAccountModalsComponent {
 
   closeModal() {
     this.globalModalService.close();
+  }
+
+  downloadTemplate() {
+    this.downloadTemplateService.downloadTemplate().subscribe();
   }
 }

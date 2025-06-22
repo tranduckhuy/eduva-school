@@ -131,7 +131,7 @@ export class PreviewLessonComponent implements OnInit {
     });
   }
 
-  openAddStudentModal() {
+  openModerateReasonModal() {
     this.globalModalService.open(
       ModerateReasonModalComponent,
       {
@@ -143,11 +143,11 @@ export class PreviewLessonComponent implements OnInit {
 
   approveLesson() {
     this.isApprovedLesson.set(true);
-    this.openAddStudentModal();
+    this.openModerateReasonModal();
   }
 
   refuseLesson() {
     this.isApprovedLesson.set(false);
-    this.openAddStudentModal();
+    this.openModerateReasonModal();
   }
 }
