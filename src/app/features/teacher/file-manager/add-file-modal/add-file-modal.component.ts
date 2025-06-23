@@ -189,8 +189,10 @@ export class AddFileModalComponent {
     this.globalModalService.close();
   }
 
-  private uploadFiles(request: string[], files: File[]) {
-    this.uploadFileService.uploadBlobs(request, files).subscribe(res => {
+  private uploadFiles(blobNames: string[], files: File[]) {
+    if (!files?.length || !blobNames?.length) return;
+
+    this.uploadFileService.uploadBlobs(blobNames, files).subscribe(res => {
       if (!res) return;
 
       const folderId = 1; // ! Placeholder folderId
@@ -208,6 +210,7 @@ export class AddFileModalComponent {
 
       const request: LessonMaterialsRequest = {
         folderId,
+        blobNames,
         lessonMaterials: materials,
       };
       this.lessonMaterialsService

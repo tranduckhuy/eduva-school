@@ -13,5 +13,6 @@ export interface LessonMaterialRequest {
 
 export interface LessonMaterialsRequest {
   folderId: number;
+  blobNames: string[];
   lessonMaterials: LessonMaterialRequest[];
 }

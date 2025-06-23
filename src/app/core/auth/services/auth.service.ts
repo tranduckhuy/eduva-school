@@ -89,7 +89,7 @@ export class AuthService {
               );
               break;
             case StatusCode.USER_NOT_CONFIRMED:
-              this.toastHandlingService.error(
+              this.toastHandlingService.warn(
                 'Đăng nhập thất bại',
                 'Tài khoản của bạn chưa được xác minh. Vui lòng kiểm tra email để hoàn tất xác minh.'
               );

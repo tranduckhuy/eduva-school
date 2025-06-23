@@ -17,6 +17,7 @@ import { routes } from './app.routes';
 
 import { MyPreset } from './my-preset';
 
+import { loggingInterceptor } from './core/interceptors/logging.interceptor';
 import { retryInterceptor } from './core/interceptors/retry.interceptor';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
@@ -25,10 +26,11 @@ import { errorInterceptor } from './core/interceptors/error.interceptor';
 
 const AppProviders = [MessageService, ConfirmationService]; // ? Can add more global service here for injector
 const httpInterceptors = withInterceptors([
-  retryInterceptor,
+  loggingInterceptor,
   authInterceptor,
-  loadingInterceptor,
   cacheInterceptor,
+  loadingInterceptor,
+  retryInterceptor,
   errorInterceptor,
 ]);
 

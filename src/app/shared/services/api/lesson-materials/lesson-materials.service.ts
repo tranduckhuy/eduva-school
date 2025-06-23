@@ -44,7 +44,7 @@ export class LessonMaterialsService {
           if (
             err.error.statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND
           ) {
-            this.toastHandlingService.error(
+            this.toastHandlingService.warn(
               'Thiếu gói đăng ký',
               'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
             );

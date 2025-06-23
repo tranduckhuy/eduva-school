@@ -36,9 +36,6 @@ export class UploadFileService {
         switchMap(res => {
           if (res.statusCode !== StatusCode.SUCCESS || !res.data) {
             this.toastHandlingService.errorGeneral();
-            if (!environment.production) {
-              console.error('Can not get upload tokens from API:', res);
-            }
             return of(null);
           }
 
@@ -47,15 +44,6 @@ export class UploadFileService {
           // ? Tokens length must equal to files length
           if (tokens.length !== files.length) {
             this.toastHandlingService.errorGeneral();
-            if (!environment.production) {
-              console.error(
-                `Mismatch files (${files.length}) vs tokens (${tokens.length})`,
-                {
-                  files,
-                  tokens,
-                }
-              );
-            }
             return of(null);
           }
 
@@ -69,12 +57,9 @@ export class UploadFileService {
                 context: new HttpContext().set(BYPASS_AUTH, true),
               })
               .pipe(
-                catchError(err => {
+                catchError(() => {
                   // ? If have 1 file got error then continue with other files and notify list error file later
                   failedFiles.push(files[index].name);
-                  if (!environment.production) {
-                    console.error(`Failed for file: ${files[index].name}`, err);
-                  }
                   return of(null); // Continue with other files
                 })
               )
@@ -98,11 +83,8 @@ export class UploadFileService {
             })
           );
         }),
-        catchError(err => {
+        catchError(() => {
           this.toastHandlingService.errorGeneral();
-          if (!environment.production) {
-            console.error('Error:', err);
-          }
           return of(null);
         })
       );
