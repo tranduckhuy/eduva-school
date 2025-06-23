@@ -32,22 +32,21 @@ export function getFileName(response: HttpResponse<Blob>): string {
   const now = new Date();
   const dateString = now.toISOString().split('T')[0]; // 'yyyy-MM-dd'
   const defaultFileName = `downloaded_file_${dateString}`;
+
   const contentDisposition = response.headers.get('Content-Disposition');
 
   if (!contentDisposition) return defaultFileName;
 
-  // Try filename*= (RFC 5987)
-  const fileNameStarMatch = contentDisposition.match(
-    /filename\*\=UTF-8''(.+?)(;|$)/i
-  );
-  if (fileNameStarMatch && fileNameStarMatch[1]) {
-    return decodeURIComponent(fileNameStarMatch[1]);
-  }
+  const fileNameStarRegex = /filename\*\s*=\s*UTF-8''([^;]*)/i;
+  const fileNameRegex = /filename\s*=\s*(?:(["'])(.*?)\1|([^;\n]*))/i;
 
-  // Fallback: Try regular filename=
-  const fileNameMatch = contentDisposition.match(
-    /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i
-  );
+  // ? Try filename*= (RFC 5987)
+  const fileNameStarMatch = fileNameStarRegex.exec(contentDisposition);
+  if (fileNameStarMatch && fileNameStarMatch[1])
+    return decodeURIComponent(fileNameStarMatch[1]);
+
+  // ? Fallback: Try regular filename=
+  const fileNameMatch = fileNameRegex.exec(contentDisposition);
   if (fileNameMatch && fileNameMatch[1]) {
     let fileName = fileNameMatch[1].trim();
     if (fileName.startsWith('"') || fileName.startsWith("'")) {
