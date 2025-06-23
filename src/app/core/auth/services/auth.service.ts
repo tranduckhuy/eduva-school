@@ -41,8 +41,8 @@ export class AuthService {
   login(request: LoginRequest): Observable<AuthTokenResponse | null> {
     return this.requestService
       .post<AuthTokenResponse>(this.LOGIN_API_URL, request, {
-        showLoading: false,
         bypassAuth: true,
+        showLoading: false,
       })
       .pipe(
         map(res => {
@@ -63,13 +63,8 @@ export class AuthService {
                 return;
               }
 
-              if (
-                user.roles.includes('Teacher') ||
-                user.roles.includes('ContentModerator')
-              ) {
-                this.router.navigateByUrl('/teacher');
-              } else {
-                this.router.navigateByUrl('/school-admin');
+              if (user.roles.includes('SystemAdmin')) {
+                this.router.navigateByUrl('/');
               }
             });
 
@@ -89,7 +84,7 @@ export class AuthService {
               );
               break;
             case StatusCode.USER_NOT_CONFIRMED:
-              this.toastHandlingService.warn(
+              this.toastHandlingService.error(
                 'Đăng nhập thất bại',
                 'Tài khoản của bạn chưa được xác minh. Vui lòng kiểm tra email để hoàn tất xác minh.'
               );
@@ -113,8 +108,8 @@ export class AuthService {
   ): Observable<AuthTokenResponse | null> {
     return this.requestService
       .post<AuthTokenResponse>(this.REFRESH_TOKEN_API_URL, request, {
-        showLoading: false,
         bypassAuth: true,
+        showLoading: false,
       })
       .pipe(
         map(res => {
