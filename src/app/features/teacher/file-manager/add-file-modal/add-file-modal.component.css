@@ -1,4 +1,9 @@
-::ng-deep .p-fileupload-advanced {
+:host ::ng-deep .p-fileupload-advanced {
   border: 1px solid var(--color-border-secondary);
   background-color: var(--color-bg-forth);
+}
+
+:host ::ng-deep .p-fileupload-file-name {
+  @apply line-clamp-1;
+  @apply break-all;
 }

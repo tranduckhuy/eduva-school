@@ -37,7 +37,7 @@ export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
 
-  form!: FormGroup;
+  form: FormGroup;
 
   submitted = signal<boolean>(false);
 

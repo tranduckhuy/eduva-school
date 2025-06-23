@@ -40,7 +40,10 @@ export class AuthService {
 
   login(request: LoginRequest): Observable<AuthTokenResponse | null> {
     return this.requestService
-      .postWithoutAuth<AuthTokenResponse>(this.LOGIN_API_URL, request)
+      .post<AuthTokenResponse>(this.LOGIN_API_URL, request, {
+        showLoading: false,
+        bypassAuth: true,
+      })
       .pipe(
         map(res => {
           if (res.statusCode === StatusCode.SUCCESS && res.data) {
@@ -86,7 +89,7 @@ export class AuthService {
               );
               break;
             case StatusCode.USER_NOT_CONFIRMED:
-              this.toastHandlingService.error(
+              this.toastHandlingService.warn(
                 'Đăng nhập thất bại',
                 'Tài khoản của bạn chưa được xác minh. Vui lòng kiểm tra email để hoàn tất xác minh.'
               );
@@ -109,7 +112,10 @@ export class AuthService {
     request: RefreshTokenRequest
   ): Observable<AuthTokenResponse | null> {
     return this.requestService
-      .postWithoutAuth<AuthTokenResponse>(this.REFRESH_TOKEN_API_URL, request)
+      .post<AuthTokenResponse>(this.REFRESH_TOKEN_API_URL, request, {
+        showLoading: false,
+        bypassAuth: true,
+      })
       .pipe(
         map(res => {
           if (res.statusCode === StatusCode.SUCCESS && res.data) {

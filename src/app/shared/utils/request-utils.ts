@@ -1,5 +1,13 @@
-import { HttpParams } from '@angular/common/http';
+import { HttpContext, HttpParams } from '@angular/common/http';
 import { FormGroup } from '@angular/forms';
+
+import {
+  BYPASS_AUTH,
+  LOADING_KEY,
+  SHOW_LOADING,
+} from '../services/core/request/request.service';
+
+import { type RequestOptions } from '../models/api/request-options.model';
 
 /**
  * Utility function to convert an object into HttpParams
@@ -47,4 +55,25 @@ export function buildFormDataFromFormGroup(form: FormGroup): FormData {
   }
 
   return formData;
+}
+
+/**
+ * Builds a configured `HttpContext` for an HTTP request based on the provided options.
+ *
+ * This is commonly used to control interceptor behavior such as:
+ * - Whether to show a global loading spinner.
+ * - Whether to bypass authentication token attachment (e.g., for public endpoints).
+ *
+ * @param options Optional `RequestOptions` object containing:
+ *  - `bypassAuth` (default: false): Whether to bypass auth-related interceptors.
+ *  - `showLoading` (default: true): Whether to enable the global loading indicator.
+ *  - `loadingKey` (default: 'default'): Whether to check specific global loading indicator.
+ *
+ * @returns An `HttpContext` instance with the configured flags.
+ */
+export function buildHttpContext(options?: RequestOptions): HttpContext {
+  return new HttpContext()
+    .set(BYPASS_AUTH, options?.bypassAuth === true)
+    .set(SHOW_LOADING, options?.showLoading !== false)
+    .set(LOADING_KEY, options?.loadingKey ?? 'default');
 }

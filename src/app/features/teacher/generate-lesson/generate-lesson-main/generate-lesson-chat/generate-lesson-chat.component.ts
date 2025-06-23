@@ -78,7 +78,7 @@ export class GenerateLessonChatComponent implements AfterViewInit {
   private readonly fb = inject(FormBuilder);
   private readonly resourcesStateService = inject(ResourcesStateService);
 
-  form!: FormGroup;
+  form: FormGroup;
 
   messages = signal<ChatMessage[]>([]);
   showScrollButton = signal(false);

@@ -1,17 +1,17 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+import { HttpResponse } from '@angular/common/http';
 
-import { Observable, map, finalize } from 'rxjs';
+import { EMPTY, Observable, catchError, tap } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 
 import { RequestService } from '../../../services/core/request/request.service';
 import { ToastHandlingService } from '../../../services/core/toast/toast-handling.service';
 
-import { StatusCode } from '../../../constants/status-code.constant';
-
-import { FileResponse } from '../../../models/api/response/file-response.model';
-
-import { triggerDownload } from '../../../utils/util-functions';
+import {
+  getFileName,
+  triggerBlobDownload,
+} from '../../../utils/util-functions';
 
 @Injectable({
   providedIn: 'root',
@@ -23,35 +23,27 @@ export class DownloadTemplateService {
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly GET_DOWNLOAD_TEMPLATE_API_URL = `${this.BASE_API_URL}/users/import-template`;
 
-  private readonly isLoadingSignal = signal<boolean>(false);
-  isLoading = this.isLoadingSignal.asReadonly();
-
-  downloadTemplate(): Observable<boolean> {
-    this.isLoadingSignal.set(true);
+  downloadTemplate(): Observable<HttpResponse<Blob>> {
     return this.requestService
-      .get<FileResponse>(this.GET_DOWNLOAD_TEMPLATE_API_URL)
+      .getFile(this.GET_DOWNLOAD_TEMPLATE_API_URL, undefined, {
+        loadingKey: 'download-template',
+      })
       .pipe(
-        map(res => {
-          if (res.statusCode === StatusCode.SUCCESS && res.data) {
+        tap(res => {
+          console.log(res);
+          console.log(res.headers.get('Content-Disposition'));
+          if (res.body) {
             this.toastHandlingService.successGeneral();
-            triggerDownload(res.data.fileName, res.data.content);
-            return true;
+            const fileName = getFileName(res);
+            triggerBlobDownload(fileName, res.body);
           } else {
             this.toastHandlingService.errorGeneral();
-            return false;
           }
         }),
-        finalize(() => {
-          this.isLoadingSignal.set(false);
+        catchError(() => {
+          this.toastHandlingService.errorGeneral();
+          return EMPTY;
         })
       );
   }
-  /**
-   * if (responseBlob.size === 0) {
-    // Thành công và không có lỗi file → import thành công
-    this.toastHandlingService.success('Thành công', 'Tải lên thành công');
-  } else {
-    // Có lỗi → file lỗi được trả về
-    triggerBlobDownload(responseBlob)
-  } */
 }

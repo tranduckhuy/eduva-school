@@ -1,18 +1,24 @@
 import { Injectable, inject } from '@angular/core';
 import {
   HttpClient,
-  HttpContext,
   HttpContextToken,
   HttpHeaders,
+  HttpResponse,
 } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { createRequestParams } from '../../../utils/request-utils';
+import {
+  createRequestParams,
+  buildHttpContext,
+} from '../../../utils/request-utils';
 
-import { BaseResponse } from '../../../models/api/base-response.model';
+import { type BaseResponse } from '../../../models/api/base-response.model';
+import { type RequestOptions } from '../../../models/api/request-options.model';
 
 export const BYPASS_AUTH = new HttpContextToken<boolean>(() => false);
+export const SHOW_LOADING = new HttpContextToken<boolean>(() => true);
+export const LOADING_KEY = new HttpContextToken<string>(() => 'default');
 
 @Injectable({
   providedIn: 'root',
@@ -30,12 +36,14 @@ export class RequestService {
    */
   get<T>(
     url: string,
-    params?: Record<string, any>
+    params?: Record<string, any>,
+    options?: RequestOptions
   ): Observable<BaseResponse<T>> {
-    const options = {
+    const reqOptions = {
       params: createRequestParams(params),
+      context: buildHttpContext(options),
     };
-    return this.http.get<BaseResponse<T>>(url, options);
+    return this.http.get<BaseResponse<T>>(url, reqOptions);
   }
 
   /**
@@ -45,10 +53,16 @@ export class RequestService {
    * @param params Optional query parameters to be appended to the request.
    * @returns An Observable emitting the binary Blob received from the server.
    */
-  getFile(url: string, params?: Record<string, any>): Observable<Blob> {
+  getFile(
+    url: string,
+    params?: Record<string, any>,
+    options?: RequestOptions
+  ): Observable<HttpResponse<Blob>> {
     return this.http.get(url, {
       params: createRequestParams(params),
+      context: buildHttpContext(options),
       responseType: 'blob',
+      observe: 'response',
     });
   }
 
@@ -60,9 +74,14 @@ export class RequestService {
    * @param body (Optional) The request payload (will be JSON stringified).
    * @returns An Observable of BaseResponse<T>.
    */
-  post<T>(url: string, body?: any): Observable<BaseResponse<T>> {
+  post<T>(
+    url: string,
+    body?: any,
+    options?: RequestOptions
+  ): Observable<BaseResponse<T>> {
     return this.http.post<BaseResponse<T>>(url, JSON.stringify(body ?? {}), {
       headers: this.getJsonHeaders(),
+      context: buildHttpContext(options),
     });
   }
 
@@ -77,9 +96,12 @@ export class RequestService {
    */
   postFormData<T>(
     url: string,
-    formData: FormData
+    formData: FormData,
+    options?: RequestOptions
   ): Observable<BaseResponse<T>> {
-    return this.http.post<BaseResponse<T>>(url, formData);
+    return this.http.post<BaseResponse<T>>(url, formData, {
+      context: buildHttpContext(options),
+    });
   }
 
   /**
@@ -99,34 +121,15 @@ export class RequestService {
    * @param formData The FormData object containing the upload payload (e.g., a file).
    * @returns An Observable emitting the file response as a Blob.
    */
-  postFile(url: string, formData: FormData): Observable<Blob> {
+  postFile(
+    url: string,
+    formData: FormData,
+    options?: RequestOptions
+  ): Observable<HttpResponse<Blob>> {
     return this.http.post(url, formData, {
+      context: buildHttpContext(options),
       responseType: 'blob',
-    });
-  }
-
-  /**
-   * Sends a POST request **without triggering auth interceptors**.
-   * Use this method only for **public endpoints**, such as login or registration,
-   * where attaching an access token or refreshing it is not applicable or necessary.
-   *
-   * Internally, this sets a special `HttpContextToken` (`BYPASS_AUTH`)
-   * to instruct the `authInterceptor` to bypass token attachment and refresh logic.
-   *
-   * @template T The expected data type within the BaseResponse.
-   * @param url The target public API endpoint (e.g. /auth/login).
-   * @param body (Optional) The request payload (will be JSON stringified).
-   * @returns An Observable of BaseResponse<T>.
-   *
-   * @example
-   * this.requestService
-   *   .postWithoutAuth<LoginResponse>('/auth/login', { email, password })
-   *   .subscribe(...);
-   */
-  postWithoutAuth<T>(url: string, body?: any): Observable<BaseResponse<T>> {
-    return this.http.post<BaseResponse<T>>(url, JSON.stringify(body ?? {}), {
-      headers: this.getJsonHeaders(),
-      context: new HttpContext().set(BYPASS_AUTH, true),
+      observe: 'response',
     });
   }
 
@@ -138,9 +141,14 @@ export class RequestService {
    * @param body (Optional) The request payload (will be JSON stringified).
    * @returns An Observable of BaseResponse<T>.
    */
-  put<T>(url: string, body?: any): Observable<BaseResponse<T>> {
+  put<T>(
+    url: string,
+    body?: any,
+    options?: RequestOptions
+  ): Observable<BaseResponse<T>> {
     return this.http.put<BaseResponse<T>>(url, JSON.stringify(body ?? {}), {
       headers: this.getJsonHeaders(),
+      context: buildHttpContext(options),
     });
   }
 
@@ -151,8 +159,13 @@ export class RequestService {
    * @param url The target API endpoint.
    * @returns An Observable of BaseResponse<T>.
    */
-  delete<T>(url: string): Observable<BaseResponse<T>> {
-    return this.http.delete<BaseResponse<T>>(url);
+  delete<T>(
+    url: string,
+    options?: RequestOptions
+  ): Observable<BaseResponse<T>> {
+    return this.http.delete<BaseResponse<T>>(url, {
+      context: buildHttpContext(options),
+    });
   }
 
   /**
