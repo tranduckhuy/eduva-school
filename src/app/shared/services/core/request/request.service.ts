@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import {
   HttpClient,
-  HttpContext,
   HttpContextToken,
   HttpHeaders,
+  HttpResponse,
 } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
@@ -57,11 +57,12 @@ export class RequestService {
     url: string,
     params?: Record<string, any>,
     options?: RequestOptions
-  ): Observable<Blob> {
+  ): Observable<HttpResponse<Blob>> {
     return this.http.get(url, {
       params: createRequestParams(params),
       context: buildHttpContext(options),
       responseType: 'blob',
+      observe: 'response',
     });
   }
 
@@ -124,10 +125,11 @@ export class RequestService {
     url: string,
     formData: FormData,
     options?: RequestOptions
-  ): Observable<Blob> {
+  ): Observable<HttpResponse<Blob>> {
     return this.http.post(url, formData, {
       context: buildHttpContext(options),
       responseType: 'blob',
+      observe: 'response',
     });
   }
 

@@ -152,7 +152,13 @@ export class AddFileModalComponent {
       return;
     }
 
-    const blobNames = files.map(file => file.name);
+    const timestamp = `${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const blobNames = files.map(file => {
+      const dotIndex = file.name.lastIndexOf('.');
+      const base = file.name.substring(0, dotIndex);
+      const ext = file.name.substring(dotIndex);
+      return `${base}_${timestamp}${ext}`;
+    });
 
     this.uploadFiles(blobNames, files);
   }
@@ -187,8 +193,8 @@ export class AddFileModalComponent {
     this.uploadFileService.uploadBlobs(request, files).subscribe(res => {
       if (!res) return;
 
-      const sourceUrls = res.uploadTokens;
       const folderId = 1; // ! Placeholder folderId
+      const sourceUrls = res.uploadTokens;
       const materials: LessonMaterialRequest[] = files.map((file, index) => ({
         title: file.name,
         description: '',
@@ -206,9 +212,7 @@ export class AddFileModalComponent {
       };
       this.lessonMaterialsService
         .createLessonMaterials(request)
-        .subscribe(() => {
-          this.closeModal();
-        });
+        .subscribe(() => this.closeModal());
     });
   }
 }

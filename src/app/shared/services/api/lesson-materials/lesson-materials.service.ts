@@ -1,4 +1,5 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { Observable, catchError, map, of, tap } from 'rxjs';
 
@@ -28,18 +29,27 @@ export class LessonMaterialsService {
         tap(res => {
           if (res.statusCode === StatusCode.SUCCESS) {
             this.toastHandlingService.success(
-              'Thành công',
-              'Tất cả tệp tin đã được tải lên thành công.'
+              'Tải lên thành công',
+              'Tất cả tài liệu đã được tải lên thành công.'
             );
           } else {
             this.toastHandlingService.error(
-              'Lỗi',
-              'Tải lên tệp tin thất bại. Vui lòng thử lại.'
+              'Tải lên thất bại',
+              'Không thể tải lên tài liệu. Vui lòng thử lại sau.'
             );
           }
         }),
         map(() => void 0),
-        catchError(() => {
+        catchError((err: HttpErrorResponse) => {
+          if (
+            err.error.statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND
+          ) {
+            this.toastHandlingService.error(
+              'Thiếu gói đăng ký',
+              'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+            );
+            return of(void 0);
+          }
           this.toastHandlingService.errorGeneral();
           return of(void 0);
         })

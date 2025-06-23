@@ -121,7 +121,7 @@ export class ImportAccountModalsComponent {
 
     // Call API upload
     this.importUserAccountsService
-      .importUserAccountsJson(formData)
+      .importUserAccounts(formData)
       .subscribe(() => this.closeModal());
   }
 
