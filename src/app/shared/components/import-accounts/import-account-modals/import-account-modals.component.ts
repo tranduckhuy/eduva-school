@@ -9,6 +9,7 @@ import {
 
 import { ButtonModule } from 'primeng/button';
 
+import { LoadingService } from '../../../services/core/loading/loading.service';
 import { GlobalModalService } from '../../../services/layout/global-modal/global-modal.service';
 import { ToastHandlingService } from '../../../services/core/toast/toast-handling.service';
 import { ImportUserAccountsService } from '../services/import-user-accounts.service';
@@ -29,6 +30,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImportAccountModalsComponent {
+  private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
   private readonly toastHandlingService = inject(ToastHandlingService);
   private readonly importUserAccountsService = inject(
@@ -38,8 +40,8 @@ export class ImportAccountModalsComponent {
 
   readonly modalData = inject(MODAL_DATA);
 
-  isLoadingTemplate = this.downloadTemplateService.isLoading;
-  isLoadingUpload = this.importUserAccountsService.isLoading;
+  isLoadingTemplate = this.loadingService.is('download-template');
+  isLoadingUpload = this.loadingService.is('upload');
 
   // View references
   fileInput = viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
@@ -118,11 +120,9 @@ export class ImportAccountModalsComponent {
     formData.append('file', blob, fileName);
 
     // Call API upload
-    this.importUserAccountsService.importUserAccountsJson(formData).subscribe({
-      next: () => {
-        this.closeModal();
-      },
-    });
+    this.importUserAccountsService
+      .importUserAccountsJson(formData)
+      .subscribe(() => this.closeModal());
   }
 
   downloadTemplate() {

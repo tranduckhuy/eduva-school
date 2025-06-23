@@ -4,19 +4,31 @@ import { Injectable, computed, signal } from '@angular/core';
   providedIn: 'root',
 })
 export class LoadingService {
-  private loadingCount = signal(0);
-  readonly isLoading = computed(() => this.loadingCount() > 0);
+  private readonly loadingMap = signal<Record<string, boolean>>({});
 
-  start() {
-    this.loadingCount.set(this.loadingCount() + 1);
+  readonly isLoading = computed(() =>
+    Object.values(this.loadingMap()).some(val => val === true)
+  );
+
+  is(key: string = 'default') {
+    return computed(() => this.loadingMap()[key] ?? false);
   }
 
-  stop() {
-    const current = this.loadingCount();
-    this.loadingCount.set(current > 0 ? current - 1 : 0);
+  start(key: string = 'default') {
+    this.loadingMap.set({
+      ...this.loadingMap(),
+      [key]: true,
+    });
+  }
+
+  stop(key: string = 'default') {
+    this.loadingMap.set({
+      ...this.loadingMap(),
+      [key]: false,
+    });
   }
 
   reset() {
-    this.loadingCount.set(0);
+    this.loadingMap.set({});
   }
 }

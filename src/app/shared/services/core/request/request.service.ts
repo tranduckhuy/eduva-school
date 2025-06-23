@@ -18,6 +18,7 @@ import { type RequestOptions } from '../../../models/api/request-options.model';
 
 export const BYPASS_AUTH = new HttpContextToken<boolean>(() => false);
 export const SHOW_LOADING = new HttpContextToken<boolean>(() => true);
+export const LOADING_KEY = new HttpContextToken<string>(() => 'default');
 
 @Injectable({
   providedIn: 'root',

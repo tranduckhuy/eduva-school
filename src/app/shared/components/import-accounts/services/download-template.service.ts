@@ -1,6 +1,6 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
-import { Observable, map, finalize } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 
@@ -23,13 +23,11 @@ export class DownloadTemplateService {
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly GET_DOWNLOAD_TEMPLATE_API_URL = `${this.BASE_API_URL}/users/import-template`;
 
-  private readonly isLoadingSignal = signal<boolean>(false);
-  isLoading = this.isLoadingSignal.asReadonly();
-
   downloadTemplate(): Observable<boolean> {
-    this.isLoadingSignal.set(true);
     return this.requestService
-      .get<FileResponse>(this.GET_DOWNLOAD_TEMPLATE_API_URL)
+      .get<FileResponse>(this.GET_DOWNLOAD_TEMPLATE_API_URL, undefined, {
+        loadingKey: 'download-template',
+      })
       .pipe(
         map(res => {
           if (res.statusCode === StatusCode.SUCCESS && res.data) {
@@ -40,18 +38,7 @@ export class DownloadTemplateService {
             this.toastHandlingService.errorGeneral();
             return false;
           }
-        }),
-        finalize(() => {
-          this.isLoadingSignal.set(false);
         })
       );
   }
-  /**
-   * if (responseBlob.size === 0) {
-    // Thành công và không có lỗi file → import thành công
-    this.toastHandlingService.success('Thành công', 'Tải lên thành công');
-  } else {
-    // Có lỗi → file lỗi được trả về
-    triggerBlobDownload(responseBlob)
-  } */
 }

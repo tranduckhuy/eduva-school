@@ -1,4 +1,5 @@
 export interface RequestOptions {
-  showLoading?: boolean;
   bypassAuth?: boolean;
+  showLoading?: boolean;
+  loadingKey?: string;
 }

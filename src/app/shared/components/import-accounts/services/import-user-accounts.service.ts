@@ -1,6 +1,6 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
-import { catchError, finalize, map, Observable, of, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 
@@ -26,14 +26,11 @@ export class ImportUserAccountsService {
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly IMPORT_USER_ACCOUNTS_API_URL = `${this.BASE_API_URL}/users/import`;
 
-  private readonly isLoadingSignal = signal<boolean>(false);
-  isLoading = this.isLoadingSignal.asReadonly();
-
   importUserAccountsJson(formData: FormData): Observable<void> {
-    this.isLoadingSignal.set(true);
-
     return this.requestService
-      .postFormData<FileResponse>(this.IMPORT_USER_ACCOUNTS_API_URL, formData)
+      .postFormData<FileResponse>(this.IMPORT_USER_ACCOUNTS_API_URL, formData, {
+        loadingKey: 'upload',
+      })
       .pipe(
         tap(res => {
           if (
@@ -56,18 +53,15 @@ export class ImportUserAccountsService {
         catchError(() => {
           this.toastHandlingService.errorGeneral();
           return of(void 0);
-        }),
-        finalize(() => {
-          this.isLoadingSignal.set(false);
         })
       );
   }
 
   importUserAccountsBlob(formData: FormData): Observable<void> {
-    this.isLoadingSignal.set(true);
-
     return this.requestService
-      .postFile(this.IMPORT_USER_ACCOUNTS_API_URL, formData)
+      .postFile(this.IMPORT_USER_ACCOUNTS_API_URL, formData, {
+        loadingKey: 'upload',
+      })
       .pipe(
         tap(blob => {
           if (blob.size === 0) {
@@ -90,9 +84,6 @@ export class ImportUserAccountsService {
         catchError(() => {
           this.toastHandlingService.errorGeneral();
           return of(void 0);
-        }),
-        finalize(() => {
-          this.isLoadingSignal.set(false);
         })
       );
   }

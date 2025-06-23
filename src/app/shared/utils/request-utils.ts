@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 
 import {
   BYPASS_AUTH,
+  LOADING_KEY,
   SHOW_LOADING,
 } from '../services/core/request/request.service';
 
@@ -64,13 +65,15 @@ export function buildFormDataFromFormGroup(form: FormGroup): FormData {
  * - Whether to bypass authentication token attachment (e.g., for public endpoints).
  *
  * @param options Optional `RequestOptions` object containing:
- *  - `showLoading` (default: true): Whether to enable the global loading indicator.
  *  - `bypassAuth` (default: false): Whether to bypass auth-related interceptors.
+ *  - `showLoading` (default: true): Whether to enable the global loading indicator.
+ *  - `loadingKey` (default: 'default'): Whether to check specific global loading indicator.
  *
  * @returns An `HttpContext` instance with the configured flags.
  */
 export function buildHttpContext(options?: RequestOptions): HttpContext {
   return new HttpContext()
+    .set(BYPASS_AUTH, options?.bypassAuth === true)
     .set(SHOW_LOADING, options?.showLoading !== false)
-    .set(BYPASS_AUTH, options?.bypassAuth === true);
+    .set(LOADING_KEY, options?.loadingKey ?? 'default');
 }
