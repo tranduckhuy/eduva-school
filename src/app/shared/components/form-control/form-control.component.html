@@ -1,15 +1,19 @@
 <div class="w-full overflow-hidden">
   <div class="w-full text-left">
     <div class="flex justify-between">
-      <label class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
-        {{ label() }}
-      </label>
-      @if (redirectLink()) {
+      @if (label()) {
+        <label
+          class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+          {{ label() }}
+        </label>
+      }
+      @if (redirectLink().value) {
         <a
+          tabindex="-1"
           routerLink="{{ redirectLink().href }}"
-          class="mb-2 block font-semibold text-[#f33a58]"
-          >{{ redirectLink().value }}</a
-        >
+          class="mb-2 block font-semibold text-[#f33a58]">
+          {{ redirectLink().value }}
+        </a>
       }
     </div>
     <div
@@ -87,12 +91,14 @@
         (!options() || options().length === 0)
       ) {
         <i
+          tabindex="-1"
           class="fa-solid fa-triangle-exclamation absolute right-[14px] top-[20%] block animate-shake text-base text-[#f33a58]"></i>
       } @else if (
         type() === 'password' && (!options() || options().length === 0)
       ) {
         @if (isShowPassword()) {
           <span
+            tabindex="-1"
             class="material-symbols-outlined absolute right-[14px] top-[17%] block cursor-pointer text-lg text-[#64748b]"
             (mousedown)="$event.preventDefault()"
             (click)="
@@ -104,6 +110,7 @@
           </span>
         } @else {
           <span
+            tabindex="-1"
             class="material-symbols-outlined absolute right-[14px] top-[17%] block cursor-pointer text-lg text-[#64748b]"
             (mousedown)="$event.preventDefault()"
             (click)="

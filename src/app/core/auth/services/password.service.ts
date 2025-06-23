@@ -1,0 +1,91 @@
+import { Injectable, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+
+import { Observable, catchError, map, of, tap } from 'rxjs';
+
+import { environment } from '../../../../environments/environment';
+
+import { RequestService } from '../../../shared/services/core/request/request.service';
+import { ToastHandlingService } from '../../../shared/services/core/toast/toast-handling.service';
+
+import { StatusCode } from '../../../shared/constants/status-code.constant';
+
+import { type EmailLinkRequest } from '../models/email-link-request.model';
+import { ResetPasswordRequest } from '../pages/reset-password/models/reset-password-request.model';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class PasswordService {
+  private readonly requestService = inject(RequestService);
+  private readonly toastHandlingService = inject(ToastHandlingService);
+
+  private readonly BASE_API_URL = environment.baseApiUrl;
+  private readonly FORGOT_PASSWORD_API_URL = `${this.BASE_API_URL}/auth/forgot-password`;
+  private readonly RESET_PASSWORD_API_URL = `${this.BASE_API_URL}/auth/reset-password`;
+
+  private readonly CLIENT_URL = `${environment.clientUrl}/reset-password`;
+
+  forgotPassword(request: EmailLinkRequest): Observable<void> {
+    request = {
+      ...request,
+      clientUrl: this.CLIENT_URL,
+    };
+    return this.requestService.post(this.FORGOT_PASSWORD_API_URL, request).pipe(
+      tap(res => {
+        if (res.statusCode === StatusCode.SUCCESS) {
+          this.toastHandlingService.success(
+            'Thành công',
+            'Liên kết đặt lại mật khẩu đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư đến hoặc thư rác.'
+          );
+        } else {
+          this.toastHandlingService.error(
+            'Không thể gửi yêu cầu',
+            'Có lỗi xảy ra khi gửi liên kết đặt lại mật khẩu. Vui lòng thử lại sau.'
+          );
+        }
+      }),
+      map(() => void 0),
+      catchError((err: HttpErrorResponse) => {
+        if (err.error.statusCode === StatusCode.USER_NOT_EXISTS) {
+          this.toastHandlingService.warn(
+            'Email không tồn tại',
+            'Vui lòng kiểm tra lại địa chỉ email.'
+          );
+          return of(void 0);
+        }
+        this.toastHandlingService.errorGeneral();
+        return of(void 0);
+      })
+    );
+  }
+
+  resetPassword(request: ResetPasswordRequest): Observable<void> {
+    return this.requestService.post(this.RESET_PASSWORD_API_URL, request).pipe(
+      tap(res => {
+        if (res.statusCode === StatusCode.SUCCESS) {
+          this.toastHandlingService.success(
+            'Thành công',
+            'Mật khẩu của bạn đã được đặt lại.'
+          );
+        } else {
+          this.toastHandlingService.errorGeneral();
+        }
+      }),
+      map(() => void 0),
+      catchError((err: HttpErrorResponse) => {
+        switch (err.error.statusCode) {
+          case StatusCode.INVALID_TOKEN:
+            this.toastHandlingService.error(
+              'Liên kết hết hạn',
+              'Vui lòng gửi lại yêu cầu đặt lại mật khẩu mới.'
+            );
+            break;
+          default:
+            this.toastHandlingService.errorGeneral();
+        }
+        return of(void 0);
+      })
+    );
+  }
+}

@@ -4,19 +4,16 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
+import { ButtonModule } from 'primeng/button';
+
+import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 import { AuthService } from '../../services/auth.service';
 
 import { AuthLayoutComponent } from '../../auth-layout/auth-layout.component';
 
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
-import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 import { type LoginRequest } from './models/login-request.model';
 
@@ -25,26 +22,28 @@ import { type LoginRequest } from './models/login-request.model';
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    ButtonModule,
     AuthLayoutComponent,
     FormControlComponent,
-    ButtonComponent,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
+  private readonly loadingService = inject(LoadingService);
   private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
 
   form: FormGroup;
 
+  isLoading = this.loadingService.isLoading;
   submitted = signal<boolean>(false);
 
   constructor() {
     this.form = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      email: '',
+      password: '',
     });
   }
 

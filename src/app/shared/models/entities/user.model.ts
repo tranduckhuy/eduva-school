@@ -1,9 +1,4 @@
-type UserRole =
-  | 'SystemAdmin'
-  | 'SchoolAdmin'
-  | 'ContentModerator'
-  | 'Teacher'
-  | 'Student';
+import { UserRole } from '../../constants/user-roles.constant';
 
 export interface User {
   id: string;

@@ -1,4 +1,6 @@
 import { HttpResponse } from '@angular/common/http';
+import { FormGroup } from '@angular/forms';
+
 import { ContentType } from '../models/enum/content-type.enum';
 
 /**
@@ -79,3 +81,22 @@ export const getContentTypeFromMime = (mime: string): ContentType => {
 
   return ContentType.DOCX;
 };
+
+/**
+ * Checks whether the password and confirm password fields in a FormGroup do not match.
+ *
+ * @param form - The FormGroup containing the password fields.
+ * @param passwordField - The name of the password field (default: 'newPassword').
+ * @param confirmField - The name of the confirm password field (default: 'confirmPassword').
+ * @returns `true` if the values do not match, otherwise `false`.
+ */
+export function isFormFieldMismatch(
+  form: FormGroup,
+  passwordField: string = 'password',
+  confirmField: string = 'confirmPassword'
+): boolean {
+  const password: string | null | undefined = form.get(passwordField)?.value;
+  const confirmPassword: string | null | undefined =
+    form.get(confirmField)?.value;
+  return password !== confirmPassword;
+}

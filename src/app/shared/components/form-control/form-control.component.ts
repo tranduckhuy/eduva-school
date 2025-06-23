@@ -1,4 +1,3 @@
-// Updated FormControlComponent using @signal input() and output() APIs
 import {
   ChangeDetectionStrategy,
   Component,

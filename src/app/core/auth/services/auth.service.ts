@@ -17,6 +17,10 @@ import { type LoginRequest } from '../pages/login/models/login-request.model';
 import { type RefreshTokenRequest } from '../models/refresh-token-request.model';
 
 import { type AuthTokenResponse } from '../models/auth-response.model';
+import {
+  UserRole,
+  UserRoles,
+} from '../../../shared/constants/user-roles.constant';
 
 @Injectable({
   providedIn: 'root',
@@ -42,7 +46,6 @@ export class AuthService {
     return this.requestService
       .post<AuthTokenResponse>(this.LOGIN_API_URL, request, {
         bypassAuth: true,
-        showLoading: false,
       })
       .pipe(
         map(res => {
@@ -63,7 +66,18 @@ export class AuthService {
                 return;
               }
 
-              if (user.roles.includes('SystemAdmin')) {
+              const roleRedirectMap: Partial<Record<UserRole, string>> = {
+                SchoolAdmin: '/school-admin',
+                ContentModerator: '/teacher',
+                Teacher: '/teacher',
+              };
+
+              const firstRole = user.roles[0];
+              const redirectUrl = roleRedirectMap[firstRole] ?? '/';
+
+              this.router.navigateByUrl(redirectUrl);
+
+              if (user.roles.includes(UserRoles.CONTENT_MODERATOR)) {
                 this.router.navigateByUrl('/');
               }
             });
