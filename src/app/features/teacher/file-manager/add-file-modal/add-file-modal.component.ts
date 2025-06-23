@@ -16,10 +16,11 @@ import {
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
-import { UploadFileService } from '../services/upload-file.service';
-import { FileManagerService } from '../services/file-manager.service';
+import { UploadFileService } from '../../../../shared/services/api/file/upload-file.service';
+import { LessonMaterialsService } from '../../../../shared/services/api/lesson-materials/lesson-materials.service';
 
 import {
   MAX_UPLOAD_FILE_SIZE,
@@ -29,7 +30,10 @@ import {
 
 import { getContentTypeFromMime } from '../../../../shared/utils/util-functions';
 
-import { LessonMaterialRequest } from '../../../../shared/models/api/request/lesson-material-request.model';
+import {
+  LessonMaterialRequest,
+  LessonMaterialsRequest,
+} from '../../../../shared/models/api/request/lesson-material-request.model';
 
 @Component({
   selector: 'app-add-file-modal',
@@ -48,10 +52,11 @@ import { LessonMaterialRequest } from '../../../../shared/models/api/request/les
 export class AddFileModalComponent {
   // private readonly fb = inject(FormBuilder);
   private readonly config = inject(PrimeNG);
+  private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
   private readonly toastHandlingService = inject(ToastHandlingService);
   private readonly uploadFileService = inject(UploadFileService);
-  private readonly fileManagerService = inject(FileManagerService);
+  private readonly lessonMaterialsService = inject(LessonMaterialsService);
 
   // ? Form
   // form: FormGroup;
@@ -60,9 +65,7 @@ export class AddFileModalComponent {
   maxUploadFileSize = MAX_UPLOAD_FILE_SIZE;
 
   // ? State
-  isLoading = this.fileManagerService.isLoading;
-
-  // ? Signal Props
+  isLoading = this.loadingService.isLoading;
   selectedFiles = signal<File[]>([]);
 
   // constructor() {
@@ -185,7 +188,7 @@ export class AddFileModalComponent {
       if (!res) return;
 
       const sourceUrls = res.uploadTokens;
-
+      const folderId = 1; // ! Placeholder folderId
       const materials: LessonMaterialRequest[] = files.map((file, index) => ({
         title: file.name,
         description: '',
@@ -195,12 +198,17 @@ export class AddFileModalComponent {
         fileSize: file.size,
         isAIContent: false,
         sourceUrl: sourceUrls[index],
-        folderId: 0,
       }));
 
-      this.fileManagerService.uploadLessonMaterials(materials).subscribe(() => {
-        this.closeModal();
-      });
+      const request: LessonMaterialsRequest = {
+        folderId,
+        lessonMaterials: materials,
+      };
+      this.lessonMaterialsService
+        .createLessonMaterials(request)
+        .subscribe(() => {
+          this.closeModal();
+        });
     });
   }
 }

@@ -8,12 +8,14 @@ import { ConfirmationService } from 'primeng/api';
 
 import { JwtService } from '../auth/services/jwt.service';
 import { ToastHandlingService } from '../../shared/services/core/toast/toast-handling.service';
+import { GlobalModalService } from '../../shared/services/layout/global-modal/global-modal.service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const jwtService = inject(JwtService);
-  const confirmationService = inject(ConfirmationService);
   const toastHandlingService = inject(ToastHandlingService);
+  const globalModalService = inject(GlobalModalService);
+  const confirmationService = inject(ConfirmationService);
 
   const excludedUrls = ['/auth/login', '/auth/refresh-token'];
   const shouldSkip401Toast = excludedUrls.some(url => req.url.includes(url));
@@ -25,6 +27,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       } else if (error.status >= 500) {
         toastHandlingService.errorGeneral(); // ? Sau sẽ redirect tới trang 500
       } else if (error.status === 401 && !shouldSkip401Toast) {
+        globalModalService.close();
         confirmationService.confirm({
           message: 'Vui lòng đăng nhập lại.',
           header: 'Phiên đã hết hạn',

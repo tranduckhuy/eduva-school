@@ -8,12 +8,12 @@ import { environment } from '../../../../../environments/environment';
 import {
   BYPASS_AUTH,
   RequestService,
-} from '../../../../shared/services/core/request/request.service';
-import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
+} from '../../core/request/request.service';
+import { ToastHandlingService } from '../../core/toast/toast-handling.service';
 
-import { StatusCode } from '../../../../shared/constants/status-code.constant';
+import { StatusCode } from '../../../constants/status-code.constant';
 
-import { type FileStorageResponse } from '../../../../shared/models/api/response/file-storage-response.model';
+import { type FileStorageResponse } from '../../../models/api/response/file-storage-response.model';
 
 @Injectable({
   providedIn: 'root',
