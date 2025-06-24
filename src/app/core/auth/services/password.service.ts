@@ -103,14 +103,22 @@ export class PasswordService {
       }),
       map(() => void 0),
       catchError((err: HttpErrorResponse) => {
-        if (err.error.statusCode === StatusCode.NEW_PASSWORD_SAME_AS_OLD) {
-          this.toastHandlingService.warn(
-            'Cảnh báo',
-            'Mật khẩu mới không được trùng với mật khẩu hiện tại.'
-          );
-          return of(void 0);
+        switch (err.error.statusCode) {
+          case StatusCode.PROVIDED_INFORMATION_IS_INVALID:
+            this.toastHandlingService.error(
+              'Lỗi xác thực',
+              'Mật khẩu hiện tại không chính xác. Vui lòng kiểm tra và thử lại.'
+            );
+            break;
+          case StatusCode.NEW_PASSWORD_SAME_AS_OLD:
+            this.toastHandlingService.warn(
+              'Cảnh báo',
+              'Mật khẩu mới không được trùng với mật khẩu hiện tại.'
+            );
+            break;
+          default:
+            this.toastHandlingService.errorGeneral();
         }
-        this.toastHandlingService.errorGeneral();
         return of(void 0);
       })
     );

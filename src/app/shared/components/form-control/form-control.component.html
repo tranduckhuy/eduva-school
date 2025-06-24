@@ -30,6 +30,7 @@
         ),
         'focus-within:border-primary':
           !control.invalid || (!control.touched && !submitted()),
+        'focus-within:border-[#e1e6f2]': readOnly() === true,
         'bg-[#e1e6f2]': readOnly() === true,
       }"
       [style.backgroundColor]="

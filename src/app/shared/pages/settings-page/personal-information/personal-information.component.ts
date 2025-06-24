@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
 
@@ -13,4 +13,10 @@ import { PersonalContactComponent } from './personal-contact/personal-contact.co
   styleUrl: './personal-information.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PersonalInformationComponent {}
+export class PersonalInformationComponent {
+  isEdit = signal<boolean>(false);
+
+  toggleEdit() {
+    this.isEdit.set(!this.isEdit());
+  }
+}

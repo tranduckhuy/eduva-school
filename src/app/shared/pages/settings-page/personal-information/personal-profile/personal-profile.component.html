@@ -22,7 +22,7 @@
         class="size-full rounded object-contain" />
     </figure>
     <div class="ml-4">
-      <h3 class="text-base font-semibold">Quy Nguyen</h3>
+      <h3 class="text-lg font-semibold">Quy Nguyen</h3>
       <div class="mt-1">
         <p class="dark:text-gray-300">
           Địa chỉ email:
@@ -37,10 +37,18 @@
   <!-- ? Name -->
   <div class="e-row">
     <div class="e-col-6">
-      <app-form-control label="Họ" placeholder="Nguyen" name="firstName" />
+      <app-form-control
+        label="Họ"
+        placeholder="Nguyen"
+        name="firstName"
+        [readOnly]="!isEdit()" />
     </div>
     <div class="e-col-6">
-      <app-form-control label="Tên" placeholder="Van A" name="lastName" />
+      <app-form-control
+        label="Tên"
+        placeholder="Van A"
+        name="lastName"
+        [readOnly]="!isEdit()" />
     </div>
   </div>
 </div>

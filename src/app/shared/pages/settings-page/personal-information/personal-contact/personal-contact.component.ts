@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { FormControlComponent } from '../../../../components/form-control/form-control.component';
 
 @Component({
@@ -9,4 +9,6 @@ import { FormControlComponent } from '../../../../components/form-control/form-c
   styleUrl: './personal-contact.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PersonalContactComponent {}
+export class PersonalContactComponent {
+  isEdit = input.required<boolean>();
+}

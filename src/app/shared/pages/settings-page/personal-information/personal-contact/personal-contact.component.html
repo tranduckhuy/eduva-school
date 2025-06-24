@@ -3,19 +3,22 @@
     <app-form-control
       label="Địa chỉ email"
       placeholder="nguyenvana@gmail.com"
-      name="email" />
+      name="email"
+      [readOnly]="!isEdit()" />
   </div>
   <div class="e-col-6">
     <app-form-control
       label="Số điện thoại"
       placeholder="0912345678"
-      name="phone" />
+      name="phone"
+      [readOnly]="!isEdit()" />
   </div>
   <div class="e-col-12">
     <app-form-control
       label="Giới thiệu"
       placeholder="Viết vài dòng giới thiệu về bạn..."
       name="bio"
-      [isTextarea]="true" />
+      [isTextarea]="true"
+      [readOnly]="!isEdit()" />
   </div>
 </div>

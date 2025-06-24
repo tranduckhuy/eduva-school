@@ -55,16 +55,8 @@ export class ResetPasswordComponent {
 
   constructor() {
     this.form = this.fb.group({
-      password: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(8),
-          Validators.maxLength(18),
-          strongPasswordValidator,
-        ],
-      ],
-      confirmPassword: ['', Validators.required],
+      password: '',
+      confirmPassword: '',
     });
 
     this.activatedRoute.queryParamMap.subscribe(params => {
@@ -72,13 +64,13 @@ export class ResetPasswordComponent {
       const rawEmail = params.get('email');
 
       this.token.set(rawToken ?? '');
-      console.log(this.token());
       this.email.set(rawEmail ?? '');
     });
   }
 
   onSubmit(): void {
     this.submitted.set(true);
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -89,7 +81,6 @@ export class ResetPasswordComponent {
       token: this.token(),
       ...this.form.value,
     };
-    console.log(request);
     this.passwordService
       .resetPassword(request)
       .subscribe(() => this.router.navigateByUrl('/auth/login'));

@@ -12,7 +12,6 @@ import { ThemeService } from '../../../../shared/services/core/theme/theme.servi
 
 import { NotificationsComponent } from './notifications/notifications.component';
 import { InformationComponent } from './information/information.component';
-import { ThemeService } from '../../../../shared/services/core/theme/theme.service';
 
 @Component({
   selector: 'header-user-actions',

@@ -3,7 +3,11 @@
     <!-- ? Redirect -->
     <ul class="settings-list">
       <li>
-        <a routerLink="/teacher/settings" class="settings-link active">
+        <a
+          routerLink="/teacher/settings"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="settings-link">
           <span class="flex items-center gap-2">
             <i class="material-symbols-outlined relative -top-[1px] text-xl">
               account_box
@@ -13,7 +17,11 @@
         </a>
       </li>
       <li>
-        <a routerLink="account-settings" class="settings-link">
+        <a
+          routerLink="account-settings"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="settings-link">
           <span class="flex items-center gap-2">
             <i class="material-symbols-outlined relative -top-[1px] text-xl">
               encrypted
@@ -23,7 +31,11 @@
         </a>
       </li>
       <li>
-        <a routerLink="terms-conditions" class="settings-link">
+        <a
+          routerLink="terms-conditions"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="settings-link">
           <span class="flex items-center gap-2">
             <i class="material-symbols-outlined relative -top-[1px] text-xl">
               book_2
@@ -33,7 +45,11 @@
         </a>
       </li>
       <li>
-        <a routerLink="privacy-policy" class="settings-link">
+        <a
+          routerLink="privacy-policy"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="settings-link">
           <span class="flex items-center gap-2">
             <i class="material-symbols-outlined relative -top-[1px] text-xl">
               database

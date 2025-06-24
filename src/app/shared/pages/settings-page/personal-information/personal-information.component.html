@@ -3,33 +3,43 @@
   <div class="p-[25px]">
     <form action="">
       <div>
-        <span class="mb-4 inline-block font-semibold dark:text-white">
+        <h3 class="mb-4 text-base font-semibold dark:text-white">
           Hồ sơ cá nhân:
-        </span>
+        </h3>
 
-        <personal-profile />
+        <personal-profile [isEdit]="isEdit()" />
       </div>
 
       <div class="mt-8">
-        <span class="mb-4 inline-block font-semibold dark:text-white">
+        <h3 class="mb-4 text-base font-semibold dark:text-white">
           Thông tin liên hệ:
-        </span>
+        </h3>
 
-        <personal-contact />
+        <personal-contact [isEdit]="isEdit()" />
       </div>
 
       <div class="mt-8 flex justify-end gap-2">
-        <p-button
-          label="Hủy"
-          icon="pi pi-times"
-          severity="danger"
-          variant="outlined"
-          size="small" />
-        <p-button
-          label="Lưu thông tin"
-          icon="pi pi-check"
-          variant="outlined"
-          size="small" />
+        @if (isEdit()) {
+          <p-button
+            label="Hủy"
+            icon="pi pi-times"
+            severity="danger"
+            variant="outlined"
+            size="small"
+            (onClick)="toggleEdit()" />
+          <p-button
+            label="Lưu thông tin"
+            icon="pi pi-check"
+            variant="outlined"
+            size="small" />
+        } @else {
+          <p-button
+            label="Chỉnh sửa thông tin"
+            icon="pi pi-pencil"
+            variant="outlined"
+            size="small"
+            (onClick)="toggleEdit()" />
+        }
       </div>
     </form>
   </div>
