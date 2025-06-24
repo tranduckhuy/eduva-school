@@ -4,12 +4,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
@@ -20,7 +15,6 @@ import { PasswordService } from '../../services/password.service';
 import { AuthLayoutComponent } from '../../auth-layout/auth-layout.component';
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 
-import { strongPasswordValidator } from '../../../../shared/utils/form-validators';
 import { isFormFieldMismatch } from '../../../../shared/utils/util-functions';
 
 import { type ResetPasswordRequest } from './models/reset-password-request.model';
