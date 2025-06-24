@@ -1,0 +1,46 @@
+<div class="flex flex-col gap-6">
+  <!-- ? Avatar -->
+  <div class="flex items-center">
+    <figure class="relative size-20 rounded">
+      <label
+        for="avatar"
+        class="absolute -right-1 -top-1 flex size-6 cursor-pointer items-center justify-center rounded-full border-[2px] border-white">
+        <input
+          #avatarInput
+          type="file"
+          name="avatar"
+          id="avatar"
+          class="hidden" />
+        <span
+          class="flex size-full items-center justify-center rounded-full bg-primary">
+          <i class="pi pi-camera text-white" style="font-size: 13px"></i>
+        </span>
+      </label>
+      <img
+        src="https://htmlcss.fullstack.edu.vn/assets/f8_icon.png"
+        alt="Quy Nguyen"
+        class="size-full rounded object-contain" />
+    </figure>
+    <div class="ml-4">
+      <h3 class="text-base font-semibold">Quy Nguyen</h3>
+      <div class="mt-1">
+        <p class="dark:text-gray-300">
+          Địa chỉ email:
+          <a href="mailto:quynguyen@gmail.com">quynguyen&#64;gmail.com</a>
+          <br />
+          Số điện thoại: <a href="tel:0398973407">0398973407</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ? Name -->
+  <div class="e-row">
+    <div class="e-col-6">
+      <app-form-control label="Họ" placeholder="Nguyen" name="firstName" />
+    </div>
+    <div class="e-col-6">
+      <app-form-control label="Tên" placeholder="Van A" name="lastName" />
+    </div>
+  </div>
+</div>

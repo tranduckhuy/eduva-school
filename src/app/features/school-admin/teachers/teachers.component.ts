@@ -4,7 +4,13 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
+
+import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
+
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 import { BadgeComponent } from '../../../shared/components/badge/badge.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';

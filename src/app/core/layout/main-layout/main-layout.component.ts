@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { fromEvent } from 'rxjs';

@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 
 import { HeaderSubmenuService } from '../services/header-submenu.service';
+import { ThemeService } from '../../../../shared/services/core/theme/theme.service';
 
 import { NotificationsComponent } from './notifications/notifications.component';
 import { InformationComponent } from './information/information.component';

@@ -1,0 +1,24 @@
+.settings-list > li + li {
+  margin-top: 16px;
+}
+
+.settings-list-lv2 > li + li {
+  margin-top: 14px;
+}
+
+.settings-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.settings-link span {
+  transition: color 0.25s ease;
+}
+
+.settings-link.active span,
+.settings-link:hover span {
+  color: var(--color-primary-500);
+}
