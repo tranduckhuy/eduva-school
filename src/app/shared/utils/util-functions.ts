@@ -44,12 +44,11 @@ export function getFileName(response: HttpResponse<Blob>): string {
 
   // ? Try filename*= (RFC 5987)
   const fileNameStarMatch = fileNameStarRegex.exec(contentDisposition);
-  if (fileNameStarMatch && fileNameStarMatch[1])
-    return decodeURIComponent(fileNameStarMatch[1]);
+  if (fileNameStarMatch?.[1]) return decodeURIComponent(fileNameStarMatch[1]);
 
   // ? Fallback: Try regular filename=
   const fileNameMatch = fileNameRegex.exec(contentDisposition);
-  if (fileNameMatch && fileNameMatch[1]) {
+  if (fileNameMatch?.[1]) {
     let fileName = fileNameMatch[1].trim();
     if (fileName.startsWith('"') || fileName.startsWith("'")) {
       fileName = fileName.slice(1, -1);
