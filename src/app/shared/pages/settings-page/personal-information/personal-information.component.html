@@ -1,0 +1,36 @@
+<div
+  class="e-container-fluid rounded bg-white px-0 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <div class="p-[25px]">
+    <form action="">
+      <div>
+        <span class="mb-4 inline-block font-semibold dark:text-white">
+          Hồ sơ cá nhân:
+        </span>
+
+        <personal-profile />
+      </div>
+
+      <div class="mt-8">
+        <span class="mb-4 inline-block font-semibold dark:text-white">
+          Thông tin liên hệ:
+        </span>
+
+        <personal-contact />
+      </div>
+
+      <div class="mt-8 flex justify-end gap-2">
+        <p-button
+          label="Hủy"
+          icon="pi pi-times"
+          severity="danger"
+          variant="outlined"
+          size="small" />
+        <p-button
+          label="Lưu thông tin"
+          icon="pi pi-check"
+          variant="outlined"
+          size="small" />
+      </div>
+    </form>
+  </div>
+</div>

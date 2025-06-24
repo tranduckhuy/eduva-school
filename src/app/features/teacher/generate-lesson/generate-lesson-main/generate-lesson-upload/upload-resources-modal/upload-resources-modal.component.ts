@@ -5,12 +5,13 @@ import {
   output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
 import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
 import { ProgressBar } from 'primeng/progressbar';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { GlobalModalService } from '../../../../../../shared/services/global-modal/global-modal.service';
+import { GlobalModalService } from '../../../../../../shared/services/layout/global-modal/global-modal.service';
 
 type UploadModalData = {
   onUploaded: (file: { fileName: string; lastModified: number }) => void;

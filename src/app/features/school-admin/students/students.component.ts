@@ -4,14 +4,17 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+import { TooltipModule } from 'primeng/tooltip';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+
+import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
+
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 import { BadgeComponent } from '../../../shared/components/badge/badge.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
-import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
-import { TooltipModule } from 'primeng/tooltip';
-import { RouterLink } from '@angular/router';
-import { GlobalModalService } from '../../../shared/services/global-modal/global-modal.service';
+import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
 import { ImportAccountsComponent } from '../../../shared/components/import-accounts/import-accounts.component';
 import { AddStudentModalComponent } from './add-student-modal/add-student-modal.component';
 

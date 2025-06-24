@@ -4,11 +4,14 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { GlobalModalService } from '../../../../shared/services/global-modal/global-modal.service';
-import { ButtonModule } from 'primeng/button';
-import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 import { FormsModule, NgForm } from '@angular/forms';
-import { MODAL_DATA } from '../../../../shared/services/global-modal/modal-data.token';
+
+import { ButtonModule } from 'primeng/button';
+
+import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
+import { MODAL_DATA } from '../../../../shared/services/layout/global-modal/modal-data.token';
+
+import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 
 interface ModerateReasonModalData {
   isApproved: boolean;

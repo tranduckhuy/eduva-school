@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 
-import { ThemeService } from '../../../shared/services/theme/theme.service';
+import { ThemeService } from '../../../shared/services/core/theme/theme.service';
 import { GlobalModalHostComponent } from '../../../shared/components/global-modal-host/global-modal-host.component';
 
 @Component({

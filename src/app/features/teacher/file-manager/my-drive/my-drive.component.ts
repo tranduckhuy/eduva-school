@@ -5,7 +5,7 @@ import {
   signal,
 } from '@angular/core';
 
-import { GlobalModalService } from '../../../../shared/services/global-modal/global-modal.service';
+import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
