@@ -6,7 +6,9 @@ import {
 } from '@angular/core';
 
 import { ButtonComponent } from '../button/button.component';
+
 import { GlobalModalService } from '../../services/layout/global-modal/global-modal.service';
+
 import { ImportAccountModalsComponent } from './import-account-modals/import-account-modals.component';
 
 @Component({

@@ -16,6 +16,7 @@ import { fromEvent } from 'rxjs';
 
 import { RouteMetadataDirective } from '../../../shared/directives/route-metadata/route-metadata.directive';
 
+import { LayoutHeadingService } from '../../../shared/services/layout-heading/layout-heading.service';
 import { LayoutHeadingService } from '../../../shared/services/layout/layout-heading/layout-heading.service';
 
 import { HeaderComponent } from '../header/header.component';

@@ -18,6 +18,7 @@ import { VideoViewerComponent } from '../video-viewer/video-viewer.component';
 import { AudioViewerComponent } from '../audio-viewer/audio-viewer.component';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { ModerateReasonModalComponent } from '../moderate-reason-modal/moderate-reason-modal.component';
+import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 
 interface Owner {
   name: string;
@@ -131,7 +132,7 @@ export class PreviewLessonComponent implements OnInit {
     });
   }
 
-  openAddStudentModal() {
+  openModerateReasonModal() {
     this.globalModalService.open(
       ModerateReasonModalComponent,
       {
@@ -143,11 +144,11 @@ export class PreviewLessonComponent implements OnInit {
 
   approveLesson() {
     this.isApprovedLesson.set(true);
-    this.openAddStudentModal();
+    this.openModerateReasonModal();
   }
 
   refuseLesson() {
     this.isApprovedLesson.set(false);
-    this.openAddStudentModal();
+    this.openModerateReasonModal();
   }
 }
