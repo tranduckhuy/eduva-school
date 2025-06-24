@@ -10,8 +10,9 @@ import { ToastHandlingService } from '../../../shared/services/core/toast/toast-
 
 import { StatusCode } from '../../../shared/constants/status-code.constant';
 
-import { type EmailLinkRequest } from '../models/email-link-request.model';
-import { ResetPasswordRequest } from '../pages/reset-password/models/reset-password-request.model';
+import { type EmailLinkRequest } from '../models/request/email-link-request.model';
+import { type ResetPasswordRequest } from '../pages/reset-password/models/reset-password-request.model';
+import { type ChangePasswordRequest } from '../../../shared/models/api/request/change-password-request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +24,7 @@ export class PasswordService {
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly FORGOT_PASSWORD_API_URL = `${this.BASE_API_URL}/auth/forgot-password`;
   private readonly RESET_PASSWORD_API_URL = `${this.BASE_API_URL}/auth/reset-password`;
+  private readonly CHANGE_PASSWORD_API_URL = `${this.BASE_API_URL}/auth/change-password`;
 
   private readonly CLIENT_URL = `${environment.clientUrl}/reset-password`;
 
@@ -74,16 +76,41 @@ export class PasswordService {
       }),
       map(() => void 0),
       catchError((err: HttpErrorResponse) => {
-        switch (err.error.statusCode) {
-          case StatusCode.INVALID_TOKEN:
-            this.toastHandlingService.error(
-              'Liên kết hết hạn',
-              'Vui lòng gửi lại yêu cầu đặt lại mật khẩu mới.'
-            );
-            break;
-          default:
-            this.toastHandlingService.errorGeneral();
+        if (err.error.statusCode === StatusCode.INVALID_TOKEN) {
+          this.toastHandlingService.error(
+            'Liên kết hết hạn',
+            'Vui lòng gửi lại yêu cầu đặt lại mật khẩu mới.'
+          );
+          return of(void 0);
         }
+        this.toastHandlingService.errorGeneral();
+        return of(void 0);
+      })
+    );
+  }
+
+  changePassword(request: ChangePasswordRequest): Observable<void> {
+    return this.requestService.post(this.CHANGE_PASSWORD_API_URL, request).pipe(
+      tap(res => {
+        if (res.statusCode === StatusCode.SUCCESS) {
+          this.toastHandlingService.success(
+            'Thành công',
+            'Mật khẩu của bạn đã được đặt lại.'
+          );
+        } else {
+          this.toastHandlingService.errorGeneral();
+        }
+      }),
+      map(() => void 0),
+      catchError((err: HttpErrorResponse) => {
+        if (err.error.statusCode === StatusCode.NEW_PASSWORD_SAME_AS_OLD) {
+          this.toastHandlingService.warn(
+            'Cảnh báo',
+            'Mật khẩu mới không được trùng với mật khẩu hiện tại.'
+          );
+          return of(void 0);
+        }
+        this.toastHandlingService.errorGeneral();
         return of(void 0);
       })
     );

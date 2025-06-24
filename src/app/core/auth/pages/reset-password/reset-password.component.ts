@@ -96,6 +96,6 @@ export class ResetPasswordComponent {
   }
 
   passwordMisMatch() {
-    return isFormFieldMismatch(this.form);
+    return isFormFieldMismatch(this.form, 'password');
   }
 }

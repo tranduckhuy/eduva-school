@@ -14,9 +14,9 @@ import { ToastHandlingService } from '../../../shared/services/core/toast/toast-
 import { StatusCode } from '../../../shared/constants/status-code.constant';
 
 import { type LoginRequest } from '../pages/login/models/login-request.model';
-import { type RefreshTokenRequest } from '../models/refresh-token-request.model';
+import { type RefreshTokenRequest } from '../models/request/refresh-token-request.model';
 
-import { type AuthTokenResponse } from '../models/auth-response.model';
+import { type AuthTokenResponse } from '../models/response/auth-response.model';
 import {
   UserRole,
   UserRoles,

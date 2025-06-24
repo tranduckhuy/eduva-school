@@ -82,20 +82,20 @@ export const getContentTypeFromMime = (mime: string): ContentType => {
 };
 
 /**
- * Checks whether the password and confirm password fields in a FormGroup do not match.
+ * Checks whether the value and confirm value fields in a FormGroup do not match.
  *
- * @param form - The FormGroup containing the password fields.
- * @param passwordField - The name of the password field (default: 'newPassword').
- * @param confirmField - The name of the confirm password field (default: 'confirmPassword').
+ * @param form - The FormGroup containing the fields that need to check matching.
+ * @param valueField - The name of the value field (default: 'newPassword').
+ * @param confirmValueField - The name of the confirm value field (default: 'confirmPassword').
  * @returns `true` if the values do not match, otherwise `false`.
  */
 export function isFormFieldMismatch(
   form: FormGroup,
-  passwordField: string = 'password',
-  confirmField: string = 'confirmPassword'
+  valueField: string = 'newPassword',
+  confirmValueField: string = 'confirmPassword'
 ): boolean {
-  const password: string | null | undefined = form.get(passwordField)?.value;
-  const confirmPassword: string | null | undefined =
-    form.get(confirmField)?.value;
-  return password !== confirmPassword;
+  const value: string | null | undefined = form.get(valueField)?.value;
+  const confirmValue: string | null | undefined =
+    form.get(confirmValueField)?.value;
+  return value !== confirmValue;
 }

@@ -14,7 +14,7 @@ import { PasswordService } from '../../services/password.service';
 import { AuthLayoutComponent } from '../../auth-layout/auth-layout.component';
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 
-import { type EmailLinkRequest } from '../../models/email-link-request.model';
+import { type EmailLinkRequest } from '../../models/request/email-link-request.model';
 
 @Component({
   selector: 'app-forgot-password',
