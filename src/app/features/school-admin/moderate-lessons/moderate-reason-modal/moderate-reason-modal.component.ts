@@ -9,7 +9,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
-import { MODAL_DATA } from '../../../../shared/services/layout/global-modal/modal-data.token';
+import { MODAL_DATA } from '../../../../shared/tokens/injection/modal-data.token';
 
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 

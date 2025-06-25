@@ -32,6 +32,9 @@ jobs:
         run: npx ng build --configuration=production
         env:
           BASE_API_URL: ${{ secrets.BASE_API_URL || 'https://api.eduva.example.com' }}
+          CLIENT_URL: ${{ secrets.CLIENT_URL || 'https://api.eduva.example.com' }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://api.eduva.example.com' }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY || 'https://api.eduva.example.com' }}
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v5.0.0

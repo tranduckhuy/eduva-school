@@ -1,32 +1,35 @@
 <div class="w-full overflow-hidden">
   <div class="w-full text-left">
     <div class="flex justify-between">
-      <label class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
-        {{ label() }}
-      </label>
-      @if (redirectLink()) {
+      @if (label()) {
+        <label
+          class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+          {{ label() }}
+        </label>
+      }
+      @if (redirectLink().value) {
         <a
+          tabindex="-1"
           routerLink="{{ redirectLink().href }}"
-          class="mb-2 block font-semibold text-[#f33a58]"
-          >{{ redirectLink().value }}</a
-        >
+          class="mb-2 block font-semibold text-[#f33a58]">
+          {{ redirectLink().value }}
+        </a>
       }
     </div>
     <div
       class="relative flex overflow-hidden rounded-md border-[1.5px] bg-white dark:bg-dark-300"
       [ngClass]="{
         'h-[44px]': !isTextarea(),
-        'border-[#f33a58] dark:border-[#f33a58]':
-          control.invalid && (control.touched || submitted()),
-        'focus-within:border-[#f33a58] dark:border-[#f33a58]':
+        'border-[#f33a58] focus-within:border-[#f33a58] dark:border-[#f33a58] focus-within:dark:border-[#f33a58]':
           control.invalid && (control.touched || submitted()),
         'border-gray-200 dark:border-gray-900': !(
           control.invalid &&
           (control.touched || submitted())
         ),
-        'focus-within:border-primary':
+        'focus-within:border-primary dark:focus-within:border-primary':
           !control.invalid || (!control.touched && !submitted()),
-        'bg-[#e1e6f2]': readOnly() === true,
+        'pointer-events-none !border-[#f1f4fa] !bg-[#f1f4fa] dark:!border-dark-400 dark:!bg-dark-400':
+          readOnly() === true,
       }"
       [style.backgroundColor]="
         control.invalid && (control.touched || submitted()) ? '#ff00001a' : ''
@@ -86,13 +89,17 @@
         type() !== 'password' &&
         (!options() || options().length === 0)
       ) {
-        <i
-          class="fa-solid fa-triangle-exclamation absolute right-[14px] top-[20%] block animate-shake text-base text-[#f33a58]"></i>
+        <div class="absolute right-[14px] top-1/2 -translate-y-1/2">
+          <i
+            class="fa-solid fa-triangle-exclamation animate-shake text-base text-[#f33a58]">
+          </i>
+        </div>
       } @else if (
         type() === 'password' && (!options() || options().length === 0)
       ) {
         @if (isShowPassword()) {
           <span
+            tabindex="-1"
             class="material-symbols-outlined absolute right-[14px] top-[17%] block cursor-pointer text-lg text-[#64748b]"
             (mousedown)="$event.preventDefault()"
             (click)="
@@ -104,6 +111,7 @@
           </span>
         } @else {
           <span
+            tabindex="-1"
             class="material-symbols-outlined absolute right-[14px] top-[17%] block cursor-pointer text-lg text-[#64748b]"
             (mousedown)="$event.preventDefault()"
             (click)="

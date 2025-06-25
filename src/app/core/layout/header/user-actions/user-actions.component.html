@@ -19,7 +19,7 @@
     <button
       class="action-btn cubic-bezier(0.4, 0, 0.2, 1) transition duration-100 hover:text-primary dark:text-dark-100 dark:hover:text-primary"
       (click)="toggleMenu('notifications')">
-      <span class="material-symbols-outlined text-xl"> notifications </span>
+      <span class="material-symbols-outlined text-xl">notifications</span>
     </button>
     @if (headerSubmenuService.getActiveSubmenuMenu() === 'notifications') {
       <header-notifications (clickOutside)="headerSubmenuService.close()" />
@@ -31,12 +31,12 @@
       class="flex cursor-pointer items-center gap-2"
       (click)="toggleMenu('information')">
       <img
-        src="https://htmlcss.fullstack.edu.vn/assets/f8_icon.png"
-        alt="Quy Nguyen"
+        [src]="user()?.avatarUrl"
+        [alt]="user()?.fullName"
         class="h-[30px] w-[30px] flex-shrink-0 rounded-[50%] object-contain outline outline-[#C2CDFF]" />
       <div class="flex items-center gap-1 xs:hidden">
         <span class="select-none font-semibold text-textBlack dark:text-white">
-          Quy Nguyen
+          {{ user()?.fullName }}
         </span>
         <span
           class="material-symbols-outlined text-xl text-textBlack dark:text-white">

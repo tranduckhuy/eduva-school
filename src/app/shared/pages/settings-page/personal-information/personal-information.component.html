@@ -1,0 +1,133 @@
+<div
+  class="e-container-fluid rounded bg-white px-0 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <div class="p-[25px]">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" action="">
+      <div>
+        <h3 class="mb-4 text-base font-semibold dark:text-white">
+          Hồ sơ cá nhân:
+        </h3>
+
+        <div class="flex flex-col gap-6">
+          <!-- ? Avatar -->
+          <div class="flex items-center">
+            <figure
+              class="relative size-20 rounded"
+              (click)="openAvatarModal()">
+              <img
+                [src]="user()?.avatarUrl"
+                [alt]="user()?.fullName"
+                class="size-full cursor-pointer rounded object-contain" />
+              <div
+                class="absolute -right-1 -top-1 flex size-6 cursor-pointer items-center justify-center rounded-full border-[2px] border-white dark:border-dark-300"
+                (click)="openAvatarModal()">
+                <span
+                  class="flex size-full items-center justify-center rounded-full bg-primary">
+                  <i
+                    class="pi pi-camera text-white"
+                    style="font-size: 13px"></i>
+                </span>
+              </div>
+            </figure>
+            <div class="ml-4">
+              <h3 class="text-lg font-semibold">{{ user()?.fullName }}</h3>
+              <div class="mt-1">
+                <p class="dark:text-gray-300">
+                  Địa chỉ email:
+                  <a href="mailto:{{ user()?.email }}">{{ user()?.email }}</a>
+                  <br />
+                  Số điện thoại:
+                  <a href="tel:{{ user()?.phoneNumber }}">{{
+                    user()?.phoneNumber
+                  }}</a>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ? Name -->
+          <div class="e-row">
+            <div class="e-col-6">
+              <app-form-control
+                label="Họ"
+                placeholder="Nguyen"
+                formControlName="firstName"
+                name="firstName"
+                [readOnly]="!isEdit()"
+                [required]="true" />
+            </div>
+            <div class="e-col-6">
+              <app-form-control
+                label="Tên"
+                placeholder="Van A"
+                formControlName="lastName"
+                name="lastName"
+                [readOnly]="!isEdit()"
+                [required]="true" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <h3 class="mb-4 text-base font-semibold dark:text-white">
+          Thông tin liên hệ:
+        </h3>
+
+        <div class="e-row e-gy-4">
+          <div class="e-col-6">
+            <app-form-control
+              label="Địa chỉ email"
+              placeholder="nguyenvana@gmail.com"
+              name="email"
+              [value]="user()?.email ?? ''"
+              [readOnly]="true" />
+          </div>
+          <div class="e-col-6">
+            <app-form-control
+              label="Số điện thoại"
+              placeholder="0912345678"
+              formControlName="phoneNumber"
+              name="phoneNumber"
+              [readOnly]="!isEdit()"
+              [required]="true" />
+          </div>
+          <div class="e-col-12">
+            <app-form-control
+              label="Giới thiệu"
+              placeholder="Viết vài dòng giới thiệu về bạn..."
+              name="bio"
+              [isTextarea]="true"
+              [readOnly]="!isEdit()" />
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 flex justify-end gap-2">
+        @if (isEdit()) {
+          <p-button
+            label="Hủy"
+            icon="pi pi-times"
+            severity="danger"
+            variant="outlined"
+            size="small"
+            (onClick)="cancelEdit()" />
+          <p-button
+            label="Lưu thông tin"
+            icon="pi pi-check"
+            variant="outlined"
+            type="submit"
+            size="small"
+            [loading]="isLoading()"
+            [disabled]="form.invalid" />
+        } @else {
+          <p-button
+            label="Chỉnh sửa thông tin"
+            icon="pi pi-pencil"
+            variant="outlined"
+            size="small"
+            (onClick)="enableEdit()" />
+        }
+      </div>
+    </form>
+  </div>
+</div>

@@ -5,7 +5,8 @@ import { catchError, switchMap } from 'rxjs';
 
 import { JwtService } from '../auth/services/jwt.service';
 import { AuthService } from '../auth/services/auth.service';
-import { BYPASS_AUTH } from '../../shared/services/core/request/request.service';
+
+import { BYPASS_AUTH } from '../../shared/tokens/context/http-context.token';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const jwtService = inject(JwtService);
@@ -17,7 +18,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const isExpired =
     expiresAt !== null && Date.now() >= new Date(expiresAt).getTime();
 
-  if (req.context.get(BYPASS_AUTH)) return next(req);
+  const isByPass = req.context.get(BYPASS_AUTH);
+  if (isByPass) return next(req);
 
   // ? If access token is still valid → attach to request header and proceed the request
   if (accessToken && !isExpired) {

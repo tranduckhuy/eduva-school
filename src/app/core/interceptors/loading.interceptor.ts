@@ -8,7 +8,7 @@ import { LoadingService } from '../../shared/services/core/loading/loading.servi
 import {
   SHOW_LOADING,
   LOADING_KEY,
-} from '../../shared/services/core/request/request.service';
+} from '../../shared/tokens/context/http-context.token';
 
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   const loadingService = inject(LoadingService);

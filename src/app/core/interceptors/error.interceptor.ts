@@ -7,12 +7,14 @@ import { catchError, throwError } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 
 import { JwtService } from '../auth/services/jwt.service';
+import { UserService } from '../../shared/services/api/user/user.service';
 import { ToastHandlingService } from '../../shared/services/core/toast/toast-handling.service';
 import { GlobalModalService } from '../../shared/services/layout/global-modal/global-modal.service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const jwtService = inject(JwtService);
+  const userService = inject(UserService);
   const toastHandlingService = inject(ToastHandlingService);
   const globalModalService = inject(GlobalModalService);
   const confirmationService = inject(ConfirmationService);
@@ -38,6 +40,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           },
           accept: () => {
             jwtService.clearAll();
+            userService.clearCurrentUser();
             router.navigateByUrl('/auth/login', {
               replaceUrl: true,
             });

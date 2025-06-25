@@ -16,31 +16,31 @@ export class LoggingService {
 
   debug(context: string, data?: any): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
-      console.debug(`[DEBUG] [${context}]`, data);
+      console.debug(`[DEBUG] [${context}]`, data ?? '');
     }
   }
 
   info(context: string, data?: any): void {
     if (this.shouldLog(LogLevel.INFO)) {
-      console.info(`[INFO] [${context}]`, data);
+      console.info(`[INFO] [${context}]`, data ?? '');
     }
   }
 
   warn(context: string, data?: any): void {
     if (this.shouldLog(LogLevel.WARN)) {
-      console.warn(`[WARN] [${context}]`, data);
+      console.warn(`[WARN] [${context}]`, data ?? '');
     }
   }
 
   error(context: string, data?: any): void {
     if (this.shouldLog(LogLevel.ERROR)) {
-      console.error(`[ERROR] [${context}]`, data);
+      console.error(`[ERROR] [${context}]`, data ?? '');
     }
   }
 
   fatal(context: string, data?: any): void {
     if (this.shouldLog(LogLevel.FATAL)) {
-      console.error(`[FATAL] [${context}]`, data);
+      console.error(`[FATAL] [${context}]`, data ?? '');
     }
   }
 }

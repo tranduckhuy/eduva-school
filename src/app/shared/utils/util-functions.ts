@@ -1,4 +1,6 @@
 import { HttpResponse } from '@angular/common/http';
+import { FormGroup } from '@angular/forms';
+
 import { ContentType } from '../models/enum/content-type.enum';
 
 /**
@@ -42,12 +44,11 @@ export function getFileName(response: HttpResponse<Blob>): string {
 
   // ? Try filename*= (RFC 5987)
   const fileNameStarMatch = fileNameStarRegex.exec(contentDisposition);
-  if (fileNameStarMatch && fileNameStarMatch[1])
-    return decodeURIComponent(fileNameStarMatch[1]);
+  if (fileNameStarMatch?.[1]) return decodeURIComponent(fileNameStarMatch[1]);
 
   // ? Fallback: Try regular filename=
   const fileNameMatch = fileNameRegex.exec(contentDisposition);
-  if (fileNameMatch && fileNameMatch[1]) {
+  if (fileNameMatch?.[1]) {
     let fileName = fileNameMatch[1].trim();
     if (fileName.startsWith('"') || fileName.startsWith("'")) {
       fileName = fileName.slice(1, -1);
@@ -79,3 +80,22 @@ export const getContentTypeFromMime = (mime: string): ContentType => {
 
   return ContentType.DOCX;
 };
+
+/**
+ * Checks whether the value and confirm value fields in a FormGroup do not match.
+ *
+ * @param form - The FormGroup containing the fields that need to check matching.
+ * @param valueField - The name of the value field (default: 'newPassword').
+ * @param confirmValueField - The name of the confirm value field (default: 'confirmPassword').
+ * @returns `true` if the values do not match, otherwise `false`.
+ */
+export function isFormFieldMismatch(
+  form: FormGroup,
+  valueField: string = 'newPassword',
+  confirmValueField: string = 'confirmPassword'
+): boolean {
+  const value: string | null | undefined = form.get(valueField)?.value;
+  const confirmValue: string | null | undefined =
+    form.get(confirmValueField)?.value;
+  return value !== confirmValue;
+}

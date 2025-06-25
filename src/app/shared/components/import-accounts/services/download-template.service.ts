@@ -21,29 +21,37 @@ export class DownloadTemplateService {
   private readonly toastHandlingService = inject(ToastHandlingService);
 
   private readonly BASE_API_URL = environment.baseApiUrl;
-  private readonly GET_DOWNLOAD_TEMPLATE_API_URL = `${this.BASE_API_URL}/users/import-template`;
+  private readonly DOWNLOAD_TEMPLATE_API_URL = `${this.BASE_API_URL}/users/import-template`;
 
   downloadTemplate(): Observable<HttpResponse<Blob>> {
     return this.requestService
-      .getFile(this.GET_DOWNLOAD_TEMPLATE_API_URL, undefined, {
+      .getFile(this.DOWNLOAD_TEMPLATE_API_URL, undefined, {
         loadingKey: 'download-template',
       })
       .pipe(
         tap(res => {
-          console.log(res);
-          console.log(res.headers.get('Content-Disposition'));
-          if (res.body) {
-            this.toastHandlingService.successGeneral();
-            const fileName = getFileName(res);
-            triggerBlobDownload(fileName, res.body);
-          } else {
-            this.toastHandlingService.errorGeneral();
-          }
+          this.handleDownloadResponse(res);
         }),
-        catchError(() => {
-          this.toastHandlingService.errorGeneral();
-          return EMPTY;
-        })
+        catchError(() => this.handleDownloadError())
       );
+  }
+
+  // ---------------------------
+  //  Private Helper Functions
+  // ---------------------------
+
+  private handleDownloadResponse(res: HttpResponse<Blob>): void {
+    if (res.body) {
+      this.toastHandlingService.successGeneral();
+      const fileName = getFileName(res);
+      triggerBlobDownload(fileName, res.body);
+    } else {
+      this.toastHandlingService.errorGeneral();
+    }
+  }
+
+  private handleDownloadError(): Observable<never> {
+    this.toastHandlingService.errorGeneral();
+    return EMPTY;
   }
 }

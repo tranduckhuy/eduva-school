@@ -29,25 +29,35 @@ export class ImportUserAccountsService {
         loadingKey: 'upload',
       })
       .pipe(
-        tap(res => {
-          if (res.body) {
-            this.toastHandlingService.error(
-              'Dữ liệu không hợp lệ',
-              'Hệ thống đã phát hiện lỗi trong dữ liệu. Vui lòng kiểm tra các chú thích được thêm vào file lỗi và sửa lại dữ liệu.'
-            );
-            const fileName = getFileName(res);
-            triggerBlobDownload(fileName, res.body);
-          } else {
-            this.toastHandlingService.success(
-              'Thành công',
-              'Tất cả tài khoản đã được nhập vào hệ thống thành công.'
-            );
-          }
-        }),
-        catchError(() => {
-          this.toastHandlingService.errorGeneral();
-          return EMPTY;
-        })
+        tap(res => this.handleImportResponse(res)),
+        catchError(() => this.handleImportError())
       );
+  }
+
+  // ---------------------------
+  //  Private Helper Functions
+  // ---------------------------
+
+  private handleImportResponse(res: HttpResponse<Blob>): void {
+    if (res.body) {
+      // ? Import file which have errors will be returned
+      this.toastHandlingService.error(
+        'Dữ liệu không hợp lệ',
+        'Hệ thống đã phát hiện lỗi trong dữ liệu. Vui lòng kiểm tra các chú thích được thêm vào file lỗi và sửa lại dữ liệu.'
+      );
+      const fileName = getFileName(res);
+      triggerBlobDownload(fileName, res.body);
+    } else {
+      // ? Do not have response body -> Import data successfully
+      this.toastHandlingService.success(
+        'Thành công',
+        'Tất cả tài khoản đã được nhập vào hệ thống thành công.'
+      );
+    }
+  }
+
+  private handleImportError(): Observable<never> {
+    this.toastHandlingService.errorGeneral();
+    return EMPTY;
   }
 }

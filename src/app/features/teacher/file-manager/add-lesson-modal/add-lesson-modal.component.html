@@ -35,8 +35,11 @@
               title.invalid && title.touched && title.dirty
             " />
           @if (title.invalid && title.touched) {
-            <i
-              class="fa-solid fa-triangle-exclamation absolute right-[14px] top-[50%] block -translate-y-[50%] animate-shake text-base text-[#f33a58]"></i>
+            <div class="absolute right-[14px] top-1/2 -translate-y-1/2">
+              <i
+                class="fa-solid fa-triangle-exclamation animate-shake text-base text-[#f33a58]">
+              </i>
+            </div>
           }
         </div>
         @if (title.invalid && title.touched) {
@@ -48,7 +51,7 @@
     </form>
   </div>
 
-  <div
+  <footer
     class="sticky bottom-0 left-0 z-[1] flex justify-end gap-2 bg-white p-[25px] dark:bg-dark-300">
     <p-button
       label="Hủy"
@@ -63,5 +66,5 @@
       icon="pi pi-plus"
       size="small"
       [disabled]="form.invalid" />
-  </div>
+  </footer>
 </div>

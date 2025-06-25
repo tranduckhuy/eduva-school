@@ -1,26 +1,31 @@
 <div
-  class="absolute right-0 top-[46px] rounded border border-gray-100 shadow-main dark:border-dark-500"
+  class="absolute right-0 top-[46px] w-[calc(100%-35px)] rounded border border-gray-100 shadow-main dark:border-dark-500"
   clickOutsideSubmenu
   (clickOutside)="clickOutside.emit()">
   <div
     class="animate-fadeInForward rounded-md bg-white shadow-2xl transition-all duration-300 ease-in-out will-change-[opacity,transform] dark:bg-dark-200">
-    <div class="w-[195px] p-5">
+    <div class="w-full p-5">
       <div
         class="flex items-center gap-3 border-b border-b-gray-100 pb-3 dark:border-b-dark-500">
         <img
-          src="https://htmlcss.fullstack.edu.vn/assets/f8_icon.png"
-          alt="Quy Nguyen"
+          [src]="user()?.avatarUrl"
+          [alt]="user()?.fullName"
           class="h-[30px] w-[30px] rounded-[50%] object-contain outline outline-[#C2CDFF]" />
         <div class="flex flex-col">
           <span class="font-medium text-textBlack dark:text-white">
-            Quy Nguyen
+            {{ user()?.fullName }}
           </span>
-          <span class="text-xs dark:text-[#e6e6e6]">Frontend Developer</span>
+          <span class="flex items-center gap-1 text-xs dark:text-[#e6e6e6]">
+            Bạn có: {{ user()?.creditBalance }}
+            <span class="material-symbols-outlined text-xs text-yellow-500">
+              paid
+            </span>
+          </span>
         </div>
       </div>
       <ul>
         <li>
-          <a href="#!" class="information-link py-3">
+          <a routerLink="/school-admin/settings" class="information-link py-3">
             <span class="material-symbols-outlined dark:text-white">
               account_circle
             </span>
@@ -57,7 +62,9 @@
           </button>
         </li>
         <li>
-          <a href="#!" class="information-link pb-2 pt-3">
+          <a
+            routerLink="/school-admin/settings"
+            class="information-link pb-2 pt-3">
             <span class="material-symbols-outlined dark:text-white">
               settings
             </span>

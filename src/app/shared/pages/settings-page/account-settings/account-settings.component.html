@@ -1,0 +1,109 @@
+<div
+  class="e-container-fluid rounded bg-white px-0 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <div class="p-[25px]">
+    <!-- ? Two Factor -->
+    <div class="flex items-center justify-between">
+      <div class="flex flex-col">
+        <h3 class="text-base font-semibold">Xác thực 2 bước</h3>
+        <p class="dark:text-gray-300">
+          Xác minh hai bước giúp tăng cường bảo mật và ngăn chặn các hành vi
+          truy cập trái phép.
+        </p>
+      </div>
+      <p-toggleswitch
+        [ngModel]="twoFactorEnabled()"
+        (onChange)="openPasswordModal()">
+        <ng-template #handle let-checked="checked">
+          <i
+            [ngClass]="[
+              '!text-[10px]',
+              'pi',
+              checked ? 'pi-check' : 'pi-times',
+            ]"></i>
+        </ng-template>
+      </p-toggleswitch>
+    </div>
+
+    <!-- ? Change Password -->
+    <form [formGroup]="form" (ngSubmit)="onSubmitChangePassword()" class="mt-5">
+      <div class="flex flex-col">
+        <h3 class="text-base font-semibold">Đổi mật khẩu</h3>
+        <p class="dark:text-gray-300">
+          Mật khẩu của bạn phải có tối thiểu
+          <strong class="font-semibold text-primary">8 ký tự*</strong>, bao gồm
+          cả
+          <strong class="font-semibold text-primary">
+            chữ hoa, chữ thường, chữ số*
+          </strong>
+          và
+          <strong class="font-semibold text-primary">
+            ký tự đặc biệt (!$&#64;%...)*.
+          </strong>
+        </p>
+      </div>
+      <div class="mt-4">
+        <div>
+          <app-form-control
+            formControlName="currentPassword"
+            type="password"
+            name="currentPassword"
+            label="Mật khẩu hiện tại"
+            placeholder="Mật khẩu hiện tại"
+            [required]="true"
+            [submitted]="submitted()" />
+        </div>
+        <div class="mt-3">
+          <app-form-control
+            formControlName="newPassword"
+            name="newPassword"
+            type="password"
+            label="Mật khẩu mới"
+            placeholder="Mật khẩu mới"
+            [required]="true"
+            [validatePassword]="true"
+            [submitted]="submitted()" />
+        </div>
+        <div class="mt-3">
+          <app-form-control
+            formControlName="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            label="Xác nhận mật khẩu"
+            placeholder="Xác nhận mật khẩu"
+            [required]="true"
+            [confirmPassword]="form.get('newPassword')?.value"
+            [submitted]="submitted()" />
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex items-center">
+          <p-checkbox
+            formControlName="logoutBehavior"
+            inputId="logoutBehavior"
+            size="small"
+            styleClass="relative -top-[3px]"
+            [binary]="true" />
+          <label for="logoutBehavior" class="ml-2 cursor-pointer select-none">
+            Đăng xuất khỏi các thiết bị khác
+          </label>
+        </div>
+        <div class="mt-5 flex items-center gap-4">
+          <p-button
+            label="Đổi mật khẩu"
+            type="submit"
+            icon="pi pi-check"
+            variant="outlined"
+            size="small"
+            [loading]="isLoading()"
+            [disabled]="form.invalid || passwordMisMatch" />
+          <a
+            routerLink="/auth/forgot-password"
+            class="font-semibold text-primary underline">
+            Quên mật khẩu?
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

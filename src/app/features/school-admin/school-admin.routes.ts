@@ -36,6 +36,20 @@ export const schoolAdminRoutes: Routes = [
             mod => mod.moderateLessonsRoute
           ),
       },
+      {
+        path: 'settings',
+        data: {
+          breadcrumb: 'Cài đặt',
+        },
+        loadComponent: () =>
+          import(
+            '../../shared/pages/settings-page/settings-page-layout/settings-page-layout.component'
+          ).then(mod => mod.SettingsPageLayoutComponent),
+        loadChildren: () =>
+          import('../../shared/pages/settings-page/settings-page.routes').then(
+            mod => mod.settingRoutes
+          ),
+      },
     ],
   },
   {

@@ -19,5 +19,6 @@ import { UserActionsComponent } from './user-actions/user-actions.component';
 export class HeaderComponent {
   isManuallyToggled = input<boolean>(true);
   isSmallScreen = input<boolean>(false);
+
   toggleSidebar = output();
 }

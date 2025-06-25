@@ -7,11 +7,12 @@ import {
   signal,
 } from '@angular/core';
 
+import { UserService } from '../../../../shared/services/api/user/user.service';
+import { ThemeService } from '../../../../shared/services/core/theme/theme.service';
 import { HeaderSubmenuService } from '../services/header-submenu.service';
 
 import { NotificationsComponent } from './notifications/notifications.component';
 import { InformationComponent } from './information/information.component';
-import { ThemeService } from '../../../../shared/services/core/theme/theme.service';
 
 @Component({
   selector: 'header-user-actions',
@@ -22,10 +23,13 @@ import { ThemeService } from '../../../../shared/services/core/theme/theme.servi
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserActionsComponent implements OnInit {
-  isFullscreen = signal(false);
-
+  private readonly userService = inject(UserService);
+  private readonly themeService = inject(ThemeService);
   readonly headerSubmenuService = inject(HeaderSubmenuService);
-  readonly themeService = inject(ThemeService);
+
+  readonly user = this.userService.currentUser;
+
+  isFullscreen = signal(false);
 
   readonly isDarkMode = computed(() => {
     return this.themeService.isDarkMode();

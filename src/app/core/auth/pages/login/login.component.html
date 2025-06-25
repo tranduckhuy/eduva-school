@@ -11,31 +11,29 @@
       [name]="'email'"
       [submitted]="submitted()"
       [email]="true"
-      [required]="true">
-    </app-form-control>
+      [required]="true" />
     <app-form-control
       formControlName="password"
       label="Mật khẩu"
+      type="password"
+      placeholder="Mật khẩu của bạn"
       [redirectLink]="{
         value: 'Quên mật khẩu?',
         href: '/auth/forgot-password',
       }"
-      type="password"
-      placeholder="Mật khẩu của bạn"
       [name]="'password'"
-      [errorMessages]="{
-        required: 'Vui lòng nhập mật khẩu hiện tại',
-      }"
       [submitted]="submitted()"
-      [required]="true">
-    </app-form-control>
-    <app-button [width]="'full'" class="mt-4" [type]="'submit'">
-      Đăng nhập
-    </app-button>
+      [required]="true" />
+    <p-button
+      label="Đăng nhập"
+      styleClass="mt-4 w-full"
+      type="submit"
+      [loading]="isLoading()"
+      [disabled]="form.invalid" />
     <p
       class="mx-auto mt-1 text-center text-[12px] opacity-80 dark:text-[#64748b]">
       Việc bạn tiếp tục sử dụng trang web này đồng nghĩa bạn đồng ý với
-      <a href="#!" class="cursor-pointer text-primary underline">
+      <a href="#!" tabindex="-1" class="cursor-pointer text-primary underline">
         điều khoản sử dụng
       </a>
       của chúng tôi.
