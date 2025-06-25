@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   signal,
+  effect,
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
@@ -53,20 +54,22 @@ export class ResetPasswordComponent {
       confirmPassword: '',
     });
 
-    this.activatedRoute.queryParamMap.subscribe(params => {
-      const rawToken = params.get('token');
-      const rawEmail = params.get('email');
-
-      this.token.set(rawToken ?? '');
-      this.email.set(rawEmail ?? '');
+    effect(() => {
+      const params = this.activatedRoute.snapshot.queryParamMap;
+      this.token.set(params.get('token') ?? '');
+      this.email.set(params.get('email') ?? '');
     });
+  }
+
+  get passwordMisMatch() {
+    return isFormFieldMismatch(this.form, 'password');
   }
 
   onSubmit(): void {
     this.submitted.set(true);
+    this.form.markAllAsTouched();
 
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
       return;
     }
 
@@ -78,9 +81,5 @@ export class ResetPasswordComponent {
     this.passwordService
       .resetPassword(request)
       .subscribe(() => this.router.navigateByUrl('/auth/login'));
-  }
-
-  passwordMisMatch() {
-    return isFormFieldMismatch(this.form, 'password');
   }
 }

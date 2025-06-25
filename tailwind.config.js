@@ -51,19 +51,19 @@ module.exports = {
         },
         shake: {
           '0%': {
-            transform: 'translate(0)',
+            transform: 'translateX(0)',
           },
           '25%': {
-            transform: 'translate(-8px)',
+            transform: 'translateX(-8px)',
           },
           '50%': {
-            transform: 'translate(8px)',
+            transform: 'translateX(8px)',
           },
           '75%': {
-            transform: 'translate(-8px)',
+            transform: 'translateX(-8px)',
           },
           '100%': {
-            transform: 'translate(0)',
+            transform: 'translateX(0)',
           },
         },
       },

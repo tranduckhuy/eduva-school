@@ -2,21 +2,31 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  computed,
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormsModule,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+} from '@angular/forms';
 
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
 
 import { LoadingService } from '../../../services/core/loading/loading.service';
+import { GlobalModalService } from '../../../services/layout/global-modal/global-modal.service';
 import { PasswordService } from '../../../../core/auth/services/password.service';
+import { UserService } from '../../../services/api/user/user.service';
 
 import { isFormFieldMismatch } from '../../../utils/util-functions';
 
 import { FormControlComponent } from '../../../components/form-control/form-control.component';
+import { PasswordModalComponent } from './password-modal/password-modal.component';
 
 import { type ChangePasswordRequest } from '../../../models/api/request/change-password-request.model';
 
@@ -26,8 +36,10 @@ import { type ChangePasswordRequest } from '../../../models/api/request/change-p
   imports: [
     RouterLink,
     CommonModule,
+    FormsModule,
     ReactiveFormsModule,
     ToggleSwitchModule,
+    CheckboxModule,
     ButtonModule,
     FormControlComponent,
   ],
@@ -38,11 +50,16 @@ import { type ChangePasswordRequest } from '../../../models/api/request/change-p
 export class AccountSettingsComponent {
   private readonly fb = inject(FormBuilder);
   private readonly loadingService = inject(LoadingService);
+  private readonly globalModalService = inject(GlobalModalService);
+  private readonly userService = inject(UserService);
   private readonly passwordService = inject(PasswordService);
 
   form: FormGroup;
 
-  isLoading = this.loadingService.isLoading;
+  isLoading = this.loadingService.is('change-password-form');
+  user = this.userService.currentUser;
+  twoFactorEnabled = computed(() => this.user()?.is2FAEnabled ?? false);
+
   submitted = signal<boolean>(false);
 
   constructor() {
@@ -50,27 +67,29 @@ export class AccountSettingsComponent {
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
+      logoutBehavior: 0,
     });
+  }
+
+  get passwordMisMatch() {
+    return isFormFieldMismatch(this.form);
   }
 
   onSubmitChangePassword() {
     this.submitted.set(true);
+    this.form.markAllAsTouched();
 
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
       return;
     }
 
-    const request: ChangePasswordRequest = {
-      ...this.form.value,
-      logoutBehavior: 0,
-    };
+    const request: ChangePasswordRequest = this.form.value;
     this.passwordService.changePassword(request).subscribe();
   }
 
-  toggleTwoFactor() {}
-
-  passwordMisMatch() {
-    return isFormFieldMismatch(this.form);
+  openPasswordModal() {
+    this.globalModalService.open(PasswordModalComponent, {
+      enabled: this.twoFactorEnabled(),
+    });
   }
 }

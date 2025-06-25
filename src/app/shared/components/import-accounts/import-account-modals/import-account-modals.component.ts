@@ -15,7 +15,7 @@ import { ToastHandlingService } from '../../../services/core/toast/toast-handlin
 import { ImportUserAccountsService } from '../services/import-user-accounts.service';
 import { DownloadTemplateService } from '../services/download-template.service';
 
-import { MODAL_DATA } from '../../../services/layout/global-modal/modal-data.token';
+import { MODAL_DATA } from '../../../tokens/injection/modal-data.token';
 import {
   MAX_IMPORT_FILE_SIZE,
   ALLOWED_IMPORT_EXTENSIONS,

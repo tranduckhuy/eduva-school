@@ -10,7 +10,9 @@
           truy cập trái phép.
         </p>
       </div>
-      <p-toggleswitch>
+      <p-toggleswitch
+        [ngModel]="twoFactorEnabled()"
+        (onChange)="openPasswordModal()">
         <ng-template #handle let-checked="checked">
           <i
             [ngClass]="[
@@ -47,7 +49,8 @@
             name="currentPassword"
             label="Mật khẩu hiện tại"
             placeholder="Mật khẩu hiện tại"
-            [required]="true" />
+            [required]="true"
+            [submitted]="submitted()" />
         </div>
         <div class="mt-3">
           <app-form-control
@@ -73,20 +76,33 @@
         </div>
       </div>
 
-      <div class="mt-5 flex items-center gap-4">
-        <p-button
-          label="Đổi mật khẩu"
-          type="submit"
-          icon="pi pi-check"
-          variant="outlined"
-          size="small"
-          [loading]="isLoading()"
-          [disabled]="form.invalid || passwordMisMatch()" />
-        <a
-          routerLink="/auth/forgot-password"
-          class="font-semibold text-primary underline">
-          Quên mật khẩu?
-        </a>
+      <div class="mt-4">
+        <div class="flex items-center">
+          <p-checkbox
+            formControlName="logoutBehavior"
+            inputId="logoutBehavior"
+            size="small"
+            styleClass="relative -top-[3px]"
+            [binary]="true" />
+          <label for="logoutBehavior" class="ml-2 cursor-pointer select-none">
+            Đăng xuất khỏi các thiết bị khác
+          </label>
+        </div>
+        <div class="mt-5 flex items-center gap-4">
+          <p-button
+            label="Đổi mật khẩu"
+            type="submit"
+            icon="pi pi-check"
+            variant="outlined"
+            size="small"
+            [loading]="isLoading()"
+            [disabled]="form.invalid || passwordMisMatch" />
+          <a
+            routerLink="/auth/forgot-password"
+            class="font-semibold text-primary underline">
+            Quên mật khẩu?
+          </a>
+        </div>
       </div>
     </form>
   </div>

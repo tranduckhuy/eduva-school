@@ -47,8 +47,9 @@ export class ForgotPasswordComponent {
 
   onSubmit(): void {
     this.submitted.set(true);
+    this.form.markAllAsTouched();
+
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
       return;
     }
 
