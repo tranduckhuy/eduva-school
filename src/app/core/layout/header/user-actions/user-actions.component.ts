@@ -27,7 +27,7 @@ export class UserActionsComponent implements OnInit {
   private readonly themeService = inject(ThemeService);
   readonly headerSubmenuService = inject(HeaderSubmenuService);
 
-  user = this.userService.currentUser;
+  readonly user = this.userService.currentUser;
 
   isFullscreen = signal(false);
 

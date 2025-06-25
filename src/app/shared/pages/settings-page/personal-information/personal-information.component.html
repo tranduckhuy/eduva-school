@@ -1,13 +1,86 @@
 <div
   class="e-container-fluid rounded bg-white px-0 shadow-main dark:border-dark-500 dark:bg-dark-200">
   <div class="p-[25px]">
-    <form action="">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" action="">
       <div>
         <h3 class="mb-4 text-base font-semibold dark:text-white">
           Hồ sơ cá nhân:
         </h3>
 
-        <personal-profile [isEdit]="isEdit()" />
+        <div class="flex flex-col gap-6">
+          <!-- ? Avatar -->
+          <div class="flex items-center">
+            <figure class="relative size-20 rounded">
+              <label
+                for="avatarFile"
+                class="absolute -right-1 -top-1 flex size-6 cursor-pointer items-center justify-center rounded-full border-[2px] border-white">
+                <input
+                  #avatarInput
+                  type="file"
+                  name="avatarFile"
+                  id="avatarFile"
+                  accept="image/*"
+                  class="hidden"
+                  (change)="onAvatarChange($event)" />
+                <input
+                  type="text"
+                  id="avatarInput"
+                  formControlName="avatar"
+                  name="avatar"
+                  class="hidden"
+                  [value]="user()?.avatarUrl" />
+                <span
+                  class="flex size-full items-center justify-center rounded-full bg-primary">
+                  <i
+                    class="pi pi-camera text-white"
+                    style="font-size: 13px"></i>
+                </span>
+              </label>
+              <label for="avatarFile">
+                <img
+                  [src]="form.get('avatar')?.value"
+                  [alt]="form.get('fullName')?.value"
+                  class="size-full cursor-pointer rounded object-contain" />
+              </label>
+            </figure>
+            <div class="ml-4">
+              <h3 class="text-lg font-semibold">{{ user()?.fullName }}</h3>
+              <div class="mt-1">
+                <p class="dark:text-gray-300">
+                  Địa chỉ email:
+                  <a href="mailto:{{ user()?.email }}">{{ user()?.email }}</a>
+                  <br />
+                  Số điện thoại:
+                  <a href="tel:{{ user()?.phoneNumber }}">{{
+                    user()?.phoneNumber
+                  }}</a>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ? Name -->
+          <div class="e-row">
+            <div class="e-col-6">
+              <app-form-control
+                label="Họ"
+                placeholder="Nguyen"
+                formControlName="firstName"
+                name="firstName"
+                [readOnly]="!isEdit()"
+                [required]="true" />
+            </div>
+            <div class="e-col-6">
+              <app-form-control
+                label="Tên"
+                placeholder="Van A"
+                formControlName="lastName"
+                name="lastName"
+                [readOnly]="!isEdit()"
+                [required]="true" />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="mt-8">
@@ -15,7 +88,33 @@
           Thông tin liên hệ:
         </h3>
 
-        <personal-contact [isEdit]="isEdit()" />
+        <div class="e-row e-gy-4">
+          <div class="e-col-6">
+            <app-form-control
+              label="Địa chỉ email"
+              placeholder="nguyenvana@gmail.com"
+              name="email"
+              [value]="user()?.email ?? ''"
+              [readOnly]="true" />
+          </div>
+          <div class="e-col-6">
+            <app-form-control
+              label="Số điện thoại"
+              placeholder="0912345678"
+              formControlName="phoneNumber"
+              name="phoneNumber"
+              [readOnly]="!isEdit()"
+              [required]="true" />
+          </div>
+          <div class="e-col-12">
+            <app-form-control
+              label="Giới thiệu"
+              placeholder="Viết vài dòng giới thiệu về bạn..."
+              name="bio"
+              [isTextarea]="true"
+              [readOnly]="!isEdit()" />
+          </div>
+        </div>
       </div>
 
       <div class="mt-8 flex justify-end gap-2">
@@ -26,19 +125,21 @@
             severity="danger"
             variant="outlined"
             size="small"
-            (onClick)="toggleEdit()" />
+            (onClick)="cancelEdit()" />
           <p-button
             label="Lưu thông tin"
             icon="pi pi-check"
             variant="outlined"
-            size="small" />
+            size="small"
+            [disabled]="form.invalid"
+            (onClick)="onSubmit()" />
         } @else {
           <p-button
             label="Chỉnh sửa thông tin"
             icon="pi pi-pencil"
             variant="outlined"
             size="small"
-            (onClick)="toggleEdit()" />
+            (onClick)="enableEdit()" />
         }
       </div>
     </form>

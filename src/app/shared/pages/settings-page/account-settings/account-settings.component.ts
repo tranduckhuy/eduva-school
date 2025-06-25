@@ -57,7 +57,7 @@ export class AccountSettingsComponent {
   form: FormGroup;
 
   isLoading = this.loadingService.is('change-password-form');
-  user = this.userService.currentUser;
+  readonly user = this.userService.currentUser;
   twoFactorEnabled = computed(() => this.user()?.is2FAEnabled ?? false);
 
   submitted = signal<boolean>(false);

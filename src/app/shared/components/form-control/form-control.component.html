@@ -20,9 +20,7 @@
       class="relative flex overflow-hidden rounded-md border-[1.5px] bg-white dark:bg-dark-300"
       [ngClass]="{
         'h-[44px]': !isTextarea(),
-        'border-[#f33a58] dark:border-[#f33a58]':
-          control.invalid && (control.touched || submitted()),
-        'focus-within:border-[#f33a58] dark:border-[#f33a58]':
+        'border-[#f33a58] focus-within:border-[#f33a58] dark:border-[#f33a58] focus-within:dark:border-[#f33a58]':
           control.invalid && (control.touched || submitted()),
         'border-gray-200 dark:border-gray-900': !(
           control.invalid &&
@@ -30,8 +28,8 @@
         ),
         'focus-within:border-primary':
           !control.invalid || (!control.touched && !submitted()),
-        'focus-within:border-[#e1e6f2]': readOnly() === true,
-        'bg-[#e1e6f2]': readOnly() === true,
+        'pointer-events-none !border-[#f1f4fa] !bg-[#f1f4fa]':
+          readOnly() === true,
       }"
       [style.backgroundColor]="
         control.invalid && (control.touched || submitted()) ? '#ff00001a' : ''

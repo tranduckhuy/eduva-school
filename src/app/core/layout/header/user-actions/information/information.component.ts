@@ -32,7 +32,7 @@ export class InformationComponent {
   clickOutside = output();
   toggleFullSCreen = output();
 
-  user = this.userService.currentUser;
+  readonly user = this.userService.currentUser;
 
   readonly isDarkMode = computed(() => {
     return this.themeService.isDarkMode();

@@ -1,9 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   inject,
   signal,
-  effect,
 } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
@@ -34,7 +34,7 @@ import { type ResetPasswordRequest } from './models/reset-password-request.model
   styleUrl: './reset-password.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ResetPasswordComponent {
+export class ResetPasswordComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
@@ -53,12 +53,12 @@ export class ResetPasswordComponent {
       password: '',
       confirmPassword: '',
     });
+  }
 
-    effect(() => {
-      const params = this.activatedRoute.snapshot.queryParamMap;
-      this.token.set(params.get('token') ?? '');
-      this.email.set(params.get('email') ?? '');
-    });
+  ngOnInit(): void {
+    const params = this.activatedRoute.snapshot.queryParamMap;
+    this.token.set(params.get('token') ?? '');
+    this.email.set(params.get('email') ?? '');
   }
 
   get passwordMisMatch() {
