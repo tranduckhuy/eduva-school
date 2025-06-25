@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
 import { FileTypeFilterComponent } from '../file-type-filter/file-type-filter.component';
-import { MaterialTableComponent } from '../lesson-material-view/material-table/material-table.component';
+import { MaterialTableComponent } from '../material-table/material-table.component';
 
 type Material = {
   id: number;

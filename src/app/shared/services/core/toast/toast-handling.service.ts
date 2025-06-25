@@ -65,7 +65,11 @@ export class ToastHandlingService {
   }
 
   errorGeneral(options?: ToastExtraOptions) {
-    this.error('Lỗi', 'Đã xảy ra lỗi. Vui lòng thử lại sau.', options);
+    this.error(
+      'Lỗi hệ thống',
+      'Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau.',
+      options
+    );
   }
 
   clear(key?: string) {

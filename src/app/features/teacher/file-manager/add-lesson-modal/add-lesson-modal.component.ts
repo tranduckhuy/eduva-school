@@ -9,7 +9,11 @@ import {
 
 import { ButtonModule } from 'primeng/button';
 
+import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
+import { FolderManagementService } from '../../../../shared/services/api/folder/folder-management.service';
+
+import { type CreateFolderRequest } from '../../../../shared/models/api/request/create-folder-request.model';
 
 @Component({
   selector: 'app-add-lesson-modal',
@@ -20,19 +24,23 @@ import { GlobalModalService } from '../../../../shared/services/layout/global-mo
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddLessonModalComponent {
-  private readonly globalModalService = inject(GlobalModalService);
   private readonly fb = inject(FormBuilder);
+  private readonly loadingService = inject(LoadingService);
+  private readonly globalModalService = inject(GlobalModalService);
+  private readonly folderManagementService = inject(FolderManagementService);
 
   form: FormGroup;
 
+  isLoading = this.loadingService.is('create-folder');
+
   constructor() {
     this.form = this.fb.group({
-      title: ['', Validators.required],
+      name: ['', Validators.required],
     });
   }
 
-  get title() {
-    return this.form.get('title')!;
+  get name() {
+    return this.form.get('name')!;
   }
 
   onBlur(controlName: string) {
@@ -44,9 +52,15 @@ export class AddLessonModalComponent {
 
   onSubmit() {
     this.form.markAllAsTouched();
+
     if (this.form.invalid) {
       return;
     }
+
+    const request: CreateFolderRequest = this.form.value;
+    this.folderManagementService
+      .createFolder(request)
+      .subscribe(() => this.closeModal());
   }
 
   getErrorMessage(controlName: string): string {

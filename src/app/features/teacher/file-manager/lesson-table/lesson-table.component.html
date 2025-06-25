@@ -1,13 +1,13 @@
 <p-table
-  [value]="lessons()"
   [tableStyle]="{ 'min-width': '50rem' }"
   [paginator]="true"
-  [rows]="10"
   [lazy]="true"
   [scrollable]="true"
   [scrollHeight]="'600px'"
-  [first]="first()"
   [showCurrentPageReport]="true"
+  [rows]="maxRowsByPage"
+  [value]="lessons()"
+  [first]="first()"
   [totalRecords]="totalRecords()"
   [loading]="loading()"
   (onLazyLoad)="loadDataLazy($event)"
@@ -19,7 +19,7 @@
     <tr>
       <th scope="col" class="!min-w-[300px]" pFrozenColumn>Thư mục bài học</th>
       <th scope="col" class="!min-w-[200px]">Người sở hữu</th>
-      <th scope="col" class="!min-w-[180px]">Lần sửa đổi cuối cùng</th>
+      <th scope="col" class="!min-w-[250px]">Lần sửa đổi cuối cùng</th>
       <th scope="col" class="!min-w-[150px] !text-center">Kích thước tệp</th>
       <th scope="col" class="!min-w-[180px] !text-center">Hành động</th>
     </tr>
@@ -36,8 +36,8 @@
           </span>
         </div>
       </td>
-      <td>{{ lesson.owner }}</td>
-      <td>{{ lesson.lastModified }}</td>
+      <td>{{ lesson.ownerName }}</td>
+      <td>{{ lesson.lastModifiedAt | date: 'fullDate' }}</td>
       <td class="!text-center">--</td>
       <td class="!text-center">
         <div class="flex items-center justify-center gap-2">

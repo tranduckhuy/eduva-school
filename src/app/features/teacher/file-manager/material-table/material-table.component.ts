@@ -2,33 +2,35 @@ import {
   ChangeDetectionStrategy,
   Component,
   input,
-  output,
   signal,
 } from '@angular/core';
 
 import { TooltipModule } from 'primeng/tooltip';
 import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 
-import { ButtonComponent } from '../../../../../shared/components/button/button.component';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { Folder } from '../../../../shared/models/entities/folder.model';
 
-type Lesson = {
+type Material = {
   id: number;
   name: string;
   owner: string;
   lastModified: string;
+  fileSize: string;
+  fileType: '.mp4' | '.mp3' | '.docx' | '.pdf';
 };
 
 @Component({
-  selector: 'lesson-table',
+  selector: 'material-table',
   standalone: true,
   imports: [TooltipModule, TableModule, ButtonComponent],
-  templateUrl: './lesson-table.component.html',
-  styleUrl: './lesson-table.component.css',
+  templateUrl: './material-table.component.html',
+  styleUrl: './material-table.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LessonTableComponent {
-  lessons = input.required<Lesson[]>();
-  viewMaterials = output<Lesson>();
+export class MaterialTableComponent {
+  materials = input<Material[]>();
+  lesson = input<Folder>();
 
   totalRecords = signal<number>(0);
   totalMaterialRecords = signal<number>(0);
@@ -38,7 +40,7 @@ export class LessonTableComponent {
   rows = signal<number>(0);
 
   ngOnInit(): void {
-    this.totalRecords.set(this.lessons.length);
+    this.totalRecords.set(this.materials.length);
   }
 
   loadDataLazy(event: TableLazyLoadEvent) {
@@ -71,12 +73,10 @@ export class LessonTableComponent {
   }
 
   isLastPage(): boolean {
-    return this.lessons()
-      ? this.first() + this.rows() >= this.lessons().length
-      : true;
+    return this.materials() ? this.first() + this.rows() >= 10 : true;
   }
 
   isFirstPage(): boolean {
-    return this.lessons() ? this.first() === 0 : true;
+    return this.materials() ? this.first() === 0 : true;
   }
 }
