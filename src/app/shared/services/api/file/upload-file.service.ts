@@ -5,13 +5,11 @@ import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 
-import {
-  BYPASS_AUTH,
-  RequestService,
-} from '../../../../shared/services/core/request/request.service';
+import { RequestService } from '../../../../shared/services/core/request/request.service';
 import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
 
 import { StatusCode } from '../../../../shared/constants/status-code.constant';
+import { BYPASS_AUTH } from '../../../tokens/context/http-context.token';
 
 import { type FileStorageResponse } from '../../../../shared/models/api/response/file-storage-response.model';
 

@@ -1,21 +1,25 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   inject,
   signal,
 } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
 
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 import { AuthService } from '../../services/auth.service';
+import { EmailVerificationService } from '../../services/email-verification.service';
 
 import { AuthLayoutComponent } from '../../auth-layout/auth-layout.component';
 
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 
 import { type LoginRequest } from './models/login-request.model';
+import { ConfirmEmailRequest } from '../../models/request/confirm-email-request.model';
 
 @Component({
   selector: 'app-login',
@@ -30,10 +34,12 @@ import { type LoginRequest } from './models/login-request.model';
   styleUrl: './login.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+  private readonly fb = inject(FormBuilder);
+  private readonly activatedRoute = inject(ActivatedRoute);
   private readonly loadingService = inject(LoadingService);
   private readonly authService = inject(AuthService);
-  private readonly fb = inject(FormBuilder);
+  private readonly emailVerificationService = inject(EmailVerificationService);
 
   form: FormGroup;
 
@@ -47,10 +53,23 @@ export class LoginComponent {
     });
   }
 
+  ngOnInit(): void {
+    this.activatedRoute.queryParamMap.subscribe(params => {
+      const token = params.get('token');
+      const email = params.get('email');
+
+      if (token && email) {
+        const request: ConfirmEmailRequest = { token, email };
+        this.emailVerificationService.confirmEmail(request).subscribe();
+      }
+    });
+  }
+
   onSubmit(): void {
     this.submitted.set(true);
+    this.form.markAllAsTouched();
+
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
       return;
     }
 
