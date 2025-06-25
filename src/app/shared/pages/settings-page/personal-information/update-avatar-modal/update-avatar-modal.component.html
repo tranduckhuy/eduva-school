@@ -1,0 +1,110 @@
+<div
+  class="max-h-[calc(100vh-40px)] w-full max-w-[calc(100vw-80px)] overflow-y-auto rounded bg-white dark:bg-dark-300">
+  <header
+    class="sticky left-0 top-0 z-[1] block w-full rounded-t-lg bg-gray-50 p-[25px] dark:bg-dark-400">
+    <h2 class="text-lg">
+      {{ isPreviewAvatar() ? 'Xem trước' : 'Ảnh đại diện' }}
+    </h2>
+    <span
+      class="pi pi-times absolute right-[5px] top-[50%] -translate-y-[50%] cursor-pointer px-5 py-3 text-xl"
+      (click)="closeModal()"></span>
+  </header>
+  <input
+    #avatarInput
+    id="avatar"
+    type="file"
+    accept="image/*"
+    class="hidden"
+    (change)="onFileSelected($event)" />
+  @if (!isPreviewAvatar()) {
+    <div class="mt-[25px] w-[380px] px-[25px] pb-0">
+      <p class="dark:text-white">
+        Ảnh đại diện giúp mọi người nhận biết bạn dễ dàng hơn qua các bình luận,
+        câu hỏi...
+      </p>
+      <div class="mt-4">
+        <label
+          class="relative mx-auto my-[30px] block size-[180px] cursor-pointer rounded bg-[#EBF4FE]"
+          for="avatar">
+          <div
+            class="duration-30 absolute z-[2] size-[180px] rounded bg-transparent transition-all">
+            <img
+              [src]="modalData.avatarUrl"
+              [alt]="modalData.fullname"
+              class="size-full rounded object-contain" />
+          </div>
+        </label>
+      </div>
+    </div>
+  } @else {
+    <div
+      class="mt-[25px] max-h-[60vh] min-h-[122px] max-w-full overflow-y-auto px-[25px] pb-0">
+      <div class="mx-auto h-auto w-full">
+        <image-cropper
+          class="custom-cropper flex size-full items-center justify-center"
+          [aspectRatio]="1 / 1"
+          [resizeToWidth]="512"
+          [onlyScaleDown]="true"
+          [maintainAspectRatio]="true"
+          [roundCropper]="false"
+          [(transform)]="transform"
+          [imageChangedEvent]="imageChangedEvent()"
+          (imageCropped)="imageCropped($event)" />
+      </div>
+
+      <div class="flex items-center justify-center gap-1">
+        <button
+          (click)="zoomOut()"
+          class="mr-2 size-[34px] cursor-pointer rounded-full text-lg text-gray-400 transition-colors duration-200 hover:bg-[#0000000d] dark:text-white">
+          <i class="fa-solid fa-minus"></i>
+        </button>
+        <div class="relative h-5 w-full max-w-[500px] flex-1 py-[30px]">
+          <p-slider
+            step="0.1"
+            max="10"
+            min="1"
+            [ngModel]="transform().scale"
+            (ngModelChange)="scaleChange($event)"
+            class="w-full" />
+        </div>
+        <button
+          (click)="zoomIn()"
+          class="ml-2 size-[34px] cursor-pointer rounded-full text-lg text-gray-400 transition-colors duration-200 hover:bg-[#0000000d] dark:text-white">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+    </div>
+  }
+  <footer
+    class="sticky bottom-0 left-0 z-[1] w-full bg-white p-[25px] dark:bg-dark-300"
+    [ngClass]="{
+      'flex justify-end gap-2': isPreviewAvatar(),
+    }">
+    @if (isPreviewAvatar()) {
+      <p-button
+        label="Đặt lại"
+        variant="outlined"
+        type="submit"
+        size="small"
+        icon="pi pi-refresh"
+        (onClick)="reset()" />
+      <p-button
+        label="Lưu lại"
+        variant="outlined"
+        type="submit"
+        size="small"
+        icon="pi pi-check"
+        [loading]="isLoading()"
+        (onClick)="saveAvatar()" />
+    } @else {
+      <p-button
+        label="Tải ảnh mới lên"
+        variant="outlined"
+        type="submit"
+        size="small"
+        icon="pi pi-plus"
+        [fluid]="true"
+        (onClick)="triggerClickInput(avatarInput)" />
+    }
+  </footer>
+</div>
