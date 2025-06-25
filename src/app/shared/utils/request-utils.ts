@@ -5,7 +5,7 @@ import {
   BYPASS_AUTH,
   LOADING_KEY,
   SHOW_LOADING,
-} from '../services/core/request/request.service';
+} from '../tokens/context/http-context.token';
 
 import { type RequestOptions } from '../models/api/request-options.model';
 
