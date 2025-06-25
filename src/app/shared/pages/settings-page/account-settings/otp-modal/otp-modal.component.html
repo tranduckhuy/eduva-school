@@ -25,7 +25,7 @@
           <p-inputotp
             name="otpCode"
             [(ngModel)]="value"
-            [invalid]="invalidValue"
+            [invalid]="isInvalidValue"
             [length]="6"
             [integerOnly]="true" />
         </div>
@@ -50,7 +50,7 @@
         type="submit"
         size="small"
         [loading]="isLoading()"
-        [disabled]="invalidValue" />
+        [disabled]="isInvalidValue" />
     </footer>
   </form>
 </div>

@@ -51,12 +51,13 @@ export class OtpModalComponent implements OnInit {
     });
   }
 
-  get invalidValue() {
-    return !!!this.value();
+  get isInvalidValue(): boolean {
+    const otpCode = this.value();
+    return !otpCode || otpCode.length !== 6;
   }
 
   onSubmit() {
-    if (this.invalidValue) {
+    if (this.isInvalidValue) {
       return;
     }
 

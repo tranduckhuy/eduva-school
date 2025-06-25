@@ -88,14 +88,7 @@ export class PasswordService {
   }
 
   private handleResetPasswordResponse(res: any): void {
-    if (res.statusCode === StatusCode.SUCCESS) {
-      this.toastHandlingService.success(
-        'Thành công',
-        'Mật khẩu của bạn đã được đặt lại.'
-      );
-    } else {
-      this.toastHandlingService.errorGeneral();
-    }
+    this.handleChangePasswordResponse(res);
   }
 
   private handleResetPasswordError(err: HttpErrorResponse): Observable<void> {

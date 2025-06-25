@@ -92,7 +92,7 @@ export class UpdateAvatarModalComponent {
       this.isLoading.set(false);
 
       this.closeModal();
-    } catch (error) {
+    } catch {
       this.isLoading.set(false);
       this.toastHandlingService.errorGeneral();
     }
