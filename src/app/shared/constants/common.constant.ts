@@ -9,3 +9,6 @@ export const ALLOWED_UPLOAD_MIME_TYPES = [
   'application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ];
+
+// Table Constants
+export const PAGE_SIZE = 12;

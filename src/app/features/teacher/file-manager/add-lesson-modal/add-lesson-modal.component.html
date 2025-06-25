@@ -1,40 +1,40 @@
 <div
   class="max-h-[calc(100vh-40px)] w-full overflow-y-auto rounded bg-white dark:bg-dark-300">
-  <header
-    class="sticky left-0 top-0 z-[1] block w-full rounded-t-lg bg-gray-50 p-[25px] dark:bg-dark-400">
-    <h2 class="text-lg">Thêm bài giảng mới</h2>
-    <span
-      class="pi pi-times absolute right-[5px] top-[50%] -translate-y-[50%] cursor-pointer px-5 py-3 text-xl"
-      (click)="closeModal()"></span>
-  </header>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <header
+      class="sticky left-0 top-0 z-[1] block w-full rounded-t-lg bg-gray-50 p-[25px] dark:bg-dark-400">
+      <h2 class="text-lg">Thêm bài giảng mới</h2>
+      <span
+        class="pi pi-times absolute right-[5px] top-[50%] -translate-y-[50%] cursor-pointer px-5 py-3 text-xl"
+        (click)="closeModal()"></span>
+    </header>
 
-  <div class="mt-[25px] px-[25px] pb-0">
-    <form (ngSubmit)="onSubmit()" [formGroup]="form">
+    <div class="mt-[25px] px-[25px] pb-0">
       <div class="w-[500px]">
-        <label for="title" class="font-bold dark:text-white">
+        <label for="name" class="font-bold dark:text-white">
           Tên bài giảng
         </label>
         <div
           class="relative mt-3 h-[55px] w-full rounded-md border-[1.5px] border-[#e9edf6] bg-white px-5 transition-colors duration-200 ease-in focus-within:border-primary dark:bg-dark-400"
           [ngClass]="{
             '!border-[#f33a58] dark:!border-[#f33a58]':
-              title.invalid && title.touched,
+              name.invalid && name.touched,
           }"
           [style.backgroundColor]="
-            title.invalid && title.touched ? '#ff00001a' : ''
+            name.invalid && name.touched ? '#ff00001a' : ''
           ">
           <input
             type="text"
-            name="title"
-            id="title"
+            id="name"
+            name="name"
+            formControlName="name"
             placeholder="E.g. Tài liệu môn Văn"
-            formControlName="title"
-            (blur)="onBlur('title')"
+            (blur)="onBlur('name')"
             class="h-full w-full border-none bg-transparent outline-none placeholder:font-medium placeholder:tracking-wide placeholder:text-gray-500 dark:text-white dark:placeholder:text-gray-400"
             [class.text-[#f33a58]]="
-              title.invalid && title.touched && title.dirty
+              name.invalid && name.touched && name.dirty
             " />
-          @if (title.invalid && title.touched) {
+          @if (name.invalid && name.touched) {
             <div class="absolute right-[14px] top-1/2 -translate-y-1/2">
               <i
                 class="fa-solid fa-triangle-exclamation animate-shake text-base text-[#f33a58]">
@@ -42,29 +42,31 @@
             </div>
           }
         </div>
-        @if (title.invalid && title.touched) {
+        @if (name.invalid && name.touched) {
           <div class="mt-2 font-medium leading-normal text-[#f33a58]">
-            {{ getErrorMessage('title') }}
+            {{ getErrorMessage('name') }}
           </div>
         }
       </div>
-    </form>
-  </div>
+    </div>
 
-  <footer
-    class="sticky bottom-0 left-0 z-[1] flex justify-end gap-2 bg-white p-[25px] dark:bg-dark-300">
-    <p-button
-      label="Hủy"
-      variant="outlined"
-      severity="danger"
-      icon="pi pi-times"
-      size="small"
-      (onClick)="closeModal()" />
-    <p-button
-      label="Thêm bài giảng"
-      variant="outlined"
-      icon="pi pi-plus"
-      size="small"
-      [disabled]="form.invalid" />
-  </footer>
+    <footer
+      class="sticky bottom-0 left-0 z-[1] flex justify-end gap-2 bg-white p-[25px] dark:bg-dark-300">
+      <p-button
+        label="Hủy"
+        variant="outlined"
+        severity="danger"
+        icon="pi pi-times"
+        size="small"
+        (onClick)="closeModal()" />
+      <p-button
+        label="Thêm bài giảng"
+        variant="outlined"
+        type="submit"
+        size="small"
+        icon="pi pi-plus"
+        [loading]="isLoading()"
+        [disabled]="form.invalid" />
+    </footer>
+  </form>
 </div>

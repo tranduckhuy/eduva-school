@@ -51,9 +51,13 @@
         </div>
       </div>
 
-      <lesson-material-view
-        [currentView]="currentView()"
-        (viewChanged)="currentView.set($event)" />
+      <div class="mt-5">
+        @if (currentView() === 'lesson') {
+          <lesson-table (viewMaterials)="onViewMaterials($event)" />
+        } @else {
+          <material-table [lesson]="selectedLesson()!" />
+        }
+      </div>
     </div>
   </div>
 </div>
