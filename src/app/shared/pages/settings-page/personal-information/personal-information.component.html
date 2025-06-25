@@ -10,38 +10,23 @@
         <div class="flex flex-col gap-6">
           <!-- ? Avatar -->
           <div class="flex items-center">
-            <figure class="relative size-20 rounded">
-              <label
-                for="avatarFile"
-                class="absolute -right-1 -top-1 flex size-6 cursor-pointer items-center justify-center rounded-full border-[2px] border-white">
-                <input
-                  #avatarInput
-                  type="file"
-                  name="avatarFile"
-                  id="avatarFile"
-                  accept="image/*"
-                  class="hidden"
-                  (change)="onAvatarChange($event)" />
-                <input
-                  type="text"
-                  id="avatarInput"
-                  formControlName="avatar"
-                  name="avatar"
-                  class="hidden"
-                  [value]="user()?.avatarUrl" />
+            <figure
+              class="relative size-20 rounded"
+              (click)="openAvatarModal()">
+              <img
+                [src]="user()?.avatarUrl"
+                [alt]="user()?.fullName"
+                class="size-full cursor-pointer rounded object-contain" />
+              <div
+                class="absolute -right-1 -top-1 flex size-6 cursor-pointer items-center justify-center rounded-full border-[2px] border-white dark:border-dark-300"
+                (click)="openAvatarModal()">
                 <span
                   class="flex size-full items-center justify-center rounded-full bg-primary">
                   <i
                     class="pi pi-camera text-white"
                     style="font-size: 13px"></i>
                 </span>
-              </label>
-              <label for="avatarFile">
-                <img
-                  [src]="form.get('avatar')?.value"
-                  [alt]="form.get('fullName')?.value"
-                  class="size-full cursor-pointer rounded object-contain" />
-              </label>
+              </div>
             </figure>
             <div class="ml-4">
               <h3 class="text-lg font-semibold">{{ user()?.fullName }}</h3>
@@ -130,9 +115,10 @@
             label="Lưu thông tin"
             icon="pi pi-check"
             variant="outlined"
+            type="submit"
             size="small"
-            [disabled]="form.invalid"
-            (onClick)="onSubmit()" />
+            [loading]="isLoading()"
+            [disabled]="form.invalid" />
         } @else {
           <p-button
             label="Chỉnh sửa thông tin"

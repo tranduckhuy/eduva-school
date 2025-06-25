@@ -26,9 +26,9 @@
           control.invalid &&
           (control.touched || submitted())
         ),
-        'focus-within:border-primary':
+        'focus-within:border-primary dark:focus-within:border-primary':
           !control.invalid || (!control.touched && !submitted()),
-        'pointer-events-none !border-[#f1f4fa] !bg-[#f1f4fa]':
+        'pointer-events-none !border-[#f1f4fa] !bg-[#f1f4fa] dark:!border-dark-400 dark:!bg-dark-400':
           readOnly() === true,
       }"
       [style.backgroundColor]="

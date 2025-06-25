@@ -18,7 +18,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const isExpired =
     expiresAt !== null && Date.now() >= new Date(expiresAt).getTime();
 
-  if (req.context.get(BYPASS_AUTH)) return next(req);
+  const isByPass = req.context.get(BYPASS_AUTH);
+  if (isByPass) return next(req);
 
   // ? If access token is still valid → attach to request header and proceed the request
   if (accessToken && !isExpired) {

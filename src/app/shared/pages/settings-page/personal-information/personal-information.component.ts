@@ -12,13 +12,21 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { startWith } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ButtonModule } from 'primeng/button';
-import { FormControlComponent } from '../../../components/form-control/form-control.component';
+
 import { UserService } from '../../../services/api/user/user.service';
-import { User } from '../../../models/entities/user.model';
+import { LoadingService } from '../../../services/core/loading/loading.service';
+import { GlobalModalService } from '../../../services/layout/global-modal/global-modal.service';
+import { ToastHandlingService } from '../../../services/core/toast/toast-handling.service';
+
+import { FormControlComponent } from '../../../components/form-control/form-control.component';
+import { UpdateAvatarModalComponent } from './update-avatar-modal/update-avatar-modal.component';
+
+import { type User } from '../../../models/entities/user.model';
 
 @Component({
   selector: 'app-personal-information',
@@ -32,8 +40,13 @@ export class PersonalInformationComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
   private readonly userService = inject(UserService);
+  private readonly loadingService = inject(LoadingService);
+  private readonly globalModalService = inject(GlobalModalService);
+  private readonly toastHandlingService = inject(ToastHandlingService);
 
   form: FormGroup;
+
+  isLoading = this.loadingService.isLoading;
   isEdit = signal(false);
 
   user = this.userService.currentUser;
@@ -56,7 +69,6 @@ export class PersonalInformationComponent implements OnInit {
     const { firstName, lastName } = this.splitFullName(user.fullName);
 
     this.originalUserData = {
-      avatarUrl: user.avatarUrl,
       phoneNumber: user.phoneNumber,
       fullName: user.fullName,
       firstName,
@@ -64,7 +76,6 @@ export class PersonalInformationComponent implements OnInit {
     };
 
     this.form.patchValue({
-      avatar: user.avatarUrl,
       firstName,
       lastName,
       fullName: user.fullName,
@@ -72,22 +83,6 @@ export class PersonalInformationComponent implements OnInit {
     });
 
     this.syncFullName();
-  }
-
-  private syncFullName() {
-    this.form.valueChanges
-      .pipe(startWith(this.form.value), takeUntilDestroyed(this.destroyRef))
-      .subscribe(({ firstName, lastName }) => {
-        const fullName = `${firstName} ${lastName}`.trim();
-        this.form.get('fullName')?.setValue(fullName, { emitEvent: false });
-      });
-  }
-
-  private splitFullName(fullName: string) {
-    const parts = fullName.trim().split(/\s+/);
-    const lastName = parts.pop() ?? '';
-    const firstName = parts.join(' ');
-    return { firstName, lastName };
   }
 
   enableEdit() {
@@ -114,24 +109,51 @@ export class PersonalInformationComponent implements OnInit {
     const payload = {
       fullName,
       phoneNumber,
-      avatarUrl: avatar, // Avatar là URL (đã xử lý từ file)
+      avatarUrl: avatar,
     };
 
-    // this.userService.updateProfile(payload).subscribe(...)
-
-    // update local backup
-    const { firstName, lastName } = this.splitFullName(fullName);
-    this.originalUserData = { ...payload, firstName, lastName };
-    this.isEdit.set(false);
+    this.userService.updateUserProfile(payload).subscribe(user => {
+      if (user) {
+        console.log(user);
+        console.log(user.fullName);
+        const { firstName, lastName } = this.splitFullName(user.fullName);
+        console.log(firstName);
+        console.log(lastName);
+        this.originalUserData = { ...payload, firstName, lastName };
+        this.isEdit.set(false);
+      }
+    });
   }
 
-  onAvatarChange(event: Event) {
-    const file = (event.target as HTMLInputElement)?.files?.[0];
-    if (!file) return;
+  openAvatarModal() {
+    this.globalModalService.open(UpdateAvatarModalComponent, {
+      fullname: this.user()?.fullName,
+      avatarUrl: this.user()?.avatarUrl,
+      onComplete: (newAvatarUrl: string) => {
+        if (!newAvatarUrl) {
+          this.toastHandlingService.errorGeneral();
+          return;
+        }
 
-    // 👇 Thay thế bằng upload thực tế nếu cần (Firebase, CDN...)
-    const fakeUploadedUrl = URL.createObjectURL(file); // demo giả lập URL
+        this.form.patchValue({ avatar: newAvatarUrl });
+        this.onSubmit();
+      },
+    });
+  }
 
-    this.form.patchValue({ avatar: fakeUploadedUrl });
+  private syncFullName() {
+    this.form.valueChanges
+      .pipe(startWith(this.form.value), takeUntilDestroyed(this.destroyRef))
+      .subscribe(({ firstName, lastName }) => {
+        const fullName = `${firstName} ${lastName}`.trim();
+        this.form.get('fullName')?.setValue(fullName, { emitEvent: false });
+      });
+  }
+
+  private splitFullName(fullName: string) {
+    const parts = fullName.trim().split(/\s+/);
+    const lastName = parts.pop() ?? '';
+    const firstName = parts.join(' ');
+    return { firstName, lastName };
   }
 }
