@@ -195,7 +195,7 @@ export class AddFileModalComponent {
     this.uploadFileService.uploadBlobs(blobNames, files).subscribe(res => {
       if (!res) return;
 
-      const folderId = 1; // ! Placeholder folderId
+      const folderId = '1'; // ! Placeholder folderId
       const sourceUrls = res.uploadTokens;
       const materials: LessonMaterialRequest[] = files.map((file, index) => ({
         title: file.name,

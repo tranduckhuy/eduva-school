@@ -1,18 +1,23 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { ToggleSwitch } from 'primeng/toggleswitch';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
+
+import {
+  ToggleSwitch,
+  type ToggleSwitchChangeEvent,
+} from 'primeng/toggleswitch';
+
+import { SubscriptionPlansService } from './services/subscription-plans.service';
+
 import { PricingPlanCardComponent } from './pricing-plan-card/pricing-plan-card.component';
 
-interface PricingPlan {
-  id: number;
-  name: string;
-  description: string;
-  maxUsers: number;
-  storageLimitGB: number;
-  priceMonthly: number;
-  pricePerYear: number;
-  status: number;
-}
+import { type SubscriptionPlan } from '../../../shared/models/entities/subscription-plan.model';
+import { type GetSubscriptionPlanRequest } from './models/request/get-subscription-plan-request.model';
 
 @Component({
   selector: 'app-pricing',
@@ -22,58 +27,30 @@ interface PricingPlan {
   styleUrl: './pricing.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PricingComponent {
-  pricingPlans = signal<PricingPlan[]>([
-    {
-      id: 1,
-      name: 'Start',
-      description: 'Gói thử nghiệm cơ bản cho nhóm nhỏ',
-      maxUsers: 10,
-      storageLimitGB: 1,
-      priceMonthly: 149000,
-      pricePerYear: 1788000,
-      status: 0,
-    },
-    {
-      id: 2,
-      name: 'Basic',
-      description: 'Gói phù hợp cho trường nhỏ',
-      maxUsers: 25,
-      storageLimitGB: 5,
-      priceMonthly: 590000,
-      pricePerYear: 7080000,
-      status: 0,
-    },
-    {
-      id: 3,
-      name: 'Plus',
-      description: 'Gói nâng cao cho trường vừa',
-      maxUsers: 50,
-      storageLimitGB: 10,
-      priceMonthly: 990000,
-      pricePerYear: 11880000,
-      status: 0,
-    },
-    {
-      id: 4,
-      name: 'Pro',
-      description: 'Gói mở rộng toàn diện cho trường lớn',
-      maxUsers: 100,
-      storageLimitGB: 50,
-      priceMonthly: 1500000,
-      pricePerYear: 18000000,
-      status: 0,
-    },
-    {
-      id: 5,
-      name: 'Premium',
-      description: 'Gói cao cấp với tài nguyên tối đa',
-      maxUsers: 500,
-      storageLimitGB: 200,
-      priceMonthly: 2500000,
-      pricePerYear: 30000000,
-      status: 0,
-    },
-  ]);
+export class PricingComponent implements OnInit {
+  private readonly subscriptionPlanService = inject(SubscriptionPlansService);
+
+  monthlyPlans = this.subscriptionPlanService.monthlyPlans;
+  yearlyPlans = this.subscriptionPlanService.yearlyPlans;
+
+  subscriptionPlans = signal<SubscriptionPlan[]>([]);
   isYearly = signal<boolean>(false);
+
+  ngOnInit(): void {
+    const request: GetSubscriptionPlanRequest = {
+      activeOnly: true,
+    };
+    this.subscriptionPlanService
+      .getSubscriptionPlans(request)
+      .subscribe(() => this.subscriptionPlans.set(this.monthlyPlans()));
+  }
+
+  onToggleChange(event: ToggleSwitchChangeEvent) {
+    this.isYearly.set(event.checked);
+    if (event.checked) {
+      this.subscriptionPlans.set(this.yearlyPlans());
+    } else {
+      this.subscriptionPlans.set(this.monthlyPlans());
+    }
+  }
 }

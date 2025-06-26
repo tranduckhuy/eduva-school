@@ -1,18 +1,23 @@
-<div class="e-container">
+<div class="e-container-fluid">
   <div class="flex min-h-screen flex-col items-center justify-center py-[60px]">
     <h1 class="mb-7 text-[28px] font-bold">Bảng giá</h1>
     <div class="mb-[32px] flex flex-wrap justify-center gap-[15px]">
       <p class="text-[15px] font-medium">Gói Tháng</p>
-      <p-toggleswitch [(ngModel)]="isYearly" />
+      <p-toggleswitch
+        [ngModel]="isYearly()"
+        (onChange)="onToggleChange($event)" />
       <p class="text-[15px] font-medium">Gói Năm</p>
-
-      <div class="e-row e-row-cols-3 e-row-cols-lg-2 e-row-cols-sm-1 e-g-4">
-        @for (pricingPlan of pricingPlans(); track pricingPlan.id) {
-          <app-pricing-plan-card
-            [pricingPlan]="pricingPlan"
-            [isYearly]="isYearly()" />
-        }
-      </div>
+    </div>
+    <div
+      class="e-row e-row-cols-4 e-row-cols-lg-3 e-row-cols-md-2 e-row-cols-sm-1 e-g-4 e-g-md-3">
+      @for (
+        subscriptionPlan of subscriptionPlans();
+        track subscriptionPlan.id
+      ) {
+        <app-pricing-plan-card
+          [subscriptionPlan]="subscriptionPlan"
+          [isYearly]="isYearly()" />
+      }
     </div>
   </div>
 </div>

@@ -1,17 +1,27 @@
 <div
-  class="rounded border border-gray-100 bg-white p-8 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  class="relative min-h-[550px] rounded border border-gray-100 bg-white p-8 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <!-- ? Icon Recommend -->
+  <img
+    src="./images/icons/recommend-subscription-plan.svg"
+    alt="Most Popular"
+    class="absolute right-2 top-1 rotate-12" />
+
   <h3 class="mb-5 text-center text-lg font-semibold">
-    {{ pricingPlan().name }}
+    {{ subscriptionPlan().name }}
   </h3>
   <p class="mb-4 text-center text-lg font-medium dark:text-dark-100">
-    <span class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{
-      (isYearly() ? pricingPlan().pricePerYear : pricingPlan().priceMonthly)
-        | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN'
-    }}</span>
-    / trên {{ isYearly() ? 'năm' : 'tháng' }}
+    <span class="text-3xl font-bold text-gray-800 dark:text-gray-200">
+      {{
+        (isYearly()
+          ? subscriptionPlan().pricePerYear
+          : subscriptionPlan().priceMonthly
+        ) | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN'
+      }}
+    </span>
+    / {{ isYearly() ? 'năm' : 'tháng' }}
   </p>
   <p class="mx-auto mb-6 text-center dark:text-dark-100">
-    {{ pricingPlan().description }}
+    {{ subscriptionPlan().description }}
   </p>
   <app-button
     [width]="'full'"
@@ -24,23 +34,24 @@
   </app-button>
   <ul class="mt-6 flex flex-col gap-3">
     <li class="flex items-center gap-4">
-      <span class="material-symbols-outlined text-success-500"> check </span>
-      <span class="text-[15px] font-medium dark:text-dark-100"
-        >Dung lượng lưu trữ: {{ pricingPlan().storageLimitGB }} GB</span
-      >
+      <span class="material-symbols-outlined text-success-500">check</span>
+      <span class="text-[15px] font-medium dark:text-dark-100">
+        Dung lượng lưu trữ:
+        {{ subscriptionPlan().storageLimitGB | storageFormat }}
+      </span>
     </li>
     <li class="flex items-center gap-4">
-      <span class="material-symbols-outlined text-success-500"> check </span>
-      <span class="text-[15px] font-medium dark:text-dark-100"
-        >Số lượng tài khoản: {{ pricingPlan().maxUsers }}</span
-      >
+      <span class="material-symbols-outlined text-success-500">check</span>
+      <span class="text-[15px] font-medium dark:text-dark-100">
+        Số lượng tài khoản: {{ subscriptionPlan().maxUsers }} tài khoản
+      </span>
     </li>
-    @for (option of pricingPlanOptions(); track option) {
+    @for (option of subscriptionPlanOptions(); track option) {
       <li class="flex items-center gap-4">
-        <span class="material-symbols-outlined text-success-500"> check </span>
-        <span class="text-[15px] font-medium dark:text-dark-100">{{
-          option
-        }}</span>
+        <span class="material-symbols-outlined text-success-500">check</span>
+        <span class="text-[15px] font-medium dark:text-dark-100">
+          {{ option }}
+        </span>
       </li>
     }
   </ul>

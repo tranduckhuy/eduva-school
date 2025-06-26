@@ -1,7 +1,7 @@
 import { FolderOwnerType } from '../enum/folder-owner-type.enum';
 
 export interface Folder {
-  id: number;
+  id: string;
   name: string;
   userId?: string;
   classId?: string;

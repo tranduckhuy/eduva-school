@@ -1,3 +1,5 @@
+import { EntityStatus } from '../enum/entity-status.enum';
+
 export interface School {
   id: number;
   name: string;
@@ -6,7 +8,7 @@ export interface School {
   contactEmail: string;
   phoneNumber: string;
   websiteUrl?: string;
-  status: 'active' | 'inactive';
+  status: EntityStatus;
   createdAt?: Date;
   createdBy?: string;
   lastModifiedAt?: Date;
