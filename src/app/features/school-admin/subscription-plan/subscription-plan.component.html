@@ -1,0 +1,35 @@
+<div class="e-container-fluid">
+  <div class="flex min-h-screen flex-col items-center justify-center pb-[60px]">
+    <h2 class="text-center text-[28px] font-bold">Chọn gói phù hợp</h2>
+    <p class="max-w-[450px] text-center text-lg">
+      Tối ưu chi phí - Tối đa hiệu quả dạy học với các công cụ giảng dạy hiện
+      đại, hỗ trợ 24/7
+    </p>
+    <div class="mt-7 flex flex-wrap justify-center gap-4">
+      <p
+        class="text-[15px] font-semibold"
+        [ngClass]="{ 'opacity-70': isYearly() }">
+        Gói Tháng
+      </p>
+      <p-toggleswitch
+        [ngModel]="isYearly()"
+        (onChange)="onToggleChange($event)" />
+      <p
+        class="text-[15px] font-semibold"
+        [ngClass]="{ 'opacity-70': !isYearly() }">
+        Gói Năm
+        <span class="text-xs text-primary">(Tiết kiệm 5%)</span>
+      </p>
+    </div>
+    <div class="mt-8" [ngClass]="getRowClass()">
+      @for (
+        subscriptionPlan of subscriptionPlans();
+        track subscriptionPlan.id
+      ) {
+        <subscription-plan-card
+          [subscriptionPlan]="subscriptionPlan"
+          [isYearly]="isYearly()" />
+      }
+    </div>
+  </div>
+</div>

@@ -1,7 +1,7 @@
 import { EntityStatus } from '../enum/entity-status.enum';
 
 export interface SubscriptionPlan {
-  id: string;
+  id: number;
   name: string;
   description: string;
   maxUsers: number;

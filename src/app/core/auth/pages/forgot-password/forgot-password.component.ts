@@ -49,9 +49,7 @@ export class ForgotPasswordComponent {
     this.submitted.set(true);
     this.form.markAllAsTouched();
 
-    if (this.form.invalid) {
-      return;
-    }
+    if (this.form.invalid) return;
 
     const request: EmailLinkRequest = this.form.value;
 
