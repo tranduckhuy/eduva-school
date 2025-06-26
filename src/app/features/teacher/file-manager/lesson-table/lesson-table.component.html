@@ -10,8 +10,7 @@
   [first]="first()"
   [totalRecords]="totalRecords()"
   [loading]="loading()"
-  (onLazyLoad)="loadDataLazy($event)"
-  (onPage)="pageChange($event)"
+  (onLazyLoad)="loadLessonsLazy($event)"
   currentPageReportTemplate="
       Hiển thị {first} đến {last} trên {totalRecords} bài học
     ">

@@ -29,6 +29,13 @@ export const authRoutes: Routes = [
             mod => mod.ResetPasswordComponent
           ),
       },
+      {
+        path: 'otp-confirmation',
+        loadComponent: () =>
+          import('./pages/otp-confirmation/otp-confirmation.component').then(
+            mod => mod.OtpConfirmationComponent
+          ),
+      },
     ],
   },
 ];

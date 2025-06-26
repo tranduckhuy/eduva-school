@@ -45,7 +45,7 @@ export class LessonTableComponent {
     return PAGE_SIZE;
   }
 
-  loadDataLazy(event: TableLazyLoadEvent) {
+  loadLessonsLazy(event: TableLazyLoadEvent) {
     const rows = event.rows ?? this.maxRowsByPage;
     const first = event.first ?? 0;
     const page = first / rows;
@@ -60,27 +60,4 @@ export class LessonTableComponent {
   }
 
   onSearchTriggered(term: string) {}
-
-  next() {
-    this.first.set(this.first() + this.rows());
-  }
-
-  prev() {
-    this.first.set(this.first() - this.rows());
-  }
-
-  pageChange(event: any) {
-    this.first.set(event.first);
-    this.rows.set(event.rows);
-  }
-
-  isLastPage(): boolean {
-    return this.lessons()
-      ? this.first() + this.rows() >= this.lessons().length
-      : true;
-  }
-
-  isFirstPage(): boolean {
-    return this.lessons() ? this.first() === 0 : true;
-  }
 }

@@ -51,7 +51,6 @@ export class AuthService {
         map(res => {
           if (res.statusCode === StatusCode.SUCCESS && res.data) {
             this.handleLoginSuccess(res.data);
-            this.redirectUserAfterLogin();
             return res.data;
           }
 
@@ -102,14 +101,15 @@ export class AuthService {
     );
   }
 
+  handleLoginSuccess(data: AuthTokenResponse): void {
+    this.handleTokenStorage(data);
+    this.redirectUserAfterLogin();
+    this.isLoggedInSignal.set(true);
+  }
+
   // ---------------------------
   //  Private Helper Functions
   // ---------------------------
-
-  private handleLoginSuccess(data: AuthTokenResponse): void {
-    this.handleTokenStorage(data);
-    this.isLoggedInSignal.set(true);
-  }
 
   private handleTokenStorage(data: AuthTokenResponse): void {
     const { accessToken, refreshToken, expiresIn } = data;
@@ -145,6 +145,12 @@ export class AuthService {
           'Đăng nhập thất bại',
           'Tài khoản của bạn đã bị vô hiệu hóa.'
         );
+        break;
+
+      case StatusCode.REQUIRES_OTP_VERIFICATION:
+        this.router.navigate(['/auth/otp-confirmation'], {
+          queryParams: { email },
+        });
         break;
 
       default:
@@ -186,9 +192,9 @@ export class AuthService {
       };
 
       const firstRole = user.roles[0];
-      const redirectUrl = roleRedirectMap[firstRole] ?? '/';
+      const redirectUrl = roleRedirectMap[firstRole] ?? '/school-admin';
 
-      this.router.navigateByUrl(redirectUrl);
+      this.router.navigateByUrl(redirectUrl, { replaceUrl: true });
     });
   }
 }

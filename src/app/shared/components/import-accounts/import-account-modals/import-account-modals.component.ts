@@ -16,10 +16,12 @@ import { ImportUserAccountsService } from '../services/import-user-accounts.serv
 import { DownloadTemplateService } from '../services/download-template.service';
 
 import { MODAL_DATA } from '../../../tokens/injection/modal-data.token';
+
 import {
   MAX_IMPORT_FILE_SIZE,
   ALLOWED_IMPORT_EXTENSIONS,
 } from '../../../constants/common.constant';
+import { TemplateType } from '../../../models/enum/template-type.enum';
 
 @Component({
   selector: 'app-import-account-modals',
@@ -126,7 +128,8 @@ export class ImportAccountModalsComponent {
   }
 
   downloadTemplate() {
-    this.downloadTemplateService.downloadTemplate().subscribe();
+    const type = TemplateType.ImportAccountsTemplate;
+    this.downloadTemplateService.downloadTemplate(type).subscribe();
   }
 
   private async handleFile(file: File) {

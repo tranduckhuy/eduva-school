@@ -40,10 +40,6 @@ export class UserService {
     );
   }
 
-  clearCurrentUser(): void {
-    this.setCurrentUser(null);
-  }
-
   updateUserProfile(request: UpdateProfileRequest): Observable<User | null> {
     return this.requestService
       .put<User>(this.USER_PROFILE_API_URL, request)
@@ -52,6 +48,17 @@ export class UserService {
         map(res => this.extractUserFromResponse(res)),
         catchError(() => this.handleErrorResponse())
       );
+  }
+
+  updateCurrentUserPartial(update: Partial<User>): void {
+    const current = this.currentUserSignal();
+    if (!current) return;
+    const merged = { ...current, ...update };
+    this.setCurrentUser(merged);
+  }
+
+  clearCurrentUser(): void {
+    this.setCurrentUser(null);
   }
 
   // ---------------------------
