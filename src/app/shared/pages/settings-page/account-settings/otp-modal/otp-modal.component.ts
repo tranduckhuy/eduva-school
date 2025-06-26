@@ -12,12 +12,17 @@ import { FormsModule } from '@angular/forms';
 import { InputOtpModule } from 'primeng/inputotp';
 import { ButtonModule } from 'primeng/button';
 
+import { UserService } from '../../../../services/api/user/user.service';
 import { TwoFactorService } from '../../../../../core/auth/services/two-factor.service';
 import { LoadingService } from '../../../../services/core/loading/loading.service';
 import { GlobalModalService } from '../../../../services/layout/global-modal/global-modal.service';
 import { MODAL_DATA } from '../../../../tokens/injection/modal-data.token';
 
 import { type ConfirmEnableDisable2FA } from '../models/toggle-2fa-request.model';
+import {
+  type ResendOtpRequest,
+  ResendOtpPurpose,
+} from '../../../../../core/auth/models/request/resend-otp-request.model';
 
 @Component({
   selector: 'app-otp-modal',
@@ -29,6 +34,7 @@ import { type ConfirmEnableDisable2FA } from '../models/toggle-2fa-request.model
 })
 export class OtpModalComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly userService = inject(UserService);
   private readonly twoFactorService = inject(TwoFactorService);
   private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
@@ -37,6 +43,7 @@ export class OtpModalComponent implements OnInit {
   value = signal<string>('');
 
   isLoading = this.loadingService.is('otp-modal');
+  user = this.userService.currentUser;
 
   readonly countdown = signal<number>(120);
   readonly isResendDisabled = signal<boolean>(true);
@@ -70,12 +77,18 @@ export class OtpModalComponent implements OnInit {
   }
 
   onResendCode() {
-    if (this.isResendDisabled()) return;
+    const user = this.user();
+    if (this.isResendDisabled() || !user?.email) return;
 
-    // Call API to resend OTP here if needed
-    // this.twoFactorService.resendOtp(...)
-
-    this.startCountdown();
+    const request: ResendOtpRequest = {
+      email: user.email,
+      purpose: this.modalData.enabled
+        ? ResendOtpPurpose.Disable2Fa
+        : ResendOtpPurpose.Enable2FA,
+    };
+    this.twoFactorService
+      .resendOtp(request)
+      .subscribe(() => this.startCountdown());
   }
 
   closeModal() {

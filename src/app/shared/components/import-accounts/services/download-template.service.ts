@@ -13,6 +13,8 @@ import {
   triggerBlobDownload,
 } from '../../../utils/util-functions';
 
+import { type TemplateType } from '../../../models/enum/template-type.enum';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -23,9 +25,9 @@ export class DownloadTemplateService {
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly DOWNLOAD_TEMPLATE_API_URL = `${this.BASE_API_URL}/users/import-template`;
 
-  downloadTemplate(): Observable<HttpResponse<Blob>> {
+  downloadTemplate(type: TemplateType): Observable<HttpResponse<Blob>> {
     return this.requestService
-      .getFile(this.DOWNLOAD_TEMPLATE_API_URL, undefined, {
+      .getFile(`${this.DOWNLOAD_TEMPLATE_API_URL}/${type}`, undefined, {
         loadingKey: 'download-template',
       })
       .pipe(

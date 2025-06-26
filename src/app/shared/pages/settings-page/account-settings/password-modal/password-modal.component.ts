@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import {
@@ -38,6 +43,8 @@ export class PasswordModalComponent {
 
   isLoading = this.loadingService.is('password-modal');
 
+  isShowPassword = signal<boolean>(false);
+
   constructor() {
     this.form = this.fb.group({
       currentPassword: ['', Validators.required],
@@ -69,6 +76,10 @@ export class PasswordModalComponent {
         next: () => this.openOtpModal(),
         error: () => this.form.reset,
       });
+  }
+
+  toggleShowPassword(): void {
+    this.isShowPassword.set(!this.isShowPassword());
   }
 
   getErrorMessage(controlName: string): string {

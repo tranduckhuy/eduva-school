@@ -20,15 +20,18 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const confirmationService = inject(ConfirmationService);
 
   const excludedUrls = ['/auth/login', '/auth/refresh-token'];
-  const shouldSkip401Toast = excludedUrls.some(url => req.url.includes(url));
+  const shouldSkipToast = excludedUrls.some(url => req.url.includes(url));
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 0) {
-        toastHandlingService.error('Lỗi', 'Không thể kết nối đến máy chủ.'); // ? Cái này thì chắc báo toast thôi
+        toastHandlingService.error(
+          'Lỗi hệ thống',
+          'Không thể kết nối đến máy chủ.'
+        );
       } else if (error.status >= 500) {
         toastHandlingService.errorGeneral(); // ? Sau sẽ redirect tới trang 500
-      } else if (error.status === 401 && !shouldSkip401Toast) {
+      } else if (error.status === 401 && !shouldSkipToast) {
         globalModalService.close();
         confirmationService.confirm({
           message: 'Vui lòng đăng nhập lại.',
@@ -46,9 +49,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             });
           },
         });
-      } else if (error.status === 403) {
+      } else if (error.status === 403 && !shouldSkipToast) {
         toastHandlingService.error(
-          'Lỗi',
+          'Không có quyền truy cập',
           'Bạn không có quyền truy cập chức năng này.'
         ); // ? Sau sẽ redirect tới trang 403
       }
