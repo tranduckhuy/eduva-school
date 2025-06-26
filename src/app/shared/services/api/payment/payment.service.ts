@@ -1,9 +1,11 @@
 import { Injectable, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { EMPTY, Observable, catchError, map, of, tap } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 
+import { UserService } from '../user/user.service';
 import { RequestService } from '../../core/request/request.service';
 import { ToastHandlingService } from '../../core/toast/toast-handling.service';
 
@@ -12,12 +14,12 @@ import { StatusCode } from '../../../constants/status-code.constant';
 import { type CreatePlanPaymentLinkRequest } from '../../../models/api/request/create-plan-payment-link-request.model';
 import { type CreatePlanPaymentLinkResponse } from '../../../models/api/response/create-plan-payment-link-response.model';
 import { type ConfirmPaymentReturnRequest } from '../../../models/api/request/confirm-payment-return-request.model';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PaymentService {
+  private readonly userService = inject(UserService);
   private readonly requestService = inject(RequestService);
   private readonly toastHandlingService = inject(ToastHandlingService);
 
@@ -77,6 +79,7 @@ export class PaymentService {
         'Thanh toán thành công',
         'Cảm ơn bạn đã tin tưởng sử dụng hệ thống EDUVA. Chúc bạn có trải nghiệm dạy và học thật hiệu quả!'
       );
+      this.updateUserProfileAfterPayment();
     } else {
       this.toastHandlingService.errorGeneral();
     }
@@ -90,6 +93,7 @@ export class PaymentService {
         'Thanh toán bị hủy',
         'Bạn đã hủy giao dịch. Không có khoản phí nào được trừ.'
       );
+      this.updateUserProfileAfterPayment();
     } else {
       this.toastHandlingService.errorGeneral();
     }
@@ -103,5 +107,9 @@ export class PaymentService {
       return res.data;
     }
     return null;
+  }
+
+  private updateUserProfileAfterPayment() {
+    this.userService.getCurrentProfile().subscribe();
   }
 }
