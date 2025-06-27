@@ -2,17 +2,15 @@ import {
   ChangeDetectionStrategy,
   Component,
   input,
-  LOCALE_ID,
   signal,
 } from '@angular/core';
-import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
-import localeVi from '@angular/common/locales/vi';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
-import { ButtonComponent } from '../../../../shared/components/button/button.component';
+
 import { TooltipModule } from 'primeng/tooltip';
 
-registerLocaleData(localeVi);
+import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-update-student',
@@ -26,7 +24,6 @@ registerLocaleData(localeVi);
   ],
   templateUrl: './update-student.component.html',
   styleUrl: './update-student.component.css',
-  providers: [DatePipe, { provide: LOCALE_ID, useValue: 'vi' }],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpdateStudentComponent {
