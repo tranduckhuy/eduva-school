@@ -108,6 +108,9 @@ export class AuthService {
         // ? Close modal
         this.globalModalService.close();
 
+        // ? Close Submenus
+        window.dispatchEvent(new Event('close-all-submenus'));
+
         this.router.navigateByUrl('/auth/login', { replaceUrl: true });
       }),
       map(() => void 0),

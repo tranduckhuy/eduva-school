@@ -20,8 +20,14 @@ import { StorageFormatPipe } from '../../../../shared/pipes/storage-format.pipe'
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 import { UserService } from '../../../../shared/services/api/user/user.service';
+import { PaymentService } from '../../../../shared/services/api/payment/payment.service';
+import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
 
 import { type SubscriptionPlan } from '../../../../shared/models/entities/subscription-plan.model';
+import {
+  BillingCycle,
+  CreatePlanPaymentLinkRequest,
+} from '../../../../shared/models/api/request/create-plan-payment-link-request.model';
 
 @Component({
   selector: 'subscription-plan-card',
@@ -40,8 +46,10 @@ import { type SubscriptionPlan } from '../../../../shared/models/entities/subscr
 export class SubscriptionPlanCardComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
+  private readonly paymentService = inject(PaymentService);
+  private readonly toastHandlingService = inject(ToastHandlingService);
 
-  subscriptionPlan = input.required<SubscriptionPlan | null>();
+  subscriptionPlan = input.required<SubscriptionPlan>();
   isYearly = input<boolean>(false);
 
   toggleSwitchChange = output<boolean>();
@@ -74,5 +82,18 @@ export class SubscriptionPlanCardComponent implements OnInit {
         this.subscriptionPlan()?.id,
       ]);
     }
+
+    this.toastHandlingService.info(
+      'Hệ thống đang xử lý yêu cầu thanh toán',
+      'Xin vui lòng đợi trong giây lát. Bạn sẽ được chuyển hướng khi liên kết sẵn sàng. Trân trọng cảm ơn!'
+    );
+
+    const request: CreatePlanPaymentLinkRequest = {
+      planId: this.subscriptionPlan().id,
+      billingCycle: this.isYearly()
+        ? BillingCycle.Yearly
+        : BillingCycle.Monthly,
+    };
+    this.paymentService.createPlanPaymentLink(request).subscribe();
   }
 }

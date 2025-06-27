@@ -1,18 +1,14 @@
-import { CurrencyPipe, DatePipe, registerLocaleData } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  LOCALE_ID,
-  signal,
-} from '@angular/core';
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import localeVi from '@angular/common/locales/vi';
+import { TooltipModule } from 'primeng/tooltip';
+
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 import { BadgeComponent } from '../../../shared/components/badge/badge.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
-import { TooltipModule } from 'primeng/tooltip';
-import { RouterLink } from '@angular/router';
 
 interface Invoice {
   id: number;
@@ -43,8 +39,6 @@ interface Invoice {
   endDate: Date;
 }
 
-registerLocaleData(localeVi);
-
 @Component({
   selector: 'app-invoices',
   standalone: true,
@@ -61,7 +55,6 @@ registerLocaleData(localeVi);
   ],
   templateUrl: './invoices.component.html',
   styleUrl: './invoices.component.css',
-  providers: [{ provide: LOCALE_ID, useValue: 'vi-VN' }],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoicesComponent {

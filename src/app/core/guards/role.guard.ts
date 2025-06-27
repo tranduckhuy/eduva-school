@@ -26,8 +26,12 @@ export const roleGuard: CanMatchFn = route => {
   const hasExpectedRole = expectedRoles?.some(role =>
     user.roles.includes(role)
   );
+
+  // ? If the user has the required role(s), allow access to the route
   if (hasExpectedRole) return true;
 
+  // ? If the user does NOT have the required role(s),
+  // ? redirect them to their role-specific dashboard
   if (
     user.roles.includes(UserRoles.TEACHER) ||
     user.roles.includes(UserRoles.CONTENT_MODERATOR)

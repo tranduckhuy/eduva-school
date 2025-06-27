@@ -1,17 +1,14 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  LOCALE_ID,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { ButtonComponent } from '../../../shared/components/button/button.component';
-import { BytesToReadablePipe } from '../../../shared/pipes/byte-to-readable.pipe';
-import { BadgeComponent } from '../../../shared/components/badge/badge.component';
-import { FileDurationFormatPipe } from '../../../shared/pipes/file-duration-format.pipe';
-import { DatePipe, registerLocaleData } from '@angular/common';
-import localeVi from '@angular/common/locales/vi';
 import { TooltipModule } from 'primeng/tooltip';
+
+import { BytesToReadablePipe } from '../../../shared/pipes/byte-to-readable.pipe';
+import { FileDurationFormatPipe } from '../../../shared/pipes/file-duration-format.pipe';
+
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { BadgeComponent } from '../../../shared/components/badge/badge.component';
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 
 interface Owner {
@@ -39,8 +36,6 @@ interface LessonMaterial {
   owner: Owner;
 }
 
-registerLocaleData(localeVi);
-
 @Component({
   selector: 'app-lessons',
   standalone: true,
@@ -56,7 +51,6 @@ registerLocaleData(localeVi);
   ],
   templateUrl: './lessons.component.html',
   styleUrl: './lessons.component.css',
-  providers: [DatePipe, { provide: LOCALE_ID, useValue: 'vi' }],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LessonsComponent {

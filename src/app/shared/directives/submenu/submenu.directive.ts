@@ -34,4 +34,9 @@ export class SubmenuDirective {
       }
     });
   }
+
+  @HostListener('window:close-all-submenus')
+  onCloseAllSubmenus() {
+    this.clickOutside.emit();
+  }
 }

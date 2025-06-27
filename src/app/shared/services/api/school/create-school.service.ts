@@ -29,17 +29,7 @@ export class CreateSchoolService {
     return this.requestService
       .post<School>(this.CREATE_SCHOOL_API_URL, request)
       .pipe(
-        map(res => {
-          if (res.statusCode === StatusCode.SUCCESS && res.data) {
-            this.toastHandlingService.info(
-              'Thành công',
-              'Thông tin trường học đã được ghi nhận. Hệ thống đang tạo đường dẫn thanh toán, vui lòng chờ trong giây lát...'
-            );
-            this.userService.updateCurrentUserPartial({ school: res.data });
-            return res.data;
-          }
-          return null;
-        }),
+        map(res => this.handleCreateSchoolResponse(res)),
         catchError((err: HttpErrorResponse) =>
           this.handleCreateSchoolError(err)
         )
@@ -49,6 +39,18 @@ export class CreateSchoolService {
   // ---------------------------
   //  Private Helper Functions
   // ---------------------------
+
+  private handleCreateSchoolResponse(res: any): School | null {
+    if (res.statusCode === StatusCode.SUCCESS && res.data) {
+      this.toastHandlingService.info(
+        'Thành công',
+        'Thông tin trường học đã được ghi nhận. Hệ thống đang tạo đường dẫn thanh toán, vui lòng chờ trong giây lát...'
+      );
+      this.userService.updateCurrentUserPartial({ school: res.data });
+      return res.data;
+    }
+    return null;
+  }
 
   private handleCreateSchoolError(err: HttpErrorResponse): Observable<null> {
     if (err.error.statusCode === StatusCode.PROVIDED_INFORMATION_IS_INVALID) {

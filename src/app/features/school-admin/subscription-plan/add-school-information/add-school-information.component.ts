@@ -71,9 +71,7 @@ export class AddSchoolInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.subscriptionPlanService
-      .getSubscriptionPlan(this.subscriptionId())
-      .subscribe();
+    this.subscriptionPlanService.getPlanById(this.subscriptionId()).subscribe();
   }
 
   onSubmit() {
