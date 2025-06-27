@@ -51,10 +51,12 @@ export class NavbarComponent implements OnInit {
 
   closeSidebar = output();
 
+  user = this.userService.currentUser;
+
   navConfigs: NavbarConfig[] = [];
 
   ngOnInit(): void {
-    const user = this.userService.currentUser();
+    const user = this.user();
     const userRole = user?.roles?.[0] as UserRole;
     this.navConfigs = this.getNavbarConfigByRole(userRole);
 
@@ -66,6 +68,13 @@ export class NavbarComponent implements OnInit {
       .subscribe((event: NavigationEnd) => {
         this.setActiveNavItems(event.urlAfterRedirects);
       });
+  }
+
+  get routerLinkRole() {
+    const link = this.user()?.roles.includes(UserRoles.SCHOOL_ADMIN)
+      ? '/school-admin'
+      : '/teacher';
+    return link;
   }
 
   private setActiveNavItems(url: string) {
