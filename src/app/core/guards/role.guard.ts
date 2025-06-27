@@ -28,12 +28,19 @@ export const roleGuard: CanMatchFn = route => {
   );
   if (hasExpectedRole) return true;
 
-  const isTeacherOrModerator = user.roles.some(
-    role => role === UserRoles.TEACHER || role === UserRoles.CONTENT_MODERATOR
-  );
-
-  const fallbackPath = isTeacherOrModerator ? '/teacher' : '/school-admin';
-  router.navigate([fallbackPath]);
+  if (
+    user.roles.includes(UserRoles.TEACHER) ||
+    user.roles.includes(UserRoles.CONTENT_MODERATOR)
+  ) {
+    router.navigate(['/teacher']);
+  } else if (
+    user.roles.includes(UserRoles.SCHOOL_ADMIN) ||
+    user.roles.includes(UserRoles.SYSTEM_ADMIN)
+  ) {
+    router.navigate(['/school-admin']);
+  } else {
+    router.navigate(['/unauthorized']);
+  }
 
   return false;
 };

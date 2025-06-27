@@ -9,6 +9,16 @@ export const schoolAdminRoutes: Routes = [
       ),
     children: [
       {
+        path: '',
+        data: {
+          heading: 'Bảng thống kê',
+        },
+        loadComponent: () =>
+          import('./dashboard/dashboard.component').then(
+            mod => mod.DashboardComponent
+          ),
+      },
+      {
         path: 'teachers',
         loadChildren: () =>
           import('./teachers/teachers.routes').then(mod => mod.teachersRoute),

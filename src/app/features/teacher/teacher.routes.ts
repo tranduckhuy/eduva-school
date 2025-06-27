@@ -9,6 +9,16 @@ export const teacherRoutes: Routes = [
       ),
     children: [
       {
+        path: '',
+        data: {
+          heading: 'Bảng thống kê',
+        },
+        loadComponent: () =>
+          import('./dashboard/dashboard.component').then(
+            mod => mod.DashboardComponent
+          ),
+      },
+      {
         path: 'file-manager',
         data: {
           breadcrumb: 'Quản lý bài giảng',

@@ -1,0 +1,36 @@
+#chart {
+  min-height: 300px;
+}
+
+.apexcharts-text.apexcharts-yaxis-label tspan {
+  fill: #aeae !important;
+}
+
+::ng-deep .dark .apexcharts-yaxis-label,
+::ng-deep .dark .apexcharts-xaxis-label {
+  fill: var(--color-gray-400);
+}
+
+::ng-deep .dark .apexcharts-gridline {
+  stroke: var(--color-gray-800) !important;
+}
+
+::ng-deep .dark .p-select,
+::ng-deep .dark .p-select-list-container,
+::ng-deep .dark .p-select-list,
+::ng-deep .dark .p-select-overlay {
+  background-color: var(--color-bg-primary) !important;
+}
+::ng-deep .dark .p-select {
+  color: #fff !important;
+  border-color: var(--color-gray-500) !important;
+}
+
+::ng-deep .dark .p-placeholder,
+::ng-deep .dark .p-select-dropdown-icon {
+  color: #fff !important;
+}
+
+::ng-deep .dark .p-select-option:hover {
+  background-color: var(--color-bg-secondary) !important;
+}
