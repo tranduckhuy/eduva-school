@@ -82,7 +82,6 @@ export class AddSchoolInformationComponent implements OnInit {
     if (this.form.invalid) return;
 
     const createSchoolRequest: CreateSchoolRequest = this.form.value;
-
     this.createSchoolService
       .createSchool(createSchoolRequest)
       .pipe(
@@ -110,7 +109,7 @@ export class AddSchoolInformationComponent implements OnInit {
           return this.paymentService.createPlanPaymentLink(paymentLinkRequest);
         })
       )
-      .subscribe(); // Side effects (redirect, toast) đã nằm trong service
+      .subscribe();
   }
 
   onToggleSwitchChange(_isYearly: boolean) {

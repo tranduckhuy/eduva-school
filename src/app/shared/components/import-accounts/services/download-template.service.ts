@@ -43,7 +43,7 @@ export class DownloadTemplateService {
   // ---------------------------
 
   private handleDownloadResponse(res: HttpResponse<Blob>): void {
-    if (res.body) {
+    if (res.body && res.body?.size > 0) {
       this.toastHandlingService.successGeneral();
       const fileName = getFileName(res);
       triggerBlobDownload(fileName, res.body);

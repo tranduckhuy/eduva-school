@@ -23,11 +23,8 @@ export class SubscriptionPlanService {
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly GET_SUBSCRIPTION_PLAN_API_URL = `${this.BASE_API_URL}/subscription-plans`;
 
-  private readonly monthlyPlansSignal = signal<SubscriptionPlan[]>([]);
-  monthlyPlans = this.monthlyPlansSignal.asReadonly();
-
-  private readonly yearlyPlansSignal = signal<SubscriptionPlan[]>([]);
-  yearlyPlans = this.yearlyPlansSignal.asReadonly();
+  private readonly subscriptionPlansSignal = signal<SubscriptionPlan[]>([]);
+  subscriptionPlans = this.subscriptionPlansSignal.asReadonly();
 
   private readonly subscriptionPlanSignal = signal<SubscriptionPlan | null>(
     null
@@ -69,8 +66,7 @@ export class SubscriptionPlanService {
 
       if (!plans) return;
 
-      this.monthlyPlansSignal.set(plans.filter(p => p.priceMonthly > 0));
-      this.yearlyPlansSignal.set(plans.filter(p => p.pricePerYear > 0));
+      this.subscriptionPlansSignal.set(plans);
     } else {
       this.toastHandlingService.errorGeneral();
     }

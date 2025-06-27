@@ -94,7 +94,7 @@ export class PaymentService {
     if (err.error.statusCode === StatusCode.PAYMENT_FAILED) {
       this.toastHandlingService.info(
         'Thanh toán bị hủy',
-        'Bạn đã hủy giao dịch. Không có khoản phí nào được trừ.'
+        'Bạn đã hủy giao dịch. Không có khoản phí nào bị trừ.'
       );
     } else {
       this.toastHandlingService.errorGeneral();

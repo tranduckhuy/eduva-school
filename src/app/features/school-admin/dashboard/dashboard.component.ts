@@ -1,10 +1,21 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+
+import { PaymentService } from '../../../shared/services/api/payment/payment.service';
 
 import { StatCardComponent } from './stat-card/stat-card.component';
 import { UserRegistrationTrendComponent } from './user-registration-trend/user-registration-trend.component';
 import { LessonCreationComponent } from './lesson-creation/lesson-creation.component';
 import { RevenueTrendComponent } from './revenue-trend/revenue-trend.component';
 import { TopActiveSchoolsComponent } from './top-active-schools/top-active-schools.component';
+
+import { type ConfirmPaymentReturnRequest } from '../../../shared/models/api/request/confirm-payment-return-request.model';
 
 interface StatCard {
   title: string;
@@ -37,7 +48,10 @@ interface SubItem {
   styleUrl: './dashboard.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
+  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly paymentService = inject(PaymentService);
+
   usersStatCard = signal<StatCard>({
     title: 'Người dùng',
     description: 'Số lượng người dùng',
@@ -85,4 +99,19 @@ export class DashboardComponent {
     isRevenue: true,
     iconColor: 'text-warning',
   });
+
+  ngOnInit(): void {
+    this.activatedRoute.queryParams.subscribe(params => {
+      const { code, id, status, orderCode } = params;
+      if (code && id && status && orderCode) {
+        const confirmRequest: ConfirmPaymentReturnRequest = {
+          code,
+          id,
+          status,
+          orderCode: +orderCode,
+        };
+        this.paymentService.confirmPaymentReturn(confirmRequest).subscribe();
+      }
+    });
+  }
 }
