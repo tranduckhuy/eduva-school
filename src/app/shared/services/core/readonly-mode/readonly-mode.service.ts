@@ -8,7 +8,7 @@ export class ReadonlyModeService {
   // todo server and can not "create (POST)" or "update (PUT & DELETE)" data
   // todo Can check "boolean" from UserProfile for this logic if Backend have that field in UserProfile
 
-  private _isReadonly = signal<boolean>(false);
+  private readonly _isReadonly = signal<boolean>(false);
 
   readonly isReadonly = computed(() => this._isReadonly());
 

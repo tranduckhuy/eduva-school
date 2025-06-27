@@ -44,7 +44,7 @@ export class InformationComponent {
   });
 
   readonly settingsLink = computed(() => {
-    const role = this.user()?.roles?.[0] as UserRole | undefined;
+    const role = this.user()?.roles[0] as UserRole | undefined;
     if (!role) return '/settings';
 
     return role === UserRoles.SCHOOL_ADMIN || role === UserRoles.SYSTEM_ADMIN

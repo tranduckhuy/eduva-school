@@ -19,9 +19,9 @@ export class ReadonlyModeDirective {
   // todo Can check "boolean" from UserProfile for this logic if Backend have that field in UserProfile
   // ! Use this directive on each "Element" that you want it can not request "create (POST)" or "update (PUT & DELETE)" data
 
-  private readonlyService = inject(ReadonlyModeService);
-  private vcr = inject(ViewContainerRef);
-  private tpl = inject(TemplateRef<any>);
+  private readonly readonlyService = inject(ReadonlyModeService);
+  private readonly vcr = inject(ViewContainerRef);
+  private readonly tpl = inject(TemplateRef<any>);
 
   appReadonlyDisable = input<boolean>(false);
 

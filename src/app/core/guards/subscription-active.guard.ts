@@ -2,10 +2,7 @@ import { inject } from '@angular/core';
 import { Router, CanMatchFn } from '@angular/router';
 
 import { UserService } from '../../shared/services/api/user/user.service';
-import {
-  UserRole,
-  UserRoles,
-} from '../../shared/constants/user-roles.constant';
+import { UserRole } from '../../shared/constants/user-roles.constant';
 
 export const subscriptionActiveGuard: CanMatchFn = route => {
   const userService = inject(UserService);
