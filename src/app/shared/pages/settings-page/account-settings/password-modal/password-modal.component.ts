@@ -65,9 +65,7 @@ export class PasswordModalComponent {
   onSubmit() {
     this.form.markAllAsTouched();
 
-    if (this.form.invalid) {
-      return;
-    }
+    if (this.form.invalid) return;
 
     const request: RequestEnableDisable2FA = this.form.value;
     this.twoFactorService

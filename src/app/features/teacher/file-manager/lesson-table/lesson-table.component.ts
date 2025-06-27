@@ -34,12 +34,12 @@ export class LessonTableComponent {
 
   viewMaterials = output<Folder>();
 
+  lessons = this.folderManagementService.folderList;
+  totalRecords = this.folderManagementService.totalRecords;
+
   loading = signal<boolean>(false);
   first = signal<number>(0);
   rows = signal<number>(0);
-
-  lessons = this.folderManagementService.folderList;
-  totalRecords = this.folderManagementService.totalRecords;
 
   get maxRowsByPage() {
     return PAGE_SIZE;

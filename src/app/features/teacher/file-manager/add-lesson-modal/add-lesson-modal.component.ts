@@ -53,9 +53,7 @@ export class AddLessonModalComponent {
   onSubmit() {
     this.form.markAllAsTouched();
 
-    if (this.form.invalid) {
-      return;
-    }
+    if (this.form.invalid) return;
 
     const request: CreateFolderRequest = this.form.value;
     this.folderManagementService
