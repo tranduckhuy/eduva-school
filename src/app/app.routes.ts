@@ -1,6 +1,17 @@
 import { Routes } from '@angular/router';
 
+import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
+import { subscriptionActiveGuard } from './core/guards/subscription-active.guard';
+
+import { UserRoles } from './shared/constants/user-roles.constant';
+
 export const routes: Routes = [
+  {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'auth/login',
+  },
   {
     path: 'auth',
     loadChildren: () =>
@@ -8,6 +19,10 @@ export const routes: Routes = [
   },
   {
     path: 'teacher',
+    canMatch: [authGuard, roleGuard, subscriptionActiveGuard],
+    data: {
+      roles: [UserRoles.TEACHER, UserRoles.CONTENT_MODERATOR],
+    },
     loadChildren: () =>
       import('./features/teacher/teacher.routes').then(
         mod => mod.teacherRoutes
@@ -15,9 +30,14 @@ export const routes: Routes = [
   },
   {
     path: 'school-admin',
+    canMatch: [authGuard, roleGuard],
+    data: {
+      roles: [UserRoles.SCHOOL_ADMIN],
+    },
     loadChildren: () =>
       import('./features/school-admin/school-admin.routes').then(
         mod => mod.schoolAdminRoutes
       ),
   },
+  { path: '**', redirectTo: '' },
 ];

@@ -1,0 +1,36 @@
+<div
+  class="relative my-6 w-full rounded border border-gray-100 bg-white shadow-main dark:border-gray-900 dark:bg-dark-200">
+  <div
+    class="flex items-center gap-1 border-b border-gray-100 p-5 dark:border-gray-700">
+    <div>
+      <h2 class="text-base font-semibold">Hoạt Động Tạo Bài Học</h2>
+    </div>
+    <div class="ml-auto flex gap-2">
+      <p-select
+        [options]="timeSelectOptions()"
+        [ngModel]="timeSelect"
+        (ngModelChange)="onTimeSelectChange($event)"
+        optionLabel="name"
+        placeholder="Chọn khoảng thời gian"
+        class="!dark:bg-dark-200 flex h-11 w-full items-center sm:w-40" />
+    </div>
+  </div>
+
+  <div id="chart" class="p-5">
+    @if (chartOptions()) {
+      <apx-chart
+        [series]="chartOptions()!.series"
+        [chart]="chartOptions()!.chart"
+        [xaxis]="chartOptions()!.xaxis"
+        [yaxis]="chartOptions()!.yaxis"
+        [title]="chartOptions()!.title"
+        [tooltip]="chartOptions()!.tooltip"
+        [dataLabels]="chartOptions()!.dataLabels"
+        [plotOptions]="chartOptions()!.plotOptions"
+        [colors]="chartOptions()!.colors"
+        [fill]="chartOptions()!.fill"
+        [legend]="chartOptions()!.legend">
+      </apx-chart>
+    }
+  </div>
+</div>

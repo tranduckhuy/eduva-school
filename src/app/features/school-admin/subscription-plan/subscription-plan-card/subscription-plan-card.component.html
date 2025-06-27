@@ -1,10 +1,12 @@
 <div
   class="relative min-h-[550px] rounded border border-gray-100 bg-white p-8 shadow-main dark:border-dark-500 dark:bg-dark-200">
   <!-- ? Icon Recommend -->
-  <img
-    src="./images/icons/recommend-subscription-plan.svg"
-    alt="Most Popular"
-    class="absolute right-2 top-1 rotate-12" />
+  @if (subscriptionPlan()?.isRecommend) {
+    <img
+      src="./images/icons/recommend-subscription-plan.svg"
+      alt="Most Popular"
+      class="absolute right-2 top-1 rotate-12" />
+  }
 
   <!-- ? Toggle Switch for checkout page -->
   @if (isShowToggle()) {

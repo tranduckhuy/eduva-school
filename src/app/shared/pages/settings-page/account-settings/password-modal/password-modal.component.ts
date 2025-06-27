@@ -71,8 +71,11 @@ export class PasswordModalComponent {
     this.twoFactorService
       .requestEnableDisable2FA(request, this.modalData.enabled)
       .subscribe({
-        next: () => this.openOtpModal(),
-        error: () => this.form.reset,
+        next: () => {
+          this.closeModal();
+          this.openOtpModal();
+        },
+        error: () => this.form.reset(),
       });
   }
 

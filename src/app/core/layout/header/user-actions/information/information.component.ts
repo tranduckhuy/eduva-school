@@ -14,6 +14,11 @@ import { AuthService } from '../../../../auth/services/auth.service';
 import { UserService } from '../../../../../shared/services/api/user/user.service';
 import { ThemeService } from '../../../../../shared/services/core/theme/theme.service';
 
+import {
+  UserRole,
+  UserRoles,
+} from '../../../../../shared/constants/user-roles.constant';
+
 @Component({
   selector: 'header-information',
   standalone: true,
@@ -36,6 +41,15 @@ export class InformationComponent {
 
   readonly isDarkMode = computed(() => {
     return this.themeService.isDarkMode();
+  });
+
+  readonly settingsLink = computed(() => {
+    const role = this.user()?.roles[0] as UserRole | undefined;
+    if (!role) return '/settings';
+
+    return role === UserRoles.SCHOOL_ADMIN || role === UserRoles.SYSTEM_ADMIN
+      ? '/school-admin/settings'
+      : '/teacher/settings';
   });
 
   toggleDarkMode() {

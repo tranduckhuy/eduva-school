@@ -1,7 +1,7 @@
 import { RouterOutlet } from '@angular/router';
 import { Component, inject, OnInit } from '@angular/core';
 
-import { PageTitleService } from './shared/services/layout/page-title/page-title.service';
+import { PageTitleService } from './shared/services/core/page-title/page-title.service';
 
 import { TailwindIndicatorComponent } from './shared/components/tailwind-indicator/tailwind-indicator.component';
 import { NetworkStateComponent } from './shared/components/network-state/network-state.component';

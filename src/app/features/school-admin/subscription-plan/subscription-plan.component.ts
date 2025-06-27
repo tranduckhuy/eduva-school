@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 
 import {
   ToggleSwitch,
@@ -17,11 +16,8 @@ import {
 import { SubscriptionPlanService } from './services/subscription-plan.service';
 
 import { SubscriptionPlanCardComponent } from './subscription-plan-card/subscription-plan-card.component';
-import { PaymentService } from '../../../shared/services/api/payment/payment.service';
 
-import { type SubscriptionPlan } from '../../../shared/models/entities/subscription-plan.model';
 import { type GetSubscriptionPlanRequest } from './models/request/get-subscription-plan-request.model';
-import { type ConfirmPaymentReturnRequest } from '../../../shared/models/api/request/confirm-payment-return-request.model';
 
 @Component({
   selector: 'subscription-plan',
@@ -37,36 +33,17 @@ import { type ConfirmPaymentReturnRequest } from '../../../shared/models/api/req
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SubscriptionPlanComponent implements OnInit {
-  private readonly activatedRoute = inject(ActivatedRoute);
   private readonly subscriptionPlanService = inject(SubscriptionPlanService);
-  private readonly paymentService = inject(PaymentService);
 
-  monthlyPlans = this.subscriptionPlanService.monthlyPlans;
-  yearlyPlans = this.subscriptionPlanService.yearlyPlans;
+  subscriptionPlans = this.subscriptionPlanService.subscriptionPlans;
 
-  subscriptionPlans = signal<SubscriptionPlan[]>([]);
   isYearly = signal<boolean>(false);
 
   ngOnInit(): void {
     const request: GetSubscriptionPlanRequest = {
       activeOnly: true,
     };
-    this.subscriptionPlanService
-      .getSubscriptionPlans(request)
-      .subscribe(() => this.subscriptionPlans.set(this.monthlyPlans()));
-
-    this.activatedRoute.queryParams.subscribe(params => {
-      const { code, id, status, orderCode } = params;
-      if (code && id && status && orderCode) {
-        const confirmRequest: ConfirmPaymentReturnRequest = {
-          code,
-          id,
-          status,
-          orderCode: +orderCode,
-        };
-        this.paymentService.confirmPaymentReturn(confirmRequest).subscribe();
-      }
-    });
+    this.subscriptionPlanService.getSubscriptionPlans(request).subscribe();
   }
 
   getRowClass(): Record<string, boolean> {
@@ -88,10 +65,5 @@ export class SubscriptionPlanComponent implements OnInit {
 
   onToggleChange(event: ToggleSwitchChangeEvent) {
     this.isYearly.set(event.checked);
-    if (event.checked) {
-      this.subscriptionPlans.set(this.yearlyPlans());
-    } else {
-      this.subscriptionPlans.set(this.monthlyPlans());
-    }
   }
 }

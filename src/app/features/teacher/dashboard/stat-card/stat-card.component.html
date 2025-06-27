@@ -1,0 +1,48 @@
+<div
+  class="relative w-full rounded border border-gray-100 bg-white p-5 text-gray-700 shadow-main dark:border-gray-900 dark:bg-dark-200 dark:text-white">
+  <div class="flex justify-between">
+    <div>
+      <h3 class="font-semibold">{{ statCard().title }}</h3>
+      <p class="mb-4 text-xs font-medium text-[#8c9097] dark:text-dark-100">
+        {{ statCard().description }}
+      </p>
+      <p
+        class="text-[28px] font-semibold leading-none text-gray-700 dark:text-white">
+        {{
+          statCard().isRevenue
+            ? (statCard().value
+              | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN')
+            : statCard().value
+        }}
+        {{ statCard().compareValue && ' / ' + statCard().compareValue }}
+      </p>
+    </div>
+    <div class="self-end">
+      <span
+        class="material-symbols-outlined leading-non relative top-[2px] text-4xl"
+        [class]="statCard().iconColor">
+        {{ statCard().icon }}
+      </span>
+    </div>
+  </div>
+  <ng-content />
+  @if (statCard().subItems) {
+    <div class="mb-1 flex min-h-[146px] flex-col justify-center">
+      @for (subItem of statCard().subItems ?? []; track subItem.title) {
+        <div class="mt-2">
+          <div class="mb-[6px] mt-2 flex items-center justify-between">
+            <span class="font-medium">{{ subItem.title }}</span>
+            <span class="font-medium">{{ subItem.value }} </span>
+          </div>
+          <p-progressbar
+            [pTooltip]="getPercent(subItem.value) + '%'"
+            tooltipPosition="top"
+            color="#2093e7"
+            [showValue]="false"
+            valueStyleClass="custom-progress"
+            [value]="getPercent(subItem.value)" />
+        </div>
+      }
+    </div>
+  }
+</div>

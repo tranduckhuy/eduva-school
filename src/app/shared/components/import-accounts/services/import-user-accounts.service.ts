@@ -39,7 +39,7 @@ export class ImportUserAccountsService {
   // ---------------------------
 
   private handleImportResponse(res: HttpResponse<Blob>): void {
-    if (res.body) {
+    if (res.body && res.body?.size > 0) {
       // ? Import file which have errors will be returned
       this.toastHandlingService.error(
         'Dữ liệu không hợp lệ',

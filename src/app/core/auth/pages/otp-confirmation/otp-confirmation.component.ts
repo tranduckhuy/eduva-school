@@ -47,9 +47,7 @@ export class OtpConfirmationComponent {
 
   ngOnInit(): void {
     const emailParam = this.activatedRoute.snapshot.queryParamMap.get('email');
-    if (emailParam) {
-      this.email.set(emailParam);
-    }
+    this.email.set(emailParam ?? '');
 
     this.startCountdown();
 

@@ -1,0 +1,45 @@
+<div
+  class="col-5 my-6 min-h-[541px] rounded border border-gray-100 bg-white p-5 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <div class="mb-4 flex items-center justify-between">
+    <h3 class="text-base font-semibold">Trường hàng đầu</h3>
+  </div>
+
+  <p-table
+    [value]="activeSchools()"
+    [tableStyle]="{ 'min-width': '100%' }"
+    [paginator]="false"
+    [rows]="5"
+    [showCurrentPageReport]="false"
+    [loading]="loading()">
+    <ng-template pTemplate="header">
+      <tr>
+        <th scope="col" class="!w-[40%]">Tên</th>
+        <th scope="col" class="!text-center">Giáo viên</th>
+        <th scope="col" class="!text-center">Học sinh</th>
+        <th scope="col" class="!w-[25%] !text-center">Bài học</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-school let-i="rowIndex">
+      <tr class="cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-300">
+        <td>
+          <a
+            [pTooltip]="school.name"
+            tooltipPosition="top"
+            [routerLink]="['/schools', school.id]"
+            class="line-clamp-1 text-ellipsis font-medium text-primary hover:underline">
+            {{ school.name }}
+          </a>
+        </td>
+        <td class="!text-center">{{ school.teacherCount | number }}</td>
+        <td class="!text-center">{{ school.studentCount | number }}</td>
+        <td class="!text-center">
+          <a
+            [routerLink]="['/schools', school.id, 'lessons']"
+            class="!pr-2 font-medium text-primary hover:underline">
+            {{ school.lessonCount | number }}
+          </a>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

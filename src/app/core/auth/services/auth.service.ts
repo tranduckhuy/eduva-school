@@ -11,6 +11,7 @@ import { UserService } from '../../../shared/services/api/user/user.service';
 import { EmailVerificationService } from './email-verification.service';
 import { RequestService } from '../../../shared/services/core/request/request.service';
 import { ToastHandlingService } from '../../../shared/services/core/toast/toast-handling.service';
+import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
 
 import { StatusCode } from '../../../shared/constants/status-code.constant';
 import { UserRole } from '../../../shared/constants/user-roles.constant';
@@ -30,6 +31,7 @@ export class AuthService {
   private readonly emailVerificationService = inject(EmailVerificationService);
   private readonly requestService = inject(RequestService);
   private readonly toastHandlingService = inject(ToastHandlingService);
+  private readonly globalModalService = inject(GlobalModalService);
 
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly LOGIN_API_URL = `${this.BASE_API_URL}/auth/login`;
@@ -93,7 +95,19 @@ export class AuthService {
   logout(): Observable<void> {
     return this.requestService.post(this.LOGOUT_API_URL).pipe(
       tap(() => {
+        // ? Clear user profile cache
         this.clearSession();
+
+        // ? Clear state cache
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('accordion-open:')) {
+            localStorage.removeItem(key);
+          }
+        });
+
+        // ? Close modal
+        this.globalModalService.close();
+
         this.router.navigateByUrl('/auth/login', { replaceUrl: true });
       }),
       map(() => void 0),
