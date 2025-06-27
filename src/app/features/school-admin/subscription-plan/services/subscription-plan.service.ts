@@ -12,7 +12,6 @@ import { StatusCode } from '../../../../shared/constants/status-code.constant';
 import { type SubscriptionPlan } from '../../../../shared/models/entities/subscription-plan.model';
 import { type GetSubscriptionPlanRequest } from '../models/request/get-subscription-plan-request.model';
 import { type GetSubscriptionPlanResponse } from '../models/response/get-subscription-plan-response.model';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',

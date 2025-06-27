@@ -22,7 +22,6 @@ import { PaymentService } from '../../../../shared/services/api/payment/payment.
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 import { SubscriptionPlanCardComponent } from '../subscription-plan-card/subscription-plan-card.component';
 
-import { type SubscriptionPlan } from '../../../../shared/models/entities/subscription-plan.model';
 import { type CreateSchoolRequest } from '../../../../shared/models/api/request/create-school-request.model';
 import { RefreshTokenRequest } from '../../../../core/auth/models/request/refresh-token-request.model';
 import {
