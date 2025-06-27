@@ -13,6 +13,7 @@ import { DatePipe, registerLocaleData } from '@angular/common';
 import localeVi from '@angular/common/locales/vi';
 import { TooltipModule } from 'primeng/tooltip';
 import { RouterLink } from '@angular/router';
+import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 
 interface Owner {
   name: string;
@@ -53,6 +54,7 @@ registerLocaleData(localeVi);
     FileDurationFormatPipe,
     DatePipe,
     RouterLink,
+    SearchInputComponent,
   ],
   templateUrl: './moderate-lessons.component.html',
   styleUrl: './moderate-lessons.component.css',
