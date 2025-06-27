@@ -1,5 +1,8 @@
 import { Routes } from '@angular/router';
 
+import { redirectAuthenticatedGuard } from '../guards/redirect-authenticated.guard';
+import { requireQueryParamsGuard } from '../guards/required-params.guard';
+
 export const authRoutes: Routes = [
   {
     path: '',
@@ -10,6 +13,7 @@ export const authRoutes: Routes = [
     children: [
       {
         path: 'login',
+        canMatch: [redirectAuthenticatedGuard],
         loadComponent: () =>
           import('./pages/login/login.component').then(
             mod => mod.LoginComponent
@@ -24,6 +28,7 @@ export const authRoutes: Routes = [
       },
       {
         path: 'reset-password',
+        canMatch: [requireQueryParamsGuard(['token', 'email'])],
         loadComponent: () =>
           import('./pages/reset-password/reset-password.component').then(
             mod => mod.ResetPasswordComponent
@@ -31,6 +36,10 @@ export const authRoutes: Routes = [
       },
       {
         path: 'otp-confirmation',
+        canMatch: [
+          redirectAuthenticatedGuard,
+          requireQueryParamsGuard(['email']),
+        ],
         loadComponent: () =>
           import('./pages/otp-confirmation/otp-confirmation.component').then(
             mod => mod.OtpConfirmationComponent
