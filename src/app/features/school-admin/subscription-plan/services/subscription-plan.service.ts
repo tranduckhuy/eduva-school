@@ -31,7 +31,7 @@ export class SubscriptionPlanService {
   );
   subscriptionPlan = this.subscriptionPlanSignal.asReadonly();
 
-  getSubscriptionPlans(
+  getAllPlans(
     request: GetSubscriptionPlanRequest
   ): Observable<GetSubscriptionPlanResponse | null> {
     return this.requestService
@@ -40,61 +40,47 @@ export class SubscriptionPlanService {
         request
       )
       .pipe(
-        tap(res => this.handleGetSubscriptionPlansResponse(res)),
-        map(res => this.extractSubscriptionFromResponse(res)),
-        catchError(() => this.handleGetSubscriptionPlanError())
+        tap(res => this.handleListResponse(res)),
+        map(res => this.handleExtractList(res)),
+        catchError(() => this.handleError())
       );
   }
 
-  getSubscriptionPlan(id: number): Observable<SubscriptionPlan | null> {
+  getPlanById(id: number): Observable<SubscriptionPlan | null> {
     return this.requestService
       .get<SubscriptionPlan>(`${this.GET_SUBSCRIPTION_PLAN_API_URL}/${id}`)
       .pipe(
-        tap(res => this.handleGetSingleSubscriptionPlanResponse(res)),
+        tap(res => this.handleSingleResponse(res)),
         map(res => res.data!),
-        catchError(() => this.handleGetSubscriptionPlanError())
+        catchError(() => this.handleError())
       );
   }
 
   // ---------------------------
-  //  Private Helper Functions
+  //  Private Handlers
   // ---------------------------
 
-  private handleGetSubscriptionPlansResponse(res: any): void {
-    if (res.statusCode === StatusCode.SUCCESS && res.data) {
-      const plans = res.data.data as SubscriptionPlan[];
-
-      if (!plans) return;
-
-      this.subscriptionPlansSignal.set(plans);
+  private handleListResponse(res: any): void {
+    if (res.statusCode === StatusCode.SUCCESS && res.data?.data) {
+      this.subscriptionPlansSignal.set(res.data.data);
     } else {
       this.toastHandlingService.errorGeneral();
     }
   }
 
-  private handleGetSingleSubscriptionPlanResponse(res: any): void {
+  private handleSingleResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS && res.data) {
-      const plan = res.data as SubscriptionPlan;
-
-      if (!plan) return;
-
-      this.subscriptionPlanSignal.set(plan);
+      this.subscriptionPlanSignal.set(res.data);
     } else {
       this.toastHandlingService.errorGeneral();
     }
   }
 
-  private extractSubscriptionFromResponse(
-    res: any
-  ): GetSubscriptionPlanResponse | null {
-    if (res.statusCode === StatusCode.SUCCESS && res.data) {
-      return res.data;
-    } else {
-      return null;
-    }
+  private handleExtractList(res: any): GetSubscriptionPlanResponse | null {
+    return res.statusCode === StatusCode.SUCCESS && res.data ? res.data : null;
   }
 
-  private handleGetSubscriptionPlanError(): Observable<never> {
+  private handleError(): Observable<never> {
     this.toastHandlingService.errorGeneral();
     return EMPTY;
   }

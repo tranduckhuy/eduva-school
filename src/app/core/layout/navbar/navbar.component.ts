@@ -1,6 +1,8 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
+  OnInit,
   inject,
   input,
   output,
@@ -40,8 +42,9 @@ type NavbarConfig = {
   styleUrl: './navbar.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly userService = inject(UserService);
 
   isSidebarCollapsed = input();
@@ -50,7 +53,7 @@ export class NavbarComponent {
 
   navConfigs: NavbarConfig[] = [];
 
-  constructor() {
+  ngOnInit(): void {
     const user = this.userService.currentUser();
     const userRole = user?.roles?.[0] as UserRole;
     this.navConfigs = this.getNavbarConfigByRole(userRole);
@@ -63,9 +66,27 @@ export class NavbarComponent {
       .subscribe((event: NavigationEnd) => {
         this.setActiveNavItems(event.urlAfterRedirects);
       });
+  }
 
-    // Initial load
-    this.setActiveNavItems(this.router.url);
+  private setActiveNavItems(url: string) {
+    const path = url.split('?')[0]; // ? Just get path name
+
+    this.navConfigs.forEach(section => {
+      section.navItems.forEach(item => {
+        // ? Match exact main nav item by path only
+        item.isActive = item.link === path;
+
+        // ? Reset and re-check submenu
+        item.submenuItems.forEach(sub => {
+          sub.active = sub.link === path;
+          if (sub.active) {
+            item.isActive = true; // ? If submenu is active, parent is also active
+          }
+        });
+      });
+    });
+
+    this.cdr.markForCheck();
   }
 
   private getNavbarConfigByRole(role: UserRole): NavbarConfig[] {
@@ -196,22 +217,5 @@ export class NavbarComponent {
         ],
       },
     ];
-  }
-
-  private setActiveNavItems(url: string) {
-    this.navConfigs.forEach(section => {
-      section.navItems.forEach(item => {
-        // ? Match exact main nav item
-        item.isActive = item.link === url;
-
-        // ? Reset and re-check submenu
-        item.submenuItems.forEach(sub => {
-          sub.active = sub.link === url;
-          if (sub.active) {
-            item.isActive = true; // ? if submenu is active, parent is also active
-          }
-        });
-      });
-    });
   }
 }

@@ -43,7 +43,7 @@ export class SubscriptionPlanComponent implements OnInit {
     const request: GetSubscriptionPlanRequest = {
       activeOnly: true,
     };
-    this.subscriptionPlanService.getSubscriptionPlans(request).subscribe();
+    this.subscriptionPlanService.getAllPlans(request).subscribe();
   }
 
   getRowClass(): Record<string, boolean> {

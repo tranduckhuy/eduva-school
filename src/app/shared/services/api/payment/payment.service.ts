@@ -82,7 +82,7 @@ export class PaymentService {
         'Thanh toán thành công',
         'Cảm ơn bạn đã tin tưởng sử dụng hệ thống EDUVA. Chúc bạn có trải nghiệm dạy và học thật hiệu quả!'
       );
-      this.updateTokenAfterConfirm();
+      this.refreshTokenAfterConfirm();
     } else {
       this.toastHandlingService.errorGeneral();
     }
@@ -111,7 +111,7 @@ export class PaymentService {
     return null;
   }
 
-  private updateTokenAfterConfirm() {
+  private refreshTokenAfterConfirm() {
     const accessToken = this.jwtService.getAccessToken();
     const refreshToken = this.jwtService.getRefreshToken();
     if (accessToken && refreshToken) {
