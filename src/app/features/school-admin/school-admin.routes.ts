@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { PricingComponent } from './pricing/pricing.component';
 
 export const schoolAdminRoutes: Routes = [
   {
@@ -37,6 +36,24 @@ export const schoolAdminRoutes: Routes = [
           ),
       },
       {
+        path: 'subscription-plans',
+        loadComponent: () =>
+          import('./subscription-plan/subscription-plan.component').then(
+            mod => mod.SubscriptionPlanComponent
+          ),
+      },
+      {
+        path: 'add-school-information/:subscriptionId',
+        data: {
+          heading: 'Thanh toán',
+          breadcrumb: 'Thanh toán',
+        },
+        loadComponent: () =>
+          import(
+            './subscription-plan/add-school-information/add-school-information.component'
+          ).then(mod => mod.AddSchoolInformationComponent),
+      },
+      {
         path: 'settings',
         data: {
           breadcrumb: 'Cài đặt',
@@ -58,11 +75,6 @@ export const schoolAdminRoutes: Routes = [
       import('../../core/layout/blank-layout/blank-layout.component').then(
         mod => mod.BlankLayoutComponent
       ),
-    children: [
-      {
-        path: 'pricing',
-        component: PricingComponent,
-      },
-    ],
+    children: [],
   },
 ];

@@ -12,7 +12,7 @@ export interface LessonMaterialRequest {
 }
 
 export interface LessonMaterialsRequest {
-  folderId: number;
+  folderId: string;
   blobNames: string[];
   lessonMaterials: LessonMaterialRequest[];
 }

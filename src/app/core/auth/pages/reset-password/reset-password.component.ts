@@ -69,9 +69,7 @@ export class ResetPasswordComponent implements OnInit {
     this.submitted.set(true);
     this.form.markAllAsTouched();
 
-    if (this.form.invalid) {
-      return;
-    }
+    if (this.form.invalid) return;
 
     const request: ResetPasswordRequest = {
       email: this.email(),
