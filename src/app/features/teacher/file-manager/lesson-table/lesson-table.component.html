@@ -25,7 +25,6 @@
         <app-table-skeleton [tableHead]="tableHeadSkeleton()" />
       } @else {
         <p-table
-          #dt
           [tableStyle]="{ 'min-width': '50rem' }"
           [paginator]="true"
           [lazy]="true"
@@ -35,11 +34,12 @@
           [rows]="pageSize()"
           [first]="firstRecordIndex()"
           [value]="folders()"
+          [paginator]="folders().length > 0"
           [totalRecords]="totalRecords()"
           (onLazyLoad)="onLazyLoadLessons($event)"
           currentPageReportTemplate="
-        Hiển thị {first} đến {last} trên {totalRecords} bài học
-      ">
+            Hiển thị {first} đến {last} trên {totalRecords} bài học
+          ">
           <ng-template #header>
             <tr>
               <th scope="col" class="!min-w-[300px]" pFrozenColumn>
@@ -59,9 +59,9 @@
                 <div
                   (click)="goToFolderMaterials(lesson.id)"
                   class="group flex cursor-pointer select-none items-center gap-2">
-                  <i class="material-symbols-outlined text-warning-500"
-                    >folder</i
-                  >
+                  <i class="material-symbols-outlined text-warning-500">
+                    folder
+                  </i>
                   <span class="transition-colors group-hover:text-primary">
                     {{ lesson.name }}
                   </span>
@@ -98,6 +98,16 @@
                     delete
                   </app-button>
                 </div>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template #emptymessage>
+            <tr>
+              <td colspan="100%">
+                <app-table-empty-state
+                  icon="folder_off"
+                  title="Không có thư mục nào"
+                  subtitle="Hãy thêm mới thư mục để bắt đầu quản lý nội dung bài học." />
               </td>
             </tr>
           </ng-template>

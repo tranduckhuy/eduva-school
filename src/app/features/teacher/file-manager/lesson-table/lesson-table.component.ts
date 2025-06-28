@@ -23,6 +23,7 @@ import { GetFoldersRequest } from '../../../../shared/models/api/request/query/g
 import { AddLessonModalComponent } from '../add-lesson-modal/add-lesson-modal.component';
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
 import { TableSkeletonComponent } from '../../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
+import { TableEmptyStateComponent } from '../../../../shared/components/table-empty-state/table-empty-state.component';
 
 @Component({
   selector: 'lesson-table',
@@ -35,6 +36,7 @@ import { TableSkeletonComponent } from '../../../../shared/components/skeleton/t
     ButtonComponent,
     SearchInputComponent,
     TableSkeletonComponent,
+    TableEmptyStateComponent,
   ],
   templateUrl: './lesson-table.component.html',
   styleUrl: './lesson-table.component.css',

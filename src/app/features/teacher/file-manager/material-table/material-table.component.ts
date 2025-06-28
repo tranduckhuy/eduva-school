@@ -23,6 +23,7 @@ import { FileTypeFilterComponent } from '../file-type-filter/file-type-filter.co
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
 import { AddFileModalComponent } from '../add-file-modal/add-file-modal.component';
 import { TableSkeletonComponent } from '../../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
+import { TableEmptyStateComponent } from '../../../../shared/components/table-empty-state/table-empty-state.component';
 import {
   BadgeComponent,
   BadgeVariant,
@@ -51,6 +52,7 @@ import { type GetLessonMaterialsRequest } from '../../../../shared/models/api/re
     FileTypeFilterComponent,
     SearchInputComponent,
     TableSkeletonComponent,
+    TableEmptyStateComponent,
   ],
   templateUrl: './material-table.component.html',
   styleUrl: './material-table.component.css',

@@ -48,6 +48,7 @@
             [rows]="pageSize()"
             [first]="firstRecordIndex()"
             [value]="materials()"
+            [paginator]="materials().length > 0"
             [totalRecords]="totalRecords()"
             (onLazyLoad)="onLazyLoad($event)"
             currentPageReportTemplate="
@@ -148,6 +149,16 @@
                       delete
                     </app-button>
                   </div>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+              <tr>
+                <td colspan="100%">
+                  <app-table-empty-state
+                    icon="folder_off"
+                    title="Không có tài liệu nào"
+                    subtitle="Hãy thêm mới tài liệu để bắt đầu quản lý nội dung bài học." />
                 </td>
               </tr>
             </ng-template>
