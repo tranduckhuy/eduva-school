@@ -1,0 +1,29 @@
+<div class="mx-auto mt-4 flex w-[95%] flex-col">
+  <!-- ? Image and Name -->
+  <figure class="relative h-60 w-full rounded-xl">
+    <img
+      src="https://gstatic.com/classroom/themes/img_code.jpg"
+      alt=""
+      class="h-full w-full rounded-xl object-cover" />
+    <div class="absolute right-3 top-3 z-[1]">
+      <p-button
+        label="Chỉnh sửa"
+        icon="pi pi-pencil"
+        size="small"
+        severity="secondary"
+        styleClass="!text-primary"
+        [raised]="true"
+        [rounded]="true" />
+    </div>
+    <div class="absolute bottom-5 left-5 z-[1] flex flex-col gap-1">
+      <h3 class="line-clamp-1 text-3xl font-medium text-white">
+        Địa lý lớp 10
+      </h3>
+      <p class="line-clamp-1 text-base text-white">Trường THPT Tran Cao Van</p>
+    </div>
+  </figure>
+  <!-- ? Information -->
+  <div class="e-container-fluid mt-8 grow px-0">
+    <class-overview />
+  </div>
+</div>
