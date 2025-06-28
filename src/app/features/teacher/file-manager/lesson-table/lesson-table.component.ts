@@ -3,7 +3,6 @@ import {
   Component,
   OnInit,
   inject,
-  input,
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';

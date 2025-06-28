@@ -19,7 +19,7 @@ export const routes: Routes = [
   },
   {
     path: 'teacher',
-    canMatch: [authGuard, roleGuard],
+    canMatch: [authGuard, roleGuard, subscriptionActiveGuard],
     data: {
       roles: [UserRoles.TEACHER, UserRoles.CONTENT_MODERATOR],
     },

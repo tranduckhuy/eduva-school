@@ -23,7 +23,7 @@ import { debounceSignal } from '../../utils/util-functions';
 export class SearchInputComponent {
   private readonly destroyRef = inject(DestroyRef);
 
-  private destroyDebounce: () => void;
+  private readonly destroyDebounce: () => void;
 
   placeholder = input<string>('Tìm kiếm...');
   customClasses = input<string>('');

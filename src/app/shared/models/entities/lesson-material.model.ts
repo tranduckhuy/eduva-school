@@ -1,6 +1,6 @@
 import { EntityStatus } from '../enum/entity-status.enum';
-import { ContentType } from '../enum/lesson-material.enum';
 import {
+  ContentType,
   LessonMaterialStatus,
   LessonMaterialVisibility,
 } from '../enum/lesson-material.enum';
