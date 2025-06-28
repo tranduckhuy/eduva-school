@@ -28,7 +28,7 @@ import { isFormFieldMismatch } from '../../../utils/util-functions';
 import { FormControlComponent } from '../../../components/form-control/form-control.component';
 import { PasswordModalComponent } from './password-modal/password-modal.component';
 
-import { type ChangePasswordRequest } from '../../../models/api/request/change-password-request.model';
+import { type ChangePasswordRequest } from '../../../models/api/request/command/change-password-request.model';
 
 @Component({
   selector: 'app-account-settings',

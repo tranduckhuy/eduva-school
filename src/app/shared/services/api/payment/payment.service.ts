@@ -12,9 +12,9 @@ import { ToastHandlingService } from '../../core/toast/toast-handling.service';
 
 import { StatusCode } from '../../../constants/status-code.constant';
 
-import { type CreatePlanPaymentLinkRequest } from '../../../models/api/request/create-plan-payment-link-request.model';
-import { type CreatePlanPaymentLinkResponse } from '../../../models/api/response/create-plan-payment-link-response.model';
-import { type ConfirmPaymentReturnRequest } from '../../../models/api/request/confirm-payment-return-request.model';
+import { type CreatePlanPaymentLinkRequest } from '../../../models/api/request/command/create-plan-payment-link-request.model';
+import { type CreatePlanPaymentLinkResponse } from '../../../models/api/response/command/create-plan-payment-link-response.model';
+import { type ConfirmPaymentReturnRequest } from '../../../models/api/request/query/confirm-payment-return-request.model';
 import { type RefreshTokenRequest } from '../../../../core/auth/models/request/refresh-token-request.model';
 
 @Injectable({

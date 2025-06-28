@@ -12,7 +12,7 @@ import { StatusCode } from '../../../shared/constants/status-code.constant';
 
 import { type EmailLinkRequest } from '../models/request/email-link-request.model';
 import { type ResetPasswordRequest } from '../pages/reset-password/models/reset-password-request.model';
-import { type ChangePasswordRequest } from '../../../shared/models/api/request/change-password-request.model';
+import { type ChangePasswordRequest } from '../../../shared/models/api/request/command/change-password-request.model';
 
 @Injectable({
   providedIn: 'root',

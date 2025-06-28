@@ -13,7 +13,7 @@ import { ToastHandlingService } from '../../../../shared/services/core/toast/toa
 import { StatusCode } from '../../../../shared/constants/status-code.constant';
 import { BYPASS_AUTH } from '../../../tokens/context/http-context.token';
 
-import { type FileStorageResponse } from '../../../../shared/models/api/response/file-storage-response.model';
+import { type FileStorageResponse } from '../../../models/api/response/command/file-storage-response.model';
 
 @Injectable({
   providedIn: 'root',

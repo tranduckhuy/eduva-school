@@ -1,4 +1,4 @@
-import { FolderOwnerType } from '../../enum/folder-owner-type.enum';
+import { FolderOwnerType } from '../../../enum/folder-owner-type.enum';
 
 export interface GetFoldersRequest {
   name?: string;

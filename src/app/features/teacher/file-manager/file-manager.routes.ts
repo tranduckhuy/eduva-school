@@ -9,6 +9,22 @@ export const fileManagerRoutes: Routes = [
     },
     loadComponent: () =>
       import('./my-drive/my-drive.component').then(mod => mod.MyDriveComponent),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./lesson-table/lesson-table.component').then(
+            mod => mod.LessonTableComponent
+          ),
+      },
+      {
+        path: ':lessonId/materials',
+        loadComponent: () =>
+          import('./material-table/material-table.component').then(
+            mod => mod.MaterialTableComponent
+          ),
+      },
+    ],
   },
   {
     path: 'recent',

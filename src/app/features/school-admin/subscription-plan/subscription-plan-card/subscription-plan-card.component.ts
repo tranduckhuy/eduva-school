@@ -27,7 +27,7 @@ import { type SubscriptionPlan } from '../../../../shared/models/entities/subscr
 import {
   BillingCycle,
   CreatePlanPaymentLinkRequest,
-} from '../../../../shared/models/api/request/create-plan-payment-link-request.model';
+} from '../../../../shared/models/api/request/command/create-plan-payment-link-request.model';
 
 @Component({
   selector: 'subscription-plan-card',

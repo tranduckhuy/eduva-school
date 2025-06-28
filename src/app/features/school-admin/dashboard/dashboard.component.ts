@@ -15,7 +15,7 @@ import { LessonCreationComponent } from './lesson-creation/lesson-creation.compo
 import { RevenueTrendComponent } from './revenue-trend/revenue-trend.component';
 import { TopActiveSchoolsComponent } from './top-active-schools/top-active-schools.component';
 
-import { type ConfirmPaymentReturnRequest } from '../../../shared/models/api/request/confirm-payment-return-request.model';
+import { type ConfirmPaymentReturnRequest } from '../../../shared/models/api/request/query/confirm-payment-return-request.model';
 
 interface StatCard {
   title: string;

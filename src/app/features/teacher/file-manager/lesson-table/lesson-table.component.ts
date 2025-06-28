@@ -1,63 +1,124 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   inject,
   input,
-  output,
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { TooltipModule } from 'primeng/tooltip';
 import { TableModule, TableLazyLoadEvent } from 'primeng/table';
+import { InputTextModule } from 'primeng/inputtext';
 
-import { type Folder } from '../../../../shared/models/entities/folder.model';
+import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 
 import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
 
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { FolderManagementService } from '../../../../shared/services/api/folder/folder-management.service';
-import { GetFoldersRequest } from '../../../../shared/models/api/request/get-folders-request.model';
+import { GetFoldersRequest } from '../../../../shared/models/api/request/query/get-folders-request.model';
+import { AddLessonModalComponent } from '../add-lesson-modal/add-lesson-modal.component';
+import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
+import { TableSkeletonComponent } from '../../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 
 @Component({
   selector: 'lesson-table',
   standalone: true,
-  imports: [DatePipe, TooltipModule, TableModule, ButtonComponent],
+  imports: [
+    InputTextModule,
+    DatePipe,
+    TooltipModule,
+    TableModule,
+    ButtonComponent,
+    SearchInputComponent,
+    TableSkeletonComponent,
+  ],
   templateUrl: './lesson-table.component.html',
   styleUrl: './lesson-table.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LessonTableComponent {
-  private readonly folderManagementService = inject(FolderManagementService);
+export class LessonTableComponent implements OnInit {
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly modalService = inject(GlobalModalService);
+  private readonly folderService = inject(FolderManagementService);
 
-  searchValue = input<string>();
+  folders = this.folderService.folderList;
+  totalRecords = this.folderService.totalRecords;
 
-  viewMaterials = output<Folder>();
+  isLoading = signal(false);
+  currentPage = signal(1);
+  pageSize = signal(PAGE_SIZE);
+  firstRecordIndex = signal(0);
+  searchValue = signal('');
 
-  lessons = this.folderManagementService.folderList;
-  totalRecords = this.folderManagementService.totalRecords;
+  tableHeadSkeleton = signal([
+    'Thư mục bài học',
+    'Người sở hữu',
+    'Lần sửa đổi cuối cùng',
+    'Kích thước tệp',
+    'Hành động',
+  ]);
 
-  loading = signal<boolean>(false);
-  first = signal<number>(0);
-  rows = signal<number>(0);
+  ngOnInit(): void {
+    this.route.queryParamMap.subscribe(params => {
+      const page = Number(params.get('page'));
+      const size = Number(params.get('pageSize'));
 
-  get maxRowsByPage() {
-    return PAGE_SIZE;
-  }
+      this.currentPage.set(!isNaN(page) && page > 0 ? page : 1);
+      this.pageSize.set(!isNaN(size) && size > 0 ? size : PAGE_SIZE);
 
-  loadLessonsLazy(event: TableLazyLoadEvent) {
-    const rows = event.rows ?? this.maxRowsByPage;
-    const first = event.first ?? 0;
-    const page = first / rows;
-    const request: GetFoldersRequest = {
-      name: this.searchValue() ?? '',
-      pageIndex: page + 1,
-      pageSize: this.maxRowsByPage,
-    };
-    this.folderManagementService.getPersonalFolders(request).subscribe(() => {
-      this.loading.set(false);
+      const firstIndex = (this.currentPage() - 1) * this.pageSize();
+      this.firstRecordIndex.set(firstIndex);
+
+      this.loadFolders();
     });
   }
 
-  onSearchTriggered(term: string) {}
+  onSearch(value: string): void {
+    this.searchValue.set(value);
+    this.currentPage.set(1);
+    this.firstRecordIndex.set(0);
+
+    this.loadFolders();
+  }
+
+  onLazyLoadLessons(event: TableLazyLoadEvent): void {
+    const rows = event.rows ?? this.pageSize();
+    const first = event.first ?? 0;
+    const page = Math.floor(first / rows) + 1;
+
+    this.currentPage.set(page);
+    this.pageSize.set(rows);
+    this.firstRecordIndex.set(first);
+
+    this.loadFolders();
+  }
+
+  private loadFolders(): void {
+    const request: GetFoldersRequest = {
+      name: this.searchValue(),
+      pageIndex: this.currentPage(),
+      pageSize: this.pageSize(),
+    };
+
+    this.folderService.getPersonalFolders(request).subscribe();
+  }
+
+  openAddFolderModal(): void {
+    this.modalService.open(AddLessonModalComponent);
+  }
+
+  goToFolderMaterials(folderId: string): void {
+    this.router.navigate([folderId, 'materials'], {
+      relativeTo: this.route,
+      queryParams: {
+        page: this.currentPage(),
+        pageSize: this.pageSize(),
+      },
+    });
+  }
 }

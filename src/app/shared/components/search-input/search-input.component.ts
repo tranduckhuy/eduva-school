@@ -1,13 +1,16 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
+  inject,
   input,
-  OnInit,
   output,
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
+import { debounceSignal } from '../../utils/util-functions';
 
 @Component({
   selector: 'app-search-input',
@@ -17,19 +20,27 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './search-input.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SearchInputComponent implements OnInit {
+export class SearchInputComponent {
+  private readonly destroyRef = inject(DestroyRef);
+
+  private destroyDebounce: () => void;
+
   placeholder = input<string>('Tìm kiếm...');
-  initialSearchTerm = input<string>('');
   customClasses = input<string>('');
+
   search = output<string>();
 
   searchTerm = signal<string>('');
 
-  ngOnInit() {
-    this.searchTerm.set(this.initialSearchTerm());
-  }
+  constructor() {
+    this.destroyDebounce = debounceSignal(
+      this.searchTerm,
+      value => {
+        this.search.emit(value);
+      },
+      300
+    );
 
-  onSearch(): void {
-    this.search.emit(this.searchTerm());
+    this.destroyRef.onDestroy(() => this.destroyDebounce());
   }
 }

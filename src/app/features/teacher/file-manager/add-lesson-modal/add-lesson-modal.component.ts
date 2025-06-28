@@ -13,7 +13,7 @@ import { LoadingService } from '../../../../shared/services/core/loading/loading
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 import { FolderManagementService } from '../../../../shared/services/api/folder/folder-management.service';
 
-import { type CreateFolderRequest } from '../../../../shared/models/api/request/create-folder-request.model';
+import { type CreateFolderRequest } from '../../../../shared/models/api/request/command/create-folder-request.model';
 
 @Component({
   selector: 'app-add-lesson-modal',
