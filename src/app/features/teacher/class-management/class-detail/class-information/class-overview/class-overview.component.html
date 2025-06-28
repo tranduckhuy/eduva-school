@@ -1,0 +1,179 @@
+<div class="e-row">
+  <div class="e-col-2">
+    <div class="flex h-full flex-col">
+      <div
+        class="flex h-[100px] flex-col justify-between rounded-md border border-[#dadce0] p-3 pr-1">
+        <p-confirmpopup key="popup" />
+        <div class="flex items-center justify-between">
+          <p class="font-semibold">Mã lớp học</p>
+          <p-button
+            variant="text"
+            styleClass="opacity-70 hover:opacity-100 transition-opacity duration-200"
+            (onClick)="confirmRefresh($event)">
+            <ng-template #icon>
+              <span class="pi pi-refresh" style="font-size: 16px"></span>
+            </ng-template>
+          </p-button>
+        </div>
+        <div class="flex items-center gap-1">
+          <p class="text-xl font-semibold text-primary">ttlqr7vy</p>
+          <p-button variant="text">
+            <ng-template #icon>
+              <span
+                class="pi pi-clipboard text-primary"
+                style="font-size: 18px"></span>
+            </ng-template>
+          </p-button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="e-col-10">
+    <!-- ? Heading -->
+    <!-- <div class="card flex items-center justify-between rounded-lg p-5">
+          <div>
+            <p class="font-semibold">Giáo viên: Trần Ngọc Sang</p>
+            <p class="mt-2 italic text-gray-500">
+              Tổng số bài học: 2 · Tổng số tài liệu: 8
+            </p>
+          </div>
+          <p-button
+            label="Thêm bài giảng"
+            icon="pi pi-plus"
+            variant="outlined"
+            size="small" />
+        </div> -->
+    <!-- ? Lesson List -->
+    <!-- <div class="mt-4">
+          <p-accordion [multiple]="true">
+            <p-accordion-panel value="0">
+              <p-accordion-header>Bài giảng Địa Lý lớp 10</p-accordion-header>
+              <p-accordion-content>
+                <ul class="pl-3">
+                  <li class="material-item">
+                    <a href="" class="flex w-full items-center gap-3">
+                      <span class="icon-wrapper bg-purple-100">
+                        <i
+                          class="material-symbols-outlined text-[20px] text-purple">
+                          movie
+                        </i>
+                      </span>
+                      Bài 1: Khoáng sản và địa chất tại Việt Nam
+                    </a>
+                  </li>
+                  <li class="material-item">
+                    <a href="" class="flex w-full items-center gap-3">
+                      <span class="icon-wrapper bg-green-100">
+                        <i
+                          class="material-symbols-outlined text-[20px] text-green-500">
+                          volume_up
+                        </i>
+                      </span>
+                      Bài 2: Khoáng sản và địa chất tại Việt Nam
+                    </a>
+                  </li>
+                  <li class="material-item">
+                    <a href="" class="flex w-full items-center gap-3">
+                      <span class="icon-wrapper bg-primary-100">
+                        <i
+                          class="material-symbols-outlined text-[20px] text-primary">
+                          docs
+                        </i>
+                      </span>
+                      Bài 3: Khoáng sản và địa chất tại Việt Nam
+                    </a>
+                  </li>
+                  <li class="material-item">
+                    <a href="" class="flex w-full items-center gap-3">
+                      <span class="icon-wrapper bg-orange-100">
+                        <i
+                          class="material-symbols-outlined text-[20px] text-orange">
+                          picture_as_pdf
+                        </i>
+                      </span>
+                      Bài 4: Khoáng sản và địa chất tại Việt Nam
+                    </a>
+                  </li>
+                </ul>
+              </p-accordion-content>
+            </p-accordion-panel>
+
+            <p-accordion-panel value="1">
+              <p-accordion-header>Bài giảng Địa Lý lớp 11</p-accordion-header>
+              <p-accordion-content>
+                <ul class="pl-3">
+                  <li class="material-item">
+                    <a href="" class="flex w-full items-center gap-3">
+                      <span class="icon-wrapper bg-purple-100">
+                        <i
+                          class="material-symbols-outlined text-[20px] text-purple">
+                          movie
+                        </i>
+                      </span>
+                      Bài 1: Khoáng sản và địa chất tại Việt Nam
+                    </a>
+                  </li>
+                  <li class="material-item">
+                    <a href="" class="flex w-full items-center gap-3">
+                      <span class="icon-wrapper bg-green-100">
+                        <i
+                          class="material-symbols-outlined text-[20px] text-green-500">
+                          volume_up
+                        </i>
+                      </span>
+                      Bài 2: Khoáng sản và địa chất tại Việt Nam
+                    </a>
+                  </li>
+                  <li class="material-item">
+                    <a href="" class="flex w-full items-center gap-3">
+                      <span class="icon-wrapper bg-primary-100">
+                        <i
+                          class="material-symbols-outlined text-[20px] text-primary">
+                          docs
+                        </i>
+                      </span>
+                      Bài 3: Khoáng sản và địa chất tại Việt Nam
+                    </a>
+                  </li>
+                  <li class="material-item">
+                    <a href="" class="flex w-full items-center gap-3">
+                      <span class="icon-wrapper bg-orange-100">
+                        <i
+                          class="material-symbols-outlined text-[20px] text-orange">
+                          picture_as_pdf
+                        </i>
+                      </span>
+                      Bài 4: Khoáng sản và địa chất tại Việt Nam
+                    </a>
+                  </li>
+                </ul>
+              </p-accordion-content>
+            </p-accordion-panel>
+          </p-accordion>
+        </div> -->
+    <!-- ? Empty State -->
+    <div class="flex items-center rounded-md border border-[#dadce0] p-[25px]">
+      <img
+        src="./images/icons/classroom-lesson-empty.svg"
+        alt=""
+        class="size-40" />
+      <div class="ml-10 flex grow flex-col">
+        <p class="text-lg font-semibold">
+          Bạn chưa có bài giảng nào trong lớp học này
+        </p>
+        <p class="mt-4 text-base italic text-gray-500 dark:text-gray-300">
+          Đây là nơi bạn có thể xây dựng và quản lý toàn bộ nội dung giảng dạy
+          cho học sinh của mình. Hãy bắt đầu bằng cách tạo bài giảng đầu tiên —
+          bạn có thể thêm văn bản, tài liệu, video, hoặc tài liệu dạng PDF.
+        </p>
+        <div class="flex justify-end">
+          <p-button
+            label="Tạo bài giảng"
+            icon="pi pi-plus"
+            variant="outlined"
+            size="small" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

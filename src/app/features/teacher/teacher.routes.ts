@@ -23,6 +23,28 @@ export const teacherRoutes: Routes = [
           ),
       },
       {
+        path: 'class-management',
+        data: {
+          heading: 'Quản lý lớp học',
+          breadcrumb: 'Danh sách lớp học',
+        },
+        loadComponent: () =>
+          import('./class-management/class-management.component').then(
+            mod => mod.ClassManagementComponent
+          ),
+      },
+      {
+        path: 'class-management/:classId',
+        data: {
+          heading: 'Chi tiết lớp học',
+          breadcrumb: 'Chi tiết lớp học',
+        },
+        loadComponent: () =>
+          import('./class-management/class-detail/class-detail.component').then(
+            mod => mod.ClassDetailComponent
+          ),
+      },
+      {
         path: 'settings',
         data: {
           breadcrumb: 'Cài đặt',

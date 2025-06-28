@@ -1,0 +1,4 @@
+:host ::ng-deep .p-tablist-tab-list,
+:host ::ng-deep .p-tabpanels {
+  background-color: var(--color-bg-primary) !important;
+}
