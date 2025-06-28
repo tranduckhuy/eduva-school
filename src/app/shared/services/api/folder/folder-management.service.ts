@@ -1,4 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { Observable, catchError, map, of, tap } from 'rxjs';
 
@@ -10,10 +11,9 @@ import { ToastHandlingService } from '../../core/toast/toast-handling.service';
 import { StatusCode } from '../../../constants/status-code.constant';
 
 import { type Folder } from '../../../models/entities/folder.model';
-import { type CreateFolderRequest } from '../../../models/api/request/create-folder-request.model';
-import { type GetFoldersRequest } from '../../../models/api/request/get-folders-request.model';
-import { type GetFoldersResponse } from '../../../models/api/response/get-folders-response.model';
-import { HttpErrorResponse } from '@angular/common/http';
+import { type CreateFolderRequest } from '../../../models/api/request/command/create-folder-request.model';
+import { type GetFoldersRequest } from '../../../models/api/request/query/get-folders-request.model';
+import { type GetFoldersResponse } from '../../../models/api/response/query/get-folders-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -44,7 +44,7 @@ export class FolderManagementService {
               `Bài giảng "${res.data.name}" đã được tạo thành công.`
             );
             const currentList = this.folderListSignal();
-            const updatedList = [res.data, ...currentList];
+            const updatedList = [...currentList, res.data];
             this.folderListSignal.set(updatedList);
             this.totalRecordsSignal.set(updatedList.length);
           } else {

@@ -22,12 +22,12 @@ import { PaymentService } from '../../../../shared/services/api/payment/payment.
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 import { SubscriptionPlanCardComponent } from '../subscription-plan-card/subscription-plan-card.component';
 
-import { type CreateSchoolRequest } from '../../../../shared/models/api/request/create-school-request.model';
+import { type CreateSchoolRequest } from '../../../../shared/models/api/request/command/create-school-request.model';
 import { RefreshTokenRequest } from '../../../../core/auth/models/request/refresh-token-request.model';
 import {
   BillingCycle,
   CreatePlanPaymentLinkRequest,
-} from '../../../../shared/models/api/request/create-plan-payment-link-request.model';
+} from '../../../../shared/models/api/request/command/create-plan-payment-link-request.model';
 
 @Component({
   selector: 'app-add-school-information',

@@ -7,6 +7,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
+import { switchMap } from 'rxjs';
+
 import { PrimeNG } from 'primeng/config';
 import {
   FileUpload,
@@ -22,6 +24,8 @@ import { ToastHandlingService } from '../../../../shared/services/core/toast/toa
 import { UploadFileService } from '../../../../shared/services/api/file/upload-file.service';
 import { LessonMaterialsService } from '../../../../shared/services/api/lesson-materials/lesson-materials.service';
 
+import { MODAL_DATA } from '../../../../shared/tokens/injection/modal-data.token';
+
 import {
   MAX_UPLOAD_FILE_SIZE,
   MAX_TOTAL_UPLOAD_FILE_SIZE,
@@ -31,9 +35,10 @@ import {
 import { getContentTypeFromMime } from '../../../../shared/utils/util-functions';
 
 import {
-  LessonMaterialRequest,
-  LessonMaterialsRequest,
-} from '../../../../shared/models/api/request/lesson-material-request.model';
+  CreateLessonMaterialRequest,
+  CreateLessonMaterialsRequest,
+} from '../../../../shared/models/api/request/command/create-lesson-material-request.model';
+import { type GetLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
 
 @Component({
   selector: 'app-add-file-modal',
@@ -57,6 +62,7 @@ export class AddFileModalComponent {
   private readonly toastHandlingService = inject(ToastHandlingService);
   private readonly uploadFileService = inject(UploadFileService);
   private readonly lessonMaterialsService = inject(LessonMaterialsService);
+  private readonly modalData = inject(MODAL_DATA);
 
   // ? Form
   // form: FormGroup;
@@ -195,26 +201,38 @@ export class AddFileModalComponent {
     this.uploadFileService.uploadBlobs(blobNames, files).subscribe(res => {
       if (!res) return;
 
-      const folderId = '1'; // ! Placeholder folderId
+      const folderId = this.modalData.folderId;
       const sourceUrls = res.uploadTokens;
-      const materials: LessonMaterialRequest[] = files.map((file, index) => ({
-        title: file.name,
-        description: '',
-        tag: '',
-        contentType: getContentTypeFromMime(file.type),
-        duration: 0,
-        fileSize: file.size,
-        isAIContent: false,
-        sourceUrl: sourceUrls[index],
-      }));
+      const materials: CreateLessonMaterialRequest[] = files.map(
+        (file, index) => ({
+          title: file.name,
+          description: '',
+          tag: '',
+          contentType: getContentTypeFromMime(file.type),
+          duration: 0,
+          fileSize: file.size,
+          isAIContent: false,
+          sourceUrl: sourceUrls[index],
+        })
+      );
 
-      const request: LessonMaterialsRequest = {
+      const request: CreateLessonMaterialsRequest = {
         folderId,
         blobNames,
         lessonMaterials: materials,
       };
       this.lessonMaterialsService
         .createLessonMaterials(request)
+        .pipe(
+          switchMap(() => {
+            const request: GetLessonMaterialsRequest = {
+              folderId,
+              pageIndex: this.modalData.pageIndex,
+              pageSize: this.modalData.pageSize,
+            };
+            return this.lessonMaterialsService.getLessonMaterials(request);
+          })
+        )
         .subscribe(() => this.closeModal());
     });
   }

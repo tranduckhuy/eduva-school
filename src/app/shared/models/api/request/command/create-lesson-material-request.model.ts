@@ -1,6 +1,6 @@
-import { ContentType } from '../../enum/content-type.enum';
+import { ContentType } from '../../../enum/lesson-material.enum';
 
-export interface LessonMaterialRequest {
+export interface CreateLessonMaterialRequest {
   title: string;
   description?: string;
   contentType: ContentType;
@@ -11,8 +11,8 @@ export interface LessonMaterialRequest {
   sourceUrl: string;
 }
 
-export interface LessonMaterialsRequest {
+export interface CreateLessonMaterialsRequest {
   folderId: string;
   blobNames: string[];
-  lessonMaterials: LessonMaterialRequest[];
+  lessonMaterials: CreateLessonMaterialRequest[];
 }

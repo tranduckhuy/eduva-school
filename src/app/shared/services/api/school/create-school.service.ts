@@ -12,7 +12,7 @@ import { ToastHandlingService } from '../../core/toast/toast-handling.service';
 import { StatusCode } from '../../../constants/status-code.constant';
 
 import { type School } from '../../../models/entities/school.model';
-import { type CreateSchoolRequest } from '../../../models/api/request/create-school-request.model';
+import { type CreateSchoolRequest } from '../../../models/api/request/command/create-school-request.model';
 
 @Injectable({
   providedIn: 'root',

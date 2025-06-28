@@ -1,80 +1,170 @@
-<p-table
-  [value]="materials()!"
-  [tableStyle]="{ 'min-width': '50rem' }"
-  [paginator]="true"
-  [rows]="10"
-  [lazy]="true"
-  [scrollable]="true"
-  scrollHeight="600px"
-  [first]="first()"
-  [showCurrentPageReport]="true"
-  [totalRecords]="totalRecords()"
-  (onLazyLoad)="loadDataLazy($event)"
-  currentPageReportTemplate="
-      Hiển thị {first} đến {last} trên {totalRecords} tài liệu
-    "
-  (onPage)="pageChange($event)"
-  [loading]="loading()">
-  <ng-template #header>
-    <tr>
-      <th scope="col" class="!min-w-[300px]" pFrozenColumn>Tài liệu bài học</th>
-      <th scope="col" class="!min-w-[200px]">Người sở hữu</th>
-      <th scope="col" class="!min-w-[180px]">Lần sửa đổi cuối cùng</th>
-      <th scope="col" class="!min-w-[150px] !text-center">Kích thước tệp</th>
-      <th scope="col" class="!min-w-[180px] !text-center">Hành động</th>
-    </tr>
-  </ng-template>
-  <ng-template #body let-material let-i="rowIndex">
-    <tr>
-      <td pFrozenColumn>
-        <a href="#!" class="group flex items-center gap-2">
-          @if (material.fileType === '.mp4') {
-            <i class="material-symbols-outlined text-purple">movie</i>
-          } @else if (material.fileType === '.mp3') {
-            <i class="material-symbols-outlined text-green-500">volume_up</i>
-          } @else if (material.fileType === '.docx') {
-            <i class="material-symbols-outlined text-primary">docs</i>
-          } @else {
-            <i class="material-symbols-outlined text-orange">picture_as_pdf</i>
-          }
-          <span class="transition-colors group-hover:text-primary">
-            {{ material.name }}
-          </span>
-        </a>
-      </td>
-      <td>{{ material.owner }}</td>
-      <td>{{ material.lastModified }}</td>
-      <td class="!text-center">{{ material.fileSize }}</td>
-      <td class="!text-center">
-        <div class="flex items-center justify-center gap-2">
-          <a href="#!">
-            <app-button
-              pTooltip="Xem chi tiết"
-              tooltipPosition="top"
-              [variant]="'outline'"
-              [size]="'xs'"
-              class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
-              visibility
-            </app-button>
-          </a>
+<div class="flex flex-col gap-6">
+  <div>
+    <file-type-filter />
+  </div>
+
+  <div
+    class="rounded bg-white px-0 shadow-main dark:border-dark-500 dark:bg-dark-200">
+    <div class="p-[25px]">
+      <div
+        class="flex items-center justify-between xs:flex-col xs:items-start xs:gap-y-2">
+        <div class="xs:w-full">
+          <app-search-input (search)="onSearch($event)" />
+        </div>
+
+        <div>
           <app-button
-            pTooltip="Chỉnh sửa"
-            tooltipPosition="top"
             [variant]="'outline'"
-            [size]="'xs'"
-            class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-gray shadow-none hover:bg-transparent">
-            edit
+            (clicked)="goBackToLessonList()"
+            class="mr-3 border-primary bg-transparent !text-primary shadow-none hover:bg-primary hover:!text-white lg:mr-2 sm:mr-3">
+            <div class="flex items-center gap-2">
+              <span class="pi pi-angle-left"></span>
+              <span>Quay lại</span>
+            </div>
           </app-button>
           <app-button
-            pTooltip="Chuyển vào thùng rác"
-            tooltipPosition="top"
             [variant]="'outline'"
-            [size]="'xs'"
-            class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-danger shadow-none hover:bg-transparent">
-            delete
+            (clicked)="openAddMaterialModal()"
+            class="border-primary bg-transparent !text-primary shadow-none hover:bg-primary hover:!text-white">
+            <div class="flex items-center gap-2">
+              <span class="pi pi-plus"></span>
+              <span>Thêm tài liệu mới</span>
+            </div>
           </app-button>
         </div>
-      </td>
-    </tr>
-  </ng-template>
-</p-table>
+      </div>
+
+      <div class="mt-5">
+        @if (isLoading()) {
+          <app-table-skeleton [tableHead]="tableHeadSkeleton()" />
+        } @else {
+          <p-table
+            [tableStyle]="{ 'min-width': '50rem' }"
+            [paginator]="true"
+            [lazy]="true"
+            [scrollable]="true"
+            [showCurrentPageReport]="true"
+            [scrollHeight]="'600px'"
+            [rows]="pageSize()"
+            [first]="firstRecordIndex()"
+            [value]="materials()"
+            [paginator]="materials().length > 0"
+            [totalRecords]="totalRecords()"
+            (onLazyLoad)="onLazyLoad($event)"
+            currentPageReportTemplate="
+              Hiển thị {first} đến {last} trên {totalRecords} tài liệu
+            ">
+            <ng-template #header>
+              <tr>
+                <th scope="col" class="!min-w-[300px]" pFrozenColumn>
+                  Tài liệu bài học
+                </th>
+                <th scope="col" class="!min-w-[250px]">Người tạo tài liệu</th>
+                <th scope="col" class="!min-w-[180px]">
+                  Lần sửa đổi cuối cùng
+                </th>
+                <th scope="col" class="!min-w-[150px] !text-center">
+                  Kích thước tệp
+                </th>
+                <th scope="col" class="!min-w-[200px] !text-center">
+                  Trạng thái
+                </th>
+                <th scope="col" class="!min-w-[200px] !text-center">Chia sẻ</th>
+                <th scope="col" class="!min-w-[180px] !text-center">
+                  Hành động
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-material let-i="rowIndex">
+              <tr>
+                <td pFrozenColumn>
+                  <a href="#!" class="group flex items-center gap-2">
+                    <i
+                      class="material-symbols-outlined"
+                      [ngClass]="getMaterialIconColor(material)">
+                      {{ getMaterialIcon(material) }}
+                    </i>
+                    <span class="transition-colors group-hover:text-primary">
+                      {{ material.title }}
+                    </span>
+                  </a>
+                </td>
+                <td>{{ material.createdByName }}</td>
+                <td>
+                  {{
+                    material.lastModifiedAt
+                      ? (material.lastModifiedAt | date: 'fullDate')
+                      : 'Chưa cập nhật'
+                  }}
+                </td>
+                <td class="!text-center">
+                  {{ material.fileSize | storageFormat: 'mb' }}
+                </td>
+                <td class="!text-center">
+                  <div class="flex items-center justify-center">
+                    <app-badge
+                      class="whitespace-nowrap"
+                      [variant]="getMaterialStatusBadge(material.lessonStatus)">
+                      {{ getMaterialStatusLabel(material.lessonStatus) }}
+                    </app-badge>
+                  </div>
+                </td>
+                <td class="!text-center">
+                  <div class="flex items-center justify-center">
+                    <app-badge
+                      class="whitespace-nowrap"
+                      [variant]="material.visibility === 0 ? 'purple' : 'info'">
+                      {{
+                        material.visibility === 0 ? 'Riêng tư' : 'Trong trường'
+                      }}
+                    </app-badge>
+                  </div>
+                </td>
+                <td class="!text-center">
+                  <div class="flex items-center justify-center gap-2">
+                    <a href="#!">
+                      <app-button
+                        pTooltip="Xem chi tiết"
+                        tooltipPosition="top"
+                        [variant]="'outline'"
+                        [size]="'xs'"
+                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
+                        visibility
+                      </app-button>
+                    </a>
+                    <app-button
+                      pTooltip="Chỉnh sửa"
+                      tooltipPosition="top"
+                      [variant]="'outline'"
+                      [size]="'xs'"
+                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-gray shadow-none hover:bg-transparent">
+                      edit
+                    </app-button>
+                    <app-button
+                      pTooltip="Chuyển vào thùng rác"
+                      tooltipPosition="top"
+                      [variant]="'outline'"
+                      [size]="'xs'"
+                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-danger shadow-none hover:bg-transparent">
+                      delete
+                    </app-button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+              <tr>
+                <td colspan="100%">
+                  <app-table-empty-state
+                    icon="folder_off"
+                    title="Không có tài liệu nào"
+                    subtitle="Hãy thêm mới tài liệu để bắt đầu quản lý nội dung bài học." />
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        }
+      </div>
+    </div>
+  </div>
+</div>

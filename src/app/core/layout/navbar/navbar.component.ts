@@ -101,8 +101,9 @@ export class NavbarComponent implements OnInit {
   private getNavbarConfigByRole(role: UserRole): NavbarConfig[] {
     const isSchoolAdmin =
       role === UserRoles.SCHOOL_ADMIN || role === UserRoles.SYSTEM_ADMIN;
-    const isTeacherOrMod =
-      role === UserRoles.TEACHER || role === UserRoles.CONTENT_MODERATOR;
+    const isTeacher = role === UserRoles.TEACHER;
+    const isContentModerator = role === UserRoles.CONTENT_MODERATOR;
+    const isTeacherOrMod = isTeacher || isContentModerator;
 
     const dashboardLink = isSchoolAdmin ? '/school-admin' : '/teacher';
     const settingsLink = isSchoolAdmin
@@ -162,19 +163,27 @@ export class NavbarComponent implements OnInit {
       : [];
 
     // ? Learning management submenu (dynamic based on role)
-    const learningSubmenu = [
-      { label: 'Danh sách bài học', link: '/school-admin/lessons' },
-      { label: 'Kiểm duyệt nội dung', link: '/school-admin/moderate-lessons' },
-      ...(isTeacherOrMod
-        ? [
-            { label: 'Danh sách lớp học', link: '#!' },
-            {
-              label: 'Tạo bài giảng tự động',
-              link: '/teacher/generate-lesson',
-            },
-          ]
-        : []),
-    ];
+    const learningSubmenu: NavItem['submenuItems'] = [];
+    if (isSchoolAdmin) {
+      learningSubmenu.push(
+        { label: 'Danh sách bài học', link: '/school-admin/lessons' },
+        { label: 'Kiểm duyệt nội dung', link: '/school-admin/moderate-lessons' }
+      );
+    }
+
+    if (isTeacherOrMod) {
+      learningSubmenu.push(
+        { label: 'Danh sách lớp học', link: '#!' },
+        { label: 'Tạo bài giảng tự động', link: '/teacher/generate-lesson' }
+      );
+    }
+
+    if (isContentModerator && !isSchoolAdmin) {
+      learningSubmenu.push({
+        label: 'Kiểm duyệt nội dung',
+        link: '/school-admin/moderate-lessons',
+      });
+    }
 
     const learningNav: NavItem = {
       label: 'Quản lý học tập',
