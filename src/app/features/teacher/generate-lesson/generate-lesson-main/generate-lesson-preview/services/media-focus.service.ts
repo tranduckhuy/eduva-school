@@ -4,7 +4,7 @@ import { Injectable, computed, signal } from '@angular/core';
   providedIn: 'root',
 })
 export class MediaFocusService {
-  private activeId = signal<string | null>(null);
+  private readonly activeId = signal<string | null>(null);
 
   setActive(id: string) {
     this.activeId.set(id);

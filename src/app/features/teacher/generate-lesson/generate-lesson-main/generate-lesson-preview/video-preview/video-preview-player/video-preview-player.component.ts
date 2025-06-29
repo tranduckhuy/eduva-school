@@ -44,7 +44,7 @@ export class VideoPreviewPlayerComponent {
   volumeBarRef = viewChild<ElementRef>('volumeBar');
 
   private vgApi = inject(VgApiService);
-  private mediaFocusService = inject(MediaFocusService);
+  private readonly mediaFocusService = inject(MediaFocusService);
 
   isActive = this.mediaFocusService.isActive('video');
 

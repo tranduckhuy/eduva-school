@@ -2,7 +2,6 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
-  OnInit,
   ElementRef,
   inject,
   signal,
