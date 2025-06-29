@@ -34,7 +34,7 @@ export const teacherRoutes: Routes = [
           ),
       },
       {
-        path: 'class-management/:classId',
+        path: 'class-management/detail',
         data: {
           heading: 'Chi tiết lớp học',
           breadcrumb: 'Chi tiết lớp học',

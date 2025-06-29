@@ -4,7 +4,7 @@
   (mouseenter)="setAsActive()">
   <div
     id="video-player"
-    class="video-player absolute left-0 top-0 box-border text-white"
+    class="video-player absolute inset-0 box-border text-white"
     [class.paused]="isPaused()">
     <!-- ? Video Player -->
     <vg-player (onPlayerReady)="onPlayerReady($event)">
