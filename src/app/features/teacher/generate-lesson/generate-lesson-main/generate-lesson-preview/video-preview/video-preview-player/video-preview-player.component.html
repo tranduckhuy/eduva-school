@@ -1,0 +1,138 @@
+<div
+  class="relative box-border w-full bg-black pt-[56.25%]"
+  (mousedown)="setAsActive()"
+  (mouseenter)="setAsActive()">
+  <div
+    id="video-player"
+    class="video-player absolute inset-0 box-border text-white"
+    [class.paused]="isPaused()">
+    <!-- ? Video Player -->
+    <vg-player (onPlayerReady)="onPlayerReady($event)">
+      <video
+        #video
+        crossorigin
+        src="./videoplayback.mp4"
+        [vgMedia]="$any(video)"
+        [preload]="preload()">
+        <source
+          src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
+          type="video/mp4" />
+      </video>
+    </vg-player>
+
+    <!-- ? Overlay -->
+    <div class="overlay" (click)="togglePlayPause(); onMobileTap()"></div>
+
+    <!-- ? Progress Bar -->
+    <div
+      class="progress-bar invisible opacity-0"
+      [class.opacity-100]="showMobileControls()"
+      [class.visible]="showMobileControls()"
+      [class.opacity-0]="!showMobileControls()"
+      [class.invisible]="!showMobileControls()">
+      <span class="current-time">{{ formatTime(currentTime()) }}</span>
+      <div
+        #progressBar
+        class="progress-holder"
+        (click)="seekTo($event)"
+        (mousedown)="startSeekDrag($event)">
+        <div class="load-progress" [style.width.%]="bufferedProgress()"></div>
+        <div class="play-progress" [style.width.%]="playedProgress()"></div>
+      </div>
+      <span class="duration-time">{{ formatTime(duration()) }}</span>
+    </div>
+
+    <div
+      class="controls-bar invisible opacity-0"
+      [class.opacity-100]="showMobileControls()"
+      [class.visible]="showMobileControls()"
+      [class.opacity-0]="!showMobileControls()"
+      [class.invisible]="!showMobileControls()">
+      <div class="flex items-center">
+        <!-- ? Rewind -->
+        <!-- <button class="control-btn sm:hidden" (click)="rewind()">
+          <fa-icon [icon]="'rotate-left'"></fa-icon>
+        </button> -->
+        <!-- ? Play -->
+        <button class="control-btn" (click)="togglePlayPause()">
+          <span class="material-symbols-outlined" style="font-size: 20px">
+            {{ isPaused() ? 'play_arrow' : 'pause' }}
+          </span>
+        </button>
+        <!-- ? Forward -->
+        <!-- <button class="control-btn sm:hidden" (click)="forward()">
+          <fa-icon [icon]="'rotate-right'"></fa-icon>
+        </button> -->
+        <!-- ? Volume -->
+        <div class="flex items-center gap-1">
+          <button class="control-btn" (click)="toggleMute()">
+            <span class="material-symbols-outlined">
+              {{
+                volumeLevel() === 0
+                  ? 'volume_off'
+                  : volumeLevel() <= 0.5
+                    ? 'volume_down'
+                    : 'volume_up'
+              }}
+            </span>
+          </button>
+          <!-- ? Volume Control -->
+          <div class="volume-control sm:hidden">
+            <div
+              #volumeBar
+              class="volume-panel"
+              (mousedown)="startVolumeDrag($event)">
+              <div
+                class="volume-level"
+                [style.width.%]="volumeLevel() * 100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center">
+        <!-- ? Settings -->
+        <button class="control-btn ml-6" (click)="onSettingsBtnClick($event)">
+          <span class="material-symbols-outlined">settings</span>
+        </button>
+
+        <!-- ? Settings Menu -->
+        <video-settings-menu
+          [isSettingsMenuOpen]="isSettingsMenuOpen()"
+          [currentSettingsMenu]="currentSettingsMenu()"
+          (closed)="onMenuClosed()"
+          (menuChange)="onMenuChange($event)"
+          (subtitleChange)="onSubtitleChange($event)"
+          (playbackRateChange)="onRateChange($event)" />
+
+        <!-- ? Expand -->
+        <button class="control-btn" (click)="toggleFullscreen()">
+          <span class="material-symbols-outlined">pageless</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ? Loading -->
+    @if (isLoading()) {
+      <div class="loading-spinner animate-spin"></div>
+    }
+  </div>
+</div>
+
+<div class="mt-4">
+  <p-button
+    label="Tạo nội dung mới"
+    size="small"
+    icon="pi pi-refresh"
+    [rounded]="true"
+    [fluid]="true" />
+  <p-button
+    label="Tải xuống Video"
+    variant="outlined"
+    severity="secondary"
+    size="small"
+    icon="pi pi-download"
+    styleClass="mt-3"
+    [rounded]="true"
+    [fluid]="true" />
+</div>
