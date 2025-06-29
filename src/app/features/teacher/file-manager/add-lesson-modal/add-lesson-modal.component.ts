@@ -13,7 +13,16 @@ import { LoadingService } from '../../../../shared/services/core/loading/loading
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 import { FolderManagementService } from '../../../../shared/services/api/folder/folder-management.service';
 
+import { MODAL_DATA } from '../../../../shared/tokens/injection/modal-data.token';
+
 import { type CreateFolderRequest } from '../../../../shared/models/api/request/command/create-folder-request.model';
+import { switchMap } from 'rxjs';
+import { GetFoldersRequest } from '../../../../shared/models/api/request/query/get-folders-request.model';
+import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
+
+interface AddLessModalData {
+  addLessonSuccess: () => void;
+}
 
 @Component({
   selector: 'app-add-lesson-modal',
@@ -28,6 +37,7 @@ export class AddLessonModalComponent {
   private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
   private readonly folderManagementService = inject(FolderManagementService);
+  private readonly modalData = inject(MODAL_DATA) as AddLessModalData;
 
   form: FormGroup;
 
@@ -58,7 +68,19 @@ export class AddLessonModalComponent {
     const request: CreateFolderRequest = this.form.value;
     this.folderManagementService
       .createFolder(request)
-      .subscribe(() => this.closeModal());
+      .pipe(
+        switchMap(() => {
+          const request: GetFoldersRequest = {
+            pageIndex: 1,
+            pageSize: PAGE_SIZE,
+          };
+          return this.folderManagementService.getPersonalFolders(request);
+        })
+      )
+      .subscribe(() => {
+        this.modalData.addLessonSuccess();
+        this.closeModal();
+      });
   }
 
   getErrorMessage(controlName: string): string {

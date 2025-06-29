@@ -11,7 +11,7 @@
           <!-- ? Avatar -->
           <div class="flex items-center">
             <figure
-              class="relative size-20 rounded"
+              class="relative size-20 shrink-0 rounded xs:size-16"
               (click)="openAvatarModal()">
               <img
                 [src]="user()?.avatarUrl"
@@ -29,9 +29,11 @@
               </div>
             </figure>
             <div class="ml-4">
-              <h3 class="text-lg font-semibold">{{ user()?.fullName }}</h3>
+              <h3 class="text-lg font-semibold xs:text-sm">
+                {{ user()?.fullName }}
+              </h3>
               <div class="mt-1">
-                <p class="dark:text-gray-300">
+                <p class="dark:text-gray-300 xs:text-[13px]">
                   Địa chỉ email:
                   <a href="mailto:{{ user()?.email }}">{{ user()?.email }}</a>
                   <br />
@@ -45,8 +47,8 @@
           </div>
 
           <!-- ? Name -->
-          <div class="e-row">
-            <div class="e-col-6">
+          <div class="e-row e-gy-xs-4">
+            <div class="e-col-6 e-col-xs-12">
               <app-form-control
                 label="Họ"
                 placeholder="Nguyen"
@@ -55,7 +57,7 @@
                 [readOnly]="!isEdit()"
                 [required]="true" />
             </div>
-            <div class="e-col-6">
+            <div class="e-col-6 e-col-xs-12">
               <app-form-control
                 label="Tên"
                 placeholder="Van A"
@@ -74,7 +76,7 @@
         </h3>
 
         <div class="e-row e-gy-4">
-          <div class="e-col-6">
+          <div class="e-col-6 e-col-xs-12">
             <app-form-control
               label="Địa chỉ email"
               placeholder="nguyenvana@gmail.com"
@@ -82,7 +84,7 @@
               [value]="user()?.email ?? ''"
               [readOnly]="true" />
           </div>
-          <div class="e-col-6">
+          <div class="e-col-6 e-col-xs-12">
             <app-form-control
               label="Số điện thoại"
               placeholder="0912345678"

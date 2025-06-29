@@ -43,10 +43,6 @@ export class FolderManagementService {
               'Tạo bài giảng thành công',
               `Bài giảng "${res.data.name}" đã được tạo thành công.`
             );
-            const currentList = this.folderListSignal();
-            const updatedList = [...currentList, res.data];
-            this.folderListSignal.set(updatedList);
-            this.totalRecordsSignal.set(updatedList.length);
           } else {
             this.toastHandlingService.error(
               'Tạo bài giảng thất bại',
@@ -89,22 +85,26 @@ export class FolderManagementService {
     api: string,
     request: GetFoldersRequest
   ): Observable<GetFoldersResponse | null> {
-    return this.requestService.get<GetFoldersResponse>(api, request).pipe(
-      tap(res => {
-        if (res.statusCode === StatusCode.SUCCESS && res.data) {
-          const folders = res.data;
-          this.folderListSignal.set(folders.data ?? []);
-          this.totalRecordsSignal.set(folders.count ?? 0);
-        } else {
-          this.toastHandlingService.error(
-            'Lấy danh sách bài giảng thất bại',
-            'Không thể lấy được danh sách bài giảng. Vui lòng thử lại sau.'
-          );
-        }
-      }),
-      map(res => this.extractData<GetFoldersResponse>(res)),
-      catchError(() => this.handleGetError())
-    );
+    return this.requestService
+      .get<GetFoldersResponse>(api, request, {
+        loadingKey: 'get-folders',
+      })
+      .pipe(
+        tap(res => {
+          if (res.statusCode === StatusCode.SUCCESS && res.data) {
+            const folders = res.data;
+            this.folderListSignal.set(folders.data ?? []);
+            this.totalRecordsSignal.set(folders.count ?? 0);
+          } else {
+            this.toastHandlingService.error(
+              'Lấy danh sách bài giảng thất bại',
+              'Không thể lấy được danh sách bài giảng. Vui lòng thử lại sau.'
+            );
+          }
+        }),
+        map(res => this.extractData<GetFoldersResponse>(res)),
+        catchError(() => this.handleGetError())
+      );
   }
 
   private extractData<T>(res: any): T | null {

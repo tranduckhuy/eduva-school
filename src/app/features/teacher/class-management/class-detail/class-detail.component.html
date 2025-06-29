@@ -1,0 +1,26 @@
+<!-- min-h-[calc(100vh-40px)] -->
+<div class="rounded bg-white pb-4 dark:border-dark-500 dark:bg-dark-200">
+  <p-tabs value="information">
+    <div class="overflow-hidden rounded-tl rounded-tr">
+      <p-tablist>
+        <p-tab value="information">Thông tin lớp học</p-tab>
+        <p-tab value="member">Thành viên lớp học</p-tab>
+      </p-tablist>
+    </div>
+    <p-tabpanels>
+      <!-- ? Class Information -->
+      <p-tabpanel value="information">
+        <class-information
+          [classModel]="classModel()"
+          [folderWithMaterials]="folderMaterials()"
+          [folderCount]="folderCount()"
+          [materialCount]="materialCount()" />
+      </p-tabpanel>
+
+      <!-- ? Class Members -->
+      <p-tabpanel value="member">
+        <class-member [classModel]="classModel()" [students]="students()" />
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>

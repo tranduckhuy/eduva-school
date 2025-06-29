@@ -173,7 +173,7 @@ export class NavbarComponent implements OnInit {
 
     if (isTeacherOrMod) {
       learningSubmenu.push(
-        { label: 'Danh sách lớp học', link: '#!' },
+        { label: 'Danh sách lớp học', link: '/teacher/class-management' },
         { label: 'Tạo bài giảng tự động', link: '/teacher/generate-lesson' }
       );
     }

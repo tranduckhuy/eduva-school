@@ -1,0 +1,40 @@
+<div
+  class="group relative h-[280px] cursor-pointer rounded-md border border-[#dadce0] bg-white transition-shadow duration-200 ease-in-out hover:shadow-md dark:bg-dark-300 dark:hover:shadow-gray-700">
+  <figure class="relative h-[120px] pt-[20%]">
+    <div class="absolute left-4 top-4 z-10 flex flex-col gap-1">
+      <h3 class="line-clamp-1 max-w-[230px] text-lg font-medium text-white">
+        <a
+          [pTooltip]="classModel().name"
+          [routerLink]="[classModel().id]"
+          [queryParams]="{ page: currentPage(), pageSize: pageSize() }"
+          tooltipPosition="bottom"
+          class="transitio-all duration-200 group-hover:underline">
+          {{ classModel().name }}
+        </a>
+      </h3>
+      <p
+        class="transitio-all line-clamp-1 text-xs text-white duration-200 group-hover:underline">
+        {{ classModel().schoolName }}
+      </p>
+    </div>
+    <p class="text absolute bottom-2 left-4 z-10 line-clamp-1 text-white">
+      {{ classModel().teacherName }}
+    </p>
+    <img
+      [src]="classModel().backgroundImageUrl"
+      [alt]="classModel().name"
+      class="absolute left-0 top-0 z-[1] h-full w-full rounded-tl rounded-tr object-cover" />
+    <img
+      [src]="classModel().teacherAvatarUrl"
+      [alt]="classModel().teacherName"
+      class="absolute right-5 top-[60%] z-[3] size-[75px] rounded-full object-cover" />
+  </figure>
+  <div
+    class="absolute bottom-0 left-0 right-0 flex h-16 items-center justify-end gap-2 border-t border-t-[#dadce0] p-3">
+    <p-button
+      label="Xem chi tiết"
+      variant="outlined"
+      size="small"
+      (onClick)="goToClassDetail(classModel().id)" />
+  </div>
+</div>
