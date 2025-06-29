@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  effect,
   inject,
   input,
   signal,
@@ -9,18 +8,16 @@ import {
 import { CommonModule } from '@angular/common';
 
 import { ButtonModule } from 'primeng/button';
-import { AccordionModule, AccordionTabOpenEvent } from 'primeng/accordion';
+import { AccordionModule } from 'primeng/accordion';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ConfirmationService } from 'primeng/api';
 
 import { ClassManagementService } from '../../../services/class-management.service';
-import { LessonMaterialsService } from '../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
 
 import { ContentType } from '../../../../../../shared/models/enum/lesson-material.enum';
 
 import { type ClassModel } from '../../../../../../shared/models/entities/class.model';
 import { type FolderWithMaterials } from '../../class-detail.component';
-import { type GetLessonMaterialsRequest } from '../../../../../../shared/models/api/request/query/get-lesson-materials-request.model';
 
 @Component({
   selector: 'class-overview',
