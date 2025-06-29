@@ -10,11 +10,42 @@
   <div class="mt-4">
     <!-- ? Audio Overview -->
     <div class="flex flex-col gap-1 p-4 pt-0">
-      <div class="flex h-12 items-center justify-between">
+      <div class="relative flex h-12 items-center justify-between">
         <h3 class="m-0 text-base font-medium">Xem trước Audio</h3>
-        <span
-          class="pi pi-info-circle cursor-pointer select-none dark:text-white"
-          style="font-size: 20px"></span>
+        <div class="group">
+          <span
+            class="pi pi-info-circle cursor-pointer select-none dark:text-white"
+            style="font-size: 20px"></span>
+          <div
+            class="invisible absolute right-0 top-12 z-[1] w-[420px] rounded-2xl bg-white p-5 opacity-0 shadow-lg transition-all duration-200 ease-in group-hover:visible group-hover:opacity-100 dark:bg-dark-400">
+            <p-scrollpanel styleClass="w-full text-textBlack dark:text-white">
+              <p>
+                Bản nghe thử là phần tóm tắt sống động được tạo bởi AI, giúp bạn
+                nhanh chóng nắm bắt những nội dung chính của tài liệu bài giảng.
+                Đây là tính năng thử nghiệm với một số lưu ý sau:
+              </p>
+              <ul class="mt-4 list-disc pl-8">
+                <li>
+                  Giọng đọc và nội dung được tạo hoàn toàn bởi AI, nên có thể có
+                  sai lệch nhỏ hoặc lỗi âm thanh.
+                </li>
+                <li>
+                  Nội dung không đảm bảo bao quát toàn diện hay khách quan, mà
+                  phản ánh chính xác những gì tài liệu cung cấp.
+                </li>
+                <li>
+                  Hệ thống sẽ tự động chọn ngôn ngữ audio theo thiết lập tài
+                  khoản của bạn.
+                </li>
+                <li>Ngôn ngữ phát được chọn dựa theo cài đặt cá nhân.</li>
+                <li>
+                  Quá trình tạo có thể mất vài phút - bạn có thể tiếp tục công
+                  việc khác trong lúc chờ.
+                </li>
+              </ul>
+            </p-scrollpanel>
+          </div>
+        </div>
       </div>
       <div class="w-full rounded-2xl border p-2">
         <generated-audio-preview />
@@ -24,6 +55,43 @@
     <div class="my-3 h-[1px] w-full bg-[#dde1eb]"></div>
 
     <!-- ? Video Overview -->
-    <div class="flex flex-col gap-4 p-4 pt-0"></div>
+    <div class="flex flex-col gap-4 p-4 pt-0">
+      <div class="relative flex h-12 items-center justify-between">
+        <h3 class="m-0 text-base font-medium">Xem trước Video</h3>
+        <div class="group">
+          <span
+            class="pi pi-info-circle cursor-pointer select-none dark:text-white"
+            style="font-size: 20px"></span>
+          <div
+            class="invisible absolute right-0 top-12 z-[1] w-[420px] rounded-2xl bg-white p-5 opacity-0 shadow-lg transition-all duration-200 ease-in group-hover:visible group-hover:opacity-100 dark:bg-dark-400">
+            <p-scrollpanel styleClass="w-full text-textBlack dark:text-white">
+              <p>
+                Bản xem trước video là đoạn video minh họa ngắn gọn, được AI tạo
+                tự động từ tài liệu bài học nhằm truyền tải nội dung chính một
+                cách trực quan và sinh động. Xin lưu ý:
+              </p>
+              <ul class="mt-4 list-disc pl-8">
+                <li>
+                  Hình ảnh, chuyển động và lời thoại đều được tạo bởi AI, có thể
+                  phát sinh lỗi hoặc chưa tự nhiên hoàn toàn.
+                </li>
+                <li>
+                  Video mang tính mô phỏng và tóm tắt, không thay thế cho việc
+                  học toàn bộ nội dung.
+                </li>
+                <li>Ngôn ngữ phát được chọn dựa theo cài đặt cá nhân.</li>
+                <li>
+                  Quá trình tạo video có thể mất vài phút - vui lòng kiên nhẫn
+                  chờ hệ thống xử lý.
+                </li>
+              </ul>
+            </p-scrollpanel>
+          </div>
+        </div>
+      </div>
+      <div class="w-full">
+        <generated-video-preview />
+      </div>
+    </div>
   </div>
 </section>

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  HostListener,
   viewChild,
   inject,
   signal,
@@ -15,6 +16,9 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
+import { SubmenuDirective } from '../../../../../../shared/directives/submenu/submenu.directive';
+
+import { MediaFocusService } from '../services/media-focus.service';
 import { ResourcesStateService } from '../../services/resources-state.service';
 
 @Component({
@@ -26,6 +30,7 @@ import { ResourcesStateService } from '../../services/resources-state.service';
     ButtonModule,
     TooltipModule,
     ProgressSpinnerModule,
+    SubmenuDirective,
   ],
   templateUrl: './audio-preview.component.html',
   styleUrl: './audio-preview.component.css',
@@ -34,15 +39,20 @@ import { ResourcesStateService } from '../../services/resources-state.service';
 export class AudioPreviewComponent {
   private readonly audio = viewChild<ElementRef<HTMLAudioElement>>('audio');
 
+  private readonly mediaFocusService = inject(MediaFocusService);
   private readonly resourcesStateService = inject(ResourcesStateService);
+
+  isActive = this.mediaFocusService.isActive('audio');
   totalResourcesChecked = this.resourcesStateService.checkedSources;
 
   isPlaying = signal(false);
   currentTime = signal(0);
   duration = signal(0);
   volume = signal(100);
+  playbackRate = signal(1.0);
   audioName = signal('');
   audioState = signal<'empty' | 'loading' | 'generated'>('empty');
+  openedMenu = signal<boolean>(false);
 
   readonly disableGenerate = computed(() => {
     const uploading = this.resourcesStateService
@@ -57,6 +67,7 @@ export class AudioPreviewComponent {
   });
 
   private previousVolume = 100;
+  readonly availableRates = [0.5, 0.8, 1.0, 1.2, 1.5, 2.0];
 
   constructor() {
     effect(() => {
@@ -68,6 +79,14 @@ export class AudioPreviewComponent {
         }
       }, 500);
       return () => clearInterval(interval);
+    });
+
+    effect(() => {
+      const rate = this.playbackRate();
+      const audioEl = this.audio()?.nativeElement;
+      if (audioEl) {
+        audioEl.playbackRate = rate;
+      }
     });
   }
 
@@ -106,6 +125,24 @@ export class AudioPreviewComponent {
     }
   }
 
+  rewind(seconds = 10) {
+    const audioEl = this.audio()?.nativeElement;
+    if (!audioEl) return;
+
+    const newTime = Math.max(0, audioEl.currentTime - seconds);
+    audioEl.currentTime = newTime;
+    this.currentTime.set(Math.floor(newTime));
+  }
+
+  forward(seconds = 10) {
+    const audioEl = this.audio()?.nativeElement;
+    if (!audioEl) return;
+
+    const newTime = Math.min(audioEl.duration, audioEl.currentTime + seconds);
+    audioEl.currentTime = newTime;
+    this.currentTime.set(Math.floor(newTime));
+  }
+
   onMetadataLoaded() {
     const audioEl = this.audio()?.nativeElement;
     if (audioEl) {
@@ -137,6 +174,14 @@ export class AudioPreviewComponent {
     }
   }
 
+  onPlaybackRateChange(rate: number) {
+    this.playbackRate.set(rate);
+  }
+
+  setAsActive() {
+    this.mediaFocusService.setActive('audio');
+  }
+
   formatTime(seconds: number): string {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
@@ -159,5 +204,36 @@ export class AudioPreviewComponent {
     setTimeout(() => {
       this.audioState.set('generated');
     }, delay);
+  }
+
+  toggleMenu() {
+    this.openedMenu.set(!this.openedMenu());
+  }
+
+  private shouldIgnoreKeyboardEvent(event: KeyboardEvent): boolean {
+    const target = event.target as HTMLElement;
+    return (
+      ['INPUT', 'TEXTAREA'].includes(target.tagName) || target.isContentEditable
+    );
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    if (!this.isActive()) return;
+
+    if (this.shouldIgnoreKeyboardEvent(event)) return;
+
+    const actions: Record<string, () => void> = {
+      Space: () => {
+        event.preventDefault();
+        this.togglePlayPause();
+      },
+      ArrowRight: () => this.forward(10),
+      ArrowLeft: () => this.rewind(10),
+      KeyM: () => this.toggleMute(),
+    };
+
+    const action = actions[event.code];
+    if (action) action();
   }
 }
