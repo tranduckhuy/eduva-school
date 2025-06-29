@@ -40,6 +40,10 @@ import {
 } from '../../../../shared/models/api/request/command/create-lesson-material-request.model';
 import { type GetLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
 
+interface AddFileModalData {
+  folderId: string;
+  addFileSuccess: () => void;
+}
 @Component({
   selector: 'app-add-file-modal',
   standalone: true,
@@ -62,7 +66,7 @@ export class AddFileModalComponent {
   private readonly toastHandlingService = inject(ToastHandlingService);
   private readonly uploadFileService = inject(UploadFileService);
   private readonly lessonMaterialsService = inject(LessonMaterialsService);
-  private readonly modalData = inject(MODAL_DATA);
+  private readonly modalData = inject(MODAL_DATA) as AddFileModalData;
 
   // ? Form
   // form: FormGroup;
@@ -227,13 +231,14 @@ export class AddFileModalComponent {
           switchMap(() => {
             const request: GetLessonMaterialsRequest = {
               folderId,
-              pageIndex: this.modalData.pageIndex,
-              pageSize: this.modalData.pageSize,
             };
             return this.lessonMaterialsService.getLessonMaterials(request);
           })
         )
-        .subscribe(() => this.closeModal());
+        .subscribe(() => {
+          this.modalData.addFileSuccess();
+          this.closeModal();
+        });
     });
   }
 }

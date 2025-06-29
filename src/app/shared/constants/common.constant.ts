@@ -9,6 +9,8 @@ export const ALLOWED_UPLOAD_MIME_TYPES = [
   'application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ];
+export const BASE_BG_CLASS_IMAGE_URL =
+  'https://egverimjijiaqduqcfur.supabase.co/storage/v1/object/public/classroom-images//back_to_school.jpg';
 
 // Table Constants
 export const PAGE_SIZE = 12;

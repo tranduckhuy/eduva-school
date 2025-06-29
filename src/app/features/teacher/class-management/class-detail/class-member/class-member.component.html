@@ -1,4 +1,5 @@
-<div class="mx-auto mt-4 flex w-[50%] flex-col">
+<div
+  class="mx-auto mt-4 flex w-[50%] flex-col xl:w-[60%] lg:w-[70%] md:w-[80%] sm:w-[95%]">
   <!-- ? Teacher -->
   <div>
     <h3
@@ -8,10 +9,10 @@
     <ul class="mt-5">
       <li class="member-item">
         <img
-          src="./images/logo.png"
-          alt=""
+          [src]="classModel()?.teacherAvatarUrl"
+          [alt]="classModel()?.teacherName"
           class="size-[32px] rounded-full object-contain" />
-        <span class="font-semibold">Nguyen Quy (K17 QN)</span>
+        <span class="font-semibold">{{ classModel()?.teacherName }}</span>
       </li>
     </ul>
   </div>
@@ -21,58 +22,31 @@
     <h3
       class="flex items-center justify-between border-b border-[#e0e0e0] pb-2 text-[#202124] dark:text-white">
       <span class="text-[32px] font-semibold">Học sinh</span>
-      <span class="text-sm font-semibold">17 học sinh</span>
+      <span class="text-sm font-semibold"
+        >{{ students().length }} học sinh</span
+      >
     </h3>
   </div>
   <ul class="mt-5">
-    <li class="member-item">
-      <img
-        src="./images/logo.png"
-        alt=""
-        class="size-[32px] rounded-full object-contain" />
-      <span class="font-semibold">Nguyen Quy (K17 QN)</span>
-    </li>
-    <li class="member-item">
-      <img
-        src="./images/logo.png"
-        alt=""
-        class="size-[32px] rounded-full object-contain" />
-      <span class="font-semibold">Nguyen Quy (K17 QN)</span>
-    </li>
-    <li class="member-item">
-      <img
-        src="./images/logo.png"
-        alt=""
-        class="size-[32px] rounded-full object-contain" />
-      <span class="font-semibold">Nguyen Quy (K17 QN)</span>
-    </li>
-    <li class="member-item">
-      <img
-        src="./images/logo.png"
-        alt=""
-        class="size-[32px] rounded-full object-contain" />
-      <span class="font-semibold">Nguyen Quy (K17 QN)</span>
-    </li>
-    <li class="member-item">
-      <img
-        src="./images/logo.png"
-        alt=""
-        class="size-[32px] rounded-full object-contain" />
-      <span class="font-semibold">Nguyen Quy (K17 QN)</span>
-    </li>
-    <li class="member-item">
-      <img
-        src="./images/logo.png"
-        alt=""
-        class="size-[32px] rounded-full object-contain" />
-      <span class="font-semibold">Nguyen Quy (K17 QN)</span>
-    </li>
-    <li class="member-item">
-      <img
-        src="./images/logo.png"
-        alt=""
-        class="size-[32px] rounded-full object-contain" />
-      <span class="font-semibold">Nguyen Quy (K17 QN)</span>
-    </li>
+    @for (student of students(); track student.id) {
+      <li class="member-item member-item--student">
+        <div class="flex items-center gap-[18px]">
+          <img
+            [src]="student.studentAvatarUrl"
+            [alt]="student.studentName"
+            class="size-8 rounded-full object-contain" />
+          <span class="font-semibold">{{ student.studentName }}</span>
+        </div>
+        <div class="xs:hidden">
+          Tham gia lớp học vào:
+          {{ student.enrolledAt | date: 'fullDate' }}
+        </div>
+      </li>
+    } @empty {
+      <li>
+        Hiện chưa có học sinh tham gia lớp. Hãy chia sẻ mã lớp để mời các bạn
+        học sinh cùng tham gia lớp học.
+      </li>
+    }
   </ul>
 </div>

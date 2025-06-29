@@ -124,4 +124,19 @@ export class UploadFileService {
       return null;
     }
   }
+
+  async getBackgroundImageUrls(): Promise<string[]> {
+    const { data, error } = await this.supabaseClient.storage
+      .from('classroom-images')
+      .list();
+
+    if (error || !data) return [];
+
+    return data.map(
+      file =>
+        this.supabaseClient.storage
+          .from('classroom-images')
+          .getPublicUrl(file.name).data.publicUrl
+    );
+  }
 }

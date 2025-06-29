@@ -45,7 +45,9 @@ export class LessonMaterialsService {
     request: GetLessonMaterialsRequest
   ): Observable<GetLessonMaterialsResponse | null> {
     return this.requestService
-      .get<GetLessonMaterialsResponse>(this.LESSON_MATERIALS_API_URL, request)
+      .get<GetLessonMaterialsResponse>(this.LESSON_MATERIALS_API_URL, request, {
+        loadingKey: 'get-materials',
+      })
       .pipe(
         tap(res => this.handleGetResponse(res)),
         map(res => this.extractLessonMaterialsFromResponse(res)),

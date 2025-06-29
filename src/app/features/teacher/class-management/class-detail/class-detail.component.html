@@ -10,12 +10,16 @@
     <p-tabpanels>
       <!-- ? Class Information -->
       <p-tabpanel value="information">
-        <class-information />
+        <class-information
+          [classModel]="classModel()"
+          [folderWithMaterials]="folderMaterials()"
+          [folderCount]="folderCount()"
+          [materialCount]="materialCount()" />
       </p-tabpanel>
 
       <!-- ? Class Members -->
       <p-tabpanel value="member">
-        <class-member />
+        <class-member [classModel]="classModel()" [students]="students()" />
       </p-tabpanel>
     </p-tabpanels>
   </p-tabs>

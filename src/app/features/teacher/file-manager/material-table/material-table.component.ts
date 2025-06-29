@@ -69,7 +69,7 @@ export class MaterialTableComponent implements OnInit {
 
   materials = this.lessonMaterialsService.lessonMaterials;
   totalRecords = this.lessonMaterialsService.totalRecords;
-  isLoading = this.loadingService.isLoading;
+  isLoading = this.loadingService.is('get-materials');
 
   currentPage = signal(1);
   pageSize = signal(PAGE_SIZE);
@@ -143,8 +143,9 @@ export class MaterialTableComponent implements OnInit {
   openAddMaterialModal(): void {
     this.globalModalService.open(AddFileModalComponent, {
       folderId: this.lessonId(),
-      pageIndex: this.currentPage(),
-      pageSize: this.pageSize(),
+      addFileSuccess: () => {
+        this.currentPage.set(0);
+      },
     });
   }
 

@@ -1,52 +1,70 @@
 <div class="e-container-fluid px-0">
   <div
     class="rounded bg-white p-[25px] dark:border-dark-500 dark:bg-dark-200 lg:p-5">
-    <div class="flex items-center justify-between">
-      <app-search-input />
+    <div class="flex items-center justify-between xs:flex-col xs:gap-5">
+      <app-search-input (search)="onSearch($event)" />
       <p-button
         label="Tạo lớp học mới"
         icon="pi pi-plus"
         size="small"
-        variant="outlined" />
+        variant="outlined"
+        (onClick)="openAddClassModal()" />
     </div>
 
-    <div class="mt-8">
-      <div
-        class="e-row e-row-cols-5 e-row-cols-xxxl-4 e-row-cols-lg-3 e-row-cols-md-2 e-row-cols-sm-1 e-gx-3 e-gy-5">
-        <div class="e-col">
-          <class-card />
+    @if (classes().length > 0) {
+      <div class="mt-8">
+        <div
+          class="e-row e-row-cols-5 e-row-cols-xxxl-4 e-row-cols-lg-3 e-row-cols-md-2 e-row-cols-xs-1 e-gx-3 e-gy-5">
+          @for (class of classes(); track class.id) {
+            <div class="e-col">
+              <class-card
+                [classModel]="class"
+                [currentPage]="currentPage()"
+                [pageSize]="pageSize()" />
+            </div>
+          }
         </div>
-        <div class="e-col">
-          <class-card />
-        </div>
-        <div class="e-col">
-          <class-card />
-        </div>
-        <div class="e-col">
-          <class-card />
-        </div>
-        <div class="e-col">
-          <class-card />
-        </div>
-        <div class="e-col">
-          <class-card />
-        </div>
-        <div class="e-col">
-          <class-card />
-        </div>
-        <div class="e-col">
-          <class-card />
-        </div>
-        <div class="e-col">
-          <class-card />
-        </div>
-        <div class="e-col">
-          <class-card />
-        </div>
-        <div class="e-col">
-          <class-card />
-        </div>
+
+        @if (classes().length > 0) {
+          <div class="mt-8 flex justify-center">
+            <p-paginator
+              [first]="first()"
+              [rows]="rows()"
+              [totalRecords]="totalClass()"
+              (onPageChange)="onPageChange($event)" />
+          </div>
+        }
       </div>
-    </div>
+    } @else {
+      <div
+        class="flex min-h-[calc(100vh-350px)] flex-col items-center justify-center text-center">
+        <img
+          src="./images/icons/classroom-lesson-empty.svg"
+          alt="Empty Classroom List"
+          class="size-[300px]" />
+        <h3 class="text-lg font-semibold">
+          {{
+            isSearching()
+              ? 'Không tìm thấy lớp học phù hợp'
+              : 'Bạn chưa có lớp học nào'
+          }}
+        </h3>
+        <p class="mt-2 italic text-gray-500 dark:text-gray-300">
+          {{
+            isSearching()
+              ? 'Vui lòng thử với tên lớp học khác.'
+              : 'Hãy tạo lớp học đầu tiên để bắt đầu giảng dạy và quản lý học sinh của bạn.'
+          }}
+        </p>
+      </div>
+    }
+    @if (isLoading()) {
+      <div
+        class="flex min-h-[calc(100vh-350px)] flex-col items-center justify-center text-center">
+        <p-progress-spinner
+          ariaLabel="loading"
+          [style]="{ width: '60px', height: '60px' }" />
+      </div>
+    }
   </div>
 </div>

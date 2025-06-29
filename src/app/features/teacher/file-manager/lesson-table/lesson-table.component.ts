@@ -13,6 +13,7 @@ import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
+import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 
 import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
 
@@ -45,12 +46,13 @@ export class LessonTableComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly modalService = inject(GlobalModalService);
+  private readonly loadingService = inject(LoadingService);
   private readonly folderService = inject(FolderManagementService);
 
   folders = this.folderService.folderList;
   totalRecords = this.folderService.totalRecords;
+  isLoading = this.loadingService.is('get-folders');
 
-  isLoading = signal(false);
   currentPage = signal(1);
   pageSize = signal(PAGE_SIZE);
   firstRecordIndex = signal(0);
@@ -110,7 +112,11 @@ export class LessonTableComponent implements OnInit {
   }
 
   openAddFolderModal(): void {
-    this.modalService.open(AddLessonModalComponent);
+    this.modalService.open(AddLessonModalComponent, {
+      addLessonSuccess: () => {
+        this.currentPage.set(0);
+      },
+    });
   }
 
   goToFolderMaterials(folderId: string): void {

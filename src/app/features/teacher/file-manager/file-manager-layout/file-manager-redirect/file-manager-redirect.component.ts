@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+
+import { FolderManagementService } from '../../../../../shared/services/api/folder/folder-management.service';
 
 @Component({
   selector: 'file-manager-redirect',
@@ -9,4 +11,8 @@ import { RouterLink } from '@angular/router';
   styleUrl: './file-manager-redirect.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FileManagerRedirectComponent {}
+export class FileManagerRedirectComponent {
+  private readonly folderManagementService = inject(FolderManagementService);
+
+  totalFolders = this.folderManagementService.totalRecords;
+}
