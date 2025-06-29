@@ -74,7 +74,11 @@
                 class="require-text grow resize-none text-[#4a4b4d] placeholder:text-[#4a4b4d]"></textarea>
               <div class="flex items-center">
                 <span class="px-4 dark:text-white">
-                  {{ totalChecked() }} tài liệu được chọn
+                  @if (totalUploaded() > 0) {
+                    {{ totalChecked() }} tài liệu được chọn
+                  } @else {
+                    Chưa tải lên tài liệu nào
+                  }
                 </span>
                 <p-button
                   [rounded]="true"
