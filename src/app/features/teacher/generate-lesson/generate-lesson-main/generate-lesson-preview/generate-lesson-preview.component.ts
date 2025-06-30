@@ -1,15 +1,20 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { ButtonModule } from 'primeng/button';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 
+import { GlobalModalService } from '../../../../../shared/services/layout/global-modal/global-modal.service';
+
 import { AudioPreviewComponent } from './audio-preview/audio-preview.component';
 import { VideoPreviewComponent } from './video-preview/video-preview.component';
+import { GenerateSettingsModalComponent } from './generate-settings-modal/generate-settings-modal.component';
 
 @Component({
   selector: 'generate-lesson-preview',
   standalone: true,
   imports: [
+    CommonModule,
     ButtonModule,
     ScrollPanelModule,
     AudioPreviewComponent,
@@ -19,4 +24,10 @@ import { VideoPreviewComponent } from './video-preview/video-preview.component';
   styleUrl: './generate-lesson-preview.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GenerateLessonPreviewComponent {}
+export class GenerateLessonPreviewComponent {
+  private readonly globalModalService = inject(GlobalModalService);
+
+  openModal() {
+    this.globalModalService.open(GenerateSettingsModalComponent);
+  }
+}

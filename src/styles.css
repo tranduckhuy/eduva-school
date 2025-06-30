@@ -127,6 +127,8 @@
     --color-heading: var(--color-black);
 
     --color-scrollbar: #b5c3d7;
+
+    --color-button-active: #edeffa;
   }
 
   html {
@@ -153,6 +155,8 @@
     --color-heading: var(--color-white);
 
     --color-scrollbar: #ffffff26;
+
+    --color-button-active: #8695aa;
   }
 
   html *::-webkit-scrollbar {
