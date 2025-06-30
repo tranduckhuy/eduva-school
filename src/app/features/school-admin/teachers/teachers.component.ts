@@ -6,8 +6,9 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { ConfirmationService } from 'primeng/api';
 
 import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
 
@@ -15,8 +16,20 @@ import { SearchInputComponent } from '../../../shared/components/search-input/se
 import { BadgeComponent } from '../../../shared/components/badge/badge.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
-import { AddTeacherModalComponent } from './add-teacher-modal/add-teacher-modal.component';
 import { ImportAccountsComponent } from '../../../shared/components/import-accounts/import-accounts.component';
+import { AddTeacherModalComponent } from './add-teacher-modal/add-teacher-modal.component';
+import { UserService } from '../../../shared/services/api/user/user.service';
+import { LoadingService } from '../../../shared/services/core/loading/loading.service';
+import { PAGE_SIZE } from '../../../shared/constants/common.constant';
+import { UserListParams } from '../../../shared/models/api/request/query/user-list-params';
+import { SelectModule } from 'primeng/select';
+import { FormControl, FormsModule } from '@angular/forms';
+import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
+
+interface StatusOption {
+  name: string;
+  code: number | undefined;
+}
 
 @Component({
   selector: 'app-teachers',
@@ -24,255 +37,177 @@ import { ImportAccountsComponent } from '../../../shared/components/import-accou
   imports: [
     SearchInputComponent,
     BadgeComponent,
+    SelectModule,
+    FormsModule,
     ButtonComponent,
     TableModule,
     LeadingZeroPipe,
     TooltipModule,
     RouterLink,
     ImportAccountsComponent,
+    TableSkeletonComponent,
   ],
   templateUrl: './teachers.component.html',
   styleUrl: './teachers.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeachersComponent {
-  teachers = [
-    {
-      id: 1,
-      name: 'Nguyễn Văn An',
-      username: 'ngvanan',
-      avatarUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
-      dob: '1980-05-12',
-      email: 'ngvanan@example.com',
-      phoneNumber: '0901234567',
-      schoolId: 'SCH001',
-      status: 'active',
-      createdAt: new Date('2020-01-15'),
-      lastModifiedAt: new Date('2023-04-10'),
-    },
-    {
-      id: 2,
-      name: 'Trần Thị Bích',
-      username: 'ttbich',
-      avatarUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
-      dob: '1985-11-20',
-      email: 'ttbich@example.com',
-      phoneNumber: '0912345678',
-      schoolId: 'SCH002',
-      status: 'active',
-      createdAt: new Date('2019-08-30'),
-      lastModifiedAt: new Date('2023-03-22'),
-    },
-    {
-      id: 3,
-      name: 'Lê Minh Cường',
-      username: 'lmcuong',
-      avatarUrl: 'https://randomuser.me/api/portraits/men/3.jpg',
-      dob: '1978-02-28',
-      email: 'lmcuong@example.com',
-      phoneNumber: '0987654321',
-      schoolId: 'SCH003',
-      status: 'inactive',
-      createdAt: new Date('2018-05-10'),
-      lastModifiedAt: new Date('2022-12-15'),
-    },
-    {
-      id: 4,
-      name: 'Phạm Thị Dung',
-      username: 'ptdung',
-      avatarUrl: 'https://randomuser.me/api/portraits/women/4.jpg',
-      dob: '1990-07-07',
-      email: 'ptdung@example.com',
-      phoneNumber: '0909876543',
-      schoolId: 'SCH001',
-      status: 'active',
-      createdAt: new Date('2021-02-20'),
-      lastModifiedAt: new Date('2023-01-05'),
-    },
-    {
-      id: 5,
-      name: 'Hoàng Văn Em',
-      username: 'hvem',
-      avatarUrl: 'https://randomuser.me/api/portraits/men/5.jpg',
-      dob: '1983-09-09',
-      email: 'hvem@example.com',
-      phoneNumber: '0911122233',
-      schoolId: 'SCH002',
-      status: 'active',
-      createdAt: new Date('2017-11-11'),
-      lastModifiedAt: new Date('2023-02-28'),
-    },
-    {
-      id: 6,
-      name: 'Đặng Thị Hương',
-      username: 'dthuong',
-      avatarUrl: 'https://randomuser.me/api/portraits/women/6.jpg',
-      dob: '1987-03-15',
-      email: 'dthuong@example.com',
-      phoneNumber: '0933445566',
-      schoolId: 'SCH003',
-      status: 'inactive',
-      createdAt: new Date('2016-06-18'),
-      lastModifiedAt: new Date('2022-10-10'),
-    },
-    {
-      id: 7,
-      name: 'Vũ Minh Giang',
-      username: 'vmgiang',
-      avatarUrl: 'https://randomuser.me/api/portraits/men/7.jpg',
-      dob: '1975-12-01',
-      email: 'vmgiang@example.com',
-      phoneNumber: '0922334455',
-      schoolId: 'SCH001',
-      status: 'active',
-      createdAt: new Date('2015-04-25'),
-      lastModifiedAt: new Date('2023-05-01'),
-    },
-    {
-      id: 8,
-      name: 'Lý Thị Hạnh',
-      username: 'lthanh',
-      avatarUrl: 'https://randomuser.me/api/portraits/women/8.jpg',
-      dob: '1992-08-19',
-      email: 'lthanh@example.com',
-      phoneNumber: '0944556677',
-      schoolId: 'SCH002',
-      status: 'active',
-      createdAt: new Date('2020-09-09'),
-      lastModifiedAt: new Date('2023-04-20'),
-    },
-    {
-      id: 9,
-      name: 'Trịnh Văn Hùng',
-      username: 'tvhung',
-      avatarUrl: 'https://randomuser.me/api/portraits/men/9.jpg',
-      dob: '1981-06-23',
-      email: 'tvhung@example.com',
-      phoneNumber: '0905566778',
-      schoolId: 'SCH003',
-      status: 'inactive',
-      createdAt: new Date('2014-12-12'),
-      lastModifiedAt: new Date('2022-09-30'),
-    },
-    {
-      id: 10,
-      name: 'Phan Thị Kiều',
-      username: 'ptkieu',
-      avatarUrl: 'https://randomuser.me/api/portraits/women/10.jpg',
-      dob: '1986-04-04',
-      email: 'ptkieu@example.com',
-      phoneNumber: '0912233445',
-      schoolId: 'SCH001',
-      status: 'active',
-      createdAt: new Date('2019-07-07'),
-      lastModifiedAt: new Date('2023-03-15'),
-    },
-    {
-      id: 11,
-      name: 'Ngô Văn Long',
-      username: 'nvlong',
-      avatarUrl: 'https://randomuser.me/api/portraits/men/11.jpg',
-      dob: '1979-10-10',
-      email: 'nvlong@example.com',
-      phoneNumber: '0933667788',
-      schoolId: 'SCH002',
-      status: 'active',
-      createdAt: new Date('2018-01-01'),
-      lastModifiedAt: new Date('2023-02-02'),
-    },
-    {
-      id: 12,
-      name: 'Bùi Thị Mai',
-      username: 'btmai',
-      avatarUrl: 'https://randomuser.me/api/portraits/women/12.jpg',
-      dob: '1991-03-03',
-      email: 'btmai@example.com',
-      phoneNumber: '0922445566',
-      schoolId: 'SCH003',
-      status: 'active',
-      createdAt: new Date('2021-05-05'),
-      lastModifiedAt: new Date('2023-04-04'),
-    },
-    {
-      id: 13,
-      name: 'Đỗ Văn Nam',
-      username: 'dvnam',
-      avatarUrl: 'https://randomuser.me/api/portraits/men/13.jpg',
-      dob: '1982-07-07',
-      email: 'dvnam@example.com',
-      phoneNumber: '0909988776',
-      schoolId: 'SCH001',
-      status: 'inactive',
-      createdAt: new Date('2013-11-11'),
-      lastModifiedAt: new Date('2022-08-08'),
-    },
-    {
-      id: 14,
-      name: 'Phùng Thị Lan',
-      username: 'ptlan',
-      avatarUrl: 'https://randomuser.me/api/portraits/women/14.jpg',
-      dob: '1988-01-01',
-      email: 'ptlan@example.com',
-      phoneNumber: '0911776655',
-      schoolId: 'SCH002',
-      status: 'active',
-      createdAt: new Date('2017-03-03'),
-      lastModifiedAt: new Date('2023-01-01'),
-    },
-    {
-      id: 15,
-      name: 'Trần Văn Quang',
-      username: 'tvquang',
-      avatarUrl: 'https://randomuser.me/api/portraits/men/15.jpg',
-      dob: '1977-09-09',
-      email: 'tvquang@example.com',
-      phoneNumber: '0933111222',
-      schoolId: 'SCH003',
-      status: 'active',
-      createdAt: new Date('2016-12-12'),
-      lastModifiedAt: new Date('2023-05-05'),
-    },
-  ];
   private readonly globalModalService = inject(GlobalModalService);
+  private readonly confirmationService = inject(ConfirmationService);
+  private readonly userService = inject(UserService);
+  private readonly loadingService = inject(LoadingService);
 
-  totalRecords = signal<number>(this.teachers.length);
-  loading = signal<boolean>(false);
+  // Pagination & Sorting signals
   first = signal<number>(0);
-  rows = signal<number>(10);
+  rows = signal<number>(PAGE_SIZE);
+  sortField = signal<string | null>(null);
+  sortOrder = signal<number>(0); // 1 = asc, -1 = desc
+  statusSelect = signal<StatusOption | undefined>(undefined);
+  selectedTimeFilter = signal<
+    { name: string; value: string | undefined } | undefined
+  >(undefined);
+  searchTerm = signal<string>('');
+  tableHeadSkeleton = signal([
+    'STT',
+    'Giáo viên',
+    'Số điện thoại',
+    'Email',
+    'Trạng thái',
+    'Hành động',
+  ]);
 
-  get pagedTeachers() {
-    return this.teachers.slice(this.first(), this.first() + this.rows());
+  readonly statusSelectOptions = signal<StatusOption[]>([
+    { name: 'Đang hoạt động', code: 0 },
+    { name: 'Vô hiệu hóa', code: 3 },
+    { name: 'Tất cả', code: undefined },
+  ]);
+
+  readonly timeFilterOptions = signal([
+    { name: 'Mới nhất', value: 'desc' },
+    { name: 'Cũ nhất', value: 'asc' },
+  ]);
+
+  // Signals from service
+  isLoadingGet = this.loadingService.is('get-users');
+  isLoadingArchive = this.loadingService.is('archive-user');
+  isLoadingActive = this.loadingService.is('active-user');
+
+  users = this.userService.users;
+  totalUsers = this.userService.totalUsers;
+
+  private loadData(): void {
+    const params: UserListParams = {
+      role: 4,
+      pageIndex: Math.floor(this.first() / this.rows()) + 1,
+      pageSize: this.rows(),
+      searchTerm: this.searchTerm(),
+      sortBy: this.sortField() ?? 'createdAt',
+      sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
+      activeOnly: this.getActiveOnlyStatus(),
+    };
+
+    this.userService.getUsers(params).subscribe();
   }
 
-  loadProductsLazy(event: TableLazyLoadEvent) {}
-
-  onSearchTriggered(term: string) {}
-
-  next() {
-    this.first.set(this.first() + this.rows());
+  private getActiveOnlyStatus(): boolean | undefined {
+    const statusCode = this.statusSelect()?.code;
+    if (statusCode === 0) return true;
+    if (statusCode === 1) return false;
+    return undefined;
   }
 
-  prev() {
-    this.first.set(this.first() - this.rows());
-  }
+  onTimeFilterChange(
+    selected: { name: string; value: string | undefined } | undefined
+  ): void {
+    this.selectedTimeFilter.set(selected);
 
-  reset() {
+    if (selected?.value) {
+      this.sortField.set('createdAt');
+      this.sortOrder.set(selected.value === 'desc' ? -1 : 1);
+    } else {
+      this.sortField.set(null);
+      this.sortOrder.set(1);
+    }
+
     this.first.set(0);
+    this.loadData();
   }
 
-  pageChange(event: any) {
-    this.first.set(event.first);
-    this.rows.set(event.rows);
+  loadDataLazy(event: TableLazyLoadEvent): void {
+    const first = event.first ?? 0;
+    const rows = event.rows ?? PAGE_SIZE;
+
+    // Handle sorting
+    if (event.sortField) {
+      this.sortField.set(
+        Array.isArray(event.sortField) ? event.sortField[0] : event.sortField
+      );
+      this.sortOrder.set(event.sortOrder ?? 1);
+    }
+
+    this.first.set(first);
+    this.rows.set(rows);
+    this.loadData();
   }
 
-  isLastPage(): boolean {
-    return this.teachers
-      ? this.first() + this.rows() >= this.teachers.length
-      : true;
+  onStatusSelectChange(selected: StatusOption | undefined): void {
+    this.statusSelect.set(selected);
+    this.first.set(0); // Reset to first page when filter changes
+    this.loadData();
   }
 
-  isFirstPage(): boolean {
-    return this.teachers ? this.first() === 0 : true;
+  onSearchTriggered(term: string): void {
+    this.searchTerm.set(term);
+    this.sortField.set(null);
+    this.sortOrder.set(1);
+    this.first.set(0); // Reset to first page when search changes
+    this.loadData();
+  }
+
+  openConfirmArchiveDialog(event: Event, userId: string): void {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Bạn có chắc chắn muốn vô hiệu hóa người dùng này không?',
+      header: 'Vô hiệu hóa người dùng',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'Hủy',
+      rejectButtonProps: {
+        label: 'Hủy',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Xác nhận',
+        severity: 'danger',
+      },
+      accept: () => {
+        this.userService.archiveUser(userId).subscribe({
+          next: () => this.loadData(),
+        });
+      },
+    });
+  }
+  openConfirmActiveDialog(event: Event, userId: string): void {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Bạn có chắc chắn muốn kích hoạt người dùng này không?',
+      header: 'Kích hoạt người dùng',
+      icon: 'pi pi-exclamation-triangle',
+      rejectLabel: 'Hủy',
+      rejectButtonProps: {
+        label: 'Hủy',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Xác nhận',
+      },
+      accept: () => {
+        this.userService.activateUser(userId).subscribe({
+          next: () => this.loadData(),
+        });
+      },
+    });
   }
 
   openAddTeacherModal() {

@@ -1,0 +1,76 @@
+::ng-deep .p-datatable-table {
+  border: 1px solid var(--color-border-secondary) !important;
+  background-color: var(--color-bg-primary) !important;
+}
+::ng-deep .p-datatable-thead > tr > th {
+  background-color: var(--color-secondary-100) !important;
+  color: var(--color-text-primary) !important;
+  font-size: 15px;
+  padding: 16px !important;
+}
+
+::ng-deep .dark .p-datatable-thead > tr > th {
+  background-color: var(--color-primary-500) !important;
+}
+
+::ng-deep .p-datatable-tbody > tr > td {
+  background-color: var(--color-bg-primary) !important;
+  color: var(--color-gray-700) !important;
+  font-size: 15px;
+  padding: 16px !important;
+}
+
+::ng-deep .dark .p-datatable-tbody > tr > td {
+  color: var(--color-white) !important;
+}
+
+::ng-deep .p-paginator {
+  padding: 20px 0 0 !important;
+  background-color: var(--color-bg-primary) !important;
+}
+
+::ng-deep .p-paginator-page.p-paginator-page-selected {
+  background-color: var(--color-primary-500) !important;
+  align-items: center;
+  color: var(--color-white) !important;
+}
+
+::ng-deep .p-paginator-page:hover,
+::ng-deep .p-paginator-next:hover,
+::ng-deep .p-paginator-prev:hover,
+::ng-deep .p-paginator-first:hover,
+::ng-deep .p-paginator-last:hover {
+  background-color: var(--color-primary-500) !important;
+  color: var(--color-white) !important;
+}
+
+::ng-deep .p-paginator-current {
+  font-size: 15px !important;
+  margin-right: auto !important;
+  color: var(--color-gray-700) !important;
+  padding-left: 8px !important;
+}
+
+::ng-deep .dark .p-paginator-current {
+  color: var(--color-gray-500) !important;
+}
+
+::ng-deep .dark .p-select,
+::ng-deep .dark .p-select-list-container,
+::ng-deep .dark .p-select-list,
+::ng-deep .dark .p-select-overlay {
+  background-color: var(--color-bg-primary) !important;
+}
+::ng-deep .dark .p-select {
+  color: #fff !important;
+  border-color: var(--color-gray-500) !important;
+}
+
+::ng-deep .dark .p-placeholder,
+::ng-deep .dark .p-select-dropdown-icon {
+  color: #fff !important;
+}
+
+::ng-deep .dark .p-select-option:hover {
+  background-color: var(--color-bg-secondary) !important;
+}

@@ -5,54 +5,47 @@ import {
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
+import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ConfirmationService } from 'primeng/api';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 
 import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
-
+import { UserService } from '../../../shared/services/api/user/user.service';
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 import { BadgeComponent } from '../../../shared/components/badge/badge.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
-import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
-import { ImportAccountsComponent } from '../../../shared/components/import-accounts/import-accounts.component';
-import { AddStudentModalComponent } from './add-student-modal/add-student-modal.component';
-import { UserService } from '../../../shared/services/api/user/user.service';
+import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
 import { PAGE_SIZE } from '../../../shared/constants/common.constant';
 import { UserListParams } from '../../../shared/models/api/request/query/user-list-params';
-import { SelectModule } from 'primeng/select';
-import { FormControl, FormsModule } from '@angular/forms';
-import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 
 interface StatusOption {
   name: string;
   code: number | undefined;
 }
-
 @Component({
-  selector: 'app-students',
+  selector: 'app-content-moderators',
   standalone: true,
   imports: [
     SearchInputComponent,
     BadgeComponent,
-    SelectModule,
-    FormsModule,
     ButtonComponent,
     TableModule,
     LeadingZeroPipe,
-    TooltipModule,
     RouterLink,
-    ImportAccountsComponent,
+    TooltipModule,
+    FormsModule,
+    SelectModule,
     TableSkeletonComponent,
   ],
-  templateUrl: './students.component.html',
-  styleUrl: './students.component.css',
+  templateUrl: './content-moderators.component.html',
+  styleUrl: './content-moderators.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StudentsComponent {
-  private readonly globalModalService = inject(GlobalModalService);
+export class ContentModeratorsComponent {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly userService = inject(UserService);
   private readonly loadingService = inject(LoadingService);
@@ -69,7 +62,7 @@ export class StudentsComponent {
   searchTerm = signal<string>('');
   tableHeadSkeleton = signal([
     'STT',
-    'Học sinh',
+    'Kiểm duyệt nội dung',
     'Số điện thoại',
     'Email',
     'Trạng thái',
@@ -85,19 +78,20 @@ export class StudentsComponent {
   readonly timeFilterOptions = signal([
     { name: 'Mới nhất', value: 'desc' },
     { name: 'Cũ nhất', value: 'asc' },
+    { name: 'Tất cả', value: undefined },
   ]);
 
   // Signals from service
-  isLoadingGet = this.loadingService.is('get-users');
-  isLoadingArchive = this.loadingService.is('archive-user');
-  isLoadingActive = this.loadingService.is('active-user');
+  isLoadingGet = this.loadingService.is('get-Schools');
+  isLoadingArchive = this.loadingService.is('archive-school');
+  isLoadingActive = this.loadingService.is('active-school');
 
   users = this.userService.users;
   totalUsers = this.userService.totalUsers;
 
   private loadData(): void {
     const params: UserListParams = {
-      role: 4,
+      role: 2,
       pageIndex: Math.floor(this.first() / this.rows()) + 1,
       pageSize: this.rows(),
       searchTerm: this.searchTerm(),
@@ -208,9 +202,5 @@ export class StudentsComponent {
         });
       },
     });
-  }
-
-  openAddStudentModal() {
-    this.globalModalService.open(AddStudentModalComponent);
   }
 }

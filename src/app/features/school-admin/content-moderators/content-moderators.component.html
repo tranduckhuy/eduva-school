@@ -1,8 +1,9 @@
 <div
   class="rounded border border-gray-100 bg-white p-5 shadow-main dark:border-dark-500 dark:bg-dark-200">
-  <div class="fap-4 mb-5 flex flex-wrap items-center justify-between">
+  <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
     <app-search-input (search)="onSearchTriggered($event)" class="md:w-64" />
-    <div class="flex items-center gap-3">
+
+    <div class="flex flex-wrap gap-3">
       <!-- Time filter -->
       <p-select
         [options]="timeFilterOptions()"
@@ -20,26 +21,22 @@
         optionLabel="name"
         placeholder="Chọn trạng thái hoạt động"
         class="!dark:bg-dark-200 flex h-11 items-center sm:w-56" />
-      <app-button
-        [variant]="'outline'"
-        class="flex items-center"
-        (clicked)="openAddTeacherModal()">
-        <span
-          class="material-symbols-outlined relative top-[3px] mr-1 text-lg leading-none">
-          add
-        </span>
-        <span>Thêm giáo viên</span>
-      </app-button>
-      <app-import-accounts [title]="'Import danh sách giáo viên'" />
-      <app-button [variant]="'outline'" class="flex items-center">
-        <span
-          class="material-symbols-outlined relative top-[3px] mr-1 text-lg leading-none">
-          download
-        </span>
-        <span>Export</span>
-      </app-button>
+
+      <!--  Export button -->
+      <div class="flex gap-2">
+        <a routerLink="create">
+          <app-button [variant]="'outline'" class="flex items-center">
+            <span
+              class="material-symbols-outlined relative top-[3px] mr-1 text-lg leading-none"
+              >download</span
+            >
+            <span>Export</span>
+          </app-button>
+        </a>
+      </div>
     </div>
   </div>
+
   @if (isLoadingGet()) {
     <app-table-skeleton [tableHead]="tableHeadSkeleton()" />
   } @else {
@@ -54,7 +51,7 @@
       (onLazyLoad)="loadDataLazy($event)"
       [totalRecords]="totalUsers()"
       currentPageReportTemplate="
-        Hiển thị {first} đến {last} trên {totalRecords} quản lý giáo viên
+        Hiển thị {first} đến {last} trên {totalRecords} người kiểm duyệt nội dung
       ">
       <ng-template #header>
         <tr>
@@ -63,7 +60,8 @@
             scope="col"
             class="!w-[25%] !min-w-[200px]"
             pSortableColumn="fullname">
-            <span class="mr-2">Giáo viên</span><p-sortIcon field="fullname" />
+            <span class="mr-2">Kiểm duyệt nội dung</span
+            ><p-sortIcon field="fullname" />
           </th>
           <th
             scope="col"
@@ -80,33 +78,41 @@
           </th>
         </tr>
       </ng-template>
-      <ng-template #body let-teacher let-i="rowIndex">
+      <ng-template #body let-contentModerator let-i="rowIndex">
         <tr>
           <td class="!text-center">{{ i + 1 | leadingZero }}</td>
           <td>
             <div class="flex items-center gap-2">
               <img
-                [src]="teacher.avatarUrl"
+                [src]="contentModerator.avatarUrl"
                 class="size-10 rounded-full object-cover"
                 alt="Avatar" />
               <div class="flex flex-col">
                 <h3 class="text-base font-semibold">
-                  {{ teacher.fullName }}
+                  {{ contentModerator.fullName }}
                 </h3>
               </div>
             </div>
           </td>
-          <td>{{ teacher.email }}</td>
-          <td>{{ teacher.phoneNumber }}</td>
+          <td>{{ contentModerator.email }}</td>
+          <td>{{ contentModerator.phoneNumber }}</td>
           <td class="!text-center">
             <app-badge
-              [variant]="teacher.status === 0 ? 'success' : 'destructive'">
-              {{ teacher.status === 0 ? 'Đang hoạt động' : 'Vô hiệu hóa' }}
+              [variant]="
+                contentModerator.status === 0 ? 'success' : 'destructive'
+              ">
+              {{
+                contentModerator.status === 0 ? 'Đang hoạt động' : 'Vô hiệu hóa'
+              }}
             </app-badge>
           </td>
           <td class="!text-center">
             <div class="mr-4 flex items-center justify-center gap-2">
-              <a [routerLink]="['/school-admin/teachers', teacher.id]">
+              <a
+                [routerLink]="[
+                  '/school-admin/content-moderators',
+                  contentModerator.id,
+                ]">
                 <app-button
                   pTooltip="Xem chi tiết"
                   tooltipPosition="top"
@@ -115,22 +121,26 @@
                   >visibility</app-button
                 >
               </a>
-              @if (teacher.status === 0) {
+              @if (contentModerator.status === 0) {
                 <app-button
                   pTooltip="Vô hiệu hóa"
                   tooltipPosition="top"
                   [loading]="isLoadingArchive()"
-                  (clicked)="openConfirmArchiveDialog($event, teacher.id)"
+                  (clicked)="
+                    openConfirmArchiveDialog($event, contentModerator.id)
+                  "
                   [variant]="'light-danger'"
                   class="material-symbols-outlined rounded-full px-[7px] py-[7px] text-lg leading-none"
                   >archive</app-button
                 >
-              } @else if (teacher.status === 1) {
+              } @else if (contentModerator.status === 1) {
                 <app-button
                   pTooltip="Kích hoạt"
                   tooltipPosition="top"
                   [loading]="isLoadingActive()"
-                  (clicked)="openConfirmActiveDialog($event, teacher.id)"
+                  (clicked)="
+                    openConfirmActiveDialog($event, contentModerator.id)
+                  "
                   [variant]="'light'"
                   class="material-symbols-outlined rounded-full px-[7px] py-[7px] text-lg leading-none"
                   >unarchive</app-button

@@ -1,0 +1,180 @@
+/* 3/4 Circle Spinner Styles */
+.spinner {
+  position: relative;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  box-sizing: border-box;
+  color: inherit;
+  top: -1px;
+}
+
+/* Create the 3/4 circle effect */
+.spinner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-right-color: currentColor;
+  border-bottom-color: currentColor;
+}
+
+/* Size Variations */
+.spinner-xs {
+  width: 14px;
+  height: 14px;
+}
+.spinner-xs::before {
+  border-width: 1.5px;
+}
+
+.spinner-default {
+  width: 16px;
+  height: 16px;
+}
+.spinner-default::before {
+  border-width: 2px;
+}
+
+.spinner-lg {
+  width: 20px;
+  height: 20px;
+}
+.spinner-lg::before {
+  border-width: 2px;
+}
+
+.spinner-xl {
+  width: 24px;
+  height: 24px;
+}
+.spinner-xl::before {
+  border-width: 3px;
+}
+
+/* Theme-based colors */
+.spinner-primary::before {
+  border-top-color: #3498db;
+  border-right-color: #3498db;
+  border-bottom-color: #3498db;
+}
+.spinner-success::before {
+  border-top-color: #2ecc71;
+  border-right-color: #2ecc71;
+  border-bottom-color: #2ecc71;
+}
+.spinner-danger::before {
+  border-top-color: #e74c3c;
+  border-right-color: #e74c3c;
+  border-bottom-color: #e74c3c;
+}
+.spinner-warning::before {
+  border-top-color: #f39c12;
+  border-right-color: #f39c12;
+  border-bottom-color: #f39c12;
+}
+.spinner-info::before {
+  border-top-color: #3498db;
+  border-right-color: #3498db;
+  border-bottom-color: #3498db;
+}
+.spinner-light::before {
+  border-top-color: #ecf0f1;
+  border-right-color: #ecf0f1;
+  border-bottom-color: #ecf0f1;
+}
+.spinner-dark::before {
+  border-top-color: #34495e;
+  border-right-color: #34495e;
+  border-bottom-color: #34495e;
+}
+
+/* Special handling for outline variants */
+button[class*='outline'] .spinner::before {
+  border-top-color: currentColor;
+  border-right-color: currentColor;
+  border-bottom-color: currentColor;
+}
+
+/* Animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Disabled state styling */
+button:disabled {
+  opacity: 0.7;
+}
+
+button:disabled:hover {
+  background: initial !important;
+}
+
+.loading-state {
+  cursor: wait !important;
+}
+
+.loading-state:hover {
+  opacity: 1 !important;
+  background-color: inherit !important;
+  color: inherit !important;
+  border-color: inherit !important;
+}
+
+/* Theme hover effects (only applied when not loading) */
+:host:not(.loading-state) button[class*='bg-primary']:hover {
+  opacity: 0.9;
+}
+
+:host:not(.loading-state) button[class*='bg-success']:hover {
+  opacity: 0.9;
+}
+
+:host:not(.loading-state) button[class*='bg-danger']:hover {
+  opacity: 0.9;
+}
+
+:host:not(.loading-state) button[class*='bg-warning']:hover {
+  opacity: 0.9;
+}
+
+:host:not(.loading-state) button[class*='bg-info']:hover {
+  opacity: 0.9;
+}
+
+:host:not(.loading-state) button[class*='bg-gray-100']:hover {
+  background-color: rgb(229, 231, 235) !important;
+}
+
+:host:not(.loading-state) button[class*='bg-dark']:hover {
+  opacity: 0.9;
+}
+
+/* Outline variants */
+:host:not(.loading-state)
+  button[class*='outline']:not([class*='outline-rounded']):hover {
+  background-color: var(--button-bg) !important;
+  color: white !important;
+}
+
+:host:not(.loading-state) button[class*='outline-rounded']:hover {
+  background-color: currentColor !important;
+  color: white !important;
+}
+
+/* Light variants */
+:host:not(.loading-state) button[class*='light']:hover {
+  background-color: var(--button-bg) !important;
+  color: rgb(249, 250, 251) !important;
+}
