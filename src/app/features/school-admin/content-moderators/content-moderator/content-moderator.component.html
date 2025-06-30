@@ -1,7 +1,7 @@
 <div
   class="rounded border border-gray-100 bg-white p-4 shadow-main dark:border-dark-500 dark:bg-dark-200">
   <div class="mb-2 flex items-center justify-between">
-    <h2 class="text-base font-medium">Thông tin học sinh</h2>
+    <h2 class="text-base font-medium">Thông tin kiểm duyệt nội dung</h2>
   </div>
 
   <div
@@ -14,7 +14,7 @@
             Avatar
           </div>
           <img
-            [src]="studentDetail()?.avatarUrl"
+            [src]="contentModeratorDetail()?.avatarUrl"
             alt="Avatar"
             class="size-[140px] rounded object-cover" />
         </div>
@@ -27,7 +27,7 @@
               label="Tên"
               type="text"
               [name]="'fullName'"
-              [value]="studentDetail()?.fullName ?? ''"
+              [value]="contentModeratorDetail()?.fullName ?? ''"
               [readOnly]="true">
             </app-form-control>
           </div>
@@ -36,7 +36,7 @@
               label="Email"
               type="email"
               [name]="'email'"
-              [value]="studentDetail()?.email ?? ''"
+              [value]="contentModeratorDetail()?.email ?? ''"
               [readOnly]="true">
             </app-form-control>
           </div>
@@ -45,7 +45,7 @@
               label="Số điện thoại"
               type="tel"
               [name]="'phone'"
-              [value]="studentDetail()?.phoneNumber ?? ''"
+              [value]="contentModeratorDetail()?.phoneNumber ?? ''"
               [readOnly]="true">
             </app-form-control>
           </div>
@@ -55,7 +55,9 @@
               type="text"
               [name]="'status'"
               [value]="
-                studentDetail()?.status === 0 ? 'Đang hoạt động' : 'Vô hiệu hóa'
+                contentModeratorDetail()?.status === 0
+                  ? 'Đang hoạt động'
+                  : 'Vô hiệu hóa'
               "
               [readOnly]="true">
             </app-form-control>
@@ -70,7 +72,7 @@
   class="mt-10 rounded border border-gray-100 bg-white p-6 shadow-main dark:border-dark-500 dark:bg-dark-200">
   <div class="mb-2 flex items-center justify-between">
     <h2 class="text-base font-medium">Thông tin trường học</h2>
-    <a [routerLink]="['/admin/schools', studentDetail()?.school?.id]"
+    <a [routerLink]="['/admin/schools', contentModeratorDetail()?.school?.id]"
       ><app-button [variant]="'light'">Xem chi tiết</app-button></a
     >
   </div>
@@ -82,7 +84,7 @@
           label="Tên"
           type="text"
           [name]="'schoolName'"
-          [value]="studentDetail()?.school?.name ?? ''"
+          [value]="contentModeratorDetail()?.school?.name ?? ''"
           [readOnly]="true">
         </app-form-control>
       </div>
@@ -91,7 +93,7 @@
           label="Email liên hệ"
           type="email"
           [name]="'schoolEmail'"
-          [value]="studentDetail()?.school?.contactEmail ?? ''"
+          [value]="contentModeratorDetail()?.school?.contactEmail ?? ''"
           [readOnly]="true">
         </app-form-control>
       </div>
@@ -100,7 +102,7 @@
           label="Số điện thoại"
           type="tel"
           [name]="'schoolPhone'"
-          [value]="studentDetail()?.school?.contactPhone ?? ''"
+          [value]="contentModeratorDetail()?.school?.contactPhone ?? ''"
           [readOnly]="true">
         </app-form-control>
       </div>
@@ -109,7 +111,7 @@
           label="Địa chỉ"
           type="text"
           [name]="'schoolAddress'"
-          [value]="studentDetail()?.school?.address ?? ''"
+          [value]="contentModeratorDetail()?.school?.address ?? ''"
           [readOnly]="true">
         </app-form-control>
       </div>
