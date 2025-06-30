@@ -2,11 +2,6 @@
   class="rounded border border-gray-100 bg-white p-4 shadow-main dark:border-dark-500 dark:bg-dark-200">
   <div class="mb-2 flex items-center justify-between">
     <h2 class="text-base font-medium">Thông tin giáo viên</h2>
-    <a [routerLink]="['update']">
-      <app-button [variant]="'outline'">
-        <span>Chỉnh sửa</span>
-      </app-button>
-    </a>
   </div>
 
   <div
@@ -19,7 +14,7 @@
             Avatar
           </div>
           <img
-            [src]="teacher.avatarUrl"
+            [src]="teacherDetail()?.avatarUrl"
             alt="Avatar"
             class="size-[140px] rounded object-cover" />
         </div>
@@ -31,8 +26,8 @@
             <app-form-control
               label="Tên"
               type="text"
-              [name]="'name'"
-              [(ngModel)]="name"
+              [name]="'fullName'"
+              [value]="teacherDetail()?.fullName ?? ''"
               [readOnly]="true">
             </app-form-control>
           </div>
@@ -41,7 +36,7 @@
               label="Email"
               type="email"
               [name]="'email'"
-              [(ngModel)]="email"
+              [value]="teacherDetail()?.email ?? ''"
               [readOnly]="true">
             </app-form-control>
           </div>
@@ -50,64 +45,73 @@
               label="Số điện thoại"
               type="tel"
               [name]="'phone'"
-              [(ngModel)]="phoneNumber"
+              [value]="teacherDetail()?.phoneNumber ?? ''"
               [readOnly]="true">
             </app-form-control>
           </div>
           <div class="e-col">
             <app-form-control
-              label="Ngày sinh"
+              label="Trạng thái hoạt động"
               type="text"
-              [name]="'dob'"
-              [(ngModel)]="dob"
+              [name]="'status'"
+              [value]="
+                teacherDetail()?.status === 0 ? 'Đang hoạt động' : 'Vô hiệu hóa'
+              "
               [readOnly]="true">
             </app-form-control>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
 
-    <div class="e-row e-row-cols-3 e-row-cols-lg-2 e-row-cols-md-1 !mt-6">
+<div
+  class="mt-10 rounded border border-gray-100 bg-white p-6 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <div class="mb-2 flex items-center justify-between">
+    <h2 class="text-base font-medium">Thông tin trường học</h2>
+    <a [routerLink]="['/admin/schools', teacherDetail()?.school?.id]"
+      ><app-button [variant]="'light'">Xem chi tiết</app-button></a
+    >
+  </div>
+  <div
+    class="rounded border border-gray-200 p-6 dark:border-dark-500 dark:bg-dark-200">
+    <div class="e-row e-row-cols-2 e-row-cols-md-1 e-g-4">
       <div class="e-col">
         <app-form-control
-          label="Trạng thái hoạt động"
+          label="Tên"
           type="text"
-          [name]="'status'"
-          [(ngModel)]="status"
+          [name]="'schoolName'"
+          [value]="teacherDetail()?.school?.name ?? ''"
           [readOnly]="true">
         </app-form-control>
       </div>
-      <div class="e-col e-gy-md-4">
+      <div class="e-col">
         <app-form-control
-          label="Ngày tạo"
-          type="text"
-          [name]="'createdAt'"
-          [(ngModel)]="createdAt"
+          label="Email liên hệ"
+          type="email"
+          [name]="'schoolEmail'"
+          [value]="teacherDetail()?.school?.contactEmail ?? ''"
           [readOnly]="true">
         </app-form-control>
       </div>
-      <div class="e-col e-gy-lg-4">
+      <div class="e-col">
         <app-form-control
-          label="Lần chỉnh sửa cuối cùng"
-          type="text"
-          [name]="'lastModifiedAt'"
-          [(ngModel)]="lastModifiedAt"
+          label="Số điện thoại"
+          type="tel"
+          [name]="'schoolPhone'"
+          [value]="teacherDetail()?.school?.contactPhone ?? ''"
           [readOnly]="true">
         </app-form-control>
       </div>
-      <div class="e-col-12 form-group">
-        <div class="checkbox flex flex-col text-left">
-          <input
-            type="checkbox"
-            id="isContentModerator"
-            name="isContentModerator"
-            [checked]="isContentModerator()"
-            hidden />
-          <label
-            class="relative ml-1 flex items-center gap-[6px] pt-2 font-semibold">
-            <span>Trở thành content moderator</span>
-          </label>
-        </div>
+      <div class="e-col">
+        <app-form-control
+          label="Địa chỉ"
+          type="text"
+          [name]="'schoolAddress'"
+          [value]="teacherDetail()?.school?.address ?? ''"
+          [readOnly]="true">
+        </app-form-control>
       </div>
     </div>
   </div>

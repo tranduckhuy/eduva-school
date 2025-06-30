@@ -114,7 +114,7 @@ export class NavbarComponent implements OnInit {
     const schoolAdminNav: NavItem[] = isSchoolAdmin
       ? [
           {
-            label: 'Quản lý trường học',
+            label: 'Trường học',
             icon: 'school',
             link: '/school-admin/schools',
             type: 'link',
@@ -122,7 +122,7 @@ export class NavbarComponent implements OnInit {
             submenuItems: [],
           },
           {
-            label: 'Quản lý giáo viên',
+            label: 'Giáo viên',
             icon: 'co_present',
             link: '/school-admin/teachers',
             type: 'link',
@@ -130,7 +130,15 @@ export class NavbarComponent implements OnInit {
             submenuItems: [],
           },
           {
-            label: 'Quản lý học sinh',
+            label: 'Kiểm duyệt viên',
+            icon: 'person_check',
+            link: '/school-admin/content-moderators',
+            type: 'link',
+            isActive: false,
+            submenuItems: [],
+          },
+          {
+            label: 'Học sinh',
             icon: 'person_edit',
             link: '/school-admin/students',
             type: 'link',
@@ -138,9 +146,9 @@ export class NavbarComponent implements OnInit {
             submenuItems: [],
           },
           {
-            label: 'Quản lý hóa đơn',
+            label: 'Lịch sử giao dịch',
             icon: 'receipt_long',
-            link: '/school-admin/invoices',
+            link: '/school-admin/payments',
             type: 'link',
             isActive: false,
             submenuItems: [],
@@ -152,7 +160,7 @@ export class NavbarComponent implements OnInit {
     const fileManagerNav: NavItem[] = isTeacherOrMod
       ? [
           {
-            label: 'Quản lý tài liệu',
+            label: 'Tài liệu',
             icon: 'folder_open',
             link: '/teacher/file-manager',
             type: 'link',

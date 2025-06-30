@@ -1,6 +1,16 @@
 <button
-  class="h-full w-full border-none bg-transparent outline-none"
-  [type]="type()"
+  [attr.type]="type()"
+  [disabled]="disabled() || loading()"
   (click)="onClick($event)">
-  <ng-content />
+  <!-- Left position spinner -->
+  <ng-container *ngIf="loading() && loadingPosition() === 'left'">
+    <span [class]="spinnerClasses" class="mr-2"></span>
+  </ng-container>
+
+  <ng-content></ng-content>
+
+  <!-- Right position spinner -->
+  <ng-container *ngIf="loading() && loadingPosition() === 'right'">
+    <span [class]="spinnerClasses" class="ml-2"></span>
+  </ng-container>
 </button>

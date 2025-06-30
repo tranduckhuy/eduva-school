@@ -7,28 +7,29 @@ import {
 import { RouterLink } from '@angular/router';
 
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
-import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { UserService } from '../../../../shared/services/api/user/user.service';
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 @Component({
-  selector: 'app-teacher',
+  selector: 'app-content-moderator',
   standalone: true,
   imports: [FormControlComponent, ButtonComponent, RouterLink],
-  templateUrl: './teacher.component.html',
-  styleUrl: './teacher.component.css',
+
+  templateUrl: './content-moderator.component.html',
+  styleUrl: './content-moderator.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TeacherComponent {
+export class ContentModeratorComponent {
   private readonly userService = inject(UserService);
   private readonly loadingService = inject(LoadingService);
 
-  teacherId = input.required<string>();
+  contentModeratorId = input.required<string>();
 
   isLoading = this.loadingService;
-  teacherDetail = this.userService.userDetail;
+  contentModeratorDetail = this.userService.userDetail;
 
   ngOnInit(): void {
-    this.userService.getUserDetailById(this.teacherId()).subscribe();
+    this.userService.getUserDetailById(this.contentModeratorId()).subscribe();
   }
 }
