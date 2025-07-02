@@ -75,7 +75,9 @@ export class TwoFactorService {
     request: VerifyOtpRequest
   ): Observable<AuthTokenResponse | null> {
     return this.requestService
-      .post<AuthTokenResponse>(this.VERIFY_OTP_LOGIN_API_URL, request)
+      .post<AuthTokenResponse>(this.VERIFY_OTP_LOGIN_API_URL, request, {
+        bypassAuth: true,
+      })
       .pipe(
         tap(res => this.handleVerify2FAResponse(res, res.data)),
         map(res => this.extractAuthDataFromResponse(res)),

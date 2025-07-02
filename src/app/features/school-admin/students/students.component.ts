@@ -5,25 +5,27 @@ import {
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import { TooltipModule } from 'primeng/tooltip';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { ConfirmationService } from 'primeng/api';
+import { SelectModule } from 'primeng/select';
 
 import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
+
+import { UserService } from '../../../shared/services/api/user/user.service';
+import { LoadingService } from '../../../shared/services/core/loading/loading.service';
+import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
+
+import { type UserListParams } from '../../../shared/models/api/request/query/user-list-params';
+import { PAGE_SIZE } from '../../../shared/constants/common.constant';
 
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 import { BadgeComponent } from '../../../shared/components/badge/badge.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
-import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
 import { ImportAccountsComponent } from '../../../shared/components/import-accounts/import-accounts.component';
 import { AddStudentModalComponent } from './add-student-modal/add-student-modal.component';
-import { UserService } from '../../../shared/services/api/user/user.service';
-import { LoadingService } from '../../../shared/services/core/loading/loading.service';
-import { PAGE_SIZE } from '../../../shared/constants/common.constant';
-import { UserListParams } from '../../../shared/models/api/request/query/user-list-params';
-import { SelectModule } from 'primeng/select';
-import { FormControl, FormsModule } from '@angular/forms';
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 
 interface StatusOption {

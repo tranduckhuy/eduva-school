@@ -39,5 +39,12 @@ export const routes: Routes = [
         mod => mod.schoolAdminRoutes
       ),
   },
-  { path: '**', redirectTo: '' },
+  {
+    path: 'errors',
+    loadChildren: () =>
+      import('./shared/pages/errors/errors.routes').then(
+        mod => mod.errorRoutes
+      ),
+  },
+  { path: '**', redirectTo: '/errors/404' },
 ];

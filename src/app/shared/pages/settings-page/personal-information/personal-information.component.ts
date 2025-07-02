@@ -27,6 +27,7 @@ import { FormControlComponent } from '../../../components/form-control/form-cont
 import { UpdateAvatarModalComponent } from './update-avatar-modal/update-avatar-modal.component';
 
 import { type User } from '../../../models/entities/user.model';
+import { type UpdateProfileRequest } from './models/update-profile-request.model';
 
 @Component({
   selector: 'app-personal-information',
@@ -106,7 +107,7 @@ export class PersonalInformationComponent implements OnInit {
 
     const { fullName, phoneNumber, avatar } = this.form.value;
 
-    const payload = {
+    const payload: UpdateProfileRequest = {
       fullName,
       phoneNumber,
       avatarUrl: avatar,
@@ -114,11 +115,7 @@ export class PersonalInformationComponent implements OnInit {
 
     this.userService.updateUserProfile(payload).subscribe(user => {
       if (user) {
-        console.log(user);
-        console.log(user.fullName);
         const { firstName, lastName } = this.splitFullName(user.fullName);
-        console.log(firstName);
-        console.log(lastName);
         this.originalUserData = { ...payload, firstName, lastName };
         this.isEdit.set(false);
       }

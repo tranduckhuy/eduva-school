@@ -3,7 +3,6 @@ import {
   Component,
   inject,
   input,
-  LOCALE_ID,
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
