@@ -36,10 +36,8 @@ export const authRoutes: Routes = [
       },
       {
         path: 'otp-confirmation',
-        canMatch: [
-          redirectAuthenticatedGuard,
-          requireQueryParamsGuard(['email']),
-        ],
+        canMatch: [redirectAuthenticatedGuard],
+        canActivate: [requireQueryParamsGuard(['email'])],
         loadComponent: () =>
           import('./pages/otp-confirmation/otp-confirmation.component').then(
             mod => mod.OtpConfirmationComponent

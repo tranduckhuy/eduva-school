@@ -14,7 +14,10 @@ import { ToastHandlingService } from '../../../shared/services/core/toast/toast-
 import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
 
 import { StatusCode } from '../../../shared/constants/status-code.constant';
-import { UserRole } from '../../../shared/constants/user-roles.constant';
+import {
+  UserRole,
+  UserRoles,
+} from '../../../shared/constants/user-roles.constant';
 
 import { type LoginRequest } from '../pages/login/models/login-request.model';
 import { type RefreshTokenRequest } from '../models/request/refresh-token-request.model';
@@ -51,13 +54,24 @@ export class AuthService {
       })
       .pipe(
         map(res => {
-          if (res.statusCode === StatusCode.SUCCESS && res.data) {
-            this.handleLoginSuccess(res.data);
-            return res.data;
+          if (!res.statusCode || !res.data) {
+            this.toastHandlingService.errorGeneral();
+            return null;
           }
 
-          this.toastHandlingService.errorGeneral();
-          return null;
+          switch (res.statusCode) {
+            case StatusCode.SUCCESS:
+              this.handleLoginSuccess(res.data);
+              return res.data;
+
+            case StatusCode.REQUIRES_OTP_VERIFICATION:
+              this.handleRequiresOtpVerification(res.data.email);
+              return res.data;
+
+            default:
+              this.toastHandlingService.errorGeneral();
+              return null;
+          }
         }),
         catchError(err => {
           this.handleLoginError(err, request.email);
@@ -121,7 +135,6 @@ export class AuthService {
   handleLoginSuccess(data: AuthTokenResponse): void {
     this.handleTokenStorage(data);
     this.redirectUserAfterLogin();
-    this.isLoggedInSignal.set(true);
   }
 
   // ---------------------------
@@ -135,6 +148,41 @@ export class AuthService {
     this.jwtService.setExpiresDate(
       new Date(Date.now() + expiresIn * 1000).toISOString()
     );
+  }
+
+  private redirectUserAfterLogin(): void {
+    this.userService.getCurrentProfile().subscribe(user => {
+      if (!user) {
+        this.toastHandlingService.errorGeneral();
+        return;
+      }
+
+      if (user.roles.includes(UserRoles.STUDENT)) {
+        this.router.navigateByUrl('/errors/403');
+        setTimeout(() => {
+          this.clearSession();
+          this.isLoggedInSignal.set(false);
+        }, 300);
+      }
+
+      const roleRedirectMap: Partial<Record<UserRole, string>> = {
+        SchoolAdmin: '/school-admin',
+        ContentModerator: '/teacher',
+        Teacher: '/teacher',
+      };
+
+      const firstRole = user.roles[0];
+      const redirectUrl = roleRedirectMap[firstRole] ?? '/school-admin';
+
+      this.isLoggedInSignal.set(true);
+      this.router.navigateByUrl(redirectUrl, { replaceUrl: true });
+    });
+  }
+
+  private handleRequiresOtpVerification(email: string) {
+    this.router.navigate(['/auth/otp-confirmation'], {
+      queryParams: { email },
+    });
   }
 
   private handleLoginError(err: HttpErrorResponse, email: string): void {
@@ -164,12 +212,6 @@ export class AuthService {
         );
         break;
 
-      case StatusCode.REQUIRES_OTP_VERIFICATION:
-        this.router.navigate(['/auth/otp-confirmation'], {
-          queryParams: { email },
-        });
-        break;
-
       default:
         this.toastHandlingService.errorGeneral();
     }
@@ -193,25 +235,5 @@ export class AuthService {
     this.jwtService.clearAll();
     this.userService.clearCurrentUser();
     this.isLoggedInSignal.set(false);
-  }
-
-  private redirectUserAfterLogin(): void {
-    this.userService.getCurrentProfile().subscribe(user => {
-      if (!user) {
-        this.toastHandlingService.errorGeneral();
-        return;
-      }
-
-      const roleRedirectMap: Partial<Record<UserRole, string>> = {
-        SchoolAdmin: '/school-admin',
-        ContentModerator: '/teacher',
-        Teacher: '/teacher',
-      };
-
-      const firstRole = user.roles[0];
-      const redirectUrl = roleRedirectMap[firstRole] ?? '/school-admin';
-
-      this.router.navigateByUrl(redirectUrl, { replaceUrl: true });
-    });
   }
 }

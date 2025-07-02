@@ -73,11 +73,7 @@ export class ExportInvoicePdfComponent {
 
       // Set default font
       pdf.setFont(fontName, 'normal');
-    } catch (error) {
-      console.warn(
-        'Failed to load Vietnamese font, falling back to default',
-        error
-      );
+    } catch {
       pdf.setFont('helvetica'); // Fallback font
     }
 
