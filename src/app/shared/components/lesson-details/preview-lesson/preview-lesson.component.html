@@ -1,0 +1,70 @@
+<div
+  class="rounded border border-gray-100 bg-white p-5 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  @if (lessonMaterial()) {
+    <!-- Viewer -->
+    <div
+      class="relative flex w-full justify-center rounded bg-dark-900"
+      [ngClass]="{
+        'aspect-video':
+          lessonMaterial()?.contentType === 0 ||
+          lessonMaterial()?.contentType === 3,
+        'aspect-[2/0.25] sm:aspect-[2/0.5]':
+          lessonMaterial()?.contentType === 1,
+        'aspect-[2/1] sm:aspect-auto sm:h-[70vh]':
+          lessonMaterial()?.contentType === 2,
+      }">
+      @switch (lessonMaterial()?.contentType) {
+        @case (0) {
+          <app-video-viewer [materialSourceUrl]="lessonMaterial()!.sourceUrl" />
+        }
+
+        @case (1) {
+          <app-audio-viewer [materialSourceUrl]="lessonMaterial()!.sourceUrl" />
+        }
+
+        @case (2) {
+          <app-doc-viewer [materialSourceUrl]="lessonMaterial()!.sourceUrl" />
+        }
+
+        @default {
+          <app-pdf-viewer [materialSourceUrl]="lessonMaterial()!.sourceUrl" />
+        }
+      }
+    </div>
+
+    <!-- Info -->
+    @if (isLoading()) {
+      <app-preview-lesson-skeleton />
+    } @else {
+      <div class="mt-5 flex items-center justify-between sm:flex-wrap">
+        <h1 class="font-nold text-2xl">{{ lessonMaterial()?.title }}</h1>
+        @if (isSchoolAdmin()) {
+          <div class="flex items-center gap-3 sm:mt-4">
+            <p-button
+              label="Duyệt"
+              icon="pi pi-check"
+              variant="outlined"
+              size="small"
+              (onClick)="approveLesson()" />
+            <p-button
+              label="Từ chối"
+              icon="pi pi-times"
+              variant="outlined"
+              size="small"
+              severity="danger"
+              (onClick)="refuseLesson()" />
+          </div>
+        }
+      </div>
+
+      <p class="my-3 dark:text-white">
+        {{ formatUpdateDate(lessonMaterial()?.lastModifiedAt) }}
+      </p>
+      @if (lessonMaterial()?.description) {
+        <div
+          class="lesson-content"
+          [innerHTML]="lessonMaterial()!.description | safeHtml"></div>
+      }
+    }
+  }
+</div>

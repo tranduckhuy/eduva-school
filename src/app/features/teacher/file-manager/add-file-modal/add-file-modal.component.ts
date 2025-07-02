@@ -99,37 +99,52 @@ export class AddFileModalComponent {
     const currentFiles = this.selectedFiles();
     const newFiles = event.files;
 
-    const invalidFiles = Array.from(newFiles).filter(file => {
-      return !ALLOWED_UPLOAD_MIME_TYPES.some(type =>
+    const validFiles: File[] = [];
+    const invalidFiles: File[] = [];
+
+    // ? Separate valid and invalid files based on allowed MIME types
+    for (const file of newFiles) {
+      const isValidType = ALLOWED_UPLOAD_MIME_TYPES.some(type =>
         file.type.startsWith(type)
       );
-    });
 
+      if (isValidType) {
+        validFiles.push(file);
+      } else {
+        invalidFiles.push(file);
+      }
+    }
+
+    // ? Warn user about invalid files but allow valid ones to proceed
     if (invalidFiles.length > 0) {
       const fileNames = invalidFiles.map(f => f.name).join(', ');
-      this.toastHandlingService.error(
-        'Lỗi',
-        `Các tệp không hợp lệ: ${fileNames}. Chỉ chấp nhận Video, Audio, PDF hoặc DOCX.`
+      this.toastHandlingService.warn(
+        'Warning',
+        `The following files are invalid and have been skipped: ${fileNames}.`
       );
+    }
+
+    // ? If no valid files remain, do nothing
+    if (validFiles.length === 0) {
       return;
     }
 
-    // ? Check new total file size if select new file
-    const totalSize = [...currentFiles, ...newFiles].reduce(
+    // 📦 Check if total size (existing + new valid files) exceeds limit
+    const totalSize = [...currentFiles, ...validFiles].reduce(
       (sum, file) => sum + file.size,
       0
     );
 
     if (totalSize > MAX_TOTAL_UPLOAD_FILE_SIZE) {
       this.toastHandlingService.error(
-        'Lỗi',
-        `Tổng dung lượng không được vượt quá ${MAX_TOTAL_UPLOAD_FILE_SIZE}MB`
+        'Error',
+        `Total file size must not exceed ${(MAX_TOTAL_UPLOAD_FILE_SIZE / 1024 / 1024).toFixed(0)}MB.`
       );
       return;
     }
 
-    // ? After checking then add new files to selected list
-    this.selectedFiles.set([...currentFiles, ...newFiles]);
+    // ? All checks passed, update selected file list with valid files
+    this.selectedFiles.set([...currentFiles, ...validFiles]);
   }
 
   onRemoveFile(event: FileRemoveEvent) {
@@ -162,7 +177,7 @@ export class AddFileModalComponent {
       return;
     }
 
-    const timestamp = `${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const timestamp = Date.now();
     const blobNames = files.map(file => {
       const dotIndex = file.name.lastIndexOf('.');
       const base = file.name.substring(0, dotIndex);

@@ -6,7 +6,8 @@ import {
   ElementRef,
   inject,
   signal,
-  ViewChild,
+  viewChild,
+  input,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -46,12 +47,15 @@ type VideoQuality = '1440' | '1080' | '720' | '360' | 'auto';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VideoViewerComponent {
-  @ViewChild('video') videoRef!: ElementRef<HTMLVideoElement>;
-  @ViewChild('progressBar') progressBarRef!: ElementRef<HTMLDivElement>;
-  @ViewChild('volumeBar') volumeBarRef!: ElementRef<HTMLDivElement>;
+  videoPlayerRef = viewChild<ElementRef>('videoPlayer');
+  progressBarRef = viewChild<ElementRef>('progressBar');
+  volumeBarRef = viewChild<ElementRef>('volumeBar');
 
   private vgApi = inject(VgApiService);
   private readonly iconLibrary = inject(FaIconLibrary);
+
+  materialSourceUrl = input.required<string>();
+
   private hideControlsTimeout!: ReturnType<typeof setTimeout>;
 
   // ? State Video Management
@@ -70,17 +74,6 @@ export class VideoViewerComponent {
   lastVolumeLevel = signal<number>(1);
   menuType = signal<'settings' | 'quality'>('settings');
   selectedQuality = signal<VideoQuality>('1080');
-  videoSources = signal<Record<VideoQuality, string>>({
-    '1440':
-      'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    '1080':
-      'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    '720':
-      'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    '360':
-      'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    auto: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-  });
   isSettingsMenuOpen = signal(false);
   currentSettingsMenu = signal<'home' | 'subtitle' | 'speed'>('home');
 
@@ -196,7 +189,7 @@ export class VideoViewerComponent {
   }
 
   seekTo(event: MouseEvent) {
-    const rect = this.progressBarRef.nativeElement.getBoundingClientRect();
+    const rect = this.progressBarRef()?.nativeElement.getBoundingClientRect();
     const ratio = (event.clientX - rect.left) / rect.width;
     const media = this.vgApi.getDefaultMedia();
     media.currentTime = ratio * media.duration;
@@ -204,7 +197,7 @@ export class VideoViewerComponent {
   }
 
   startSeekDrag(event: MouseEvent) {
-    this.startDrag(event, this.progressBarRef, ratio => {
+    this.startDrag(event, this.progressBarRef()!, ratio => {
       const media = this.vgApi.getDefaultMedia();
       media.currentTime = ratio * media.duration;
       this.playedProgress.set(ratio * 100);
@@ -228,13 +221,13 @@ export class VideoViewerComponent {
   }
 
   startVolumeDrag(event: MouseEvent) {
-    this.startDrag(event, this.volumeBarRef, ratio => {
+    this.startDrag(event, this.volumeBarRef()!, ratio => {
       this.updateVolume(ratio);
     });
   }
 
   toggleFullscreen() {
-    const videoEl = document.getElementById('video-player');
+    const videoEl = document.getElementById('video-wrapper');
     if (!document.fullscreenElement) {
       videoEl?.requestFullscreen();
     } else {
@@ -285,7 +278,7 @@ export class VideoViewerComponent {
   onQualityChange(q: string) {
     this.selectedQuality.set(q as VideoQuality);
 
-    const videoEl = this.videoRef.nativeElement;
+    const videoEl = this.videoPlayerRef()!.nativeElement;
     const currentTime = videoEl.currentTime;
     const wasPaused = videoEl.paused;
 

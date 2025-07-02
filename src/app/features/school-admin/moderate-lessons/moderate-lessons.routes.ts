@@ -13,11 +13,11 @@ export const moderateLessonsRoute: Routes = [
     },
   },
   {
-    path: ':lessonId/preview',
+    path: ':materialId',
     loadComponent: () =>
-      import('./preview-lesson/preview-lesson.component').then(
-        mod => mod.PreviewLessonComponent
-      ),
+      import(
+        '../../../shared/components/lesson-details/preview-lesson/preview-lesson.component'
+      ).then(mod => mod.PreviewLessonComponent),
     data: {
       heading: 'Kiểm duyệt nội dung',
       breadcrumb: 'Kiểm duyệt nội dung',

@@ -163,6 +163,7 @@ export class AuthService {
           this.clearSession();
           this.isLoggedInSignal.set(false);
         }, 300);
+        return;
       }
 
       const roleRedirectMap: Partial<Record<UserRole, string>> = {

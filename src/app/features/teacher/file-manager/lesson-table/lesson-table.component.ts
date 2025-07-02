@@ -120,7 +120,7 @@ export class LessonTableComponent implements OnInit {
   }
 
   goToFolderMaterials(folderId: string): void {
-    this.router.navigate([folderId, 'materials'], {
+    this.router.navigate([folderId], {
       relativeTo: this.route,
       queryParams: {
         page: this.currentPage(),
