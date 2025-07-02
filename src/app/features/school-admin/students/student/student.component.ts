@@ -4,12 +4,13 @@ import {
   inject,
   input,
 } from '@angular/core';
-
 import { RouterLink } from '@angular/router';
-import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
-import { ButtonComponent } from '../../../../shared/components/button/button.component';
+
 import { UserService } from '../../../../shared/services/api/user/user.service';
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
+
+import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 @Component({
   selector: 'app-student',
