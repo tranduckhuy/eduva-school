@@ -11,7 +11,6 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { BytesToReadablePipe } from '../../../shared/pipes/byte-to-readable.pipe';
-import { FileDurationFormatPipe } from '../../../shared/pipes/file-duration-format.pipe';
 
 import { LessonMaterialsService } from '../../../shared/services/api/lesson-materials/lesson-materials.service';
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
@@ -43,7 +42,6 @@ import { type LessonMaterial } from '../../../shared/models/entities/lesson-mate
     TooltipModule,
     ButtonComponent,
     BadgeComponent,
-    FileDurationFormatPipe,
     SearchInputComponent,
     TableSkeletonComponent,
     TableEmptyStateComponent,
