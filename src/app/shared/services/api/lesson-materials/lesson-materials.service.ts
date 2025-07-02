@@ -26,6 +26,9 @@ export class LessonMaterialsService {
   private readonly lessonMaterialsSignal = signal<LessonMaterial[]>([]);
   lessonMaterials = this.lessonMaterialsSignal.asReadonly();
 
+  private readonly lessonMaterialSignal = signal<LessonMaterial | null>(null);
+  lessonMaterial = this.lessonMaterialSignal.asReadonly();
+
   private readonly totalRecordsSignal = signal<number>(0);
   totalRecords = this.totalRecordsSignal.asReadonly();
 
@@ -49,9 +52,19 @@ export class LessonMaterialsService {
         loadingKey: 'get-materials',
       })
       .pipe(
-        tap(res => this.handleGetResponse(res)),
-        map(res => this.extractLessonMaterialsFromResponse(res)),
-        catchError(() => this.handleGetError())
+        tap(res => this.handleListResponse(res)),
+        map(res => this.extractListResponse(res)),
+        catchError(() => this.handleError())
+      );
+  }
+
+  fetchLessonMaterialById(id: string): Observable<LessonMaterial | null> {
+    return this.requestService
+      .get<LessonMaterial>(`${this.LESSON_MATERIALS_API_URL}/${id}`)
+      .pipe(
+        tap(res => this.handleDetailResponse(res)),
+        map(res => this.extractDetailResponse(res)),
+        catchError(() => this.handleError())
       );
   }
 
@@ -82,30 +95,35 @@ export class LessonMaterialsService {
     } else {
       this.toastHandlingService.errorGeneral();
     }
-
     return of(void 0);
   }
 
-  private handleGetResponse(res: any): void {
+  private handleListResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS && res.data) {
-      const lessonMaterials = res.data;
-      this.lessonMaterialsSignal.set(lessonMaterials.data ?? []);
-      this.totalRecordsSignal.set(lessonMaterials.count ?? 0);
+      this.lessonMaterialsSignal.set(res.data.data ?? []);
+      this.totalRecordsSignal.set(res.data.count ?? 0);
     } else {
       this.toastHandlingService.errorGeneral();
     }
   }
 
-  private extractLessonMaterialsFromResponse(
-    res: any
-  ): GetLessonMaterialsResponse | null {
-    if (res.statusCode === StatusCode.SUCCESS && res.data) {
-      return res.data;
-    }
-    return null;
+  private extractListResponse(res: any): GetLessonMaterialsResponse | null {
+    return res.statusCode === StatusCode.SUCCESS ? res.data : null;
   }
 
-  private handleGetError(): Observable<null> {
+  private handleDetailResponse(res: any): void {
+    if (res.statusCode === StatusCode.SUCCESS && res.data) {
+      this.lessonMaterialSignal.set(res.data);
+    } else {
+      this.toastHandlingService.errorGeneral();
+    }
+  }
+
+  private extractDetailResponse(res: any): LessonMaterial | null {
+    return res.statusCode === StatusCode.SUCCESS ? res.data : null;
+  }
+
+  private handleError(): Observable<null> {
     this.toastHandlingService.errorGeneral();
     return of(null);
   }

@@ -9,25 +9,34 @@ export const errorRoutes: Routes = [
       ),
     children: [
       {
-        path: '500',
+        path: '',
         loadComponent: () =>
-          import('./internal-error/internal-error.component').then(
-            mod => mod.InternalErrorComponent
+          import('./errors-layout/errors-layout.component').then(
+            mod => mod.ErrorsLayoutComponent
           ),
-      },
-      {
-        path: '404',
-        loadComponent: () =>
-          import('./not-found-error/not-found-error.component').then(
-            mod => mod.NotFoundErrorComponent
-          ),
-      },
-      {
-        path: '403',
-        loadComponent: () =>
-          import('./unauthorized-error/unauthorized-error.component').then(
-            mod => mod.UnauthorizedErrorComponent
-          ),
+        children: [
+          {
+            path: '500',
+            loadComponent: () =>
+              import('./internal-error/internal-error.component').then(
+                mod => mod.InternalErrorComponent
+              ),
+          },
+          {
+            path: '404',
+            loadComponent: () =>
+              import('./not-found-error/not-found-error.component').then(
+                mod => mod.NotFoundErrorComponent
+              ),
+          },
+          {
+            path: '403',
+            loadComponent: () =>
+              import('./unauthorized-error/unauthorized-error.component').then(
+                mod => mod.UnauthorizedErrorComponent
+              ),
+          },
+        ],
       },
     ],
   },

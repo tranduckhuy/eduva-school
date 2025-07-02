@@ -1,8 +1,8 @@
-:host ::ng-deep .p-datatable-table {
+::ng-deep .p-datatable-table {
   border: 1px solid var(--color-border-secondary) !important;
   background-color: var(--color-bg-primary) !important;
 }
-:host ::ng-deep .p-datatable-thead > tr > th {
+::ng-deep .p-datatable-thead > tr > th {
   background-color: var(--color-secondary-100) !important;
   color: var(--color-text-primary) !important;
   font-size: 15px;
@@ -12,11 +12,11 @@
   padding-bottom: 11px !important;
 }
 
-:host ::ng-deep .dark .p-datatable-thead > tr > th {
+::ng-deep .dark .p-datatable-thead > tr > th {
   background-color: var(--color-primary-500) !important;
 }
 
-:host ::ng-deep .p-datatable-tbody > tr > td {
+::ng-deep .p-datatable-tbody > tr > td {
   background-color: var(--color-bg-primary) !important;
   color: var(--color-gray-700) !important;
   font-size: 15px;
@@ -26,37 +26,37 @@
   padding-bottom: 14px !important;
 }
 
-:host ::ng-deep .dark .p-datatable-tbody > tr > td {
+::ng-deep .dark .p-datatable-tbody > tr > td {
   color: var(--color-white) !important;
 }
 
-:host ::ng-deep .p-paginator {
+::ng-deep .p-paginator {
   padding: 20px 0 0 !important;
   background-color: var(--color-bg-primary) !important;
 }
 
-:host ::ng-deep .p-paginator-page.p-paginator-page-selected {
+::ng-deep .p-paginator-page.p-paginator-page-selected {
   background-color: var(--color-primary-500) !important;
   align-items: center;
   color: var(--color-white) !important;
 }
 
-:host ::ng-deep .p-paginator-page:hover,
-:host ::ng-deep .p-paginator-next:hover,
-:host ::ng-deep .p-paginator-prev:hover,
-:host ::ng-deep .p-paginator-first:hover,
-:host ::ng-deep .p-paginator-last:hover {
+::ng-deep .p-paginator-page:hover,
+::ng-deep .p-paginator-next:hover,
+::ng-deep .p-paginator-prev:hover,
+::ng-deep .p-paginator-first:hover,
+::ng-deep .p-paginator-last:hover {
   background-color: var(--color-primary-500) !important;
   color: var(--color-white) !important;
 }
 
-:host ::ng-deep .p-paginator-current {
+::ng-deep .p-paginator-current {
   font-size: 15px !important;
   margin-right: auto !important;
   color: var(--color-gray-700) !important;
   padding-left: 8px !important;
 }
 
-:host ::ng-deep .dark .p-paginator-current {
+::ng-deep .dark .p-paginator-current {
   color: var(--color-gray-500) !important;
 }

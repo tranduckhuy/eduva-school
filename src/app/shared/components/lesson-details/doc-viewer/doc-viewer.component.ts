@@ -11,5 +11,5 @@ import { NgxDocViewerModule } from 'ngx-doc-viewer';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DocViewerComponent {
-  lessonMaterial = input.required<any>();
+  materialSourceUrl = input.required<string>();
 }

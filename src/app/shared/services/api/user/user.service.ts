@@ -23,7 +23,7 @@ export class UserService {
   private readonly USER_API_URL = `${this.BASE_API_URL}/users`;
   private readonly USER_PROFILE_API_URL = `${this.BASE_API_URL}/users/profile`;
 
-  private readonly SESSION_STORAGE_KEY = 'eduva_user';
+  private readonly LOCAL_STORAGE_USER_KEY = 'eduva_user';
 
   private readonly currentUserSignal = signal<User | null>(null);
   currentUser = this.currentUserSignal.asReadonly();
@@ -196,7 +196,7 @@ export class UserService {
   }
 
   private loadUserFromStorage(): User | null {
-    const raw = sessionStorage.getItem(this.SESSION_STORAGE_KEY);
+    const raw = localStorage.getItem(this.LOCAL_STORAGE_USER_KEY);
     try {
       return raw ? JSON.parse(raw) : null;
     } catch {
@@ -207,9 +207,9 @@ export class UserService {
   private setCurrentUser(user: User | null): void {
     this.currentUserSignal.set(user);
     if (user) {
-      sessionStorage.setItem(this.SESSION_STORAGE_KEY, JSON.stringify(user));
+      localStorage.setItem(this.LOCAL_STORAGE_USER_KEY, JSON.stringify(user));
     } else {
-      sessionStorage.removeItem(this.SESSION_STORAGE_KEY);
+      localStorage.removeItem(this.LOCAL_STORAGE_USER_KEY);
     }
   }
 

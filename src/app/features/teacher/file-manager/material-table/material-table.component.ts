@@ -7,19 +7,18 @@ import {
   signal,
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { TooltipModule } from 'primeng/tooltip';
 import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 
-import { StorageFormatPipe } from '../../../../shared/pipes/storage-format.pipe';
+import { BytesToReadablePipe } from '../../../../shared/pipes/byte-to-readable.pipe';
 
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 import { LessonMaterialsService } from '../../../../shared/services/api/lesson-materials/lesson-materials.service';
 
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
-import { FileTypeFilterComponent } from '../file-type-filter/file-type-filter.component';
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
 import { AddFileModalComponent } from '../add-file-modal/add-file-modal.component';
 import { TableSkeletonComponent } from '../../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
@@ -44,15 +43,15 @@ import { type GetLessonMaterialsRequest } from '../../../../shared/models/api/re
   imports: [
     CommonModule,
     DatePipe,
+    RouterLink,
     TooltipModule,
     TableModule,
-    StorageFormatPipe,
     ButtonComponent,
     BadgeComponent,
-    FileTypeFilterComponent,
     SearchInputComponent,
     TableSkeletonComponent,
     TableEmptyStateComponent,
+    BytesToReadablePipe,
   ],
   templateUrl: './material-table.component.html',
   styleUrl: './material-table.component.css',
@@ -65,7 +64,7 @@ export class MaterialTableComponent implements OnInit {
   private readonly loadingService = inject(LoadingService);
   private readonly lessonMaterialsService = inject(LessonMaterialsService);
 
-  lessonId = input<string>();
+  folderId = input<string>();
 
   materials = this.lessonMaterialsService.lessonMaterials;
   totalRecords = this.lessonMaterialsService.totalRecords;
@@ -129,20 +128,9 @@ export class MaterialTableComponent implements OnInit {
     this.loadMaterials();
   }
 
-  private loadMaterials(): void {
-    const request: GetLessonMaterialsRequest = {
-      folderId: this.lessonId(),
-      searchTerm: this.searchTerm(),
-      pageIndex: this.currentPage(),
-      pageSize: this.pageSize(),
-    };
-
-    this.lessonMaterialsService.getLessonMaterials(request).subscribe();
-  }
-
   openAddMaterialModal(): void {
     this.globalModalService.open(AddFileModalComponent, {
-      folderId: this.lessonId(),
+      folderId: this.folderId(),
       addFileSuccess: () => {
         this.currentPage.set(0);
       },
@@ -213,5 +201,16 @@ export class MaterialTableComponent implements OnInit {
       default:
         return 'gray';
     }
+  }
+
+  private loadMaterials(): void {
+    const request: GetLessonMaterialsRequest = {
+      folderId: this.folderId(),
+      searchTerm: this.searchTerm(),
+      pageIndex: this.currentPage(),
+      pageSize: this.pageSize(),
+    };
+
+    this.lessonMaterialsService.getLessonMaterials(request).subscribe();
   }
 }

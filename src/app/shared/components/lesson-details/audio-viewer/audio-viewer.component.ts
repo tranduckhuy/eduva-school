@@ -3,11 +3,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  ViewChild,
+  DestroyRef,
+  viewChild,
+  inject,
   input,
   computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
 import Plyr from 'plyr';
 
 @Component({
@@ -19,18 +22,20 @@ import Plyr from 'plyr';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AudioViewerComponent {
-  @ViewChild('audioPlayer') audioPlayer!: ElementRef<HTMLAudioElement>;
-  audio = input<string>(
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
-  ); // Default or dynamic input
+  audioPlayer = viewChild<ElementRef>('audioPlayer');
+
+  private readonly destroyRef = inject(DestroyRef);
+
+  materialSourceUrl = input.required<string>();
+
   player!: Plyr;
 
   audioSrc = computed(() => {
-    return { src: this.audio(), type: 'audio/mp3' };
+    return { src: this.materialSourceUrl(), type: 'audio/mp3' };
   });
 
   ngAfterViewInit() {
-    this.player = new Plyr(this.audioPlayer.nativeElement, {
+    this.player = new Plyr(this.audioPlayer()?.nativeElement, {
       controls: [
         'play',
         'progress',
@@ -51,9 +56,7 @@ export class AudioViewerComponent {
         normal: 'Bình thường',
       },
     });
-  }
 
-  ngOnDestroy() {
-    if (this.player) this.player.destroy();
+    this.destroyRef.onDestroy(() => this.player.destroy());
   }
 }

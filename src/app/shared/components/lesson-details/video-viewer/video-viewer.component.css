@@ -228,7 +228,8 @@
 
 .control-btn {
   width: 38px;
-  border: 0;
+  border: none;
+  outline: none;
   font-size: 18px;
   background-color: transparent;
   background-repeat: no-repeat;

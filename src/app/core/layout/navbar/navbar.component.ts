@@ -6,6 +6,7 @@ import {
   inject,
   input,
   output,
+  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, NavigationEnd } from '@angular/router';
@@ -52,6 +53,9 @@ export class NavbarComponent implements OnInit {
   closeSidebar = output();
 
   user = this.userService.currentUser;
+  isSchoolAdmin = computed(() =>
+    this.user()?.roles.includes(UserRoles.SCHOOL_ADMIN)
+  );
 
   navConfigs: NavbarConfig[] = [];
 
@@ -160,7 +164,7 @@ export class NavbarComponent implements OnInit {
     const fileManagerNav: NavItem[] = isTeacherOrMod
       ? [
           {
-            label: 'Tài liệu',
+            label: 'Quản lý Tài liệu',
             icon: 'folder_open',
             link: '/teacher/file-manager',
             type: 'link',

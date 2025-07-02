@@ -15,7 +15,5 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PdfViewerComponent {
-  lessonMaterial = input.required<any>();
-
-  constructor(private readonly pdfService: NgxExtendedPdfViewerService) {}
+  materialSourceUrl = input.required<string>();
 }

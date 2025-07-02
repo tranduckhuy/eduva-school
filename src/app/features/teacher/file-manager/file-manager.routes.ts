@@ -12,17 +12,35 @@ export const fileManagerRoutes: Routes = [
     children: [
       {
         path: '',
+        data: {
+          breadcrumb: 'Danh sách bài giảng',
+        },
         loadComponent: () =>
           import('./lesson-table/lesson-table.component').then(
             mod => mod.LessonTableComponent
           ),
       },
       {
-        path: ':lessonId/materials',
+        path: ':folderId',
+        data: {
+          heading: 'Danh sách bài học',
+          breadcrumb: 'Danh sách bài học',
+        },
         loadComponent: () =>
           import('./material-table/material-table.component').then(
             mod => mod.MaterialTableComponent
           ),
+      },
+      {
+        path: ':folderId/:materialId',
+        data: {
+          heading: 'Chi tiết bài học',
+          breadcrumb: 'Chi tiết bài học',
+        },
+        loadComponent: () =>
+          import(
+            '../../../shared/components/lesson-details/preview-lesson/preview-lesson.component'
+          ).then(mod => mod.PreviewLessonComponent),
       },
     ],
   },
