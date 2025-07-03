@@ -1,30 +1,27 @@
 <div class="dark:bg-dark-300">
-  <div class="e-container sm:e-container-fluid">
-    <div class="e-row h-full min-h-screen items-center justify-center">
-      <div
-        class="e-col-4 e-col-lg-6 e-col-md-8 e-col-sm-12 relative mt-[-5%] xxxxxl:w-[416px]">
-        <!-- Logo -->
-        <div class="my-6 flex items-center justify-center">
-          <a
-            href="/"
-            class="flex h-[70px] items-center gap-2 px-5 py-[14px] md:hidden">
-            <img
-              src="./images/logo.png"
-              alt="EDUVA"
-              class="size-9 rounded-md object-contain" />
-            <span
-              class="text-[22px] font-extrabold leading-none text-gray-900 dark:text-white"
-              >EDUVA</span
-            >
-          </a>
-        </div>
+  <div class="flex h-screen items-center justify-center">
+    <div class="relative xxxxxl:w-[416px]">
+      <!-- Logo -->
+      <div class="my-6 flex items-center justify-center">
+        <a
+          href="/"
+          class="flex h-[70px] items-center gap-2 px-5 py-[14px] md:hidden">
+          <img
+            src="./images/logo.png"
+            alt="EDUVA"
+            class="size-9 rounded-md object-contain" />
+          <span
+            class="text-[22px] font-extrabold leading-none text-gray-900 dark:text-white">
+            EDUVA
+          </span>
+        </a>
+      </div>
 
-        <!-- Form container -->
-        <div
-          class="relative mb-6 rounded border border-gray-100 bg-white shadow-auth dark:border-dark-500 dark:bg-dark-200">
-          <div class="p-12 pb-[52px]">
-            <ng-content />
-          </div>
+      <!-- Form container -->
+      <div
+        class="relative mb-6 max-h-[calc(100vh-120px)] overflow-auto rounded border border-gray-100 bg-white shadow-auth dark:border-dark-500 dark:bg-dark-200">
+        <div class="h-full p-12 pb-[52px]">
+          <ng-content />
         </div>
       </div>
     </div>

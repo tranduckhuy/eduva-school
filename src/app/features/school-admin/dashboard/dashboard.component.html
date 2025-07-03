@@ -1,0 +1,38 @@
+<div class="e-row e-g-4">
+  <div class="e-col-3 e-col-xl-6 e-col-sm-12">
+    <app-stat-card [statCard]="usersStatCard()" />
+  </div>
+  <div class="e-col-3 e-col-xl-6 e-col-sm-12">
+    <app-stat-card [statCard]="lessonsStatCard()" />
+  </div>
+  <div class="e-col-3 e-col-xl-6 e-col-sm-12">
+    <div class="flex flex-col gap-6">
+      <app-stat-card [statCard]="schoolsStatCard()" />
+      <app-stat-card [statCard]="storageStatCard()" />
+    </div>
+  </div>
+  <div class="e-col-3 e-col-xl-6 e-col-sm-12">
+    <div class="flex flex-col gap-6">
+      <app-stat-card [statCard]="pricingPlanRevenueStatCard()" />
+      <app-stat-card [statCard]="pricingPlanRevenueStatCard()" />
+    </div>
+  </div>
+</div>
+
+<div class="e-row e-g-4">
+  <div class="e-col-7 e-col-xl-12">
+    <app-lesson-creation />
+  </div>
+  <div class="e-col-5 e-col-xl-12">
+    <app-top-active-schools />
+  </div>
+</div>
+
+<div class="e-row e-g-4">
+  <div class="e-col-6 e-col-xl-12">
+    <app-user-registration-trend />
+  </div>
+  <div class="e-col-6 e-col-xl-12">
+    <app-revenue-trend />
+  </div>
+</div>

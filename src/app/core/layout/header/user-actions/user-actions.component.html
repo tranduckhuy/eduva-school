@@ -1,15 +1,15 @@
 <div class="flex items-center justify-center gap-6">
   <button
-    class="action-btn cubic-bezier(0.4, 0, 0.2, 1) text-xl transition duration-100 hover:text-primary dark:text-dark-100 sm:hidden"
+    class="action-btn cubic-bezier(0.4, 0, 0.2, 1) text-xl transition duration-100 hover:text-primary dark:text-dark-100 dark:hover:text-primary sm:hidden"
     (click)="toggleDarkMode()">
     @if (isDarkMode()) {
-      <span class="material-symbols-outlined text-xl"> light_mode </span>
+      <span class="material-symbols-outlined text-xl">light_mode</span>
     } @else {
-      <span class="material-symbols-outlined text-xl"> dark_mode </span>
+      <span class="material-symbols-outlined text-xl">dark_mode</span>
     }
   </button>
   <button
-    class="action-btn cubic-bezier(0.4, 0, 0.2, 1) transition duration-100 hover:text-primary dark:text-dark-100 sm:hidden"
+    class="action-btn cubic-bezier(0.4, 0, 0.2, 1) transition duration-100 hover:text-primary dark:text-dark-100 dark:hover:text-primary sm:hidden"
     (click)="toggleFullscreen()">
     <span class="material-symbols-rounded action-btn-icon text-xl">
       {{ isFullscreen() ? 'fullscreen_exit' : 'fullscreen' }}
@@ -17,9 +17,9 @@
   </button>
   <div class="relative">
     <button
-      class="action-btn cubic-bezier(0.4, 0, 0.2, 1) transition duration-100 hover:text-primary dark:text-dark-100"
+      class="action-btn cubic-bezier(0.4, 0, 0.2, 1) transition duration-100 hover:text-primary dark:text-dark-100 dark:hover:text-primary"
       (click)="toggleMenu('notifications')">
-      <span class="material-symbols-outlined text-xl"> notifications </span>
+      <span class="material-symbols-outlined text-xl">notifications</span>
     </button>
     @if (headerSubmenuService.getActiveSubmenuMenu() === 'notifications') {
       <header-notifications (clickOutside)="headerSubmenuService.close()" />
@@ -31,13 +31,13 @@
       class="flex cursor-pointer items-center gap-2"
       (click)="toggleMenu('information')">
       <img
-        src="https://htmlcss.fullstack.edu.vn/assets/f8_icon.png"
-        alt="Quy Nguyen"
+        [src]="user()?.avatarUrl"
+        [alt]="user()?.fullName"
         class="h-[30px] w-[30px] flex-shrink-0 rounded-[50%] object-contain outline outline-[#C2CDFF]" />
       <div class="flex items-center gap-1 xs:hidden">
-        <span class="select-none font-semibold text-textBlack dark:text-white"
-          >Quy Nguyen</span
-        >
+        <span class="select-none font-semibold text-textBlack dark:text-white">
+          {{ user()?.fullName }}
+        </span>
         <span
           class="material-symbols-outlined text-xl text-textBlack dark:text-white">
           keyboard_arrow_down

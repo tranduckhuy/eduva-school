@@ -1,0 +1,70 @@
+/* ? User */
+.from-user {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 20px;
+  padding-left: 32px;
+}
+
+.from-user-box {
+  display: flex;
+  align-items: center;
+  max-width: 700px;
+  min-height: 65px;
+  padding: 20px;
+  border-radius: 16px 16px 0 16px;
+}
+
+/* ? System */
+.from-system {
+  display: flex;
+  justify-content: flex-start;
+  padding-right: 32px;
+  padding-bottom: 20px;
+}
+
+.loader {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  margin-left: 20px;
+  background-color: var(--color-primary-500);
+  color: var(--color-primary-500);
+  animation: loader 0.5s infinite linear alternate;
+  animation-delay: 0.25s;
+}
+
+.loader::before,
+.loader::after {
+  position: absolute;
+  top: 0;
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: var(--color-primary-500);
+  color: var(--color-primary-500);
+  animation: loader 0.5s infinite alternate;
+}
+
+.loader::before {
+  left: -15px;
+  animation-delay: 0s;
+}
+
+.loader::after {
+  left: 15px;
+  animation-delay: 0.5s;
+}
+
+@keyframes loader {
+  0% {
+    background-color: var(--color-primary-500);
+  }
+  50%,
+  100% {
+    background-color: var(--color-primary-100);
+  }
+}

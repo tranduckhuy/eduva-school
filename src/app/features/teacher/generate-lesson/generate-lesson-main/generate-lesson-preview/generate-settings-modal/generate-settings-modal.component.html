@@ -1,0 +1,122 @@
+<div
+  class="max-h-[calc(100vh-80px)] w-[50vw] rounded-2xl bg-white dark:bg-dark-300">
+  <header
+    class="relative flex h-14 w-full items-center rounded-t-lg bg-white px-6 py-3 pb-2 dark:bg-dark-300">
+    <h2 class="text-lg">Cài đặt bài giảng AI</h2>
+    <span
+      class="pi pi-times absolute right-0 top-[50%] -translate-y-[50%] cursor-pointer px-5 py-3 text-xl"
+      (click)="closeModal()"></span>
+  </header>
+
+  <div class="p-6 pt-3">
+    <div class="max-w-[90%]">
+      <p class="text-[#5f6368] dark:text-white">
+        Chọn giọng đọc, thời lượng mong muốn và thư mục lưu trữ cho bài giảng
+        được tạo bởi AI. Các tùy chọn này giúp cá nhân hóa nội dung theo nhu cầu
+        giảng dạy của bạn.
+      </p>
+      <p class="text-[#5f6368] dark:text-white">
+        (Ví dụ: giọng nữ miền Nam, thời lượng 10 phút, lưu vào thư mục "Bài
+        giảng toán 10")
+      </p>
+    </div>
+
+    <form [formGroup]="form" class="mt-6 w-full">
+      <!-- ? Length -->
+      <div class="flex flex-col">
+        <span class="text-base font-semibold dark:text-white">Length</span>
+        <div class="mt-4 flex gap-3">
+          <input
+            type="radio"
+            name="length"
+            id="shorter"
+            class="input-length hidden" />
+          <label
+            for="shorter"
+            class="button-length text-[#5f6368] hover:bg-[#ecf2fc] dark:text-[#e6e6e6] dark:hover:bg-dark-400">
+            <span class="pi pi-check hidden"></span>
+            <span>Shorter</span>
+          </label>
+
+          <input
+            type="radio"
+            name="length"
+            id="default"
+            class="input-length hidden"
+            checked />
+          <label
+            for="default"
+            class="button-length text-[#5f6368] hover:bg-[#ecf2fc] dark:text-[#e6e6e6] dark:hover:bg-dark-400">
+            <span class="pi pi-check hidden"></span>
+            <span>Default</span>
+          </label>
+
+          <input
+            type="radio"
+            name="length"
+            id="longer"
+            class="input-length hidden" />
+          <label
+            for="longer"
+            class="button-length text-[#5f6368] hover:bg-[#ecf2fc] dark:text-[#e6e6e6] dark:hover:bg-dark-400">
+            <span class="pi pi-check hidden"></span>
+            <span>Longer</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- ? Voice Type -->
+      <div class="mt-5 flex flex-col">
+        <span class="text-base font-semibold dark:text-white">Giọng đọc</span>
+        <div class="mt-2 flex w-full gap-3">
+          <p-select
+            formControlName="voice"
+            name="voice"
+            placeholder="Chọn giọng phù hợp yêu cầu"
+            filterPlaceholder="Tìm kiếm..."
+            emptyFilterMessage="Không có kết quả tìm thấy"
+            emptyMessage="Chưa có giọng đọc nào."
+            class="w-full"
+            [options]="options()"
+            [checkmark]="true"
+            [filter]="true"
+            [resetFilterOnHide]="true"
+            [showClear]="true" />
+        </div>
+      </div>
+
+      <!-- ? Folder -->
+      <div class="mt-5 flex flex-col">
+        <span class="text-base font-semibold dark:text-white">
+          Thư mục bài giảng
+        </span>
+        <div class="mt-2 flex gap-3">
+          <p-select
+            formControlName="folderId"
+            name="folderId"
+            placeholder="Chọn thư mục bạn muốn lưu trữ"
+            filterPlaceholder="Tìm kiếm..."
+            emptyFilterMessage="Không có kết quả tìm thấy"
+            emptyMessage="Chưa có thư mục nào. Vui lòng tạo thư mục mới để bắt đầu."
+            class="w-full"
+            [options]="options()"
+            [checkmark]="true"
+            [filter]="true"
+            [resetFilterOnHide]="true"
+            [showClear]="true" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <footer
+    class="flex h-14 w-full items-center justify-end gap-2 rounded-b-lg bg-white px-6 pb-3 dark:bg-dark-300">
+    <p-button
+      label="Hủy"
+      icon="pi pi-times"
+      variant="outlined"
+      severity="danger"
+      (onClick)="closeModal()" />
+    <p-button label="Lưu" icon="pi pi-check" variant="outlined" />
+  </footer>
+</div>

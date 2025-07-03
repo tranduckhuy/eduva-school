@@ -1,0 +1,13 @@
+.member-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.member-item--student {
+  justify-content: space-between;
+}
+
+.member-item + .member-item {
+  margin-top: 20px;
+}

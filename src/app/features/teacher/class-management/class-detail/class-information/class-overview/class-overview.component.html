@@ -1,0 +1,133 @@
+<div class="e-row e-gy-xs-4">
+  <div class="e-col-2 e-col-lg-3 e-col-sm-4 e-col-xs-12">
+    <div class="flex h-full flex-col">
+      <div
+        class="flex h-[100px] flex-col justify-between rounded-md border border-[#dadce0] p-3 pr-1">
+        <p-confirmpopup key="popup" />
+        <div class="flex items-center justify-between">
+          <p class="font-semibold xl:text-[13px] lg:text-sm md:text-[13px]">
+            Mã lớp học
+          </p>
+          <p-button
+            variant="text"
+            styleClass="opacity-70 hover:opacity-100 transition-opacity duration-200 xl:!w-[30px] lg:!w-12 md:!w-10"
+            (onClick)="confirmRefresh($event)">
+            <ng-template #icon>
+              <span class="pi pi-refresh" style="font-size: 16px"></span>
+            </ng-template>
+          </p-button>
+        </div>
+        <div class="flex items-center gap-1">
+          <p
+            class="text-base font-semibold text-primary xl:text-sm lg:text-xl md:text-lg sm:!text-sm">
+            {{ classModel()?.classCode }}
+          </p>
+          <p-button
+            variant="text"
+            styleClass="relative -top-[1.5px]"
+            (onClick)="copyClassCode()">
+            <ng-template #icon>
+              <span
+                class="pi text-primary lg:!text-xl md:!text-lg sm:!text-sm"
+                [ngClass]="isCopied() ? 'pi-check' : 'pi-clipboard'"></span>
+            </ng-template>
+          </p-button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="e-col-10 e-col-lg-9 e-col-sm-8 e-col-xs-12">
+    <!-- ? Heading -->
+    <div
+      class="card flex items-center justify-between rounded-lg p-5 sm:flex-col sm:gap-5">
+      <div>
+        <p class="font-semibold sm:text-center">
+          Giáo viên: {{ classModel()?.teacherName }}
+        </p>
+        <p class="mt-2 italic text-gray-500 sm:text-center">
+          Tổng số bài học: {{ folderCount() }} · Tổng số tài liệu:
+          {{ materialCount() }}
+        </p>
+      </div>
+      @if (folderWithMaterials()?.length !== 0) {
+        <p-button
+          label="Thêm bài giảng"
+          icon="pi pi-plus"
+          variant="outlined"
+          size="small"
+          (onClick)="openAddFolderModal()" />
+      }
+    </div>
+    <!-- ? Lesson List -->
+    <div class="mt-4">
+      <p-accordion>
+        @for (folderWithMaterials of folderWithMaterials(); track $index) {
+          <p-accordion-panel [value]="$index">
+            <p-accordion-header>
+              {{ folderWithMaterials.folder.name }}
+            </p-accordion-header>
+            <p-accordion-content>
+              <ul class="pl-3">
+                @for (material of folderWithMaterials.materials; track $index) {
+                  <li class="px-3">
+                    <a href="" class="flex w-full items-center gap-3">
+                      <span
+                        class="icon-wrapper"
+                        [ngClass]="
+                          getMaterialIconConfig(material.contentType).bgColor
+                        ">
+                        <i
+                          class="material-symbols-outlined text-[20px]"
+                          [ngClass]="
+                            getMaterialIconConfig(material.contentType)
+                              .textColor
+                          ">
+                          {{ getMaterialIconConfig(material.contentType).icon }}
+                        </i>
+                      </span>
+                      <span class="line-clamp-2">{{ material.title }}</span>
+                    </a>
+                  </li>
+                } @empty {
+                  <li>
+                    Hiện chưa có tài liệu trong thư mục này. Vui lòng thêm tài
+                    liệu mới để bắt đầu giảng dạy.
+                  </li>
+                }
+              </ul>
+            </p-accordion-content>
+          </p-accordion-panel>
+        }
+      </p-accordion>
+      @if (folderWithMaterials()?.length === 0) {
+        <!-- ? Empty State -->
+        <div
+          class="flex items-center rounded-md border border-[#dadce0] p-[25px]">
+          <img
+            src="./images/icons/classroom-lesson-empty.svg"
+            alt=""
+            class="size-40" />
+          <div class="ml-10 flex grow flex-col">
+            <p class="text-lg font-semibold">
+              Bạn chưa có bài giảng nào trong lớp học này
+            </p>
+            <p class="mt-4 text-base italic text-gray-500 dark:text-gray-300">
+              Đây là nơi bạn có thể xây dựng và quản lý toàn bộ nội dung giảng
+              dạy cho học sinh của mình. Hãy bắt đầu bằng cách tạo bài giảng đầu
+              tiên — bạn có thể thêm văn bản, tài liệu, video, hoặc tài liệu
+              dạng PDF.
+            </p>
+            <div class="flex justify-end">
+              <p-button
+                label="Tạo bài giảng"
+                icon="pi pi-plus"
+                variant="outlined"
+                size="small"
+                (onClick)="openAddFolderModal()" />
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

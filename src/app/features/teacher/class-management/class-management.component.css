@@ -1,0 +1,30 @@
+:host ::ng-deep .p-paginator {
+  padding: 20px 0 0 !important;
+  background-color: var(--color-bg-primary) !important;
+}
+
+:host ::ng-deep .p-paginator-page.p-paginator-page-selected {
+  background-color: var(--color-primary-500) !important;
+  align-items: center;
+  color: var(--color-white) !important;
+}
+
+:host ::ng-deep .p-paginator-page:hover,
+:host ::ng-deep .p-paginator-next:hover,
+:host ::ng-deep .p-paginator-prev:hover,
+:host ::ng-deep .p-paginator-first:hover,
+:host ::ng-deep .p-paginator-last:hover {
+  background-color: var(--color-primary-500) !important;
+  color: var(--color-white) !important;
+}
+
+:host ::ng-deep .p-paginator-current {
+  font-size: 15px !important;
+  margin-right: auto !important;
+  color: var(--color-gray-700) !important;
+  padding-left: 8px !important;
+}
+
+:host ::ng-deep .dark .p-paginator-current {
+  color: var(--color-gray-500) !important;
+}

@@ -1,0 +1,20 @@
+.file-type-block {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 15px;
+  border-radius: 8px;
+  color: var(--color-heading);
+}
+
+@media screen and (max-width: 1399.98px) {
+  .file-type-block {
+    padding: 15px;
+  }
+}
+
+@media screen and (max-width: 1199.98px) {
+  .file-type-block {
+    padding: 25px;
+  }
+}

@@ -1,0 +1,21 @@
+@if (sender() === 'user') {
+  <div class="from-user">
+    <div
+      class="from-user-box bg-[#edeffa] text-[#47484c] dark:bg-dark-400 dark:text-white">
+      <p>{{ content() }}</p>
+    </div>
+  </div>
+} @else {
+  <div class="from-system">
+    @if (isLoading()) {
+      <div class="loader"></div>
+    } @else {
+      <div>
+        <p class="font-bold text-[#47484c] dark:text-white">Chào bạn,</p>
+        <p
+          [innerHTML]="content() | safeHtml"
+          class="text-[#47484c] dark:text-white"></p>
+      </div>
+    }
+  </div>
+}

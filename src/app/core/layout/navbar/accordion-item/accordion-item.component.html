@@ -3,7 +3,7 @@
     class="accordion-item whitespace-nowrap text-textBlack dark:text-white"
     [class.active]="isActive()">
     <a
-      [href]="link()"
+      [routerLink]="link()"
       class="accordion-button flex w-full items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors ease-linear">
       <i
         class="material-symbols-rounded text-[22px] leading-none text-gray-500 dark:text-dark-100">
@@ -13,6 +13,24 @@
         <span>{{ label() }}</span>
       }
     </a>
+  </div>
+}
+
+@if (type() === 'button') {
+  <div
+    class="accordion-item whitespace-nowrap text-textBlack dark:text-white"
+    [class.active]="isActive()">
+    <button
+      class="accordion-button flex w-full items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors ease-linear"
+      (click)="onClick()">
+      <i
+        class="material-symbols-rounded text-[22px] leading-none text-gray-500 dark:text-dark-100">
+        {{ icon() }}
+      </i>
+      @if (!isSidebarCollapsed()) {
+        <span>{{ label() }}</span>
+      }
+    </button>
   </div>
 }
 
@@ -38,12 +56,14 @@
         </span>
       }
     </button>
-    <div class="accordion-collapse mt-1" [class.hidden]="!isOpen()">
+    <div
+      class="accordion-collapse mt-1"
+      [class.hidden]="!isOpen() || isSidebarCollapsed()">
       <ul>
         @for (item of submenuItems(); track $index) {
           <li>
             <a
-              [href]="item.link"
+              [routerLink]="item.link"
               class="submenu-link flex w-full items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors duration-200 ease-linear"
               [class.active]="item.active">
               <i class="material-symbols-rounded" style="font-size: 12px">

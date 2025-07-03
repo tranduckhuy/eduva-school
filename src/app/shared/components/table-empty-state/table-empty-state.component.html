@@ -1,0 +1,14 @@
+<div
+  class="flex w-full flex-col items-center justify-center py-6 text-gray-500">
+  @if (icon()) {
+    <span class="material-symbols-outlined mb-2 text-5xl text-gray-400">
+      {{ icon() }}
+    </span>
+  }
+  <p class="text-lg font-medium">{{ title() }}</p>
+  @if (subtitle()) {
+    <p class="mt-2 text-sm">
+      {{ subtitle() }}
+    </p>
+  }
+</div>

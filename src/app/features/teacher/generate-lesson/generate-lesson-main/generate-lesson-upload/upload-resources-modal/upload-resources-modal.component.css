@@ -1,0 +1,6 @@
+::ng-deep .p-fileupload-advanced {
+  border-width: 2px !important;
+  border-style: dashed !important;
+  border-radius: 8px !important;
+  background-color: var(--color-bg-forth) !important;
+}

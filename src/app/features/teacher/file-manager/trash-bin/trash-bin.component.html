@@ -1,0 +1,14 @@
+<div class="flex flex-col gap-6">
+  <file-type-filter />
+
+  <div
+    class="rounded bg-white px-0 shadow-main dark:border-dark-500 dark:bg-dark-200">
+    <div class="p-[25px]">
+      <app-search-input (search)="onSearchTriggered()" />
+
+      <div class="mt-5">
+        <material-table />
+      </div>
+    </div>
+  </div>
+</div>

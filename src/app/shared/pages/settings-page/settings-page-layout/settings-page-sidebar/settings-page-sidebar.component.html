@@ -1,0 +1,63 @@
+<div class="rounded bg-white shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <div class="p-[25px]">
+    <!-- ? Redirect -->
+    <ul class="settings-list">
+      <li>
+        <a
+          routerLink="/teacher/settings"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="settings-link">
+          <span class="flex items-center gap-2">
+            <i class="material-symbols-outlined relative -top-[1px] text-xl">
+              account_box
+            </i>
+            <span>Thông tin cá nhân</span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="account-settings"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="settings-link">
+          <span class="flex items-center gap-2">
+            <i class="material-symbols-outlined relative -top-[1px] text-xl">
+              encrypted
+            </i>
+            <span>Mật khẩu và bảo mật</span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="terms-conditions"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="settings-link">
+          <span class="flex items-center gap-2">
+            <i class="material-symbols-outlined relative -top-[1px] text-xl">
+              book_2
+            </i>
+            <span>Điều khoản sử dụng</span>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="privacy-policy"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="settings-link">
+          <span class="flex items-center gap-2">
+            <i class="material-symbols-outlined relative -top-[1px] text-xl">
+              database
+            </i>
+            <span>Chính sách bảo mật</span>
+          </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>

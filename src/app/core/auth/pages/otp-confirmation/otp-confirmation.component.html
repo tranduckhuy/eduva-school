@@ -1,0 +1,44 @@
+<app-auth-layout>
+  <h1 class="mb-2 text-center text-xl font-bold">Xác minh 2 bước</h1>
+  <p class="mb-6 text-center text-[15px] opacity-80">
+    Một mã xác nhận gồm 6 chữ số đã được gửi tới
+    <br />
+    <strong>{{ email() }}</strong>
+  </p>
+
+  <form (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <div class="flex w-full flex-col items-center gap-5">
+      <p-inputotp
+        name="otpCode"
+        [(ngModel)]="value"
+        [invalid]="isInvalidValue"
+        [length]="6"
+        [integerOnly]="true" />
+
+      <p class="text-center">
+        Không nhận được mã?
+        <a
+          class="cursor-pointer font-medium text-primary underline"
+          [class.disable]="isResendDisabled()"
+          (click)="onResendCode($event)">
+          {{ resendLinkText }}
+        </a>
+      </p>
+    </div>
+
+    <p-button
+      label="Xác nhận"
+      styleClass="mt-2"
+      type="submit"
+      [fluid]="true"
+      [loading]="isLoading()" />
+    <p
+      class="mx-auto mt-1 text-center text-[12px] opacity-80 dark:text-[#64748b]">
+      Việc bạn tiếp tục sử dụng trang web này đồng nghĩa bạn đồng ý với
+      <a href="#!" class="cursor-pointer text-primary underline">
+        điều khoản sử dụng
+      </a>
+      của chúng tôi.
+    </p>
+  </form>
+</app-auth-layout>

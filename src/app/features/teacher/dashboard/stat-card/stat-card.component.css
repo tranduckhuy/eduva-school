@@ -1,0 +1,7 @@
+::ng-deep .p-progressbar {
+  height: 5px !important;
+}
+
+::ng-deep .p-progressbar-value {
+  background-color: var(--color-primary-500) !important;
+}

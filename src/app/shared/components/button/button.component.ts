@@ -1,11 +1,11 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
-  Input,
-  Output,
-  EventEmitter,
   forwardRef,
   HostBinding,
   ChangeDetectionStrategy,
+  input,
+  output,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -24,6 +24,7 @@ type ButtonSize = 'default' | 'xs' | 'lg' | 'xl';
 type ButtonVariant =
   | 'default'
   | 'outline'
+  | 'outline-danger'
   | 'rounded'
   | 'light'
   | 'light-danger'
@@ -35,7 +36,9 @@ type ButtonWidth = 'default' | 'full' | 'xs' | 'sm' | 'md' | 'lg';
 @Component({
   selector: 'app-button',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './button.component.html',
+  styleUrls: ['./button.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
@@ -46,17 +49,59 @@ type ButtonWidth = 'default' | 'full' | 'xs' | 'sm' | 'md' | 'lg';
   ],
 })
 export class ButtonComponent {
-  @Input() variant: ButtonVariant = 'default';
-  @Input() size: ButtonSize = 'default';
-  @Input() theme: ButtonTheme = 'default';
-  @Input() width: ButtonWidth = 'default';
-  @Input() disabled = false;
-  @Input() type: 'button' | 'submit' | 'reset' = 'button';
-  @Input() asChild = false;
-  @Output() clicked = new EventEmitter<Event>();
+  variant = input<ButtonVariant>('default');
+  size = input<ButtonSize>('default');
+  theme = input<ButtonTheme>('default');
+  width = input<ButtonWidth>('default');
+  type = input<'button' | 'submit' | 'reset'>('button');
+  disabled = input<boolean>(false);
+  asChild = input<boolean>(false);
+  loading = input<boolean>(false);
+  loadingPosition = input<'left' | 'right'>('left');
+
+  clicked = output<Event>();
+
+  get spinnerSizeClass() {
+    switch (this.size()) {
+      case 'xs':
+        return 'spinner-xs';
+      case 'lg':
+        return 'spinner-lg';
+      case 'xl':
+        return 'spinner-xl';
+      default:
+        return 'spinner-default';
+    }
+  }
+
+  get spinnerColorClass(): string {
+    switch (this.theme()) {
+      case 'primary':
+        return 'spinner-primary';
+      case 'success':
+        return 'spinner-success';
+      case 'danger':
+        return 'spinner-danger';
+      case 'warning':
+        return 'spinner-warning';
+      case 'info':
+        return 'spinner-info';
+      case 'light':
+        return 'spinner-light';
+      case 'dark':
+        return 'spinner-dark';
+      default:
+        return 'spinner-primary';
+    }
+  }
+
+  get spinnerClasses(): string {
+    return `spinner ${this.spinnerSizeClass} ${this.spinnerColorClass}`;
+  }
 
   @HostBinding('class') get classes() {
-    return this.buttonVariants();
+    const loadingClass = this.loading() ? 'loading-state' : '';
+    return `${this.buttonVariants()} ${loadingClass}`;
   }
 
   buttonVariants() {
@@ -64,14 +109,14 @@ export class ButtonComponent {
       'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded text-[14px] font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0';
 
     const themeClasses: Record<ButtonTheme, string> = {
-      default: 'bg-primary text-white shadow hover:opacity-90',
-      primary: 'bg-primary text-white shadow hover:opacity-90',
-      success: 'bg-success-600 text-white hover:opacity-90',
-      danger: 'bg-danger-600 text-white hover:opacity-90',
-      warning: 'bg-warning-600 text-black hover:opacity-90',
-      info: 'bg-info-500 text-white hover:opacity-90',
-      light: 'bg-gray-100 hover:bg-gray-200',
-      dark: 'bg-gray-900 text-white hover:opacity-90',
+      default: 'bg-primary text-white shadow',
+      primary: 'bg-primary text-white shadow',
+      success: 'bg-success-600 text-white',
+      danger: 'bg-danger-600 text-white',
+      warning: 'bg-warning-600 text-black',
+      info: 'bg-info-500 text-white',
+      light: 'bg-gray-100',
+      dark: 'bg-gray-900 text-white',
     };
 
     const sizeClasses: Record<ButtonSize, string> = {
@@ -84,16 +129,16 @@ export class ButtonComponent {
     const variantClasses: Record<ButtonVariant, string> = {
       default: 'rounded',
       outline:
-        'border border-current bg-transparent hover:bg-current hover:text-white',
+        'border border-primary bg-white dark:bg-dark-200 !text-primary hover:!bg-primary hover:!text-white',
+      'outline-danger':
+        'border border-danger bg-white dark:bg-dark-200 !text-danger',
       rounded: 'rounded-full',
-      light:
-        'bg-primary-500/20 hover:!text-gray-50 !text-primary-500 hover:bg-primary-500',
-      'light-danger':
-        '!bg-danger-500/20 hover:!text-gray-50 !text-danger-500 hover:!bg-danger-500',
+      light: 'bg-primary-500/20 !text-primary-500',
+      'light-danger': '!bg-danger-500/20 !text-danger-500',
       'light-rounded': 'bg-gray-100 text-gray-900 rounded-full',
-      'outline-rounded':
-        'border border-current bg-transparent rounded-full hover:bg-current hover:text-white',
+      'outline-rounded': 'border border-current bg-transparent rounded-full',
     };
+
     const widthClasses: Record<ButtonWidth, string> = {
       default: '',
       xs: 'min-w-[90px]',
@@ -103,11 +148,11 @@ export class ButtonComponent {
       full: 'w-full',
     };
 
-    return `${baseClasses} ${this.disabled && 'pointer-events-none opacity-70 '} ${themeClasses[this.theme]} ${variantClasses[this.variant]} ${sizeClasses[this.size]} ${widthClasses[this.width]}`;
+    return `${baseClasses} ${this.disabled() && 'pointer-events-none opacity-70 '} ${themeClasses[this.theme()]} ${variantClasses[this.variant()]} ${sizeClasses[this.size()]} ${widthClasses[this.width()]}`;
   }
 
   onClick(event: Event) {
-    if (!this.disabled) {
+    if (!this.disabled() && !this.loading()) {
       this.clicked.emit(event);
     }
   }

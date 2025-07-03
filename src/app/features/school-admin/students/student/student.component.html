@@ -1,0 +1,118 @@
+<div
+  class="rounded border border-gray-100 bg-white p-4 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <div class="mb-2 flex items-center justify-between">
+    <h2 class="text-base font-medium">Thông tin học sinh</h2>
+  </div>
+
+  <div
+    class="rounded border border-gray-200 p-6 dark:border-dark-500 dark:bg-dark-200">
+    <div class="e-row items-center">
+      <div class="e-col-2 e-col-xl-12 e-row-cols-md-1 lg:mb-4">
+        <div class="flex flex-col">
+          <div
+            class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+            Avatar
+          </div>
+          <img
+            [src]="studentDetail()?.avatarUrl"
+            alt="Avatar"
+            class="size-[140px] rounded object-cover" />
+        </div>
+      </div>
+
+      <div class="e-col-10 e-col-xl-12">
+        <div class="e-row e-row-cols-2 e-row-cols-md-1 e-gy-4">
+          <div class="e-col">
+            <app-form-control
+              label="Tên"
+              type="text"
+              [name]="'fullName'"
+              [value]="studentDetail()?.fullName ?? ''"
+              [readOnly]="true">
+            </app-form-control>
+          </div>
+          <div class="e-col">
+            <app-form-control
+              label="Email"
+              type="email"
+              [name]="'email'"
+              [value]="studentDetail()?.email ?? ''"
+              [readOnly]="true">
+            </app-form-control>
+          </div>
+          <div class="e-col">
+            <app-form-control
+              label="Số điện thoại"
+              type="tel"
+              [name]="'phone'"
+              [value]="studentDetail()?.phoneNumber ?? ''"
+              [readOnly]="true">
+            </app-form-control>
+          </div>
+          <div class="e-col">
+            <app-form-control
+              label="Trạng thái hoạt động"
+              type="text"
+              [name]="'status'"
+              [value]="
+                studentDetail()?.status === 0 ? 'Đang hoạt động' : 'Vô hiệu hóa'
+              "
+              [readOnly]="true">
+            </app-form-control>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="mt-10 rounded border border-gray-100 bg-white p-6 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <div class="mb-2 flex items-center justify-between">
+    <h2 class="text-base font-medium">Thông tin trường học</h2>
+    <a [routerLink]="['/admin/schools', studentDetail()?.school?.id]"
+      ><app-button [variant]="'light'">Xem chi tiết</app-button></a
+    >
+  </div>
+  <div
+    class="rounded border border-gray-200 p-6 dark:border-dark-500 dark:bg-dark-200">
+    <div class="e-row e-row-cols-2 e-row-cols-md-1 e-g-4">
+      <div class="e-col">
+        <app-form-control
+          label="Tên"
+          type="text"
+          [name]="'schoolName'"
+          [value]="studentDetail()?.school?.name ?? ''"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+      <div class="e-col">
+        <app-form-control
+          label="Email liên hệ"
+          type="email"
+          [name]="'schoolEmail'"
+          [value]="studentDetail()?.school?.contactEmail ?? ''"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+      <div class="e-col">
+        <app-form-control
+          label="Số điện thoại"
+          type="tel"
+          [name]="'schoolPhone'"
+          [value]="studentDetail()?.school?.contactPhone ?? ''"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+      <div class="e-col">
+        <app-form-control
+          label="Địa chỉ"
+          type="text"
+          [name]="'schoolAddress'"
+          [value]="studentDetail()?.school?.address ?? ''"
+          [readOnly]="true">
+        </app-form-control>
+      </div>
+    </div>
+  </div>
+</div>

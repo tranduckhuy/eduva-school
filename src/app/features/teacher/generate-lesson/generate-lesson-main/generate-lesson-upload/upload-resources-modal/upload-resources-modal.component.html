@@ -1,0 +1,70 @@
+<div
+  class="max-h-[calc(100vh-40px)] w-[50vw] overflow-y-auto rounded-2xl bg-white dark:bg-dark-300">
+  <header
+    class="sticky left-0 top-0 z-[1] flex h-14 w-full items-center rounded-t-lg bg-white px-6 py-3 pb-2 dark:bg-dark-300">
+    <h2 class="text-lg">Thêm tài liệu</h2>
+    <span
+      class="pi pi-times absolute right-0 top-[50%] -translate-y-[50%] cursor-pointer px-5 py-3 text-xl"
+      (click)="closeModal()"></span>
+  </header>
+
+  <div class="p-6 pt-3">
+    <div class="max-w-[90%]">
+      <p class="text-[#5f6368] dark:text-white">
+        Tài liệu bạn tải lên sẽ giúp AI hiểu rõ hơn nội dung cần giảng dạy, kết
+        hợp với yêu cầu bạn nhập để tạo ra bài giảng dưới dạng audio hoặc video.
+      </p>
+      <p class="text-[#5f6368] dark:text-white">
+        (Ví dụ: giáo trình, bài đọc, ghi chú, đề cương bài học, v.v.)
+      </p>
+    </div>
+
+    <div class="mt-6 w-full">
+      <p-fileupload
+        mode="advanced"
+        accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, text/plain"
+        maxFileSize="1000000"
+        (onSelect)="onSelectFile($event)">
+        <ng-template #header></ng-template>
+        <ng-template #content let-file let-chooseCallback="chooseCallback">
+          <div *ngIf="file.length > 0; else empty"></div>
+
+          <ng-template #empty>
+            <div class="flex w-full flex-col items-center justify-center">
+              <i
+                class="pi pi-cloud-upload !rounded-full !border-2 !p-8 !text-4xl !text-gray-400"></i>
+              <p class="mb-0 mt-4">Kéo và thả tệp vào đây để tải lên.</p>
+              <p class="mb-0 mt-3 font-semibold">- Hoặc -</p>
+              <p-button
+                pTooltip="Chọn tệp để tải lên"
+                tooltipPosition="bottom"
+                label="Tải lên"
+                variant="outlined"
+                icon="pi pi-upload"
+                size="small"
+                styleClass="mt-3"
+                (onClick)="chooseCallback()" />
+              <p class="mt-12 text-gray-400">
+                Các loại file được hỗ trợ: .pdf, .doc, .txt
+              </p>
+            </div>
+          </ng-template>
+        </ng-template>
+      </p-fileupload>
+    </div>
+
+    <div class="mt-6 flex items-center gap-2">
+      <span class="pi pi-file-arrow-up dark:text-white"></span>
+      <p class="dark:text-white">Giới hạn tài liệu</p>
+      <div class="relative top-[1px] grow">
+        <p-progressbar
+          [pTooltip]="(current / max).toString()"
+          [value]="(current / max) * 100"
+          tooltipPosition="bottom"
+          showValue="false"
+          styleClass="!h-2"></p-progressbar>
+      </div>
+      <p class="dark:text-white">{{ current }} / {{ max }}</p>
+    </div>
+  </div>
+</div>

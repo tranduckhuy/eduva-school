@@ -3,9 +3,10 @@ import { Injectable, inject } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 
 import {
-  TOKEN_KEY,
+  ACCESS_TOKEN_KEY,
   REFRESH_TOKEN_KEY,
-} from '../../../shared/constants/token.constants';
+  EXPIRES_DATE_KEY,
+} from '../../../shared/constants/jwt.constant';
 
 @Injectable({
   providedIn: 'root',
@@ -13,14 +14,14 @@ import {
 export class JwtService {
   private readonly cookieService = inject(CookieService);
 
-  getToken(): string | null {
-    return this.cookieService.get(TOKEN_KEY) || null;
+  getAccessToken(): string | null {
+    return this.cookieService.get(ACCESS_TOKEN_KEY) || null;
   }
 
-  setToken(token: string): void {
+  setAccessToken(accessToken: string): void {
     this.cookieService.set(
-      TOKEN_KEY,
-      token,
+      ACCESS_TOKEN_KEY,
+      accessToken,
       undefined,
       '/',
       undefined,
@@ -30,7 +31,7 @@ export class JwtService {
   }
 
   removeToken(): void {
-    this.cookieService.delete(TOKEN_KEY, '/');
+    this.cookieService.delete(ACCESS_TOKEN_KEY, '/');
   }
 
   getRefreshToken(): string | null {
@@ -53,8 +54,29 @@ export class JwtService {
     this.cookieService.delete(REFRESH_TOKEN_KEY, '/');
   }
 
+  getExpiresDate(): string | null {
+    return this.cookieService.get(EXPIRES_DATE_KEY) || null;
+  }
+
+  setExpiresDate(expiresDate: string): void {
+    this.cookieService.set(
+      EXPIRES_DATE_KEY,
+      expiresDate,
+      undefined,
+      '/',
+      undefined,
+      true,
+      'Strict'
+    );
+  }
+
+  removeExpiredDate(): void {
+    this.cookieService.delete(EXPIRES_DATE_KEY, '/');
+  }
+
   clearAll(): void {
     this.removeToken();
     this.removeRefreshToken();
+    this.removeExpiredDate();
   }
 }

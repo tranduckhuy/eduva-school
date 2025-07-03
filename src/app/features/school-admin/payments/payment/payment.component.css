@@ -1,0 +1,14 @@
+th,
+td {
+  border-top: 1px solid var(--color-border-secondary);
+  padding: 12px;
+  border-collapse: collapse; /* To avoid double borders */
+}
+table {
+  border: 1px solid var(--color-border-primary);
+}
+
+th {
+  text-transform: uppercase;
+  font-weight: 600;
+}

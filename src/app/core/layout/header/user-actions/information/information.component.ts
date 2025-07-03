@@ -2,49 +2,58 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  inject,
   input,
   output,
+  inject,
 } from '@angular/core';
-
-import {
-  FontAwesomeModule,
-  FaIconLibrary,
-} from '@fortawesome/angular-fontawesome';
-import {
-  faGear,
-  faArrowRightFromBracket,
-} from '@fortawesome/free-solid-svg-icons';
-import { faCircleUser } from '@fortawesome/free-regular-svg-icons';
+import { RouterLink } from '@angular/router';
 
 import { SubmenuDirective } from '../../../../../shared/directives/submenu/submenu.directive';
-import { ThemeService } from '../../../../../shared/services/theme/theme.service';
+
+import { AuthService } from '../../../../auth/services/auth.service';
+import { UserService } from '../../../../../shared/services/api/user/user.service';
+import { ThemeService } from '../../../../../shared/services/core/theme/theme.service';
+
+import { UserRoles } from '../../../../../shared/constants/user-roles.constant';
 
 @Component({
   selector: 'header-information',
   standalone: true,
-  imports: [FontAwesomeModule, SubmenuDirective],
+  imports: [RouterLink, SubmenuDirective],
   templateUrl: './information.component.html',
   styleUrl: './information.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InformationComponent {
+  private readonly authService = inject(AuthService);
+  private readonly userService = inject(UserService);
+  private readonly themeService = inject(ThemeService);
+
   isFullScreen = input(false);
 
   clickOutside = output();
   toggleFullSCreen = output();
 
-  libIcon = inject(FaIconLibrary);
-  readonly themeService = inject(ThemeService);
+  readonly user = this.userService.currentUser;
 
   readonly isDarkMode = computed(() => {
     return this.themeService.isDarkMode();
   });
 
-  constructor() {
-    this.libIcon.addIcons(faCircleUser, faGear, faArrowRightFromBracket);
-  }
+  readonly settingsLink = computed(() => {
+    const role = this.user()?.roles[0];
+    if (!role) return '/settings';
+
+    return role === UserRoles.SCHOOL_ADMIN || role === UserRoles.SYSTEM_ADMIN
+      ? '/school-admin/settings'
+      : '/teacher/settings';
+  });
+
   toggleDarkMode() {
     this.themeService.toggleDarkMode();
+  }
+
+  logout() {
+    this.authService.logout().subscribe();
   }
 }

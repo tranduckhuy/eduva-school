@@ -1,6 +1,6 @@
 @import '@angular/cdk/overlay-prebuilt.css';
 @import 'primeicons/primeicons.css';
-@import 'ckeditor5/ckeditor5.css';
+@import '~plyr/dist/plyr.css';
 
 @import './assets/css/grid.css';
 @import './assets/fonts/Nunito/stylesheet.css';
@@ -111,6 +111,7 @@
     --color-bg-primary: var(--color-white);
     --color-bg-secondary: var(--color-gray-50);
     --color-bg-third: var(--color-gray-50);
+    --color-bg-forth: var(--color-white);
 
     --color-border-primary: #f3f3f3;
     --color-border-secondary: #e9edf6;
@@ -124,6 +125,10 @@
     --color-placeholder-primary: var(--color-gray-500);
 
     --color-heading: var(--color-black);
+
+    --color-scrollbar: #b5c3d7;
+
+    --color-button-active: #edeffa;
   }
 
   html {
@@ -134,30 +139,35 @@
     --color-bg-primary: #001027;
     --color-bg-secondary: #15203c;
     --color-bg-third: #071932;
+    --color-bg-forth: var(--color-bg-secondary);
 
     --color-border-primary: #172036;
-    --color-border-secondary: #15203c;
+    --color-border-secondary: var(--color-bg-secondary);
 
     --color-text-primary: var(--color-white);
     --color-text-secondary: var(--color-gray-400);
 
-    --color-hover-primary: #15203c;
+    --color-hover-primary: var(--color-bg-secondary);
     --color-hover-secondary: var(--color-dark);
 
     --color-placeholder-primary: var(--color-gray-400);
 
     --color-heading: var(--color-white);
+
+    --color-scrollbar: #ffffff26;
+
+    --color-button-active: #8695aa;
   }
 
   html *::-webkit-scrollbar {
-    border-radius: 0;
-    width: 8px;
-    height: 8px;
+    border-radius: 0px;
+    width: 4px;
+    height: 4px;
   }
 
   html *::-webkit-scrollbar-thumb {
     border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: var(--color-scrollbar);
   }
 
   html *::-webkit-scrollbar-track {
@@ -171,6 +181,7 @@
     background-color: var(--color-bg-third);
     line-height: 1.6;
     text-rendering: optimizeSpeed;
+    overscroll-behavior: contain;
     direction: ltr;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

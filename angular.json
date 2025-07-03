@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "frontend-school": {
+    "eduva-school": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -21,7 +21,7 @@
             "customWebpackConfig": {
               "path": "./custom-webpack.config.ts"
             },
-            "outputPath": "dist/frontend-school",
+            "outputPath": "dist/eduva-school",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [],
@@ -36,12 +36,18 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/ngx-extended-pdf-viewer/assets/",
+                "output": "/assets/"
               }
             ],
             "styles": [
               "node_modules/@fortawesome/fontawesome-svg-core/styles.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
-              "node_modules/ckeditor5/dist/ckeditor5.css",
+              "node_modules/@videogular/ngx-videogular/fonts/videogular.css",
+              "node_modules/plyr/dist/plyr.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -91,48 +97,19 @@
           "builder": "@angular-builders/custom-webpack:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "frontend-school:build:production"
+              "buildTarget": "eduva-school:build:production"
             },
             "development": {
-              "buildTarget": "frontend-school:build:development"
+              "buildTarget": "eduva-school:build:development"
             },
             "staging": {
-              "buildTarget": "frontend-school:build:staging"
+              "buildTarget": "eduva-school:build:staging"
             }
           },
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n"
-        },
-        "test": {
-          "builder": "@angular-builders/custom-webpack:karma",
-          "options": {
-            "customWebpackConfig": {
-              "path": "./custom-webpack.config.ts"
-            },
-            "polyfills": [],
-            "tsConfig": "tsconfig.spec.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public",
-                "output": "."
-              },
-              {
-                "glob": "**/*",
-                "input": "src/assets",
-                "output": "assets"
-              }
-            ],
-            "styles": [
-              "node_modules/@fortawesome/fontawesome-svg-core/styles.css",
-              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
-              "node_modules/ckeditor5/dist/ckeditor5.css",
-              "src/styles.css"
-            ],
-            "scripts": []
-          }
         }
       }
     }

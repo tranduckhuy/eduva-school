@@ -1,0 +1,90 @@
+<div class="e-row e-g-4 e-g-md-6">
+  <div class="e-col-8 e-col-lg-12">
+    <div
+      class="rounded border border-gray-100 bg-white p-4 shadow-main dark:border-dark-500 dark:bg-dark-200">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-base font-medium">Thông tin trường học</h2>
+        </div>
+
+        <div class="e-row e-row-cols-2 e-row-cols-md-1 e-g-4">
+          <div class="e-col-12">
+            <app-form-control
+              formControlName="name"
+              name="name"
+              label="Tên trường"
+              type="text"
+              placeholder="Nhập tên trường học"
+              [required]="true">
+            </app-form-control>
+          </div>
+          <div class="e-col">
+            <app-form-control
+              formControlName="contactEmail"
+              name="contactEmail"
+              label="Địa chỉ email"
+              type="email"
+              placeholder="Nhập địa chỉ email liên hệ"
+              [required]="true"
+              [email]="true">
+            </app-form-control>
+          </div>
+          <div class="e-col">
+            <app-form-control
+              formControlName="contactPhone"
+              name="contactPhone"
+              label="Số điện thoại"
+              type="text"
+              placeholder="Nhập số điện thoại liên hệ"
+              [required]="true"
+              [phone]="true">
+            </app-form-control>
+          </div>
+          <div class="e-col-12">
+            <app-form-control
+              formControlName="address"
+              name="address"
+              label="Địa chỉ"
+              type="text"
+              placeholder="Nhập địa chỉ trường học"
+              [required]="true">
+            </app-form-control>
+          </div>
+          <div class="e-col-12">
+            <app-form-control
+              formControlName="websiteUrl"
+              name="websiteUrl"
+              label="Địa chỉ Website"
+              type="text"
+              placeholder="Nhập đường dẫn website (nếu có)">
+            </app-form-control>
+          </div>
+        </div>
+
+        <div class="mt-5 flex w-full justify-end gap-2">
+          <p-button
+            label="Hủy"
+            variant="outlined"
+            size="small"
+            icon="pi pi-times"
+            severity="danger" />
+          <p-button
+            label="Thanh toán"
+            variant="outlined"
+            type="submit"
+            size="small"
+            icon="pi pi-check"
+            [loading]="isLoading()"
+            [disabled]="form.invalid" />
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="e-col-4 e-col-lg-12">
+    <subscription-plan-card
+      [subscriptionPlan]="subscriptionPlan()!"
+      [isYearly]="isYearly()"
+      (toggleSwitchChange)="onToggleSwitchChange($event)" />
+  </div>
+</div>

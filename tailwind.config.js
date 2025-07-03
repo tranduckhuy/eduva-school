@@ -17,6 +17,7 @@ module.exports = {
       animation: {
         fadeIn: 'fadeIn 0.2s ease-out',
         fadeInForward: 'fadeInForward 0.5s ease',
+        scaleIn: 'scaleIn 0.2s ease',
         shake: 'shake 0.5s ease-in-out',
       },
       keyframes: {
@@ -38,21 +39,31 @@ module.exports = {
             transform: 'translateY(0)',
           },
         },
-        shake: {
+        scaleIn: {
           '0%': {
-            transform: 'translate(0)',
-          },
-          '25%': {
-            transform: 'translate(-8px)',
-          },
-          '50%': {
-            transform: 'translate(8px)',
-          },
-          '75%': {
-            transform: 'translate(-8px)',
+            opacity: '0',
+            transform: 'scale(0.8)',
           },
           '100%': {
-            transform: 'translate(0)',
+            opacity: '1',
+            transform: 'scale(1)',
+          },
+        },
+        shake: {
+          '0%': {
+            transform: 'translateX(0)',
+          },
+          '25%': {
+            transform: 'translateX(-8px)',
+          },
+          '50%': {
+            transform: 'translateX(8px)',
+          },
+          '75%': {
+            transform: 'translateX(-8px)',
+          },
+          '100%': {
+            transform: 'translateX(0)',
           },
         },
       },

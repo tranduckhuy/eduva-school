@@ -1,0 +1,44 @@
+/* Target elements inside your component's host */
+:host ::ng-deep .lesson-content {
+  line-height: 1.6;
+  color: #45494f;
+}
+
+.dark :host ::ng-deep .lesson-content {
+  color: #ffffffcc;
+}
+
+:host ::ng-deep .lesson-content h2 {
+  display: inline-block;
+  margin-top: 32px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+:host ::ng-deep .lesson-content h3 {
+  margin-top: 28px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+:host ::ng-deep .lesson-content h2 span,
+:host ::ng-deep .lesson-content h3 span,
+:host ::ng-deep .lesson-content h4 span,
+:host ::ng-deep .lesson-content h5 span,
+:host ::ng-deep .lesson-content h6 span {
+  color: var(--color-primary-500);
+}
+
+:host ::ng-deep .lesson-content p {
+  margin: 16px 0;
+  font-size: 14px;
+}
+
+:host ::ng-deep .lesson-content ul {
+  padding-left: 2em;
+  margin-bottom: 1em;
+}
+
+:host ::ng-deep .lesson-content li {
+  margin-bottom: 0.5em;
+}

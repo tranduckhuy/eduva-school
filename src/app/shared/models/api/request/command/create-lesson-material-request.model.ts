@@ -1,0 +1,18 @@
+import { ContentType } from '../../../enum/lesson-material.enum';
+
+export interface CreateLessonMaterialRequest {
+  title: string;
+  description?: string;
+  contentType: ContentType;
+  tag?: string;
+  duration: number;
+  fileSize: number;
+  isAIContent: boolean;
+  sourceUrl: string;
+}
+
+export interface CreateLessonMaterialsRequest {
+  folderId: string;
+  blobNames: string[];
+  lessonMaterials: CreateLessonMaterialRequest[];
+}

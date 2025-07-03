@@ -1,0 +1,145 @@
+<div
+  class="rounded border border-gray-100 bg-white p-5 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <div class="fap-4 mb-5 flex flex-wrap items-center justify-between">
+    <app-search-input (search)="onSearchTriggered($event)" class="md:w-64" />
+    <div class="flex items-center gap-3">
+      <!-- Time filter -->
+      <p-select
+        [options]="timeFilterOptions()"
+        [ngModel]="selectedTimeFilter()"
+        (ngModelChange)="onTimeFilterChange($event)"
+        optionLabel="name"
+        placeholder="Sắp xếp theo thời gian"
+        class="!dark:bg-dark-200 flex h-11 items-center sm:w-56" />
+
+      <!-- Status filter -->
+      <p-select
+        [options]="statusSelectOptions()"
+        [ngModel]="statusSelect()"
+        (ngModelChange)="onStatusSelectChange($event)"
+        optionLabel="name"
+        placeholder="Chọn trạng thái hoạt động"
+        class="!dark:bg-dark-200 flex h-11 items-center sm:w-56" />
+      <app-button
+        [variant]="'outline'"
+        class="flex items-center"
+        (clicked)="openAddStudentModal()">
+        <span
+          class="material-symbols-outlined relative top-[3px] mr-1 text-lg leading-none">
+          add
+        </span>
+        <span>Thêm học sinh</span>
+      </app-button>
+      <app-import-accounts [title]="'Import danh sách học sinh'" />
+      <app-button [variant]="'outline'" class="flex items-center">
+        <span
+          class="material-symbols-outlined relative top-[3px] mr-1 text-lg leading-none">
+          download
+        </span>
+        <span>Export</span>
+      </app-button>
+    </div>
+  </div>
+  @if (isLoadingGet()) {
+    <app-table-skeleton [tableHead]="tableHeadSkeleton()" />
+  } @else {
+    <p-table
+      [value]="users()"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      [paginator]="true"
+      [rows]="rows()"
+      [lazy]="true"
+      [first]="first()"
+      [showCurrentPageReport]="true"
+      (onLazyLoad)="loadDataLazy($event)"
+      [totalRecords]="totalUsers()"
+      currentPageReportTemplate="
+        Hiển thị {first} đến {last} trên {totalRecords} quản lý học sinh
+      ">
+      <ng-template #header>
+        <tr>
+          <th scope="col" class="!w-[5%] !text-center">STT</th>
+          <th
+            scope="col"
+            class="!w-[25%] !min-w-[200px]"
+            pSortableColumn="fullname">
+            <span class="mr-2">Học sinh</span><p-sortIcon field="fullname" />
+          </th>
+          <th
+            scope="col"
+            class="!w-[25%] !min-w-[150px]"
+            pSortableColumn="email">
+            <span class="mr-2">Email</span><p-sortIcon field="email" />
+          </th>
+          <th scope="col" class="!w-[15%] !min-w-[150px]">Số điện thoại</th>
+          <th scope="col" class="!w-[10%] !min-w-[150px] !text-center">
+            Trạng thái
+          </th>
+          <th scope="col" class="!w-[15%] !min-w-[150px] !text-center">
+            Hành động
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-student let-i="rowIndex">
+        <tr>
+          <td class="!text-center">{{ i + 1 | leadingZero }}</td>
+          <td>
+            <div class="flex items-center gap-2">
+              <img
+                [src]="student.avatarUrl"
+                class="size-10 rounded-full object-cover"
+                alt="Avatar" />
+              <div class="flex flex-col">
+                <h3 class="text-base font-semibold">
+                  {{ student.fullName }}
+                </h3>
+              </div>
+            </div>
+          </td>
+          <td>{{ student.email }}</td>
+          <td>{{ student.phoneNumber }}</td>
+          <td class="!text-center">
+            <app-badge
+              [variant]="student.status === 0 ? 'success' : 'destructive'">
+              {{ student.status === 0 ? 'Đang hoạt động' : 'Vô hiệu hóa' }}
+            </app-badge>
+          </td>
+          <td class="!text-center">
+            <div class="mr-4 flex items-center justify-center gap-2">
+              <a [routerLink]="['/school-admin/students', student.id]">
+                <app-button
+                  pTooltip="Xem chi tiết"
+                  tooltipPosition="top"
+                  [variant]="'light'"
+                  class="material-symbols-outlined rounded-full px-[7px] pb-[6px] pt-[8px] text-lg leading-none"
+                  >visibility</app-button
+                >
+              </a>
+              @if (student.status === 0) {
+                <app-button
+                  pTooltip="Vô hiệu hóa"
+                  tooltipPosition="top"
+                  [loading]="isLoadingArchive()"
+                  (clicked)="openConfirmArchiveDialog($event, student.id)"
+                  [variant]="'light-danger'"
+                  class="material-symbols-outlined rounded-full px-[7px] py-[7px] text-lg leading-none"
+                  >archive</app-button
+                >
+              } @else if (student.status === 1) {
+                <app-button
+                  pTooltip="Kích hoạt"
+                  tooltipPosition="top"
+                  [loading]="isLoadingActive()"
+                  (clicked)="openConfirmActiveDialog($event, student.id)"
+                  [variant]="'light'"
+                  class="material-symbols-outlined rounded-full px-[7px] py-[7px] text-lg leading-none"
+                  >unarchive</app-button
+                >
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>
