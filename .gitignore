@@ -43,3 +43,6 @@ Thumbs.db
 
 # Environment Variables
 .env
+
+# Build Enhance
+.swc/
