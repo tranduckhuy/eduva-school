@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { type ClassModel } from '../../../../../shared/models/entities/class.model';
-import { type StudentClassResponse } from '../../models/response/query/get-studentss-class-response.model';
+import { type StudentClassResponse } from '../../models/response/query/get-students-class-response.model';
 
 @Component({
   selector: 'class-member',

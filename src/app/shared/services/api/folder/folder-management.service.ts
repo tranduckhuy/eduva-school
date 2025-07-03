@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { Observable, catchError, map, of, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 
@@ -50,31 +50,21 @@ export class FolderManagementService {
             );
           }
         }),
-        map(res => this.extractData<Folder>(res)),
+        map(res => this.extractSingleData<Folder>(res)),
         catchError((err: HttpErrorResponse) => this.handleCreateError(err))
       );
   }
 
-  getAllFolders(
-    request: GetFoldersRequest
-  ): Observable<GetFoldersResponse | null> {
+  getAllFolders(request: GetFoldersRequest): Observable<Folder[] | null> {
     return this.fetchFolders(this.BASE_FOLDERS_API_URL, request);
   }
 
-  getPersonalFolders(
-    request: GetFoldersRequest
-  ): Observable<GetFoldersResponse | null> {
+  getPersonalFolders(request: GetFoldersRequest): Observable<Folder[] | null> {
     return this.fetchFolders(`${this.BASE_FOLDERS_API_URL}/user`, request);
   }
 
-  getClassFolders(
-    request: GetFoldersRequest,
-    classId: string
-  ): Observable<GetFoldersResponse | null> {
-    return this.fetchFolders(
-      `${this.BASE_FOLDERS_API_URL}/class/${classId}`,
-      request
-    );
+  getClassFolders(classId: string): Observable<Folder[] | null> {
+    return this.fetchFolders(`${this.BASE_FOLDERS_API_URL}/class/${classId}`);
   }
 
   // ---------------------------
@@ -82,19 +72,18 @@ export class FolderManagementService {
   // ---------------------------
 
   private fetchFolders(
-    api: string,
-    request: GetFoldersRequest
-  ): Observable<GetFoldersResponse | null> {
+    apiUrl: string,
+    request?: GetFoldersRequest
+  ): Observable<Folder[] | null> {
     return this.requestService
-      .get<GetFoldersResponse>(api, request, {
+      .get<GetFoldersResponse>(apiUrl, request, {
         loadingKey: 'get-folders',
       })
       .pipe(
         tap(res => {
           if (res.statusCode === StatusCode.SUCCESS && res.data) {
-            const folders = res.data;
-            this.folderListSignal.set(folders.data ?? []);
-            this.totalRecordsSignal.set(folders.count ?? 0);
+            this.folderListSignal.set([...(res.data.data ?? [])]);
+            this.totalRecordsSignal.set(res.data.count ?? 0);
           } else {
             this.toastHandlingService.error(
               'Lấy danh sách bài giảng thất bại',
@@ -102,13 +91,21 @@ export class FolderManagementService {
             );
           }
         }),
-        map(res => this.extractData<GetFoldersResponse>(res)),
+        map(res => this.extractListData<Folder>(res)),
         catchError(() => this.handleGetError())
       );
   }
 
-  private extractData<T>(res: any): T | null {
-    return res.statusCode === StatusCode.SUCCESS && res.data ? res.data : null;
+  private extractListData<T>(res: any): T[] | null {
+    return res.statusCode === StatusCode.SUCCESS && res.data
+      ? (res.data as T[])
+      : null;
+  }
+
+  private extractSingleData<T>(res: any): T | null {
+    return res.statusCode === StatusCode.SUCCESS && res.data
+      ? (res.data as T)
+      : null;
   }
 
   private handleGetError(): Observable<null> {
@@ -119,8 +116,8 @@ export class FolderManagementService {
   private handleCreateError(err: HttpErrorResponse): Observable<null> {
     switch (err.error.statusCode) {
       case StatusCode.FOLDER_NAME_ALREADY_EXISTS:
-        this.toastHandlingService.error(
-          'Tạo bài giảng thất bại',
+        this.toastHandlingService.warn(
+          'Cảnh báo',
           'Tên bài giảng đã tồn tại. Vui lòng chọn tên khác.'
         );
         break;
@@ -133,6 +130,6 @@ export class FolderManagementService {
       default:
         this.toastHandlingService.errorGeneral();
     }
-    return of(null);
+    return throwError(() => err);
   }
 }

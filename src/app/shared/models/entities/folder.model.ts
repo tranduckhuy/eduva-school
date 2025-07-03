@@ -8,6 +8,7 @@ export interface Folder {
   ownerName: string;
   ownerType: FolderOwnerType;
   order: number;
+  countLessonMaterial: number;
   createdAt: string;
   lastModifiedAt: string;
 }

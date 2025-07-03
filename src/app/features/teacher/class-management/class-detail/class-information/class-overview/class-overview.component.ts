@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   input,
+  output,
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -13,11 +14,15 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ConfirmationService } from 'primeng/api';
 
 import { ClassManagementService } from '../../../services/class-management.service';
+import { GlobalModalService } from '../../../../../../shared/services/layout/global-modal/global-modal.service';
 
 import { ContentType } from '../../../../../../shared/models/enum/lesson-material.enum';
 
+import { AddLessonModalComponent } from '../../../../../../shared/components/add-lesson-modal/add-lesson-modal.component';
+
 import { type ClassModel } from '../../../../../../shared/models/entities/class.model';
 import { type FolderWithMaterials } from '../../class-detail.component';
+import { FolderOwnerType } from '../../../../../../shared/models/enum/folder-owner-type.enum';
 
 @Component({
   selector: 'class-overview',
@@ -29,12 +34,15 @@ import { type FolderWithMaterials } from '../../class-detail.component';
 })
 export class ClassOverviewComponent {
   private readonly classManagementService = inject(ClassManagementService);
+  private readonly globalModalService = inject(GlobalModalService);
   private readonly confirmationService = inject(ConfirmationService);
 
   classModel = input<ClassModel | null>();
   folderWithMaterials = input<FolderWithMaterials[]>();
   folderCount = input<number>(0);
   materialCount = input<number>(0);
+
+  classFolderAdded = output();
 
   isCopied = signal<boolean>(false);
   accordionActiveIndex = signal<number>(0);
@@ -85,6 +93,16 @@ export class ClassOverviewComponent {
       setTimeout(() => {
         this.isCopied.set(false);
       }, 5000);
+    });
+  }
+
+  openAddFolderModal(): void {
+    this.globalModalService.open(AddLessonModalComponent, {
+      ownerType: FolderOwnerType.Class,
+      classId: this.classModel()?.id,
+      addLessonSuccess: () => {
+        this.classFolderAdded.emit();
+      },
     });
   }
 

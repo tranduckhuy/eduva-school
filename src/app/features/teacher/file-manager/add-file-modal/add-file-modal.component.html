@@ -46,7 +46,7 @@
         }
       </div> -->
 
-    <div class="mt-[25px] w-[550px]">
+    <div class="mt-[25px] w-[550px] sm:w-[480px] xs:w-[280px]">
       <label for="files" class="font-bold dark:text-white">
         Chọn tệp từ thiết bị
       </label>
@@ -111,19 +111,26 @@
             <ng-template #empty>
               <div class="flex w-full flex-col items-center justify-center">
                 <i
-                  class="pi pi-cloud-upload !rounded-full !border-2 !p-8 !text-4xl !text-gray-400"></i>
-                <p class="mb-0 mt-4">Kéo và thả tệp vào đây để tải lên.</p>
+                  class="pi pi-cloud-upload !rounded-full !border-2 !p-8 !text-4xl !text-gray-400 xs:hidden"></i>
+                <p class="mb-0 mt-4 md:hidden">
+                  Kéo và thả tệp vào đây để tải lên
+                </p>
+                <p class="mb-0 mt-4 hidden text-base md:block">
+                  Chọn tệp để tải lên
+                </p>
                 <p class="mb-0 mt-3 font-semibold">- Hoặc -</p>
-                <p-button
-                  pTooltip="Chọn tệp để tải lên"
-                  tooltipPosition="bottom"
-                  label="Tải lên"
-                  variant="outlined"
-                  icon="pi pi-upload"
-                  size="small"
-                  styleClass="mt-3"
-                  (onClick)="chooseCallback()" />
-                <p class="mt-12 text-gray-400">
+                <div class="">
+                  <p-button
+                    pTooltip="Chọn tệp để tải lên"
+                    tooltipPosition="bottom"
+                    label="Tải lên"
+                    variant="outlined"
+                    icon="pi pi-upload"
+                    size="small"
+                    styleClass="mt-3"
+                    (onClick)="chooseCallback()" />
+                </div>
+                <p class="mt-12 text-center text-gray-400">
                   Các loại file được hỗ trợ: .pdf, .doc, .txt, Video (e.g.
                   .mp4), Audio (e.g. .mp3)
                 </p>
