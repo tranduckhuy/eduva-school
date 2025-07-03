@@ -1,4 +1,4 @@
-name: CI - Test EDUVA Landing
+name: CI - Test EDUVA School
 
 on:
   push:
