@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+} from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
 import { ClassOverviewComponent } from './class-overview/class-overview.component';
@@ -19,4 +24,6 @@ export class ClassInformationComponent {
   folderWithMaterials = input<FolderWithMaterials[]>([]);
   folderCount = input<number>(0);
   materialCount = input<number>(0);
+
+  classFolderAdded = output();
 }

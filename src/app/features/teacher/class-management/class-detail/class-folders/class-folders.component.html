@@ -1,0 +1,122 @@
+<div
+  class="mx-auto mt-4 flex w-[50%] flex-col xl:w-[60%] lg:w-[70%] md:w-[80%] sm:w-[95%]">
+  <!-- ? Teacher -->
+  <div>
+    <h3
+      class="border-b border-[#e0e0e0] pb-2 text-[32px] font-semibold text-[#202124] dark:text-white">
+      Giáo viên
+    </h3>
+    <ul class="mt-5">
+      <li class="member-item">
+        <img
+          [src]="classModel()?.teacherAvatarUrl"
+          [alt]="classModel()?.teacherName"
+          class="size-[32px] rounded-full object-contain" />
+        <span class="font-semibold">{{ classModel()?.teacherName }}</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ? Folders -->
+  <div class="mt-8">
+    <h3
+      class="border-b border-[#e0e0e0] pb-2 text-[32px] font-semibold text-[#202124] dark:text-white">
+      Thư mục
+    </h3>
+    <ul class="mt-5 px-3">
+      @for (folderWithMaterials of folderWithMaterials(); track $index) {
+        <li class="folder-item group cursor-pointer">
+          <div
+            class="relative flex w-full items-center justify-between border-b border-b-[#e0e0e0] py-3">
+            <p
+              class="select-none text-base font-semibold opacity-80 transition-opacity group-hover:opacity-100">
+              {{ folderWithMaterials.folder.name }}
+            </p>
+            <div class="relative">
+              <p-button
+                variant="text"
+                styleClass="group"
+                [rounded]="true"
+                (onClick)="toggleMenuFolderItem(folderWithMaterials.folder.id)">
+                <ng-template #icon>
+                  <span
+                    class="pi pi-ellipsis-v !opacity-60 transition-opacity group-hover:!opacity-100"
+                    style="font-size: 16px"></span>
+                </ng-template>
+              </p-button>
+              @if (openedMenuFolderId() === folderWithMaterials.folder.id) {
+                <div
+                  class="absolute left-0 top-[40px] z-[1] flex min-w-[150px] max-w-[280px] origin-top-left animate-scaleIn flex-col overflow-hidden rounded bg-[#f0f4f9] dark:bg-dark-400 sm:left-auto sm:right-0 sm:origin-top-right"
+                  clickOutsideSubmenu
+                  (clickOutside)="
+                    toggleMenuFolderItem(folderWithMaterials.folder.id)
+                  ">
+                  <button
+                    class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300">
+                    <span class="pi pi-plus" style="font-size: 14px"></span>
+                    <span>Thêm tài liệu</span>
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+          <ul class="mt-4 pl-3">
+            @for (material of folderWithMaterials.materials; track $index) {
+              <li class="material-item flex items-center justify-between">
+                <a
+                  [routerLink]="[
+                    '/teacher/view-lesson',
+                    folderWithMaterials.folder.id,
+                    material.id,
+                  ]"
+                  class="flex w-full grow items-center gap-3 pr-2">
+                  <span
+                    class="icon-wrapper"
+                    [ngClass]="
+                      getMaterialIconConfig(material.contentType).bgColor
+                    ">
+                    <i
+                      class="material-symbols-outlined text-[20px]"
+                      [ngClass]="
+                        getMaterialIconConfig(material.contentType).textColor
+                      ">
+                      {{ getMaterialIconConfig(material.contentType).icon }}
+                    </i>
+                  </span>
+                  <span class="line-clamp-2">{{ material.title }}</span>
+                </a>
+                <div class="relative">
+                  <p-button
+                    variant="text"
+                    styleClass="group"
+                    [rounded]="true"
+                    (onClick)="toggleMenuMaterialItem(material.id)">
+                    <ng-template #icon>
+                      <span
+                        class="pi pi-ellipsis-v !opacity-60 transition-opacity group-hover:!opacity-100"
+                        style="font-size: 16px"></span>
+                    </ng-template>
+                  </p-button>
+                  @if (openedMenuMaterialId() === material.id) {
+                    <div
+                      class="absolute left-0 top-[40px] z-[1] flex min-w-[150px] max-w-[280px] origin-top-left animate-scaleIn flex-col overflow-hidden rounded bg-[#f0f4f9] dark:bg-dark-400 sm:left-auto sm:right-0 sm:origin-top-right"
+                      clickOutsideSubmenu
+                      (clickOutside)="toggleMenuMaterialItem(material.id)">
+                      <button
+                        class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300">
+                        <span class="pi pi-trash"></span>
+                        <span>Xóa tài liệu</span>
+                      </button>
+                    </div>
+                  }
+                </div>
+              </li>
+            } @empty {
+              <li>Hiện chưa có tài liệu trong thư mục này.</li>
+            }
+          </ul>
+        </li>
+      }
+    </ul>
+  </div>
+</div>

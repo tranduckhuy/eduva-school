@@ -1,0 +1,24 @@
+.member-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.member-item + .member-item,
+.folder-item + .folder-item {
+  margin-top: 20px;
+}
+
+.material-item + .material-item {
+  margin-top: 16px;
+}
+
+.icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}

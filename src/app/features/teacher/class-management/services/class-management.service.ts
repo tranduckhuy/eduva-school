@@ -18,7 +18,7 @@ import { GetStudentsClassRequest } from '../models/request/query/get-students-cl
 import {
   GetStudentsClassResponse,
   StudentClassResponse,
-} from '../models/response/query/get-studentss-class-response.model';
+} from '../models/response/query/get-students-class-response.model';
 
 @Injectable({
   providedIn: 'root',

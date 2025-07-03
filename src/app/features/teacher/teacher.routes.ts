@@ -55,6 +55,13 @@ export const teacherRoutes: Routes = [
           ),
       },
       {
+        path: 'view-lesson/:folderId/:materialId',
+        loadComponent: () =>
+          import(
+            '../../shared/components/lesson-details/preview-lesson/preview-lesson.component'
+          ).then(mod => mod.PreviewLessonComponent),
+      },
+      {
         path: 'settings',
         data: {
           breadcrumb: 'Cài đặt',

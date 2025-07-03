@@ -16,11 +16,12 @@ import { GlobalModalService } from '../../../../shared/services/layout/global-mo
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 
 import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
+import { FolderOwnerType } from '../../../../shared/models/enum/folder-owner-type.enum';
 
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { FolderManagementService } from '../../../../shared/services/api/folder/folder-management.service';
 import { GetFoldersRequest } from '../../../../shared/models/api/request/query/get-folders-request.model';
-import { AddLessonModalComponent } from '../add-lesson-modal/add-lesson-modal.component';
+import { AddLessonModalComponent } from '../../../../shared/components/add-lesson-modal/add-lesson-modal.component';
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
 import { TableSkeletonComponent } from '../../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 import { TableEmptyStateComponent } from '../../../../shared/components/table-empty-state/table-empty-state.component';
@@ -113,6 +114,7 @@ export class LessonTableComponent implements OnInit {
 
   openAddFolderModal(): void {
     this.modalService.open(AddLessonModalComponent, {
+      ownerType: FolderOwnerType.Personal,
       addLessonSuccess: () => {
         this.currentPage.set(0);
       },

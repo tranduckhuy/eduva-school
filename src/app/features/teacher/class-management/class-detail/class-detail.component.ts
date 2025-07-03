@@ -22,13 +22,12 @@ import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
 import { ClassInformationComponent } from './class-information/class-information.component';
 import { ClassMemberComponent } from './class-member/class-member.component';
 
-import { FolderOwnerType } from '../../../../shared/models/enum/folder-owner-type.enum';
+import { ClassFoldersComponent } from './class-folders/class-folders.component';
 
 import { type Folder } from '../../../../shared/models/entities/folder.model';
 import { type LessonMaterial } from '../../../../shared/models/entities/lesson-material.model';
-import { type GetFoldersRequest } from '../../../../shared/models/api/request/query/get-folders-request.model';
 import { type GetLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
-import { type StudentClassResponse } from '../models/response/query/get-studentss-class-response.model';
+import { type StudentClassResponse } from '../models/response/query/get-students-class-response.model';
 
 export interface FolderWithMaterials {
   folder: Folder;
@@ -43,6 +42,7 @@ export interface FolderWithMaterials {
     TabsModule,
     ClassInformationComponent,
     ClassMemberComponent,
+    ClassFoldersComponent,
   ],
   templateUrl: './class-detail.component.html',
   styleUrl: './class-detail.component.css',
@@ -88,7 +88,7 @@ export class ClassDetailComponent implements OnInit {
     });
   }
 
-  private loadData() {
+  loadData() {
     this.classManagementService
       .getTeacherClassById(this.classId())
       .pipe(
@@ -108,17 +108,12 @@ export class ClassDetailComponent implements OnInit {
               this.students.set(students ?? []);
             });
 
-          const folderReq: GetFoldersRequest = {
-            classId: classModel.id,
-            ownerType: FolderOwnerType.Class,
-          };
-
           // ? Load Folders
           return this.folderManagementService
-            .getClassFolders(folderReq, classModel.id)
+            .getClassFolders(classModel.id)
             .pipe(
               switchMap(folderRes => {
-                const folders = folderRes?.data ?? [];
+                const folders = folderRes ?? [];
 
                 if (folders.length === 0) return of([]);
 
@@ -146,7 +141,7 @@ export class ClassDetailComponent implements OnInit {
         })
       )
       .subscribe(folderWithMaterials => {
-        this.folderMaterials.set(folderWithMaterials);
+        this.folderMaterials.set([...folderWithMaterials]);
 
         const totalFolders = folderWithMaterials.length;
         const totalMaterials = folderWithMaterials.reduce(
