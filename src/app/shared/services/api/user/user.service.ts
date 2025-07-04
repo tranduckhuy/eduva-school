@@ -21,6 +21,7 @@ export class UserService {
 
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly USER_API_URL = `${this.BASE_API_URL}/users`;
+  private readonly USER_DETAIL_API_URL = `${this.BASE_API_URL}/users/school`;
   private readonly USER_PROFILE_API_URL = `${this.BASE_API_URL}/users/profile`;
 
   private readonly LOCAL_STORAGE_USER_KEY = 'eduva_user';
@@ -102,7 +103,7 @@ export class UserService {
    */
   getUserDetailById(id: string): Observable<User | null> {
     return this.handleRequest<User>(
-      this.requestService.get<User>(`${this.USER_API_URL}/${id}`),
+      this.requestService.get<User>(`${this.USER_DETAIL_API_URL}/${id}`),
       {
         successHandler: data => this.userDetailSignal.set(data),
         errorHandler: () => this.resetUser(),
