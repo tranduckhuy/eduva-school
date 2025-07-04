@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 
 import {
   BYPASS_AUTH,
+  BYPASS_AUTH_ERROR,
   LOADING_KEY,
   SHOW_LOADING,
 } from '../tokens/context/http-context.token';
@@ -70,6 +71,7 @@ export function buildFormDataFromFormGroup(form: FormGroup): FormData {
 export function buildHttpContext(options?: RequestOptions): HttpContext {
   return new HttpContext()
     .set(BYPASS_AUTH, options?.bypassAuth === true)
+    .set(BYPASS_AUTH_ERROR, options?.bypassAuthError === true)
     .set(SHOW_LOADING, options?.showLoading !== false)
     .set(LOADING_KEY, options?.loadingKey ?? 'default');
 }

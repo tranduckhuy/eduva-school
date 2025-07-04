@@ -26,7 +26,7 @@ export class PasswordService {
   private readonly RESET_PASSWORD_API_URL = `${this.BASE_API_URL}/auth/reset-password`;
   private readonly CHANGE_PASSWORD_API_URL = `${this.BASE_API_URL}/auth/change-password`;
 
-  private readonly CLIENT_URL = `${environment.clientUrl}/reset-password`;
+  private readonly CLIENT_URL = `${environment.clientUrl}/auth/reset-password`;
 
   forgotPassword(request: EmailLinkRequest): Observable<void> {
     const payload = { ...request, clientUrl: this.CLIENT_URL };

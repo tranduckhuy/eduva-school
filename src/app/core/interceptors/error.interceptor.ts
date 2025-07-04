@@ -10,7 +10,7 @@ import { JwtService } from '../auth/services/jwt.service';
 import { UserService } from '../../shared/services/api/user/user.service';
 import { GlobalModalService } from '../../shared/services/layout/global-modal/global-modal.service';
 
-import { BYPASS_AUTH } from '../../shared/tokens/context/http-context.token';
+import { BYPASS_AUTH_ERROR } from '../../shared/tokens/context/http-context.token';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
@@ -19,7 +19,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const globalModalService = inject(GlobalModalService);
   const confirmationService = inject(ConfirmationService);
 
-  const isByPass = req.context.get(BYPASS_AUTH);
+  const isByPass = req.context.get(BYPASS_AUTH_ERROR);
 
   const handleServerError = () => router.navigateByUrl('/errors/500');
 

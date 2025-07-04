@@ -100,6 +100,7 @@ module.exports = {
           800: '#163990',
         },
         dark: {
+          DEFAULT: '#172036',
           50: '#f3f3f3',
           100: '#8695aa',
           200: '#001027',
@@ -146,6 +147,7 @@ module.exports = {
           900: '#23272e',
         },
         success: {
+          DEFAULT: '#22c03c',
           50: '#e6f4e9',
           100: '#c1e6bd',
           200: '#8edc82',
@@ -168,6 +170,7 @@ module.exports = {
           700: '#d71c00',
         },
         warning: {
+          DEFAULT: '#ffc107',
           50: '#fff8e1',
           200: '#ffe082',
           400: '#ffca28',
@@ -176,6 +179,7 @@ module.exports = {
           700: '#ffa000',
         },
         info: {
+          DEFAULT: '#00c1eb',
           50: '#e1f7fe',
           100: '#b3ecfc',
           200: '#80e0fa',
