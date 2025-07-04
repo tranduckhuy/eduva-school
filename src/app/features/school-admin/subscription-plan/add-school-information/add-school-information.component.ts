@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 
-import { switchMap, of } from 'rxjs';
+import { switchMap, of, filter } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 
@@ -22,8 +22,9 @@ import { PaymentService } from '../../../../shared/services/api/payment/payment.
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 import { SubscriptionPlanCardComponent } from '../subscription-plan-card/subscription-plan-card.component';
 
+import { type School } from '../../../../shared/models/entities/school.model';
 import { type CreateSchoolRequest } from '../../../../shared/models/api/request/command/create-school-request.model';
-import { RefreshTokenRequest } from '../../../../core/auth/models/request/refresh-token-request.model';
+import { type RefreshTokenRequest } from '../../../../core/auth/models/request/refresh-token-request.model';
 import {
   BillingCycle,
   CreatePlanPaymentLinkRequest,
@@ -83,6 +84,7 @@ export class AddSchoolInformationComponent implements OnInit {
     this.createSchoolService
       .createSchool(createSchoolRequest)
       .pipe(
+        filter((school): school is School => school !== null),
         switchMap(() => {
           const accessToken = this.jwtService.getAccessToken();
           const refreshToken = this.jwtService.getRefreshToken();

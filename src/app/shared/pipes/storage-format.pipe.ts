@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-type StorageUnit = 'mb' | 'gb';
+type StorageUnit = 'kb' | 'mb' | 'gb' | 'tb';
 
 @Pipe({
   name: 'storageFormat',

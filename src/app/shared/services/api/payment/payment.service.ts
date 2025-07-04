@@ -3,6 +3,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { EMPTY, Observable, catchError, map, of, tap } from 'rxjs';
 
+import { ConfirmationService } from 'primeng/api';
+
 import { environment } from '../../../../../environments/environment';
 
 import { JwtService } from '../../../../core/auth/services/jwt.service';
@@ -25,6 +27,7 @@ export class PaymentService {
   private readonly authService = inject(AuthService);
   private readonly requestService = inject(RequestService);
   private readonly toastHandlingService = inject(ToastHandlingService);
+  private readonly confirmationService = inject(ConfirmationService);
 
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly CREATE_PLAN_PAYMENT_LINK_API_URL = `${this.BASE_API_URL}/school-subscriptions/payment-link`;
@@ -65,14 +68,46 @@ export class PaymentService {
   // ---------------------------
 
   private handleCreatePaymentLinkResponse(res: any): void {
-    if (res.statusCode === StatusCode.SUCCESS && res.data) {
-      const data = res.data as CreatePlanPaymentLinkResponse;
-      window.location.href = data.checkoutUrl;
-    } else {
+    if (res.statusCode !== StatusCode.SUCCESS || !res.data) {
       this.toastHandlingService.error(
         'Sự cố hệ thống',
         'Đã xảy ra lỗi trong quá trình tạo đường dẫn thanh toán. Vui lòng thử lại sau hoặc liên hệ hỗ trợ.'
       );
+      return;
+    }
+
+    const data = res.data as CreatePlanPaymentLinkResponse;
+
+    const proceedToCheckout = () => {
+      window.location.href = data.checkoutUrl;
+    };
+
+    if (data.deductedAmount > 0) {
+      const formattedAmount = new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+        minimumFractionDigits: 0,
+      }).format(data.deductedAmount);
+
+      this.confirmationService.confirm({
+        header: 'Thông báo khuyến mãi',
+        message: `
+        Bạn sẽ được giảm <strong>${formattedAmount}</strong> do gói hiện tại vẫn còn thời hạn sử dụng.
+        <br />
+        Hệ thống sẽ trừ số tiền chưa sử dụng của gói hiện tại vào giá trị đơn hàng.
+      `,
+        acceptButtonProps: { label: 'Tiếp tục thanh toán' },
+        rejectVisible: true,
+        rejectButtonProps: {
+          label: 'Hủy',
+          severity: 'secondary',
+          outlined: true,
+        },
+        closable: false,
+        accept: proceedToCheckout,
+      });
+    } else {
+      proceedToCheckout();
     }
   }
 
@@ -91,14 +126,26 @@ export class PaymentService {
   private handleConfirmPaymentReturnError(
     err: HttpErrorResponse
   ): Observable<void> {
-    if (err.error.statusCode === StatusCode.PAYMENT_FAILED) {
-      this.toastHandlingService.info(
-        'Thanh toán bị hủy',
-        'Bạn đã hủy giao dịch. Không có khoản phí nào bị trừ.'
-      );
-    } else {
-      this.toastHandlingService.errorGeneral();
+    switch (err.error?.statusCode) {
+      case StatusCode.PAYMENT_FAILED:
+        this.toastHandlingService.info(
+          'Thanh toán bị hủy',
+          'Bạn đã hủy giao dịch. Không có khoản phí nào bị trừ.'
+        );
+        break;
+
+      case StatusCode.PAYMENT_ALREADY_CONFIRMED:
+        this.toastHandlingService.info(
+          'Giao dịch đã hoàn tất',
+          'Giao dịch của bạn đã hoàn tất trước đó. EDUVA xin chân trọng cảm ơn bạn đã tin tưởng.'
+        );
+        break;
+
+      default:
+        this.toastHandlingService.errorGeneral();
+        break;
     }
+
     return of(void 0);
   }
 

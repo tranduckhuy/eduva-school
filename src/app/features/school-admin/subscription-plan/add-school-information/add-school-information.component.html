@@ -82,9 +82,11 @@
   </div>
 
   <div class="e-col-4 e-col-lg-12">
-    <subscription-plan-card
-      [subscriptionPlan]="subscriptionPlan()!"
-      [isYearly]="isYearly()"
-      (toggleSwitchChange)="onToggleSwitchChange($event)" />
+    @if (subscriptionPlan()) {
+      <subscription-plan-card
+        [subscriptionPlan]="subscriptionPlan()!"
+        [isYearly]="isYearly()"
+        (toggleSwitchChange)="onToggleSwitchChange($event)" />
+    }
   </div>
 </div>

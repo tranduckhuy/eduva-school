@@ -4,7 +4,9 @@
     <ul class="settings-list">
       <li>
         <a
-          routerLink="/teacher/settings"
+          [routerLink]="
+            isSchoolAdmin() ? '/school-admin/settings' : '/teacher/settings'
+          "
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
           class="settings-link">

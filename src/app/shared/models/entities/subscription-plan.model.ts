@@ -8,6 +8,6 @@ export interface SubscriptionPlan {
   storageLimitGB: number;
   priceMonthly: number;
   pricePerYear: number;
-  isRecommend: boolean;
+  isRecommended: boolean;
   status: EntityStatus;
 }

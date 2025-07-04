@@ -59,7 +59,7 @@ export class VideoViewerComponent {
   private hideControlsTimeout!: ReturnType<typeof setTimeout>;
 
   // ? State Video Management
-  preload = signal<string>('metadata');
+  preload = signal<string>('auto');
   currentTime = signal<number>(0);
   duration = signal<number>(0);
   isPaused = signal<boolean>(true);
@@ -133,12 +133,22 @@ export class VideoViewerComponent {
       this.isLoading.set(true);
       this.showMobileControls.set(false);
     });
+
+    media.subscriptions.seeked.subscribe(() => {
+      this.isLoading.set(false);
+    });
+
+    media.subscriptions.seeking.subscribe(() => {
+      this.isLoading.set(true);
+    });
+
     media.subscriptions.playing.subscribe(() => {
       this.isLoading.set(false);
       this.hasStarted.set(true);
       this.isPaused.set(false);
       this.onMobileTap();
     });
+
     media.subscriptions.pause.subscribe(() => this.isPaused.set(true));
   }
 
@@ -192,16 +202,48 @@ export class VideoViewerComponent {
     const rect = this.progressBarRef()?.nativeElement.getBoundingClientRect();
     const ratio = (event.clientX - rect.left) / rect.width;
     const media = this.vgApi.getDefaultMedia();
-    media.currentTime = ratio * media.duration;
+
+    const seekTime = ratio * media.duration;
+    const isPlaying = !this.getVideoElement().paused;
+    const currentTime = media.currentTime;
+
+    const diff = Math.abs(currentTime - seekTime);
+
+    if (isPlaying && diff > 0.3) {
+      media.pause();
+      media.currentTime = seekTime;
+
+      setTimeout(() => media.play(), 100);
+    } else {
+      media.currentTime = seekTime;
+    }
+
     this.playedProgress.set(ratio * 100);
   }
 
   startSeekDrag(event: MouseEvent) {
+    const media = this.vgApi.getDefaultMedia();
+    const isPlaying = !this.getVideoElement().paused;
+
+    if (isPlaying) {
+      media.pause();
+    }
+
     this.startDrag(event, this.progressBarRef()!, ratio => {
-      const media = this.vgApi.getDefaultMedia();
-      media.currentTime = ratio * media.duration;
+      const seekTime = ratio * media.duration;
+      const currentTime = media.currentTime;
+      const diff = Math.abs(currentTime - seekTime);
+
+      if (diff > 0.3) {
+        media.currentTime = seekTime;
+      }
+
       this.playedProgress.set(ratio * 100);
     });
+
+    if (isPlaying) {
+      setTimeout(() => media.play(), 100);
+    }
   }
 
   updateVolume(level: number) {
