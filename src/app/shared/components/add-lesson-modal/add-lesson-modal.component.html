@@ -3,7 +3,7 @@
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <header
       class="sticky left-0 top-0 z-[1] block w-full rounded-t-lg bg-gray-50 p-[25px] dark:bg-dark-400">
-      <h2 class="text-lg">Thêm bài giảng mới</h2>
+      <h2 class="text-lg">Thêm thư mục mới</h2>
       <span
         class="pi pi-times absolute right-[5px] top-[50%] -translate-y-[50%] cursor-pointer px-5 py-3 text-xl"
         (click)="closeModal()"></span>
@@ -12,7 +12,7 @@
     <div class="mt-[25px] px-[25px] pb-0">
       <div class="w-[500px] xs:w-[300px]">
         <label for="name" class="font-bold dark:text-white">
-          Tên bài giảng
+          Tên thư mục
         </label>
         <div
           class="relative mt-3 h-[55px] w-full rounded-md border-[1.5px] border-[#e9edf6] bg-white px-5 transition-colors duration-200 ease-in focus-within:border-primary dark:bg-dark-400"
@@ -60,7 +60,7 @@
         size="small"
         (onClick)="closeModal()" />
       <p-button
-        label="Thêm bài giảng"
+        label="Thêm thư mục"
         variant="outlined"
         type="submit"
         size="small"
