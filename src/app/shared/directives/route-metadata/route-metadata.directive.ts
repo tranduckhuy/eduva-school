@@ -67,7 +67,7 @@ export class RouteMetadataDirective implements OnInit {
 
     this.breadcrumbService.setBreadcrumbs([
       {
-        label: 'Dashboard',
+        label: 'Bảng Thống kê',
         icon: 'pi pi-home',
         routerLink: '/',
       },

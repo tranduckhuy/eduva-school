@@ -73,7 +73,10 @@ export class OtpModalComponent implements OnInit {
     };
     this.twoFactorService
       .confirmEnableDisable2FA(request, this.modalData.enabled)
-      .subscribe(() => this.closeModal());
+      .subscribe({
+        next: () => this.closeModal(),
+        error: () => this.value.set(''),
+      });
   }
 
   onResendCode() {
