@@ -27,6 +27,7 @@ import { GlobalModalService } from '../../../shared/services/layout/global-modal
 import { ImportAccountsComponent } from '../../../shared/components/import-accounts/import-accounts.component';
 import { AddTeacherModalComponent } from './add-teacher-modal/add-teacher-modal.component';
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
+import { Role } from '../../../shared/models/enum/role.enum';
 
 interface StatusOption {
   name: string;
@@ -99,7 +100,7 @@ export class TeachersComponent {
 
   private loadData(): void {
     const params: UserListParams = {
-      role: 4,
+      role: Role.Teacher,
       pageIndex: Math.floor(this.first() / this.rows()) + 1,
       pageSize: this.rows(),
       searchTerm: this.searchTerm(),
