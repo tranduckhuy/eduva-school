@@ -27,6 +27,7 @@ import { ButtonComponent } from '../../../shared/components/button/button.compon
 import { ImportAccountsComponent } from '../../../shared/components/import-accounts/import-accounts.component';
 import { AddStudentModalComponent } from './add-student-modal/add-student-modal.component';
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
+import { Role } from '../../../shared/models/enum/role.enum';
 
 interface StatusOption {
   name: string;
@@ -99,7 +100,7 @@ export class StudentsComponent {
 
   private loadData(): void {
     const params: UserListParams = {
-      role: 4,
+      role: Role.Student,
       pageIndex: Math.floor(this.first() / this.rows()) + 1,
       pageSize: this.rows(),
       searchTerm: this.searchTerm(),

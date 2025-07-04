@@ -21,6 +21,7 @@ import { TableSkeletonComponent } from '../../../shared/components/skeleton/tabl
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
 import { PAGE_SIZE } from '../../../shared/constants/common.constant';
 import { UserListParams } from '../../../shared/models/api/request/query/user-list-params';
+import { Role } from '../../../shared/models/enum/role.enum';
 
 interface StatusOption {
   name: string;
@@ -91,7 +92,7 @@ export class ContentModeratorsComponent {
 
   private loadData(): void {
     const params: UserListParams = {
-      role: 2,
+      role: Role.ContentModerator,
       pageIndex: Math.floor(this.first() / this.rows()) + 1,
       pageSize: this.rows(),
       searchTerm: this.searchTerm(),
