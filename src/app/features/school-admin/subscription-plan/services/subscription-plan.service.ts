@@ -21,7 +21,7 @@ export class SubscriptionPlanService {
   private readonly toastHandlingService = inject(ToastHandlingService);
 
   private readonly BASE_API_URL = environment.baseApiUrl;
-  private readonly GET_SUBSCRIPTION_PLAN_API_URL = `${this.BASE_API_URL}/subscription-plans`;
+  private readonly GET_SUBSCRIPTION_PLANS_API_URL = `${this.BASE_API_URL}/subscription-plans`;
 
   private readonly subscriptionPlansSignal = signal<SubscriptionPlan[]>([]);
   subscriptionPlans = this.subscriptionPlansSignal.asReadonly();
@@ -36,7 +36,7 @@ export class SubscriptionPlanService {
   ): Observable<GetSubscriptionPlanResponse | null> {
     return this.requestService
       .get<GetSubscriptionPlanResponse>(
-        this.GET_SUBSCRIPTION_PLAN_API_URL,
+        this.GET_SUBSCRIPTION_PLANS_API_URL,
         request
       )
       .pipe(
@@ -48,10 +48,10 @@ export class SubscriptionPlanService {
 
   getPlanById(id: number): Observable<SubscriptionPlan | null> {
     return this.requestService
-      .get<SubscriptionPlan>(`${this.GET_SUBSCRIPTION_PLAN_API_URL}/${id}`)
+      .get<SubscriptionPlan>(`${this.GET_SUBSCRIPTION_PLANS_API_URL}/${id}`)
       .pipe(
         tap(res => this.handleSingleResponse(res)),
-        map(res => res.data!),
+        map(res => this.handleExtractSingle(res)),
         catchError(() => this.handleError())
       );
   }
@@ -68,6 +68,10 @@ export class SubscriptionPlanService {
     }
   }
 
+  private handleExtractList(res: any): GetSubscriptionPlanResponse | null {
+    return res.statusCode === StatusCode.SUCCESS && res.data ? res.data : null;
+  }
+
   private handleSingleResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS && res.data) {
       this.subscriptionPlanSignal.set(res.data);
@@ -76,7 +80,7 @@ export class SubscriptionPlanService {
     }
   }
 
-  private handleExtractList(res: any): GetSubscriptionPlanResponse | null {
+  private handleExtractSingle(res: any): SubscriptionPlan | null {
     return res.statusCode === StatusCode.SUCCESS && res.data ? res.data : null;
   }
 

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
+  computed,
   inject,
   input,
   output,
@@ -26,7 +27,7 @@ import { ToastHandlingService } from '../../../../shared/services/core/toast/toa
 import { type SubscriptionPlan } from '../../../../shared/models/entities/subscription-plan.model';
 import {
   BillingCycle,
-  CreatePlanPaymentLinkRequest,
+  type CreatePlanPaymentLinkRequest,
 } from '../../../../shared/models/api/request/command/create-plan-payment-link-request.model';
 
 @Component({
@@ -50,6 +51,7 @@ export class SubscriptionPlanCardComponent implements OnInit {
   private readonly toastHandlingService = inject(ToastHandlingService);
 
   subscriptionPlan = input.required<SubscriptionPlan>();
+  isCurrent = input<boolean>(false);
   isYearly = input<boolean>(false);
 
   toggleSwitchChange = output<boolean>();
@@ -76,11 +78,25 @@ export class SubscriptionPlanCardComponent implements OnInit {
 
   onClickBuyButton() {
     const user = this.user();
-    if (user && !user.school) {
-      this.router.navigate([
-        '/school-admin/add-school-information',
-        this.subscriptionPlan()?.id,
-      ]);
+    const plan = this.subscriptionPlan();
+    const isYearly = this.isYearly();
+
+    if (!user) {
+      this.toastHandlingService.error(
+        'Lỗi',
+        'Không tìm thấy thông tin người dùng.'
+      );
+      return;
+    }
+
+    if (!plan) {
+      this.toastHandlingService.error('Lỗi', 'Không tìm thấy gói đăng ký.');
+      return;
+    }
+
+    if (!user.school) {
+      this.router.navigate(['/school-admin/add-school-information', plan.id]);
+      return;
     }
 
     this.toastHandlingService.info(
@@ -89,10 +105,8 @@ export class SubscriptionPlanCardComponent implements OnInit {
     );
 
     const request: CreatePlanPaymentLinkRequest = {
-      planId: this.subscriptionPlan().id,
-      billingCycle: this.isYearly()
-        ? BillingCycle.Yearly
-        : BillingCycle.Monthly,
+      planId: plan.id,
+      billingCycle: isYearly ? BillingCycle.Yearly : BillingCycle.Monthly,
     };
     this.paymentService.createPlanPaymentLink(request).subscribe();
   }

@@ -8,16 +8,20 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { forkJoin } from 'rxjs';
+
 import {
   ToggleSwitch,
   type ToggleSwitchChangeEvent,
 } from 'primeng/toggleswitch';
 
 import { SubscriptionPlanService } from './services/subscription-plan.service';
+import { SchoolSubscriptionPlanService } from './services/school-subscription-plan.service';
 
 import { SubscriptionPlanCardComponent } from './subscription-plan-card/subscription-plan-card.component';
 
 import { type GetSubscriptionPlanRequest } from './models/request/get-subscription-plan-request.model';
+import { type SchoolSubscriptionPlan } from '../../../shared/models/entities/school-subscription-plan.model';
 
 @Component({
   selector: 'subscription-plan',
@@ -34,16 +38,23 @@ import { type GetSubscriptionPlanRequest } from './models/request/get-subscripti
 })
 export class SubscriptionPlanComponent implements OnInit {
   private readonly subscriptionPlanService = inject(SubscriptionPlanService);
+  private readonly schoolPlanService = inject(SchoolSubscriptionPlanService);
 
   subscriptionPlans = this.subscriptionPlanService.subscriptionPlans;
 
+  currentSchoolPlan = signal<SchoolSubscriptionPlan | null>(null);
   isYearly = signal<boolean>(false);
 
   ngOnInit(): void {
     const request: GetSubscriptionPlanRequest = {
       activeOnly: true,
     };
-    this.subscriptionPlanService.getAllPlans(request).subscribe();
+    forkJoin({
+      plans: this.subscriptionPlanService.getAllPlans(request),
+      currentPlan: this.schoolPlanService.getCurrentSchoolPlan(),
+    }).subscribe(({ plans, currentPlan }) => {
+      this.currentSchoolPlan.set(currentPlan);
+    });
   }
 
   getRowClass(): Record<string, boolean> {
