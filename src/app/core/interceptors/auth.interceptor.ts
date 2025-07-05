@@ -1,12 +1,15 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 
-import { catchError, switchMap } from 'rxjs';
+import { ReplaySubject, catchError, switchMap, take } from 'rxjs';
 
 import { JwtService } from '../auth/services/jwt.service';
 import { AuthService } from '../auth/services/auth.service';
 
 import { BYPASS_AUTH } from '../../shared/tokens/context/http-context.token';
+
+let isRefreshing = false;
+let refreshSubject: ReplaySubject<string> | null = null;
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const jwtService = inject(JwtService);
@@ -33,21 +36,55 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   // ? If token has expired → attempt to refresh it before sending the request
   if (accessToken && refreshToken) {
+    // ? If another refresh is already in progress → wait for it
+    if (isRefreshing) {
+      return refreshSubject!.pipe(
+        take(1),
+        switchMap(newAccessToken => {
+          const cloned = req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${newAccessToken}`,
+            },
+          });
+          return next(cloned);
+        }),
+        catchError(() => {
+          // ? If the refresh process fails for some reason, fallback to sending original request
+          return next(req);
+        })
+      );
+    }
+
+    isRefreshing = true;
+    refreshSubject = new ReplaySubject<string>(1);
+
     return authService.refreshToken({ accessToken, refreshToken }).pipe(
       switchMap(res => {
-        if (!res) return next(req);
+        if (!res) return next(req); // ? If refresh fails, proceed as-is
 
+        // ? Tokens are already updated inside AuthService
+        const newAccessToken = jwtService.getAccessToken();
+
+        // ? Notify all queued requests with new token
+        refreshSubject!.next(newAccessToken!);
+        refreshSubject!.complete();
+        isRefreshing = false;
+
+        // ? Retry original request with new token
         const cloned = req.clone({
           setHeaders: {
-            Authorization: `Bearer ${res.accessToken}`,
+            Authorization: `Bearer ${newAccessToken}`,
           },
         });
+
         return next(cloned);
       }),
-      catchError(() => {
-        // ? If refresh throws an error → fallback to sending the original request as-is
-        // ? Note: AuthService already handles clearing tokens and redirecting if needed
-        return next(req);
+      catchError(err => {
+        // ? Refresh failed (token expired, invalid, etc.)
+        isRefreshing = false;
+        refreshSubject!.error(err); // ? Notify waiting requests of failure
+        refreshSubject!.complete();
+        return next(req); // ? Proceed without token (likely to get 401)
       })
     );
   }

@@ -21,7 +21,7 @@ export class EmailVerificationService {
 
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly CONFIRM_EMAIL_API_URL = `${this.BASE_API_URL}/auth/confirm-email`;
-  private readonly RESEND_CONFIRM_EMAIL_API_URL = `${this.BASE_API_URL}/auth/resend-confirm-email`;
+  private readonly RESEND_CONFIRM_EMAIL_API_URL = `${this.BASE_API_URL}/auth/resend-confirmation-email`;
 
   private readonly CLIENT_URL = `${environment.clientUrl}/auth/login`;
 

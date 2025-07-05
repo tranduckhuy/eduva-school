@@ -81,6 +81,7 @@ export class OtpModalComponent implements OnInit {
 
   onResendCode() {
     const user = this.user();
+
     if (this.isResendDisabled() || !user?.email) return;
 
     const request: ResendOtpRequest = {

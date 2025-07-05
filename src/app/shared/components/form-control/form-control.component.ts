@@ -26,6 +26,7 @@ import {
   matchPasswordValidator,
   minWordCountValidator,
 } from '../../utils/form-validators';
+import { VIETNAM_PHONE_REGEX } from '../../constants/common.constant';
 
 @Component({
   selector: 'app-form-control',
@@ -59,7 +60,7 @@ export class FormControlComponent
   });
   placeholder = input<string>('');
   options = input<Array<{ label: string; value: string }>>([]);
-  maxLength = input<number>(50);
+  maxLength = input<number>(0);
   minLength = input<number>(0);
   max = input<number>(0);
   min = input<number>(0);
@@ -154,13 +155,21 @@ export class FormControlComponent
     this.isShowPassword.set(!this.isShowPassword());
   }
 
+  resetControl(value = '') {
+    this.control.reset(value, {
+      emitEvent: false,
+    });
+    this.control.markAsPristine();
+    this.control.markAsUntouched();
+  }
+
   private onChange: (value: any) => void = () => {};
   private onTouched: () => void = () => {};
 
   private buildValidators() {
     const validators = [];
     if (this.required()) validators.push(Validators.required);
-    if (this.phone()) validators.push(Validators.pattern(/^0\d{9,10}$/));
+    if (this.phone()) validators.push(Validators.pattern(VIETNAM_PHONE_REGEX));
     else if (this.pattern())
       validators.push(Validators.pattern(this.pattern()!));
     if (this.email()) validators.push(Validators.email);

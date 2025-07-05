@@ -22,6 +22,7 @@ import {
   ALLOWED_IMPORT_EXTENSIONS,
 } from '../../../constants/common.constant';
 import { TemplateType } from '../../../models/enum/template-type.enum';
+import { Role } from '../../../models/enum/role.enum';
 
 @Component({
   selector: 'app-import-account-modals',
@@ -123,7 +124,7 @@ export class ImportAccountModalsComponent {
 
     // Call API upload
     this.importUserAccountsService
-      .importUserAccounts(formData)
+      .importUserAccounts(formData, this.modalData.role as Role)
       .subscribe(() => this.closeModal());
   }
 

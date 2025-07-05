@@ -58,7 +58,7 @@ export class LessonMaterialsService {
       );
   }
 
-  fetchLessonMaterialById(id: string): Observable<LessonMaterial | null> {
+  getLessonMaterialById(id: string): Observable<LessonMaterial | null> {
     return this.requestService
       .get<LessonMaterial>(`${this.LESSON_MATERIALS_API_URL}/${id}`)
       .pipe(
