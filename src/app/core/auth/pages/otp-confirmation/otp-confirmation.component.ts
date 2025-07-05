@@ -40,7 +40,7 @@ export class OtpConfirmationComponent {
 
   value = signal<string>('');
   email = signal<string>('');
-  readonly countdown = signal<number>(10);
+  readonly countdown = signal<number>(120);
   readonly isResendDisabled = signal<boolean>(true);
 
   private countdownInterval!: ReturnType<typeof setInterval>;
