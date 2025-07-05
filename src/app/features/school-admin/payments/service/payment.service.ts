@@ -1,5 +1,4 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { Router } from '@angular/router';
 
 import { catchError, EMPTY, map, Observable } from 'rxjs';
 
@@ -22,7 +21,6 @@ export class PaymentService {
   private readonly requestService = inject(RequestService);
   private readonly toastService = inject(ToastHandlingService);
   private readonly userService = inject(UserService);
-  private readonly router = inject(Router);
 
   // API URLs
   private readonly PAYMENT_URL = `${environment.baseApiUrl}/payments/my`;

@@ -9,4 +9,5 @@ type UserRole =
 
 export interface UserListParams extends EntityListParams {
   role: UserRole;
+  schoolId?: number;
 }

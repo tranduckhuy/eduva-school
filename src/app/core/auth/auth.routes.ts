@@ -28,7 +28,7 @@ export const authRoutes: Routes = [
       },
       {
         path: 'reset-password',
-        canMatch: [requireQueryParamsGuard(['token', 'email'])],
+        canActivate: [requireQueryParamsGuard(['token', 'email'])],
         loadComponent: () =>
           import('./pages/reset-password/reset-password.component').then(
             mod => mod.ResetPasswordComponent
