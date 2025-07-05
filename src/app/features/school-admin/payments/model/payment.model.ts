@@ -14,6 +14,7 @@ interface User {
   fullName: string;
   phoneNumber: string;
   email: string;
+  avatarUrl: string;
 }
 
 export interface Payment {
