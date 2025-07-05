@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -44,6 +46,8 @@ interface AvatarModalData {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpdateAvatarModalComponent {
+  private readonly avatarInputRef = viewChild<ElementRef>('avatarInput');
+
   private readonly uploadFileService = inject(UploadFileService);
   private readonly toastHandlingService = inject(ToastHandlingService);
   private readonly globalModalService = inject(GlobalModalService);
@@ -166,6 +170,11 @@ export class UpdateAvatarModalComponent {
       translateV: 0,
     });
     this.imageChangedEvent.set(null);
+
+    const input = this.avatarInputRef()?.nativeElement as HTMLInputElement;
+    if (input) {
+      input.value = '';
+    }
   }
 
   triggerClickInput(input: HTMLInputElement) {

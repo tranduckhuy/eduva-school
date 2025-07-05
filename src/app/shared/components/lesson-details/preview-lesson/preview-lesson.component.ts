@@ -79,7 +79,7 @@ export class PreviewLessonComponent implements OnInit {
     });
 
     this.lessonMaterialService
-      .fetchLessonMaterialById(this.materialId())
+      .getLessonMaterialById(this.materialId())
       .subscribe();
   }
 

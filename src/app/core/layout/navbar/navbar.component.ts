@@ -118,14 +118,6 @@ export class NavbarComponent implements OnInit {
     const schoolAdminNav: NavItem[] = isSchoolAdmin
       ? [
           {
-            label: 'Trường học',
-            icon: 'school',
-            link: '/school-admin/schools',
-            type: 'link',
-            isActive: false,
-            submenuItems: [],
-          },
-          {
             label: 'Giáo viên',
             icon: 'co_present',
             link: '/school-admin/teachers',
