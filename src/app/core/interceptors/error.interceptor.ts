@@ -55,14 +55,33 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       roles.includes(UserRoles.SYSTEM_ADMIN)
     ) {
       toastHandlingService.info(
-        'Yêu cầu mua gói',
-        'Bạn cần mua gói kích hoạt trường học thì mới có thể sử dụng hệ thống.'
+        'Chưa có gói sử dụng',
+        'Vui lòng chọn và kích hoạt gói để bắt đầu sử dụng hệ thống.'
       );
       router.navigateByUrl('/school-admin/subscription-plans');
     } else {
       toastHandlingService.info(
-        'Trường của bạn hiện chưa có gói',
-        'Vui lòng liên hệ quản trị viên của trường bạn để biết thêm thông tin.'
+        'Trường chưa có gói sử dụng',
+        'Vui lòng liên hệ quản trị viên để được cấp quyền truy cập.'
+      );
+    }
+  };
+
+  const handleSubscriptionExpired = () => {
+    const roles = user()?.roles ?? [];
+    if (
+      roles.includes(UserRoles.SCHOOL_ADMIN) ||
+      roles.includes(UserRoles.SYSTEM_ADMIN)
+    ) {
+      toastHandlingService.info(
+        'Gói đã hết hạn',
+        'Vui lòng gia hạn để tiếp tục sử dụng hệ thống.'
+      );
+      router.navigateByUrl('/school-admin/subscription-plans');
+    } else {
+      toastHandlingService.info(
+        'Gói sử dụng đã hết hạn',
+        'Vui lòng liên hệ quản trị viên để gia hạn và tiếp tục sử dụng hệ thống.'
       );
     }
   };
@@ -70,6 +89,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       const isUnauthorized = error.status === 401;
+      const isPaymentRequired = error.status === 402;
       const isForbidden = error.status === 403;
       const isServerError = error.status === 0 || error.status >= 500;
 
@@ -85,8 +105,16 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
+      if (isPaymentRequired) {
+        handleSubscriptionExpired();
+        return throwError(() => error);
+      }
+
       if (isForbidden && !isByPass) {
-        if (statusCode === StatusCode.SCHOOL_AND_SUBSCRIPTION_REQUIRED) {
+        if (
+          statusCode === StatusCode.SCHOOL_AND_SUBSCRIPTION_REQUIRED ||
+          statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND
+        ) {
           handleMissingSchoolOrSubscription();
         } else {
           handleForbidden();

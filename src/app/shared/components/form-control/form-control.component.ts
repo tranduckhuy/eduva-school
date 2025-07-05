@@ -168,54 +168,27 @@ export class FormControlComponent
   private onTouched: () => void = () => {};
 
   private buildValidators() {
-    const validators: ValidatorFn[] = [];
-
-    const {
-      required,
-      phone,
-      pattern,
-      email,
-      min,
-      max,
-      maxLength,
-      minLength,
-      minWords,
-      validatePassword,
-      confirmPassword,
-    } = {
-      required: this.required(),
-      phone: this.phone(),
-      pattern: this.pattern(),
-      email: this.email(),
-      min: this.min(),
-      max: this.max(),
-      maxLength: this.maxLength(),
-      minLength: this.minLength(),
-      minWords: this.minWords(),
-      validatePassword: this.validatePassword(),
-      confirmPassword: this.confirmPassword(),
-    };
-
-    const pushIf = (condition: boolean, validator: ValidatorFn) => {
-      if (condition) validators.push(validator);
-    };
-
-    pushIf(required, Validators.required);
-    pushIf(phone, Validators.pattern(VIETNAM_PHONE_REGEX));
-    pushIf(!phone && !!pattern, Validators.pattern(pattern!));
-    pushIf(email, Validators.email);
-    pushIf(minWords > 0, (c: AbstractControl) =>
-      minWordCountValidator(c, minWords)
-    );
-    pushIf(min !== 0, Validators.min(min));
-    pushIf(max !== 0, Validators.max(max));
-    pushIf(!!maxLength, Validators.maxLength(maxLength));
-    pushIf(!!minLength, Validators.minLength(minLength));
-    pushIf(validatePassword, strongPasswordValidator);
-    pushIf(confirmPassword !== null, (c: AbstractControl) =>
-      matchPasswordValidator(c, confirmPassword!)
-    );
-
+    const validators = [];
+    if (this.required()) validators.push(Validators.required);
+    if (this.phone()) validators.push(Validators.pattern(VIETNAM_PHONE_REGEX));
+    else if (this.pattern())
+      validators.push(Validators.pattern(this.pattern()!));
+    if (this.email()) validators.push(Validators.email);
+    if (this.minWords() > 0)
+      validators.push((c: AbstractControl) =>
+        minWordCountValidator(c, this.minWords())
+      );
+    if (this.min() !== 0) validators.push(Validators.min(this.min()));
+    if (this.max() !== 0) validators.push(Validators.max(this.max()));
+    if (this.maxLength())
+      validators.push(Validators.maxLength(this.maxLength()));
+    if (this.minLength())
+      validators.push(Validators.minLength(this.minLength()));
+    if (this.validatePassword()) validators.push(strongPasswordValidator);
+    if (this.confirmPassword() !== null)
+      validators.push((c: AbstractControl) =>
+        matchPasswordValidator(c, this.confirmPassword()!)
+      );
     return validators;
   }
 
