@@ -14,3 +14,7 @@ export const BASE_BG_CLASS_IMAGE_URL =
 
 // Table Constants
 export const PAGE_SIZE = 12;
+
+// Validators
+export const VIETNAM_PHONE_REGEX =
+  /^(?:0|\+84(?:0)?)(3[2-9]|5[2689]|7[06-9]|8[1-689]|9\d)\d{7}$|^(?:0|\+84(?:0)?)2\d{9}$/;

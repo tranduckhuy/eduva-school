@@ -30,7 +30,16 @@
         </span>
         <span>Thêm giáo viên</span>
       </app-button>
-      <app-import-accounts [title]="'Import danh sách giáo viên'" />
+      <app-button
+        [variant]="'outline'"
+        class="flex items-center"
+        (clicked)="openImportModal()">
+        <span
+          class="material-symbols-outlined relative top-[3px] mr-1 text-lg leading-none">
+          upload
+        </span>
+        <span>Import</span>
+      </app-button>
       <app-button [variant]="'outline'" class="flex items-center">
         <span
           class="material-symbols-outlined relative top-[3px] mr-1 text-lg leading-none">
