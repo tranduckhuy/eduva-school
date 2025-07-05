@@ -59,7 +59,7 @@ export class FormControlComponent
   });
   placeholder = input<string>('');
   options = input<Array<{ label: string; value: string }>>([]);
-  maxLength = input<number>(50);
+  maxLength = input<number>(0);
   minLength = input<number>(0);
   max = input<number>(0);
   min = input<number>(0);
