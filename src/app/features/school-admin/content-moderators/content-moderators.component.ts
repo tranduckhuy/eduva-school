@@ -88,11 +88,13 @@ export class ContentModeratorsComponent {
   isLoadingActive = this.loadingService.is('active-school');
 
   users = this.userService.users;
+  currentUser = this.userService.currentUser;
   totalUsers = this.userService.totalUsers;
 
   private loadData(): void {
     const params: UserListParams = {
       role: Role.ContentModerator,
+      schoolId: this.currentUser()!.school!.id,
       pageIndex: Math.floor(this.first() / this.rows()) + 1,
       pageSize: this.rows(),
       searchTerm: this.searchTerm(),
