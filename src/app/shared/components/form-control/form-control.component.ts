@@ -17,7 +17,6 @@ import {
   Validators,
   ReactiveFormsModule,
   FormControl,
-  ValidatorFn,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
