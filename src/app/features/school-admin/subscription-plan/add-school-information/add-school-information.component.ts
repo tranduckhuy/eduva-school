@@ -60,6 +60,7 @@ export class AddSchoolInformationComponent implements OnInit {
   subscriptionPlan = this.subscriptionPlanService.subscriptionPlan;
 
   isYearly = signal<boolean>(false);
+  submitted = signal<boolean>(false);
 
   constructor() {
     this.form = this.fb.group({
@@ -76,6 +77,7 @@ export class AddSchoolInformationComponent implements OnInit {
   }
 
   onSubmit() {
+    this.submitted.set(true);
     this.form.markAllAsTouched();
 
     if (this.form.invalid) return;

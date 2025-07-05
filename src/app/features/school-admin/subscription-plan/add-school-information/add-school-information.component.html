@@ -15,6 +15,7 @@
               label="Tên trường"
               type="text"
               placeholder="Nhập tên trường học"
+              [submitted]="submitted()"
               [required]="true">
             </app-form-control>
           </div>
@@ -25,6 +26,7 @@
               label="Địa chỉ email"
               type="email"
               placeholder="Nhập địa chỉ email liên hệ"
+              [submitted]="submitted()"
               [required]="true"
               [email]="true">
             </app-form-control>
@@ -36,8 +38,12 @@
               label="Số điện thoại"
               type="text"
               placeholder="Nhập số điện thoại liên hệ"
+              [submitted]="submitted()"
               [required]="true"
-              [phone]="true">
+              [phone]="true"
+              [errorMessages]="{
+                pattern: 'Số điện thoại không hợp lệ',
+              }">
             </app-form-control>
           </div>
           <div class="e-col-12">
@@ -47,6 +53,7 @@
               label="Địa chỉ"
               type="text"
               placeholder="Nhập địa chỉ trường học"
+              [submitted]="submitted()"
               [required]="true">
             </app-form-control>
           </div>

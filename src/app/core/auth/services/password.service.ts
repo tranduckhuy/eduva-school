@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { Observable, catchError, map, of, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 
@@ -124,21 +124,21 @@ export class PasswordService {
 
   private handleChangePasswordError(err: HttpErrorResponse): Observable<void> {
     switch (err.error?.statusCode) {
-      case StatusCode.PROVIDED_INFORMATION_IS_INVALID:
-        this.toastHandlingService.error(
-          'Lỗi xác thực',
+      case StatusCode.INCORRECT_CURRENT_PASSWORD:
+        this.toastHandlingService.warn(
+          'Cảnh báo xác thực',
           'Mật khẩu hiện tại không chính xác. Vui lòng kiểm tra và thử lại.'
         );
         break;
       case StatusCode.NEW_PASSWORD_SAME_AS_OLD:
         this.toastHandlingService.warn(
-          'Cảnh báo',
+          'Cảnh báo xác thực',
           'Mật khẩu mới không được trùng với mật khẩu hiện tại.'
         );
         break;
       default:
         this.toastHandlingService.errorGeneral();
     }
-    return of(void 0);
+    return throwError(() => err);
   }
 }

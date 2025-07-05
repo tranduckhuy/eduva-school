@@ -24,10 +24,10 @@ import { SearchInputComponent } from '../../../shared/components/search-input/se
 import { BadgeComponent } from '../../../shared/components/badge/badge.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
-import { ImportAccountsComponent } from '../../../shared/components/import-accounts/import-accounts.component';
 import { AddTeacherModalComponent } from './add-teacher-modal/add-teacher-modal.component';
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 import { Role } from '../../../shared/models/enum/role.enum';
+import { ImportAccountModalsComponent } from '../../../shared/components/import-accounts/import-account-modals/import-account-modals.component';
 
 interface StatusOption {
   name: string;
@@ -47,7 +47,6 @@ interface StatusOption {
     LeadingZeroPipe,
     TooltipModule,
     RouterLink,
-    ImportAccountsComponent,
     TableSkeletonComponent,
   ],
   templateUrl: './teachers.component.html',
@@ -217,5 +216,12 @@ export class TeachersComponent {
 
   openAddTeacherModal() {
     this.globalModalService.open(AddTeacherModalComponent);
+  }
+
+  openImportModal() {
+    this.globalModalService.open(ImportAccountModalsComponent, {
+      title: 'Import danh sách giáo viên',
+      role: Role.Teacher,
+    });
   }
 }
