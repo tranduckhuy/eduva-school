@@ -1,5 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { EMPTY, Observable, catchError, map, of, tap } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+
+import { EMPTY, Observable, catchError, map, of, tap, throwError } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 import { RequestService } from '../../core/request/request.service';
@@ -226,7 +228,7 @@ export class UserService {
   ): Observable<T | null> {
     return request$.pipe(
       map(res => {
-        if (res.statusCode === StatusCode.SUCCESS && res.data !== undefined) {
+        if (res.statusCode === StatusCode.SUCCESS && res.data) {
           options.successHandler?.(res.data);
           return res.data;
         }
@@ -234,9 +236,9 @@ export class UserService {
         this.toastHandlingService.errorGeneral();
         return null;
       }),
-      catchError(() => {
+      catchError((err: HttpErrorResponse) => {
         this.toastHandlingService.errorGeneral();
-        return EMPTY;
+        return throwError(() => err);
       })
     );
   }
@@ -256,9 +258,9 @@ export class UserService {
           this.toastHandlingService.errorGeneral();
         }
       }),
-      catchError(() => {
+      catchError((err: HttpErrorResponse) => {
         this.toastHandlingService.errorGeneral();
-        return EMPTY;
+        return throwError(() => err);
       })
     );
   }
