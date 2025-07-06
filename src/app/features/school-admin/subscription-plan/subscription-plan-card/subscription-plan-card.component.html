@@ -50,21 +50,16 @@
   </p>
 
   <!-- ? Checkout Button -->
-  <app-button
-    width="full"
-    class="flex items-center gap-2 py-[10px] text-lg font-extrabold sm:py-2"
-    [disabled]="isCurrent()"
-    (clicked)="onClickBuyButton()">
-    <span class="ml-1 select-none">
-      {{ isCurrent() ? 'Gói hiện tại của bạn' : 'Mua ngay' }}
-    </span>
-    @if (!isCurrent()) {
-      <span
-        class="material-symbols-outlined relative top-[5px] ml-1 text-xl leading-none">
-        arrow_outward
-      </span>
-    }
-  </app-button>
+  <p-button
+    styleClass="rounded"
+    [fluid]="true"
+    [iconPos]="'right'"
+    [icon]="!isCurrent() ? 'pi pi-arrow-up-right' : ''"
+    [label]="isCurrent() ? 'Gói hiện tại của bạn' : 'Mua ngay'"
+    [loading]="isPlanLoading(subscriptionPlan().id)"
+    [disabled]="isDisabled()"
+    (onClick)="onClickBuyButton()">
+  </p-button>
 
   <!-- ? Plan Options -->
   <ul class="mt-6 flex flex-col gap-3">

@@ -28,7 +28,8 @@
       ) {
         <subscription-plan-card
           [subscriptionPlan]="subscriptionPlan"
-          [isCurrent]="subscriptionPlan.name === currentSchoolPlan()?.planName"
+          [isCurrent]="isCurrent(subscriptionPlan, isYearly())"
+          [isDisabled]="isPlanDisabled(subscriptionPlan, isYearly())"
           [isYearly]="isYearly()" />
       }
     </div>

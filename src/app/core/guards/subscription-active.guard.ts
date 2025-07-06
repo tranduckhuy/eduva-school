@@ -16,7 +16,7 @@ export const subscriptionActiveGuard: CanMatchFn = route => {
     user?.userSubscriptionResponse?.isSubscriptionActive;
 
   if (isProtectedUser && !isSubscriptionActive) {
-    router.navigate(['/subscription-expired']);
+    router.navigate(['/errors/subscription-expired']);
     return false;
   }
 

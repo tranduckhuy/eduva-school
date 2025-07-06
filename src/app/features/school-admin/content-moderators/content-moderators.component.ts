@@ -14,15 +14,19 @@ import { ConfirmationService } from 'primeng/api';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 
 import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
+
 import { UserService } from '../../../shared/services/api/user/user.service';
+import { LoadingService } from '../../../shared/services/core/loading/loading.service';
+
+import { type UserListParams } from '../../../shared/models/api/request/query/user-list-params';
+import { PAGE_SIZE } from '../../../shared/constants/common.constant';
+import { Role } from '../../../shared/models/enum/role.enum';
+
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 import { BadgeComponent } from '../../../shared/components/badge/badge.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
-import { LoadingService } from '../../../shared/services/core/loading/loading.service';
-import { PAGE_SIZE } from '../../../shared/constants/common.constant';
-import { UserListParams } from '../../../shared/models/api/request/query/user-list-params';
-import { Role } from '../../../shared/models/enum/role.enum';
+import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
 
 interface StatusOption {
   name: string;
@@ -42,6 +46,7 @@ interface StatusOption {
     FormsModule,
     SelectModule,
     TableSkeletonComponent,
+    TableEmptyStateComponent,
   ],
   templateUrl: './content-moderators.component.html',
   styleUrl: './content-moderators.component.css',

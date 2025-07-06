@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
-import { subscriptionActiveGuard } from './core/guards/subscription-active.guard';
 
 import { UserRoles } from './shared/constants/user-roles.constant';
 
@@ -19,7 +18,7 @@ export const routes: Routes = [
   },
   {
     path: 'teacher',
-    canMatch: [authGuard, roleGuard, subscriptionActiveGuard],
+    canMatch: [authGuard, roleGuard],
     data: {
       roles: [UserRoles.TEACHER, UserRoles.CONTENT_MODERATOR],
     },

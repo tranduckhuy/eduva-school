@@ -53,7 +53,9 @@ export class PaymentService {
 
   confirmPaymentReturn(request: ConfirmPaymentReturnRequest): Observable<void> {
     return this.requestService
-      .get(this.CONFIRM_PAYMENT_RETURN_API_URL, request)
+      .get(this.CONFIRM_PAYMENT_RETURN_API_URL, request, {
+        bypassPaymentError: true,
+      })
       .pipe(
         tap(res => this.handleConfirmPaymentReturnResponse(res)),
         map(() => void 0),

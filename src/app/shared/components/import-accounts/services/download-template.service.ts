@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
-import { EMPTY, Observable, catchError, tap } from 'rxjs';
+import { Observable, catchError, tap, throwError } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 
@@ -34,7 +34,7 @@ export class DownloadTemplateService {
         tap(res => {
           this.handleDownloadResponse(res);
         }),
-        catchError(() => this.handleDownloadError())
+        catchError((err: HttpErrorResponse) => this.handleDownloadError(err))
       );
   }
 
@@ -52,8 +52,8 @@ export class DownloadTemplateService {
     }
   }
 
-  private handleDownloadError(): Observable<never> {
+  private handleDownloadError(err: HttpErrorResponse): Observable<never> {
     this.toastHandlingService.errorGeneral();
-    return EMPTY;
+    return throwError(() => err);
   }
 }
