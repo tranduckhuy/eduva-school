@@ -90,7 +90,7 @@ export class LessonTableComponent implements OnInit {
     this.loadFolders();
   }
 
-  onLazyLoadLessons(event: TableLazyLoadEvent): void {
+  onLazyLoad(event: TableLazyLoadEvent): void {
     const rows = event.rows ?? this.pageSize();
     const first = event.first ?? 0;
     const page = Math.floor(first / rows) + 1;
@@ -98,8 +98,6 @@ export class LessonTableComponent implements OnInit {
     this.currentPage.set(page);
     this.pageSize.set(rows);
     this.firstRecordIndex.set(first);
-
-    this.loadFolders();
   }
 
   private loadFolders(): void {

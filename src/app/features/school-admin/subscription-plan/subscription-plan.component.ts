@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 import { forkJoin, of } from 'rxjs';
 
@@ -38,6 +39,7 @@ import { type SchoolSubscriptionPlan } from '../../../shared/models/entities/sch
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SubscriptionPlanComponent implements OnInit {
+  private readonly activatedRoute = inject(ActivatedRoute);
   private readonly userService = inject(UserService);
   private readonly subscriptionPlanService = inject(SubscriptionPlanService);
   private readonly schoolPlanService = inject(SchoolSubscriptionPlanService);
@@ -49,15 +51,19 @@ export class SubscriptionPlanComponent implements OnInit {
   isYearly = signal<boolean>(false);
 
   ngOnInit(): void {
-    const request: GetSubscriptionPlanRequest = {
-      activeOnly: true,
-    };
+    this.activatedRoute.queryParamMap.subscribe(params => {
+      this.isYearly.set(params.get('isYearly') === 'true');
+    });
 
     const hasSchool = !!this.user()?.school;
 
     const currentPlan$ = hasSchool
       ? this.schoolPlanService.getCurrentSchoolPlan()
       : of(null);
+
+    const request: GetSubscriptionPlanRequest = {
+      activeOnly: true,
+    };
 
     forkJoin({
       plans: this.subscriptionPlanService.getAllPlans(request),

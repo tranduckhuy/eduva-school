@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   inject,
   signal,
 } from '@angular/core';
@@ -54,7 +55,7 @@ interface StatusOption {
   styleUrl: './students.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StudentsComponent {
+export class StudentsComponent implements OnInit {
   private readonly globalModalService = inject(GlobalModalService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly userService = inject(UserService);
@@ -99,26 +100,8 @@ export class StudentsComponent {
   currentUser = this.userService.currentUser;
   totalUsers = this.userService.totalUsers;
 
-  private loadData(): void {
-    const params: UserListParams = {
-      role: Role.Student,
-      schoolId: this.currentUser()!.school!.id,
-      pageIndex: Math.floor(this.first() / this.rows()) + 1,
-      pageSize: this.rows(),
-      searchTerm: this.searchTerm(),
-      sortBy: this.sortField() ?? 'createdAt',
-      sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
-      activeOnly: this.getActiveOnlyStatus(),
-    };
-
-    this.userService.getUsers(params).subscribe();
-  }
-
-  private getActiveOnlyStatus(): boolean | undefined {
-    const statusCode = this.statusSelect()?.code;
-    if (statusCode === 0) return true;
-    if (statusCode === 1) return false;
-    return undefined;
+  ngOnInit(): void {
+    this.loadData();
   }
 
   onTimeFilterChange(
@@ -152,7 +135,6 @@ export class StudentsComponent {
 
     this.first.set(first);
     this.rows.set(rows);
-    this.loadData();
   }
 
   onStatusSelectChange(selected: StatusOption | undefined): void {
@@ -224,5 +206,27 @@ export class StudentsComponent {
       title: 'Import danh sách học sinh',
       role: Role.Student,
     });
+  }
+
+  private loadData(): void {
+    const params: UserListParams = {
+      role: Role.Student,
+      schoolId: this.currentUser()!.school!.id,
+      pageIndex: Math.floor(this.first() / this.rows()) + 1,
+      pageSize: this.rows(),
+      searchTerm: this.searchTerm(),
+      sortBy: this.sortField() ?? 'createdAt',
+      sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
+      activeOnly: this.getActiveOnlyStatus(),
+    };
+
+    this.userService.getUsers(params).subscribe();
+  }
+
+  private getActiveOnlyStatus(): boolean | undefined {
+    const statusCode = this.statusSelect()?.code;
+    if (statusCode === 0) return true;
+    if (statusCode === 1) return false;
+    return undefined;
   }
 }
