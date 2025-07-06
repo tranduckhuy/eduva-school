@@ -9,7 +9,6 @@ import { ConfirmationService } from 'primeng/api';
 import { JwtService } from '../auth/services/jwt.service';
 import { UserService } from '../../shared/services/api/user/user.service';
 import { GlobalModalService } from '../../shared/services/layout/global-modal/global-modal.service';
-import { ToastHandlingService } from '../../shared/services/core/toast/toast-handling.service';
 
 import { StatusCode } from '../../shared/constants/status-code.constant';
 import { UserRoles } from '../../shared/constants/user-roles.constant';
@@ -22,7 +21,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const jwtService = inject(JwtService);
   const userService = inject(UserService);
   const globalModalService = inject(GlobalModalService);
-  const toastHandlingService = inject(ToastHandlingService);
   const confirmationService = inject(ConfirmationService);
 
   const user = userService.currentUser;

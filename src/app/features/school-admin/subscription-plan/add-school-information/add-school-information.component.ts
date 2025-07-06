@@ -30,7 +30,6 @@ import {
   BillingCycle,
   CreatePlanPaymentLinkRequest,
 } from '../../../../shared/models/api/request/command/create-plan-payment-link-request.model';
-import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
 
 @Component({
   selector: 'app-add-school-information',
