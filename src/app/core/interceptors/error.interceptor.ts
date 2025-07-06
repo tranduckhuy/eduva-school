@@ -15,6 +15,8 @@ import { StatusCode } from '../../shared/constants/status-code.constant';
 import { UserRoles } from '../../shared/constants/user-roles.constant';
 import { BYPASS_AUTH_ERROR } from '../../shared/tokens/context/http-context.token';
 
+let hasShownUnauthorizedDialog = false;
+
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const jwtService = inject(JwtService);
@@ -29,6 +31,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const handleServerError = () => router.navigateByUrl('/errors/500');
 
   const handleUnauthorized = () => {
+    if (hasShownUnauthorizedDialog) return;
+
+    hasShownUnauthorizedDialog = true;
+
     globalModalService.close();
     confirmationService.confirm({
       message: 'Vui lòng đăng nhập lại.',
@@ -93,7 +99,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       const isForbidden = error.status === 403;
       const isServerError = error.status === 0 || error.status >= 500;
 
-      const statusCode = error.error.statusCode;
+      const statusCode = (error.error as any)?.statusCode;
 
       if (isServerError) {
         handleServerError();
@@ -112,8 +118,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
       if (isForbidden && !isByPass) {
         if (
-          statusCode === StatusCode.SCHOOL_AND_SUBSCRIPTION_REQUIRED ||
-          statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND
+          statusCode &&
+          (statusCode === StatusCode.SCHOOL_AND_SUBSCRIPTION_REQUIRED ||
+            statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND)
         ) {
           handleMissingSchoolOrSubscription();
         } else {
