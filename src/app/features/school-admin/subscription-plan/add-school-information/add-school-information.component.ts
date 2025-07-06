@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 
-import { switchMap, of, filter } from 'rxjs';
+import { switchMap, of, filter, take } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 
@@ -29,6 +29,7 @@ import {
   BillingCycle,
   CreatePlanPaymentLinkRequest,
 } from '../../../../shared/models/api/request/command/create-plan-payment-link-request.model';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-add-school-information',
@@ -45,6 +46,7 @@ import {
 })
 export class AddSchoolInformationComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
+  private readonly activatedRoute = inject(ActivatedRoute);
   private readonly loadingService = inject(LoadingService);
   private readonly subscriptionPlanService = inject(SubscriptionPlanService);
   private readonly createSchoolService = inject(CreateSchoolService);
@@ -73,6 +75,10 @@ export class AddSchoolInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.activatedRoute.queryParamMap.pipe(take(1)).subscribe(params => {
+      this.isYearly.set(params.get('isYearly') === 'true');
+    });
+
     this.subscriptionPlanService.getPlanById(this.subscriptionId()).subscribe();
   }
 

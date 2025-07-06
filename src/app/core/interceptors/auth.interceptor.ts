@@ -1,7 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 
-import { ReplaySubject, catchError, switchMap, take } from 'rxjs';
+import { ReplaySubject, catchError, switchMap, take, throwError } from 'rxjs';
 
 import { JwtService } from '../auth/services/jwt.service';
 import { AuthService } from '../auth/services/auth.service';
@@ -50,7 +50,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         }),
         catchError(() => {
           // ? If the refresh process fails for some reason, fallback to sending original request
-          return next(req);
+          return next(req).pipe(
+            catchError(innerError => {
+              return throwError(() => innerError);
+            })
+          );
         })
       );
     }
@@ -60,7 +64,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
     return authService.refreshToken({ accessToken, refreshToken }).pipe(
       switchMap(res => {
-        if (!res) return next(req); // ? If refresh fails, proceed as-is
+        if (!res)
+          return next(req).pipe(
+            catchError(innerError => {
+              return throwError(() => innerError);
+            })
+          ); // ? If refresh fails, proceed as-is
 
         // ? Tokens are already updated inside AuthService
         const newAccessToken = jwtService.getAccessToken();
@@ -84,7 +93,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         isRefreshing = false;
         refreshSubject!.error(err); // ? Notify waiting requests of failure
         refreshSubject!.complete();
-        return next(req); // ? Proceed without token (likely to get 401)
+        return next(req).pipe(
+          catchError(innerError => {
+            return throwError(() => innerError);
+          })
+        ); // ? Proceed without token (likely to get 401)
       })
     );
   }

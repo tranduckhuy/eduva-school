@@ -8,13 +8,14 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 
 import {
   ToggleSwitch,
   type ToggleSwitchChangeEvent,
 } from 'primeng/toggleswitch';
 
+import { UserService } from '../../../shared/services/api/user/user.service';
 import { SubscriptionPlanService } from './services/subscription-plan.service';
 import { SchoolSubscriptionPlanService } from './services/school-subscription-plan.service';
 
@@ -37,9 +38,11 @@ import { type SchoolSubscriptionPlan } from '../../../shared/models/entities/sch
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SubscriptionPlanComponent implements OnInit {
+  private readonly userService = inject(UserService);
   private readonly subscriptionPlanService = inject(SubscriptionPlanService);
   private readonly schoolPlanService = inject(SchoolSubscriptionPlanService);
 
+  user = this.userService.currentUser;
   subscriptionPlans = this.subscriptionPlanService.subscriptionPlans;
 
   currentSchoolPlan = signal<SchoolSubscriptionPlan | null>(null);
@@ -49,9 +52,16 @@ export class SubscriptionPlanComponent implements OnInit {
     const request: GetSubscriptionPlanRequest = {
       activeOnly: true,
     };
+
+    const hasSchool = !!this.user()?.school;
+
+    const currentPlan$ = hasSchool
+      ? this.schoolPlanService.getCurrentSchoolPlan()
+      : of(null);
+
     forkJoin({
       plans: this.subscriptionPlanService.getAllPlans(request),
-      currentPlan: this.schoolPlanService.getCurrentSchoolPlan(),
+      currentPlan: currentPlan$,
     }).subscribe(({ plans, currentPlan }) => {
       this.currentSchoolPlan.set(currentPlan);
     });

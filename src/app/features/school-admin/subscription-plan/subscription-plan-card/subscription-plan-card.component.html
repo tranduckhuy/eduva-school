@@ -18,6 +18,7 @@
       </p>
       <p-toggleswitch
         class="relative top-1"
+        [ngModel]="isYearly()"
         (onChange)="onToggleSwitchChange($event)" />
       <p
         class="text-[15px] font-medium"
