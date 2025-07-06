@@ -14,6 +14,8 @@ export interface SchoolSubscriptionPlan {
   endDate: string;
   subscriptionStatus: SubscriptionStatus;
   billingCycle: BillingCycle;
+  priceMonthly: number;
+  pricePerYear: number;
   maxUsers: number;
   storageLimitGB: number;
   amountPaid: number;

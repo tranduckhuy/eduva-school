@@ -63,7 +63,13 @@
               name="websiteUrl"
               label="Địa chỉ Website"
               type="text"
-              placeholder="Nhập đường dẫn website (nếu có)">
+              placeholder="Nhập đường dẫn website (nếu có)"
+              [submitted]="submitted()"
+              [pattern]="URI_REGEX"
+              [errorMessages]="{
+                pattern:
+                  'Vui lòng nhập đường dẫn hợp lệ (ví dụ: example.com hoặc https://example.com)',
+              }">
             </app-form-control>
           </div>
         </div>

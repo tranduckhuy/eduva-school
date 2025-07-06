@@ -15,10 +15,9 @@ import {
   ToggleSwitchChangeEvent,
   ToggleSwitchModule,
 } from 'primeng/toggleswitch';
+import { ButtonModule } from 'primeng/button';
 
 import { StorageFormatPipe } from '../../../../shared/pipes/storage-format.pipe';
-
-import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 import { UserService } from '../../../../shared/services/api/user/user.service';
 import { PaymentService } from '../../../../shared/services/api/payment/payment.service';
@@ -39,7 +38,7 @@ import {
     FormsModule,
     StorageFormatPipe,
     ToggleSwitchModule,
-    ButtonComponent,
+    ButtonModule,
   ],
   templateUrl: './subscription-plan-card.component.html',
   styleUrl: './subscription-plan-card.component.css',
@@ -53,6 +52,7 @@ export class SubscriptionPlanCardComponent implements OnInit {
 
   subscriptionPlan = input.required<SubscriptionPlan>();
   isCurrent = input<boolean>(false);
+  isDisabled = input<boolean>(false);
   isYearly = input<boolean>(false);
 
   toggleSwitchChange = output<boolean>();
@@ -67,10 +67,15 @@ export class SubscriptionPlanCardComponent implements OnInit {
     'Báo cáo chi tiết',
     'Hỗ trợ kỹ thuật 24/7',
   ]);
+  isLoadingMap = signal<Record<number, boolean>>({});
 
   ngOnInit(): void {
     const currentUrl = this.router.url;
     this.isShowToggle.set(currentUrl.includes('add-school-information'));
+  }
+
+  isPlanLoading(planId: number): boolean {
+    return this.isLoadingMap()[planId] ?? false;
   }
 
   onToggleSwitchChange(event: ToggleSwitchChangeEvent) {
@@ -79,8 +84,14 @@ export class SubscriptionPlanCardComponent implements OnInit {
 
   onClickBuyButton() {
     const user = this.user();
-    const plan = this.subscriptionPlan();
     const isYearly = this.isYearly();
+    const plan = this.subscriptionPlan();
+    const planId = plan.id;
+
+    this.isLoadingMap.set({
+      ...this.isLoadingMap(),
+      [planId]: true,
+    });
 
     if (!user) {
       this.toastHandlingService.error(
@@ -111,6 +122,13 @@ export class SubscriptionPlanCardComponent implements OnInit {
       planId: plan.id,
       billingCycle: isYearly ? BillingCycle.Yearly : BillingCycle.Monthly,
     };
-    this.paymentService.createPlanPaymentLink(request).subscribe();
+    this.paymentService.createPlanPaymentLink(request).subscribe({
+      complete: () => {
+        this.isLoadingMap.set({
+          ...this.isLoadingMap(),
+          [planId]: false,
+        });
+      },
+    });
   }
 }

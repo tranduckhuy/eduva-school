@@ -30,6 +30,7 @@ import { ButtonComponent } from '../../../shared/components/button/button.compon
 import { AddStudentModalComponent } from './add-student-modal/add-student-modal.component';
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 import { ImportAccountModalsComponent } from '../../../shared/components/import-accounts/import-account-modals/import-account-modals.component';
+import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
 
 interface StatusOption {
   name: string;
@@ -50,6 +51,7 @@ interface StatusOption {
     TooltipModule,
     RouterLink,
     TableSkeletonComponent,
+    TableEmptyStateComponent,
   ],
   templateUrl: './students.component.html',
   styleUrl: './students.component.css',

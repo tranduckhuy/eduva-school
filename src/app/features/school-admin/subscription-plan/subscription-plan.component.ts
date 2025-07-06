@@ -22,8 +22,11 @@ import { SchoolSubscriptionPlanService } from './services/school-subscription-pl
 
 import { SubscriptionPlanCardComponent } from './subscription-plan-card/subscription-plan-card.component';
 
-import { type GetSubscriptionPlanRequest } from './models/request/get-subscription-plan-request.model';
+import { BillingCycle } from '../../../shared/models/api/request/command/create-plan-payment-link-request.model';
+
+import { type SubscriptionPlan } from '../../../shared/models/entities/subscription-plan.model';
 import { type SchoolSubscriptionPlan } from '../../../shared/models/entities/school-subscription-plan.model';
+import { type GetSubscriptionPlanRequest } from './models/request/get-subscription-plan-request.model';
 
 @Component({
   selector: 'subscription-plan',
@@ -55,9 +58,11 @@ export class SubscriptionPlanComponent implements OnInit {
       this.isYearly.set(params.get('isYearly') === 'true');
     });
 
-    const hasSchool = !!this.user()?.school;
+    const hasSchoolAndHasPlan =
+      !!this.user()?.school &&
+      this.user()?.userSubscriptionResponse.isSubscriptionActive;
 
-    const currentPlan$ = hasSchool
+    const currentPlan$ = hasSchoolAndHasPlan
       ? this.schoolPlanService.getCurrentSchoolPlan()
       : of(null);
 
@@ -71,6 +76,61 @@ export class SubscriptionPlanComponent implements OnInit {
     }).subscribe(({ plans, currentPlan }) => {
       this.currentSchoolPlan.set(currentPlan);
     });
+  }
+
+  onToggleChange(event: ToggleSwitchChangeEvent) {
+    this.isYearly.set(event.checked);
+  }
+
+  isCurrent(plan: SubscriptionPlan, isYearly: boolean): boolean {
+    const current = this.currentSchoolPlan();
+    if (!current) return false;
+
+    // ? Compare billing cycle (Yearly/Monthly)
+    const planBillingCycle = isYearly
+      ? BillingCycle.Yearly
+      : BillingCycle.Monthly;
+    const isSameCycle = current.billingCycle === planBillingCycle;
+
+    // ? Compare plan name (or id, if unique)
+    const isSamePlan = plan.name === current.planName;
+
+    // ? Compare price/amount paid
+    const isSamePrice = isYearly
+      ? plan.pricePerYear === current.pricePerYear
+      : plan.priceMonthly === current.priceMonthly;
+
+    // ? Mark as current if name, cycle, and amount all match
+    return isSamePlan && isSameCycle && isSamePrice;
+  }
+
+  isPlanDisabled(plan: SubscriptionPlan, isYearly: boolean): boolean {
+    const current = this.currentSchoolPlan();
+    if (!current) return false;
+
+    // ? All plans sorted from lowest to highest index
+    const allPlans = this.subscriptionPlans();
+
+    // ? Get index of current plan in the plan list
+    const currentIndex = allPlans.findIndex(p => p.name === current.planName);
+    const planIndex = allPlans.findIndex(p => p.name === plan.name);
+
+    // ? Current plan's billing cycle
+    const currentIsYearly = current.billingCycle === BillingCycle.Yearly;
+
+    if (!currentIsYearly) {
+      // ? Current is monthly
+      if (!isYearly) {
+        // ? Target plan is monthly: disable if index <= current index
+        return planIndex <= currentIndex;
+      } else {
+        // ? Target plan is yearly: disable if index < current index (allow upgrade to same or higher)
+        return planIndex < currentIndex;
+      }
+    } else {
+      // ? Current is yearly, disable all plans of lower or same index, regardless of cycle
+      return planIndex <= currentIndex;
+    }
   }
 
   getRowClass(): Record<string, boolean> {
@@ -88,9 +148,5 @@ export class SubscriptionPlanComponent implements OnInit {
       'e-g-4': true,
       'e-g-md-3': true,
     };
-  }
-
-  onToggleChange(event: ToggleSwitchChangeEvent) {
-    this.isYearly.set(event.checked);
   }
 }

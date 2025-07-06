@@ -39,91 +39,112 @@
   @if (isLoadingGet()) {
     <app-table-skeleton [tableHead]="tableHeadSkeleton()" />
   } @else {
-    <p-table
-      [value]="payments()"
-      [tableStyle]="{ 'min-width': '50rem' }"
-      [paginator]="true"
-      [rows]="rows()"
-      [lazy]="true"
-      [first]="first()"
-      [showCurrentPageReport]="true"
-      (onLazyLoad)="loadDataLazy($event)"
-      [totalRecords]="totalPayments()"
-      currentPageReportTemplate="
+    <div class="relative">
+      <p-table
+        [value]="payments()"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [paginator]="true"
+        [rows]="rows()"
+        [lazy]="true"
+        [first]="first()"
+        [showCurrentPageReport]="true"
+        (onLazyLoad)="loadDataLazy($event)"
+        [totalRecords]="totalPayments()"
+        currentPageReportTemplate="
           Hiển thị {first} đến {last} trên {totalRecords} giao dịch
         ">
-      <ng-template #header>
-        <tr>
-          <th scope="col" class="!w-[5%] !text-center">STT</th>
-          <th
-            scope="col"
-            class="!w-[25%] !min-w-[200px]"
-            pSortableColumn="fullname">
-            <span class="mr-2">Khách hàng</span><p-sortIcon field="fullname" />
-          </th>
-          <th scope="col" class="!min-w-[150px]">Mã đơn</th>
-          <th scope="col" class="!min-w-[150px]" pSortableColumn="price">
-            <span class="mr-2">Giá</span><p-sortIcon field="price" />
-          </th>
-          <th scope="col" class="!min-w-[150px]">Loại đơn</th>
-          <th scope="col" class="!min-w-[150px]">Phương thức</th>
-          <th scope="col" class="!min-w-[150px]">Ngày tạo</th>
-          <th scope="col" class="!w-[10%] !pr-4 !text-center">Hành động</th>
-        </tr>
-      </ng-template>
-      <ng-template #body let-payment let-i="rowIndex">
-        <tr>
-          <td class="!text-center">{{ i + 1 | leadingZero }}</td>
-          <td>
-            <div class="flex items-center gap-2">
-              <img
-                [src]="payment.user.avatarUrl"
-                class="size-10 rounded-full object-cover"
-                alt="Avatar" />
-              <div class="flex flex-col">
-                <h3 class="text-base font-semibold">
-                  {{ payment.user.fullName }}
-                </h3>
-                <p class="w-[200px] text-sm text-gray-500">
-                  {{ payment.user.email }}
-                </p>
+        <ng-template #header>
+          <tr>
+            <th scope="col" class="!w-[5%] !text-center">STT</th>
+            <th
+              scope="col"
+              class="!w-[25%] !min-w-[200px]"
+              pSortableColumn="fullname">
+              <span class="mr-2">Khách hàng</span
+              ><p-sortIcon field="fullname" />
+            </th>
+            <th scope="col" class="!min-w-[150px]">Mã đơn</th>
+            <th scope="col" class="!min-w-[150px]" pSortableColumn="price">
+              <span class="mr-2">Giá</span><p-sortIcon field="price" />
+            </th>
+            <th scope="col" class="!min-w-[150px]">Loại đơn</th>
+            <th scope="col" class="!min-w-[150px]">Phương thức</th>
+            <th scope="col" class="!min-w-[150px]">Ngày tạo</th>
+            <th scope="col" class="!w-[10%] !pr-4 !text-center">Hành động</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-payment let-i="rowIndex">
+          <tr>
+            <td class="!text-center">{{ i + 1 | leadingZero }}</td>
+            <td>
+              <div class="flex items-center gap-2">
+                <img
+                  [src]="payment.user.avatarUrl"
+                  class="size-10 rounded-full object-cover"
+                  alt="Avatar" />
+                <div class="flex flex-col">
+                  <h3 class="text-base font-semibold">
+                    {{ payment.user.fullName }}
+                  </h3>
+                  <p class="w-[200px] text-sm text-gray-500">
+                    {{ payment.user.email }}
+                  </p>
+                </div>
               </div>
-            </div>
-          </td>
-          <td class="uppercase text-primary">#{{ payment.transactionCode }}</td>
-          <td>
-            {{
-              payment.amount | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN'
-            }}
-          </td>
-          <td>
-            {{ payment.paymentPurpose === 0 ? 'Gói credit' : 'Gói trường' }}
-          </td>
-          <td>{{ payment.paymentMethod === 0 ? 'VNPAY' : 'PayOS' }}</td>
-          <td>{{ payment.createdAt | date: 'mediumDate' }}</td>
-          <td class="!text-center">
-            <div class="flex items-center justify-center gap-2">
-              <a
-                [routerLink]="[
-                  '/school-admin/payments',
-                  payment.paymentPurpose === 0
-                    ? 'credit-pack'
-                    : 'subscription-plan',
-                  payment.relatedId,
-                ]">
-                <app-button
-                  pTooltip="Xem chi tiết"
-                  tooltipPosition="top"
-                  [variant]="'light'"
-                  [size]="'xs'"
-                  class="material-symbols-outlined rounded-full px-[7px] pb-[6px] pt-[8px] text-lg leading-none"
-                  >visibility</app-button
-                >
-              </a>
-            </div>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+            </td>
+            <td class="uppercase text-primary">
+              #{{ payment.transactionCode }}
+            </td>
+            <td>
+              {{
+                payment.amount | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN'
+              }}
+            </td>
+            <td>
+              {{ payment.paymentPurpose === 0 ? 'Gói credit' : 'Gói trường' }}
+            </td>
+            <td>{{ payment.paymentMethod === 0 ? 'VNPAY' : 'PayOS' }}</td>
+            <td>{{ payment.createdAt | date: 'mediumDate' }}</td>
+            <td class="!text-center">
+              <div class="flex items-center justify-center gap-2">
+                <a
+                  [routerLink]="[
+                    '/school-admin/payments',
+                    payment.paymentPurpose === 0
+                      ? 'credit-pack'
+                      : 'subscription-plan',
+                    payment.relatedId,
+                  ]">
+                  <app-button
+                    pTooltip="Xem chi tiết"
+                    tooltipPosition="top"
+                    [variant]="'light'"
+                    [size]="'xs'"
+                    class="material-symbols-outlined rounded-full px-[7px] pb-[6px] pt-[8px] text-lg leading-none"
+                    >visibility</app-button
+                  >
+                </a>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="100%">
+              <div class="h-[200px]"></div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+      @if (payments().length === 0) {
+        <div
+          class="pointer-events-none absolute left-0 right-0 top-[50%] -translate-y-[50%]">
+          <app-table-empty-state
+            icon="receipt_long"
+            title="Chưa có giao dịch nào"
+            subtitle="Bạn chưa thực hiện thanh toán nào. Lịch sử giao dịch sẽ hiển thị tại đây sau khi bạn hoàn tất thanh toán." />
+        </div>
+      }
+    </div>
   }
 </div>

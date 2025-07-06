@@ -27,7 +27,13 @@ type NavItem = {
   type: 'link' | 'accordion' | 'button';
   link?: string;
   isActive: boolean;
-  submenuItems: { label: string; link: string; active?: boolean }[];
+  isDisabled?: boolean;
+  submenuItems: {
+    label: string;
+    link: string;
+    active?: boolean;
+    isDisabled?: boolean;
+  }[];
 };
 
 type NavbarConfig = {
@@ -55,6 +61,11 @@ export class NavbarComponent implements OnInit {
   user = this.userService.currentUser;
   isSchoolAdmin = computed(() =>
     this.user()?.roles.includes(UserRoles.SCHOOL_ADMIN)
+  );
+  schoolAndPlanMissing = computed(
+    () =>
+      !this.user()?.school ||
+      !this.user()?.userSubscriptionResponse.isSubscriptionActive
   );
 
   navConfigs: NavbarConfig[] = [];
@@ -84,17 +95,31 @@ export class NavbarComponent implements OnInit {
   private setActiveNavItems(url: string) {
     const path = url.split('?')[0]; // ? Just get path name
 
+    if (path === '/school-admin/subscription-plans') {
+      this.navConfigs.forEach(section => {
+        section.navItems.forEach(item => {
+          if (
+            item.link === '/school-admin' ||
+            item.link === '/school-admin/settings' ||
+            item.type === 'button'
+          ) {
+            item.isActive = item.link === path;
+          } else {
+            item.isActive = false;
+          }
+          item.submenuItems.forEach(sub => (sub.active = false));
+        });
+      });
+      this.cdr.markForCheck();
+      return;
+    }
+
     this.navConfigs.forEach(section => {
       section.navItems.forEach(item => {
-        // ? Match exact main nav item by path only
         item.isActive = item.link === path;
-
-        // ? Reset and re-check submenu
         item.submenuItems.forEach(sub => {
           sub.active = sub.link === path;
-          if (sub.active) {
-            item.isActive = true; // ? If submenu is active, parent is also active
-          }
+          if (sub.active) item.isActive = true;
         });
       });
     });
@@ -110,7 +135,7 @@ export class NavbarComponent implements OnInit {
     const isTeacherOrMod = isTeacher || isContentModerator;
 
     const dashboardLink = isSchoolAdmin ? '/school-admin' : '/teacher';
-    const settingsLink = isSchoolAdmin
+    const profileLink = isSchoolAdmin
       ? '/school-admin/settings'
       : '/teacher/settings';
 
@@ -120,7 +145,9 @@ export class NavbarComponent implements OnInit {
           {
             label: 'Giáo viên',
             icon: 'co_present',
-            link: '/school-admin/teachers',
+            link: this.schoolAndPlanMissing()
+              ? '/school-admin/subscription-plans'
+              : '/school-admin/teachers',
             type: 'link',
             isActive: false,
             submenuItems: [],
@@ -128,7 +155,9 @@ export class NavbarComponent implements OnInit {
           {
             label: 'Kiểm duyệt viên',
             icon: 'person_check',
-            link: '/school-admin/content-moderators',
+            link: this.schoolAndPlanMissing()
+              ? '/school-admin/subscription-plans'
+              : '/school-admin/content-moderators',
             type: 'link',
             isActive: false,
             submenuItems: [],
@@ -136,7 +165,9 @@ export class NavbarComponent implements OnInit {
           {
             label: 'Học sinh',
             icon: 'person_edit',
-            link: '/school-admin/students',
+            link: this.schoolAndPlanMissing()
+              ? '/school-admin/subscription-plans'
+              : '/school-admin/students',
             type: 'link',
             isActive: false,
             submenuItems: [],
@@ -144,7 +175,9 @@ export class NavbarComponent implements OnInit {
           {
             label: 'Lịch sử giao dịch',
             icon: 'receipt_long',
-            link: '/school-admin/payments',
+            link: this.schoolAndPlanMissing()
+              ? '/school-admin/subscription-plans'
+              : '/school-admin/payments',
             type: 'link',
             isActive: false,
             submenuItems: [],
@@ -161,6 +194,7 @@ export class NavbarComponent implements OnInit {
             link: '/teacher/file-manager',
             type: 'link',
             isActive: false,
+            isDisabled: this.schoolAndPlanMissing(),
             submenuItems: [],
           },
         ]
@@ -170,15 +204,33 @@ export class NavbarComponent implements OnInit {
     const learningSubmenu: NavItem['submenuItems'] = [];
     if (isSchoolAdmin) {
       learningSubmenu.push(
-        { label: 'Danh sách bài học', link: '/school-admin/lessons' },
-        { label: 'Kiểm duyệt nội dung', link: '/school-admin/moderate-lessons' }
+        {
+          label: 'Danh sách bài học',
+          link: this.schoolAndPlanMissing()
+            ? '/school-admin/subscription-plans'
+            : '/school-admin/lessons',
+        },
+        {
+          label: 'Kiểm duyệt nội dung',
+          link: this.schoolAndPlanMissing()
+            ? '/school-admin/subscription-plans'
+            : '/school-admin/moderate-lessons',
+        }
       );
     }
 
     if (isTeacherOrMod) {
       learningSubmenu.push(
-        { label: 'Danh sách lớp học', link: '/teacher/class-management' },
-        { label: 'Tạo bài giảng tự động', link: '/teacher/generate-lesson' }
+        {
+          label: 'Danh sách lớp học',
+          link: '/teacher/class-management',
+          isDisabled: this.schoolAndPlanMissing(),
+        },
+        {
+          label: 'Tạo bài giảng tự động',
+          link: '/teacher/generate-lesson',
+          isDisabled: this.schoolAndPlanMissing(),
+        }
       );
     }
 
@@ -186,6 +238,7 @@ export class NavbarComponent implements OnInit {
       learningSubmenu.push({
         label: 'Kiểm duyệt nội dung',
         link: '/school-admin/moderate-lessons',
+        isDisabled: this.schoolAndPlanMissing(),
       });
     }
 
@@ -222,9 +275,9 @@ export class NavbarComponent implements OnInit {
         section: 'Khác',
         navItems: [
           {
-            label: 'Cài đặt',
-            icon: 'settings',
-            link: settingsLink,
+            label: 'Trang cá nhân',
+            icon: 'account_circle',
+            link: profileLink,
             type: 'link',
             isActive: false,
             submenuItems: [],

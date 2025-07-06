@@ -3,8 +3,10 @@
     class="accordion-item whitespace-nowrap text-textBlack dark:text-white"
     [class.active]="isActive()">
     <a
-      [routerLink]="link()"
-      class="accordion-button flex w-full items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors ease-linear">
+      [routerLink]="!isDisabled() ? link() : null"
+      [tabindex]="isDisabled() ? -1 : 0"
+      (click)="onNavClick($event)"
+      class="accordion-button flex w-full select-none items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors ease-linear">
       <i
         class="material-symbols-rounded text-[22px] leading-none text-gray-500 dark:text-dark-100">
         {{ icon() }}
@@ -21,7 +23,7 @@
     class="accordion-item whitespace-nowrap text-textBlack dark:text-white"
     [class.active]="isActive()">
     <button
-      class="accordion-button flex w-full items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors ease-linear"
+      class="accordion-button flex w-full select-none items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors ease-linear"
       (click)="onClick()">
       <i
         class="material-symbols-rounded text-[22px] leading-none text-gray-500 dark:text-dark-100">
@@ -39,7 +41,7 @@
     class="accordion-item whitespace-nowrap text-textBlack dark:text-white"
     [class.active]="isActive()">
     <button
-      class="accordion-button flex w-full items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors duration-200 ease-linear"
+      class="accordion-button flex w-full select-none items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors duration-200 ease-linear"
       (click)="toggleAccordion()">
       <i
         class="material-symbols-rounded text-[22px] leading-none text-gray-500 dark:text-dark-100">
@@ -63,9 +65,11 @@
         @for (item of submenuItems(); track $index) {
           <li>
             <a
-              [routerLink]="item.link"
-              class="submenu-link flex w-full items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors duration-200 ease-linear"
-              [class.active]="item.active">
+              class="submenu-link flex w-full select-none items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors duration-200 ease-linear"
+              [class.active]="item.active"
+              [routerLink]="!item.isDisabled ? item.link : null"
+              [tabindex]="isDisabled() ? -1 : 0"
+              (click)="onNavClick($event)">
               <i class="material-symbols-rounded" style="font-size: 12px">
                 radio_button_unchecked
               </i>

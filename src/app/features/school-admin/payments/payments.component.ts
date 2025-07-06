@@ -21,6 +21,7 @@ import { PaymentService } from './service/payment.service';
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
 import { PAGE_SIZE } from '../../../shared/constants/common.constant';
 import { PaymentListParams } from './model/payment-list-params';
+import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
 
 @Component({
   selector: 'app-payments',
@@ -37,6 +38,7 @@ import { PaymentListParams } from './model/payment-list-params';
     FormsModule,
     Select,
     TableSkeletonComponent,
+    TableEmptyStateComponent,
   ],
   templateUrl: './payments.component.html',
   styleUrl: './payments.component.css',

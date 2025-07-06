@@ -17,18 +17,19 @@ import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
 
 import { UserService } from '../../../shared/services/api/user/user.service';
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
+import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
 
 import { type UserListParams } from '../../../shared/models/api/request/query/user-list-params';
 import { PAGE_SIZE } from '../../../shared/constants/common.constant';
+import { Role } from '../../../shared/models/enum/role.enum';
 
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 import { BadgeComponent } from '../../../shared/components/badge/badge.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
-import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
 import { AddTeacherModalComponent } from './add-teacher-modal/add-teacher-modal.component';
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
-import { Role } from '../../../shared/models/enum/role.enum';
 import { ImportAccountModalsComponent } from '../../../shared/components/import-accounts/import-account-modals/import-account-modals.component';
+import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
 
 interface StatusOption {
   name: string;
@@ -49,6 +50,7 @@ interface StatusOption {
     TooltipModule,
     RouterLink,
     TableSkeletonComponent,
+    TableEmptyStateComponent,
   ],
   templateUrl: './teachers.component.html',
   styleUrl: './teachers.component.css',

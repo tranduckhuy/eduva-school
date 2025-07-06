@@ -40,13 +40,22 @@ export class InformationComponent {
     return this.themeService.isDarkMode();
   });
 
-  readonly settingsLink = computed(() => {
+  readonly profileLink = computed(() => {
     const role = this.user()?.roles[0];
     if (!role) return '/settings';
 
     return role === UserRoles.SCHOOL_ADMIN || role === UserRoles.SYSTEM_ADMIN
       ? '/school-admin/settings'
       : '/teacher/settings';
+  });
+
+  readonly settingsLink = computed(() => {
+    const role = this.user()?.roles[0];
+    if (!role) return '/settings';
+
+    return role === UserRoles.SCHOOL_ADMIN || role === UserRoles.SYSTEM_ADMIN
+      ? '/school-admin/settings/account-settings'
+      : '/teacher/settings/account-settings';
   });
 
   toggleDarkMode() {

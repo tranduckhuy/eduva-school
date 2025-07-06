@@ -20,6 +20,9 @@ import { JwtService } from '../../../../core/auth/services/jwt.service';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { PaymentService } from '../../../../shared/services/api/payment/payment.service';
 
+import { normalizeUrl } from '../../../../shared/utils/form-validators';
+import { WELL_URI_REGEX } from '../../../../shared/constants/common.constant';
+
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 import { SubscriptionPlanCardComponent } from '../subscription-plan-card/subscription-plan-card.component';
 
@@ -65,6 +68,8 @@ export class AddSchoolInformationComponent implements OnInit {
   isYearly = signal<boolean>(false);
   submitted = signal<boolean>(false);
 
+  URI_REGEX = WELL_URI_REGEX;
+
   constructor() {
     this.form = this.fb.group({
       name: '',
@@ -89,7 +94,10 @@ export class AddSchoolInformationComponent implements OnInit {
 
     if (this.form.invalid) return;
 
-    const createSchoolRequest: CreateSchoolRequest = this.form.value;
+    const createSchoolRequest: CreateSchoolRequest = {
+      ...this.form.value,
+      websiteUrl: normalizeUrl(this.form.get('websiteUrl')?.value),
+    };
     this.createSchoolService
       .createSchool(createSchoolRequest)
       .pipe(
