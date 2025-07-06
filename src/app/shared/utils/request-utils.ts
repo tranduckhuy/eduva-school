@@ -63,6 +63,7 @@ export function buildFormDataFromFormGroup(form: FormGroup): FormData {
  *
  * @param options Optional `RequestOptions` object containing:
  *  - `bypassAuth` (default: false): Whether to bypass auth-related interceptors.
+ *  - `bypassAuthError` (default: false): Whether to bypass 401 error related interceptors.
  *  - `showLoading` (default: true): Whether to enable the global loading indicator.
  *  - `loadingKey` (default: 'default'): Whether to check specific global loading indicator.
  *

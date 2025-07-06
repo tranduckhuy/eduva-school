@@ -228,7 +228,7 @@ export class UserService {
   ): Observable<T | null> {
     return request$.pipe(
       map(res => {
-        if (res.statusCode === StatusCode.SUCCESS && res.data !== undefined) {
+        if (res.statusCode === StatusCode.SUCCESS && res.data) {
           options.successHandler?.(res.data);
           return res.data;
         }

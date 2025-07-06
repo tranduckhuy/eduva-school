@@ -1,6 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, map, of, tap } from 'rxjs';
+
+import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 import { RequestService } from '../../core/request/request.service';
@@ -54,7 +55,7 @@ export class LessonMaterialsService {
       .pipe(
         tap(res => this.handleListResponse(res)),
         map(res => this.extractListResponse(res)),
-        catchError(() => this.handleError())
+        catchError((err: HttpErrorResponse) => this.handleError(err))
       );
   }
 
@@ -64,7 +65,7 @@ export class LessonMaterialsService {
       .pipe(
         tap(res => this.handleDetailResponse(res)),
         map(res => this.extractDetailResponse(res)),
-        catchError(() => this.handleError())
+        catchError((err: HttpErrorResponse) => this.handleError(err))
       );
   }
 
@@ -123,8 +124,8 @@ export class LessonMaterialsService {
     return res.statusCode === StatusCode.SUCCESS ? res.data : null;
   }
 
-  private handleError(): Observable<null> {
+  private handleError(err: HttpErrorResponse): Observable<null> {
     this.toastHandlingService.errorGeneral();
-    return of(null);
+    return throwError(() => err);
   }
 }
