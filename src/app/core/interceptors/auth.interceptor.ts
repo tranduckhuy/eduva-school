@@ -9,28 +9,14 @@ import { AuthService } from '../auth/services/auth.service';
 import { BYPASS_AUTH } from '../../shared/tokens/context/http-context.token';
 
 let isRefreshing = false;
-let isSessionInvalidated = false;
 let refreshSubject: ReplaySubject<string> | null = null;
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const jwtService = inject(JwtService);
   const authService = inject(AuthService);
 
-  const isByPass = req.context.get(BYPASS_AUTH);
-
   const handleWith = (request: HttpRequest<unknown>) => {
-    if (isSessionInvalidated) {
-      return throwError(() => new Error('Session already invalidated.'));
-    }
-
-    return next(request).pipe(
-      catchError(err => {
-        if (err.status === 401 && !isByPass) {
-          isSessionInvalidated = true;
-        }
-        return throwError(() => err);
-      })
-    );
+    return next(request).pipe(catchError(err => throwError(() => err)));
   };
 
   const accessToken = jwtService.getAccessToken();
@@ -38,6 +24,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const expiresAt = jwtService.getExpiresDate();
   const isExpired =
     expiresAt !== null && Date.now() >= new Date(expiresAt).getTime();
+
+  const isByPass = req.context.get(BYPASS_AUTH);
   if (isByPass) return handleWith(req);
 
   // ? If access token is still valid → attach to request header and proceed the request
