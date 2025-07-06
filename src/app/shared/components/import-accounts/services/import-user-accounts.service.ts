@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
-import { EMPTY, Observable, catchError, tap } from 'rxjs';
+import { Observable, catchError, tap, throwError } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 
@@ -40,7 +40,7 @@ export class ImportUserAccountsService {
       })
       .pipe(
         tap(res => this.handleImportResponse(res, role)),
-        catchError(() => this.handleImportError())
+        catchError((err: HttpErrorResponse) => this.handleImportError(err))
       );
   }
 
@@ -74,8 +74,8 @@ export class ImportUserAccountsService {
     }
   }
 
-  private handleImportError(): Observable<never> {
+  private handleImportError(err: HttpErrorResponse): Observable<never> {
     this.toastHandlingService.errorGeneral();
-    return EMPTY;
+    return throwError(() => err);
   }
 }

@@ -36,6 +36,13 @@ export const errorRoutes: Routes = [
                 mod => mod.UnauthorizedErrorComponent
               ),
           },
+          {
+            path: 'subscription-expired',
+            loadComponent: () =>
+              import(
+                './subscription-expired/subscription-expired.component'
+              ).then(mod => mod.SubscriptionExpiredComponent),
+          },
         ],
       },
     ],

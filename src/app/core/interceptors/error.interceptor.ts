@@ -12,7 +12,10 @@ import { GlobalModalService } from '../../shared/services/layout/global-modal/gl
 
 import { StatusCode } from '../../shared/constants/status-code.constant';
 import { UserRoles } from '../../shared/constants/user-roles.constant';
-import { BYPASS_AUTH_ERROR } from '../../shared/tokens/context/http-context.token';
+import {
+  BYPASS_AUTH_ERROR,
+  BYPASS_PAYMENT_ERROR,
+} from '../../shared/tokens/context/http-context.token';
 
 let hasShownUnauthorizedDialog = false;
 
@@ -25,6 +28,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   const user = userService.currentUser;
   const isByPass = req.context.get(BYPASS_AUTH_ERROR);
+  const isByPassPayment = req.context.get(BYPASS_PAYMENT_ERROR);
 
   const handleServerError = () => router.navigateByUrl('/errors/500');
 
@@ -121,6 +125,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       const isUnauthorized = error.status === 401;
       const isPaymentRequired = error.status === 402;
       const isForbidden = error.status === 403;
+      const isNotFound = error.status === 404;
       const isServerError = error.status === 0 || error.status >= 500;
 
       const statusCode = (error.error as any)?.statusCode;
@@ -135,7 +140,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
-      if (isPaymentRequired) {
+      if (isPaymentRequired && !isByPassPayment) {
         handleSubscriptionExpired();
         return throwError(() => error);
       }
@@ -143,12 +148,18 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (isForbidden && !isByPass) {
         if (
           statusCode &&
-          (statusCode === StatusCode.SCHOOL_AND_SUBSCRIPTION_REQUIRED ||
-            statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND)
+          statusCode === StatusCode.SCHOOL_AND_SUBSCRIPTION_REQUIRED
         ) {
           handleMissingSchoolOrSubscription();
         } else {
           handleForbidden();
+        }
+        return throwError(() => error);
+      }
+
+      if (isNotFound && statusCode) {
+        if (statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND) {
+          handleMissingSchoolOrSubscription();
         }
         return throwError(() => error);
       }

@@ -14,6 +14,7 @@ type Item = {
   label: string;
   link: string;
   active?: boolean;
+  isDisabled?: boolean;
 };
 
 @Component({
@@ -35,6 +36,7 @@ export class AccordionItemComponent {
   link = input<string>('#!');
   submenuItems = input<Item[]>([]);
   isActive = input<boolean>(false);
+  isDisabled = input<boolean>(false);
 
   // ? State Management
   isOpen = signal<boolean>(false);
@@ -53,6 +55,13 @@ export class AccordionItemComponent {
   onClick() {
     if (this.label() === 'Đăng xuất') {
       this.authService.logout().subscribe();
+    }
+  }
+
+  onNavClick(event: MouseEvent) {
+    if (this.isDisabled()) {
+      event.preventDefault();
+      event.stopPropagation();
     }
   }
 

@@ -63,3 +63,25 @@ export function minWordCountValidator(
 
   return wordCount >= minWords ? null : { minWords: true };
 }
+
+/**
+ * Normalizes a URL string by ensuring it starts with "https://"
+ * if no protocol is provided. Returns `undefined` if the input is empty.
+ *
+ * This is useful when the backend requires absolute URLs with protocols,
+ * but users may input domain names without "http://" or "https://".
+ *
+ * Examples:
+ * - "example.com"       => "https://example.com"
+ * - "http://example.com" => "http://example.com"
+ * - "   " or null       => undefined
+ *
+ * @param input - The raw URL string input from the user (optional).
+ * @returns A normalized absolute URL string or `undefined` if input is empty.
+ */
+export function normalizeUrl(input?: string): string | undefined {
+  if (!input || input.trim() === '') return undefined;
+
+  const trimmed = input.trim();
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
