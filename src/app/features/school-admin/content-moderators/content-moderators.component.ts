@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   inject,
   signal,
 } from '@angular/core';
@@ -46,7 +47,7 @@ interface StatusOption {
   styleUrl: './content-moderators.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentModeratorsComponent {
+export class ContentModeratorsComponent implements OnInit {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly userService = inject(UserService);
   private readonly loadingService = inject(LoadingService);
@@ -91,26 +92,8 @@ export class ContentModeratorsComponent {
   currentUser = this.userService.currentUser;
   totalUsers = this.userService.totalUsers;
 
-  private loadData(): void {
-    const params: UserListParams = {
-      role: Role.ContentModerator,
-      schoolId: this.currentUser()!.school!.id,
-      pageIndex: Math.floor(this.first() / this.rows()) + 1,
-      pageSize: this.rows(),
-      searchTerm: this.searchTerm(),
-      sortBy: this.sortField() ?? 'createdAt',
-      sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
-      activeOnly: this.getActiveOnlyStatus(),
-    };
-
-    this.userService.getUsers(params).subscribe();
-  }
-
-  private getActiveOnlyStatus(): boolean | undefined {
-    const statusCode = this.statusSelect()?.code;
-    if (statusCode === 0) return true;
-    if (statusCode === 1) return false;
-    return undefined;
+  ngOnInit(): void {
+    this.loadData();
   }
 
   onTimeFilterChange(
@@ -144,7 +127,6 @@ export class ContentModeratorsComponent {
 
     this.first.set(first);
     this.rows.set(rows);
-    this.loadData();
   }
 
   onStatusSelectChange(selected: StatusOption | undefined): void {
@@ -205,5 +187,27 @@ export class ContentModeratorsComponent {
         });
       },
     });
+  }
+
+  private loadData(): void {
+    const params: UserListParams = {
+      role: Role.ContentModerator,
+      schoolId: this.currentUser()!.school!.id,
+      pageIndex: Math.floor(this.first() / this.rows()) + 1,
+      pageSize: this.rows(),
+      searchTerm: this.searchTerm(),
+      sortBy: this.sortField() ?? 'createdAt',
+      sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
+      activeOnly: this.getActiveOnlyStatus(),
+    };
+
+    this.userService.getUsers(params).subscribe();
+  }
+
+  private getActiveOnlyStatus(): boolean | undefined {
+    const statusCode = this.statusSelect()?.code;
+    if (statusCode === 0) return true;
+    if (statusCode === 1) return false;
+    return undefined;
   }
 }

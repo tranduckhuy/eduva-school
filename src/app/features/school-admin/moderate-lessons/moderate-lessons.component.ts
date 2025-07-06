@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   inject,
   signal,
 } from '@angular/core';
@@ -50,7 +51,7 @@ import { type LessonMaterial } from '../../../shared/models/entities/lesson-mate
   styleUrl: './moderate-lessons.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ModerateLessonsComponent {
+export class ModerateLessonsComponent implements OnInit {
   private readonly lessonMaterialsService = inject(LessonMaterialsService);
   private readonly loadingService = inject(LoadingService);
 
@@ -72,6 +73,10 @@ export class ModerateLessonsComponent {
     'Hành động',
   ]);
 
+  ngOnInit(): void {
+    this.onSearch();
+  }
+
   onLazyLoad(event: TableLazyLoadEvent): void {
     const rows = event.rows ?? this.pageSize();
     const first = event.first ?? 0;
@@ -80,12 +85,10 @@ export class ModerateLessonsComponent {
     this.currentPage.set(page);
     this.pageSize.set(rows);
     this.firstRecordIndex.set(first);
-
-    this.loadMaterials();
   }
 
-  onSearch(term: string): void {
-    this.searchTerm.set(term);
+  onSearch(term?: string): void {
+    this.searchTerm.set(term ?? '');
     this.currentPage.set(1);
     this.firstRecordIndex.set(0);
 

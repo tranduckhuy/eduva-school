@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   inject,
   signal,
 } from '@angular/core';
@@ -53,7 +54,7 @@ interface StatusOption {
   styleUrl: './teachers.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TeachersComponent {
+export class TeachersComponent implements OnInit {
   private readonly globalModalService = inject(GlobalModalService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly userService = inject(UserService);
@@ -98,26 +99,8 @@ export class TeachersComponent {
   currentUser = this.userService.currentUser;
   totalUsers = this.userService.totalUsers;
 
-  private loadData(): void {
-    const params: UserListParams = {
-      role: Role.Teacher,
-      schoolId: this.currentUser()!.school!.id,
-      pageIndex: Math.floor(this.first() / this.rows()) + 1,
-      pageSize: this.rows(),
-      searchTerm: this.searchTerm(),
-      sortBy: this.sortField() ?? 'createdAt',
-      sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
-      activeOnly: this.getActiveOnlyStatus(),
-    };
-
-    this.userService.getUsers(params).subscribe();
-  }
-
-  private getActiveOnlyStatus(): boolean | undefined {
-    const statusCode = this.statusSelect()?.code;
-    if (statusCode === 0) return true;
-    if (statusCode === 1) return false;
-    return undefined;
+  ngOnInit(): void {
+    this.loadData();
   }
 
   onTimeFilterChange(
@@ -151,7 +134,6 @@ export class TeachersComponent {
 
     this.first.set(first);
     this.rows.set(rows);
-    this.loadData();
   }
 
   onStatusSelectChange(selected: StatusOption | undefined): void {
@@ -191,6 +173,7 @@ export class TeachersComponent {
       },
     });
   }
+
   openConfirmActiveDialog(event: Event, userId: string): void {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
@@ -223,5 +206,27 @@ export class TeachersComponent {
       title: 'Import danh sách giáo viên',
       role: Role.Teacher,
     });
+  }
+
+  private loadData(): void {
+    const params: UserListParams = {
+      role: Role.Teacher,
+      schoolId: this.currentUser()!.school!.id,
+      pageIndex: Math.floor(this.first() / this.rows()) + 1,
+      pageSize: this.rows(),
+      searchTerm: this.searchTerm(),
+      sortBy: this.sortField() ?? 'createdAt',
+      sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
+      activeOnly: this.getActiveOnlyStatus(),
+    };
+
+    this.userService.getUsers(params).subscribe();
+  }
+
+  private getActiveOnlyStatus(): boolean | undefined {
+    const statusCode = this.statusSelect()?.code;
+    if (statusCode === 0) return true;
+    if (statusCode === 1) return false;
+    return undefined;
   }
 }

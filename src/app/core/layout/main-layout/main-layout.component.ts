@@ -75,7 +75,7 @@ import { GlobalModalHostComponent } from '../../../shared/components/global-moda
     </div>
 
     <p-toast />
-    <p-confirmdialog [baseZIndex]="1000" />
+    <p-confirmdialog [baseZIndex]="1000" [closeOnEscape]="true" />
     <app-global-modal-host />
   `,
   styleUrl: './main-layout.component.css',
