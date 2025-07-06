@@ -10,6 +10,7 @@ import { ToastHandlingService } from '../../../../shared/services/core/toast/toa
 import { StatusCode } from '../../../../shared/constants/status-code.constant';
 
 import { type SchoolSubscriptionPlan } from '../../../../shared/models/entities/school-subscription-plan.model';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +27,7 @@ export class SchoolSubscriptionPlanService {
       .get<SchoolSubscriptionPlan>(this.GET_SUBSCRIPTION_PLANS_API_URL)
       .pipe(
         map(res => this.extractCurrentSchoolPlan(res)),
-        catchError(() => this.handleErrorResponse())
+        catchError((err: HttpErrorResponse) => this.handleErrorResponse(err))
       );
   }
 
@@ -41,8 +42,10 @@ export class SchoolSubscriptionPlanService {
     return null;
   }
 
-  private handleErrorResponse(): Observable<null> {
-    this.toastHandlingService.errorGeneral();
+  private handleErrorResponse(err: HttpErrorResponse): Observable<null> {
+    if (err.error.statusCode !== StatusCode.SCHOOL_NOT_FOUND) {
+      this.toastHandlingService.errorGeneral();
+    }
     return of(null);
   }
 }

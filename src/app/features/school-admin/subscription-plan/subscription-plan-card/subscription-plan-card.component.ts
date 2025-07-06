@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, CurrencyPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import {
   ToggleSwitchChangeEvent,
@@ -35,6 +36,7 @@ import {
   imports: [
     CommonModule,
     CurrencyPipe,
+    FormsModule,
     StorageFormatPipe,
     ToggleSwitchModule,
     ButtonComponent,
@@ -94,7 +96,9 @@ export class SubscriptionPlanCardComponent implements OnInit {
     }
 
     if (!user.school) {
-      this.router.navigate(['/school-admin/add-school-information', plan.id]);
+      this.router.navigate(['/school-admin/add-school-information', plan.id], {
+        queryParams: { isYearly },
+      });
       return;
     }
 

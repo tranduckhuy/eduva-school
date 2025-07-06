@@ -108,7 +108,7 @@ export class PasswordService {
       default:
         this.toastHandlingService.errorGeneral();
     }
-    return of(void 0);
+    return throwError(() => err);
   }
 
   private handleChangePasswordResponse(res: any): void {

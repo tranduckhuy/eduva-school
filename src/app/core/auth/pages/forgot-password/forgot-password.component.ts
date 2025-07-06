@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   signal,
+  viewChildren,
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 
@@ -31,6 +32,8 @@ import { type EmailLinkRequest } from '../../models/request/email-link-request.m
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForgotPasswordComponent {
+  private readonly formControls = viewChildren(FormControlComponent);
+
   private readonly fb = inject(FormBuilder);
   private readonly loadingService = inject(LoadingService);
   private readonly passwordService = inject(PasswordService);
@@ -56,6 +59,12 @@ export class ForgotPasswordComponent {
 
     const request: EmailLinkRequest = this.form.value;
 
-    this.passwordService.forgotPassword(request).subscribe(this.form.reset);
+    this.passwordService.forgotPassword(request).subscribe({
+      next: () => {
+        this.submitted.set(false);
+        this.form.markAsUntouched();
+        this.formControls().forEach(fc => fc.resetControl());
+      },
+    });
   }
 }
