@@ -105,6 +105,8 @@ export class MaterialTableComponent implements OnInit {
 
       const calculatedFirst = (this.currentPage() - 1) * this.pageSize();
       this.firstRecordIndex.set(calculatedFirst);
+
+      this.loadMaterials();
     });
   }
 
@@ -124,8 +126,6 @@ export class MaterialTableComponent implements OnInit {
     this.currentPage.set(page);
     this.pageSize.set(rows);
     this.firstRecordIndex.set(first);
-
-    this.loadMaterials();
   }
 
   openAddMaterialModal(): void {

@@ -28,7 +28,7 @@ import { GlobalModalHostComponent } from '../../../shared/components/global-moda
     <router-outlet />
 
     <p-toast />
-    <p-confirmDialog [baseZIndex]="1000" />
+    <p-confirmDialog [baseZIndex]="1000" [closeOnEscape]="true" />
     <app-global-modal-host />
 
     @if (showThemeButton()) {

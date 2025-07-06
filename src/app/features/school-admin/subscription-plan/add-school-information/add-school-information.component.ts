@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { switchMap, of, filter, take } from 'rxjs';
 
@@ -29,7 +30,7 @@ import {
   BillingCycle,
   CreatePlanPaymentLinkRequest,
 } from '../../../../shared/models/api/request/command/create-plan-payment-link-request.model';
-import { ActivatedRoute } from '@angular/router';
+import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
 
 @Component({
   selector: 'app-add-school-information',
@@ -46,6 +47,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class AddSchoolInformationComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly loadingService = inject(LoadingService);
   private readonly subscriptionPlanService = inject(SubscriptionPlanService);
@@ -122,5 +124,13 @@ export class AddSchoolInformationComponent implements OnInit {
 
   onToggleSwitchChange(_isYearly: boolean) {
     this.isYearly.set(_isYearly);
+  }
+
+  goBackToPlanList() {
+    this.router.navigate(['/school-admin/subscription-plans'], {
+      queryParams: {
+        isYearly: this.isYearly(),
+      },
+    });
   }
 }

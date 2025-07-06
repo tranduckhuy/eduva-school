@@ -56,40 +56,66 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   const handleMissingSchoolOrSubscription = () => {
     const roles = user()?.roles ?? [];
-    if (
+    const isAdmin =
       roles.includes(UserRoles.SCHOOL_ADMIN) ||
-      roles.includes(UserRoles.SYSTEM_ADMIN)
-    ) {
-      toastHandlingService.info(
-        'Chưa có gói sử dụng',
-        'Vui lòng chọn và kích hoạt gói để bắt đầu sử dụng hệ thống.'
-      );
-      router.navigateByUrl('/school-admin/subscription-plans');
-    } else {
-      toastHandlingService.info(
-        'Trường chưa có gói sử dụng',
-        'Vui lòng liên hệ quản trị viên để được cấp quyền truy cập.'
-      );
-    }
+      roles.includes(UserRoles.SYSTEM_ADMIN);
+
+    confirmationService.confirm({
+      header: 'Trường chưa được kích hoạt',
+      message: isAdmin
+        ? `
+        <p>Trường của bạn hiện chưa có gói sử dụng.</p>
+        <p>Vui lòng <strong>chọn và kích hoạt</strong> gói để tiếp tục sử dụng hệ thống.</p>
+      `
+        : `
+        <p>Trường của bạn hiện chưa được kích hoạt.</p>
+        <p>Vui lòng liên hệ với <strong>quản trị viên của trường</strong> để được cấp quyền truy cập.</p>
+      `,
+      acceptButtonProps: { label: isAdmin ? 'Xem các gói' : 'Đăng xuất' },
+      rejectVisible: false,
+      closable: false,
+      accept: () => {
+        if (isAdmin) {
+          router.navigateByUrl('/school-admin/subscription-plans');
+        } else {
+          jwtService.clearAll();
+          userService.clearCurrentUser();
+          router.navigateByUrl('/auth/login', { replaceUrl: true });
+        }
+      },
+    });
   };
 
   const handleSubscriptionExpired = () => {
     const roles = user()?.roles ?? [];
-    if (
+    const isAdmin =
       roles.includes(UserRoles.SCHOOL_ADMIN) ||
-      roles.includes(UserRoles.SYSTEM_ADMIN)
-    ) {
-      toastHandlingService.info(
-        'Gói đã hết hạn',
-        'Vui lòng gia hạn để tiếp tục sử dụng hệ thống.'
-      );
-      router.navigateByUrl('/school-admin/subscription-plans');
-    } else {
-      toastHandlingService.info(
-        'Gói sử dụng đã hết hạn',
-        'Vui lòng liên hệ quản trị viên để gia hạn và tiếp tục sử dụng hệ thống.'
-      );
-    }
+      roles.includes(UserRoles.SYSTEM_ADMIN);
+
+    confirmationService.confirm({
+      header: 'Gói sử dụng đã hết hạn',
+      message: isAdmin
+        ? `
+        <p>Gói sử dụng của trường bạn đã hết hạn.</p>
+        <p>Vui lòng <strong>gia hạn</strong> để tiếp tục sử dụng hệ thống.</p>
+      `
+        : `
+        <p>Gói sử dụng của trường bạn đã hết hạn.</p>
+        <p>Vui lòng liên hệ với <strong>quản trị viên</strong> để gia hạn và tiếp tục sử dụng hệ thống.</p>
+      `,
+      acceptButtonProps: { label: isAdmin ? 'Gia hạn' : 'Đăng xuất' },
+      rejectVisible: false,
+      closable: false,
+      accept: () => {
+        if (isAdmin) {
+          router.navigateByUrl('/school-admin/subscription-plans');
+        } else {
+          jwtService.clearAll();
+          userService.clearCurrentUser();
+          router.navigateByUrl('/auth/login', { replaceUrl: true });
+        }
+      },
+    });
   };
 
   return next(req).pipe(

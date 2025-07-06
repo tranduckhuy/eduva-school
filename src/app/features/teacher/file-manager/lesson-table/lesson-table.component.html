@@ -37,7 +37,7 @@
             [value]="folders()"
             [paginator]="folders().length > 0"
             [totalRecords]="totalRecords()"
-            (onLazyLoad)="onLazyLoadLessons($event)"
+            (onLazyLoad)="onLazyLoad($event)"
             currentPageReportTemplate="
             Hiển thị {first} đến {last} trên {totalRecords} bài học
           ">

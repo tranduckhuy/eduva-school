@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  OnInit,
   signal,
 } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
@@ -41,7 +42,7 @@ import { PaymentListParams } from './model/payment-list-params';
   styleUrl: './payments.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PaymentsComponent {
+export class PaymentsComponent implements OnInit {
   private readonly paymentService = inject(PaymentService);
   private readonly loadingService = inject(LoadingService);
 
@@ -77,19 +78,8 @@ export class PaymentsComponent {
   payments = this.paymentService.payments;
   totalPayments = this.paymentService.totalPayments;
 
-  private loadData(): void {
-    const params: PaymentListParams = {
-      pageIndex: Math.floor(this.first() / this.rows()) + 1,
-      pageSize: this.rows(),
-      searchTerm: this.searchTerm(),
-      sortBy: this.sortField() ?? 'createdAt',
-      sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
-      paymentPurpose: this.paymentPurpose(),
-      paymentStatus: 1,
-      paymentMethod: 1,
-    };
-
-    this.paymentService.getPayments(params).subscribe();
+  ngOnInit(): void {
+    this.loadData();
   }
 
   onTimeFilterChange(
@@ -123,7 +113,6 @@ export class PaymentsComponent {
 
     this.first.set(first);
     this.rows.set(rows);
-    this.loadData();
   }
 
   getCreditPayments() {
@@ -147,5 +136,20 @@ export class PaymentsComponent {
     this.sortOrder.set(1);
     this.first.set(0); // Reset to first page when search changes
     this.loadData();
+  }
+
+  private loadData(): void {
+    const params: PaymentListParams = {
+      pageIndex: Math.floor(this.first() / this.rows()) + 1,
+      pageSize: this.rows(),
+      searchTerm: this.searchTerm(),
+      sortBy: this.sortField() ?? 'createdAt',
+      sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
+      paymentPurpose: this.paymentPurpose(),
+      paymentStatus: 1,
+      paymentMethod: 1,
+    };
+
+    this.paymentService.getPayments(params).subscribe();
   }
 }
