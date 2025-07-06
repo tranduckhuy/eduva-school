@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 
-import { switchMap, of, filter } from 'rxjs';
+import { switchMap, of, filter, take } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 
@@ -75,11 +75,8 @@ export class AddSchoolInformationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.activatedRoute.queryParamMap.subscribe(params => {
-      const isYearly = params.get('isYearly');
-      if (isYearly) {
-        this.isYearly.set(!!isYearly);
-      }
+    this.activatedRoute.queryParamMap.pipe(take(1)).subscribe(params => {
+      this.isYearly.set(params.get('isYearly') === 'true');
     });
 
     this.subscriptionPlanService.getPlanById(this.subscriptionId()).subscribe();
