@@ -1,4 +1,4 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 
 import { ReplaySubject, catchError, switchMap, take, throwError } from 'rxjs';
@@ -15,6 +15,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const jwtService = inject(JwtService);
   const authService = inject(AuthService);
 
+  const handleWith = (request: HttpRequest<unknown>) =>
+    next(request).pipe(catchError(err => throwError(() => err)));
+
   const accessToken = jwtService.getAccessToken();
   const refreshToken = jwtService.getRefreshToken();
   const expiresAt = jwtService.getExpiresDate();
@@ -22,16 +25,16 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     expiresAt !== null && Date.now() >= new Date(expiresAt).getTime();
 
   const isByPass = req.context.get(BYPASS_AUTH);
-  if (isByPass) return next(req);
+  if (isByPass) return handleWith(req);
 
   // ? If access token is still valid → attach to request header and proceed the request
   if (accessToken && !isExpired) {
-    req = req.clone({
+    const cloned = req.clone({
       setHeaders: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    return next(req);
+    return handleWith(cloned);
   }
 
   // ? If token has expired → attempt to refresh it before sending the request
@@ -46,16 +49,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
               Authorization: `Bearer ${newAccessToken}`,
             },
           });
-          return next(cloned);
+          return handleWith(cloned);
         }),
-        catchError(() => {
-          // ? If the refresh process fails for some reason, fallback to sending original request
-          return next(req).pipe(
-            catchError(innerError => {
-              return throwError(() => innerError);
-            })
-          );
-        })
+        catchError(err => throwError(() => err))
       );
     }
 
@@ -64,12 +60,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
     return authService.refreshToken({ accessToken, refreshToken }).pipe(
       switchMap(res => {
-        if (!res)
-          return next(req).pipe(
-            catchError(innerError => {
-              return throwError(() => innerError);
-            })
-          ); // ? If refresh fails, proceed as-is
+        if (!res) {
+          refreshSubject!.complete();
+          return throwError(() => new Error('Refresh token failed'));
+        } // ? If refresh fails, throw error for error interceptor handle
 
         // ? Tokens are already updated inside AuthService
         const newAccessToken = jwtService.getAccessToken();
@@ -86,22 +80,18 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           },
         });
 
-        return next(cloned);
+        return handleWith(cloned);
       }),
       catchError(err => {
-        // ? Refresh failed (token expired, invalid, etc.)
         isRefreshing = false;
-        refreshSubject!.error(err); // ? Notify waiting requests of failure
-        refreshSubject!.complete();
-        return next(req).pipe(
-          catchError(innerError => {
-            return throwError(() => innerError);
-          })
-        ); // ? Proceed without token (likely to get 401)
+        refreshSubject?.error(err);
+        refreshSubject?.complete();
+
+        return throwError(() => err);
       })
     );
   }
 
   // ? If no token is available → proceed with the request (e.g., for public endpoints)
-  return next(req);
+  return handleWith(req);
 };
