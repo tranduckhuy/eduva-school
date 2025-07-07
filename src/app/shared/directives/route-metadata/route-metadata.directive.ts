@@ -77,7 +77,7 @@ export class RouteMetadataDirective implements OnInit {
     // ? Show Date instead of Breadcrumbs if on Dashboard/Home page
     const isHome = breadcrumbs.length === 0;
     const isOnlyDashboard =
-      breadcrumbs.length === 1 && breadcrumbs[0].label === 'Dashboard';
+      breadcrumbs.length === 1 && breadcrumbs[0].label === 'Bảng thống kê';
 
     this.dateDisplayService.setShowDate(isHome || isOnlyDashboard);
   }

@@ -64,15 +64,12 @@ export class MaterialTableComponent implements OnInit {
   private readonly loadingService = inject(LoadingService);
   private readonly lessonMaterialsService = inject(LessonMaterialsService);
 
-  folderId = input<string>();
+  folderId = input.required<string>();
 
   materials = this.lessonMaterialsService.lessonMaterials;
   totalRecords = this.lessonMaterialsService.totalRecords;
   isLoading = this.loadingService.is('get-materials');
 
-  currentPage = signal(1);
-  pageSize = signal(PAGE_SIZE);
-  firstRecordIndex = signal(0);
   searchTerm = signal('');
 
   previousPage = signal(1);
@@ -94,46 +91,31 @@ export class MaterialTableComponent implements OnInit {
       const size = Number(params.get('pageSize'));
 
       if (!isNaN(page) && page > 0) {
-        this.currentPage.set(page);
         this.previousPage.set(page);
       }
 
       if (!isNaN(size) && size > 0) {
-        this.pageSize.set(size);
         this.previousPageSize.set(size);
       }
-
-      const calculatedFirst = (this.currentPage() - 1) * this.pageSize();
-      this.firstRecordIndex.set(calculatedFirst);
-
-      this.loadMaterials();
     });
+
+    this.onSearch();
   }
 
-  onSearch(term: string): void {
-    this.searchTerm.set(term);
-    this.currentPage.set(1);
-    this.firstRecordIndex.set(0);
+  onSearch(term?: string): void {
+    this.searchTerm.set(term ?? '');
 
-    this.loadMaterials();
-  }
-
-  onLazyLoad(event: TableLazyLoadEvent): void {
-    const rows = event.rows ?? this.pageSize();
-    const first = event.first ?? 0;
-    const page = Math.floor(first / rows) + 1;
-
-    this.currentPage.set(page);
-    this.pageSize.set(rows);
-    this.firstRecordIndex.set(first);
+    const request: GetLessonMaterialsRequest = {
+      searchTerm: this.searchTerm(),
+    };
+    this.lessonMaterialsService
+      .getLessonMaterials(this.folderId(), request)
+      .subscribe();
   }
 
   openAddMaterialModal(): void {
     this.globalModalService.open(AddFileModalComponent, {
       folderId: this.folderId(),
-      addFileSuccess: () => {
-        this.currentPage.set(0);
-      },
     });
   }
 
@@ -201,16 +183,5 @@ export class MaterialTableComponent implements OnInit {
       default:
         return 'gray';
     }
-  }
-
-  private loadMaterials(): void {
-    const request: GetLessonMaterialsRequest = {
-      folderId: this.folderId(),
-      searchTerm: this.searchTerm(),
-      pageIndex: this.currentPage(),
-      pageSize: this.pageSize(),
-    };
-
-    this.lessonMaterialsService.getLessonMaterials(request).subscribe();
   }
 }

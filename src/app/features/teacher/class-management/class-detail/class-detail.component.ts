@@ -118,18 +118,13 @@ export class ClassDetailComponent implements OnInit {
                 if (folders.length === 0) return of([]);
 
                 const requests = folders.map(folder => {
-                  const req: GetLessonMaterialsRequest = {
-                    folderId: folder.id,
-                    classId: classModel.id,
-                  };
-
                   // ? Get Materials of each Folders
                   return this.lessonMaterialsService
-                    .getLessonMaterials(req)
+                    .getLessonMaterials(folder.id)
                     .pipe(
                       map(materialRes => ({
                         folder,
-                        materials: materialRes?.data ?? [],
+                        materials: materialRes ?? [],
                       }))
                     );
                 });

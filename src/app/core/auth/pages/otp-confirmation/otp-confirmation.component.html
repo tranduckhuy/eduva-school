@@ -1,5 +1,5 @@
 <app-auth-layout>
-  <h1 class="mb-2 text-center text-xl font-bold">Xác minh 2 bước</h1>
+  <h1 class="mb-2 text-center text-xl font-bold">Xác Minh 2 Bước</h1>
   <p class="mb-6 text-center text-[15px] opacity-80">
     Một mã xác nhận gồm 6 chữ số đã được gửi tới
     <br />
@@ -31,7 +31,8 @@
       styleClass="mt-2"
       type="submit"
       [fluid]="true"
-      [loading]="isLoading()" />
+      [loading]="isLoading()"
+      [disabled]="isLoading()" />
     <p
       class="mx-auto mt-1 text-center text-[12px] opacity-80 dark:text-[#64748b]">
       Việc bạn tiếp tục sử dụng trang web này đồng nghĩa bạn đồng ý với

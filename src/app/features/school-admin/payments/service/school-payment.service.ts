@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 
-import { catchError, EMPTY, map, Observable } from 'rxjs';
+import { catchError, EMPTY, map, Observable, of } from 'rxjs';
 
 import { Payment } from '../model/payment.model';
 import { PaymentListParams } from '../model/payment-list-params';
@@ -17,7 +17,7 @@ import { UserService } from '../../../../shared/services/api/user/user.service';
 @Injectable({
   providedIn: 'root',
 })
-export class PaymentService {
+export class SchoolPaymentService {
   private readonly requestService = inject(RequestService);
   private readonly toastService = inject(ToastHandlingService);
   private readonly userService = inject(UserService);
@@ -130,7 +130,7 @@ export class PaymentService {
       }),
       catchError(() => {
         this.toastService.errorGeneral();
-        return EMPTY;
+        return of(null);
       })
     );
   }
@@ -139,6 +139,7 @@ export class PaymentService {
     this.paymentsSignal.set([]);
     this.totalPaymentsSignal.set(0);
   }
+
   private resetPayment(): void {
     this.schoolSubscriptionDetailSignal.set(null);
   }

@@ -98,12 +98,13 @@ export class FolderManagementService {
 
   private extractListData<T>(res: any): T[] | null {
     return res.statusCode === StatusCode.SUCCESS && res.data
-      ? (res.data as T[])
+      ? (res.data.data as T[])
       : null;
   }
 
   private extractSingleData<T>(res: any): T | null {
-    return res.statusCode === StatusCode.SUCCESS && res.data
+    return [StatusCode.SUCCESS, StatusCode.CREATED].includes(res.statusCode) &&
+      res.data
       ? (res.data as T)
       : null;
   }
