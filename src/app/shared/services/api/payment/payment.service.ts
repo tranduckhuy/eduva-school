@@ -46,7 +46,7 @@ export class PaymentService {
         map(res => this.extractDataFromResponse(res)),
         catchError(() => {
           this.toastHandlingService.errorGeneral();
-          return EMPTY;
+          return of(null);
         })
       );
   }
@@ -65,6 +65,10 @@ export class PaymentService {
       );
   }
 
+  protected redirectToUrl(url: string) {
+    window.location.href = url;
+  }
+
   // ---------------------------
   //  Private Helper Functions
   // ---------------------------
@@ -81,7 +85,7 @@ export class PaymentService {
     const data = res.data as CreatePlanPaymentLinkResponse;
 
     const proceedToCheckout = () => {
-      window.location.href = data.checkoutUrl;
+      this.redirectToUrl(data.checkoutUrl);
     };
 
     if (data.deductedAmount > 0) {
