@@ -5,7 +5,6 @@ import {
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 
 import { switchMap } from 'rxjs';
 
@@ -21,6 +20,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
+import { UserService } from '../../../../shared/services/api/user/user.service';
 import { UploadFileService } from '../../../../shared/services/api/file/upload-file.service';
 import { LessonMaterialsService } from '../../../../shared/services/api/lesson-materials/lesson-materials.service';
 
@@ -40,60 +40,30 @@ import {
 } from '../../../../shared/models/api/request/command/create-lesson-material-request.model';
 import { type GetLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
 
-interface AddFileModalData {
-  folderId: string;
-  addFileSuccess: () => void;
-}
 @Component({
   selector: 'app-add-file-modal',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    TooltipModule,
-    FileUpload,
-    ButtonModule,
-  ],
+  imports: [CommonModule, TooltipModule, FileUpload, ButtonModule],
   templateUrl: './add-file-modal.component.html',
   styleUrl: './add-file-modal.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddFileModalComponent {
-  // private readonly fb = inject(FormBuilder);
   private readonly config = inject(PrimeNG);
   private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
   private readonly toastHandlingService = inject(ToastHandlingService);
+  private readonly userService = inject(UserService);
   private readonly uploadFileService = inject(UploadFileService);
   private readonly lessonMaterialsService = inject(LessonMaterialsService);
-  private readonly modalData = inject(MODAL_DATA) as AddFileModalData;
+  private readonly modalData = inject(MODAL_DATA);
 
-  // ? Form
-  // form: FormGroup;
-
-  // ? File Size
   maxUploadFileSize = MAX_UPLOAD_FILE_SIZE;
 
-  // ? State
+  user = this.userService.currentUser;
   isLoading = this.loadingService.isLoading;
+
   selectedFiles = signal<File[]>([]);
-
-  // constructor() {
-  //   this.form = this.fb.group({
-  //     title: ['', Validators.required],
-  //   });
-  // }
-
-  // get title() {
-  //   return this.form.get('title')!;
-  // }
-
-  // onBlur(controlName: string) {
-  //   const control = this.form.get(controlName);
-  //   if (control && !control.touched) {
-  //     control.markAsTouched();
-  //   }
-  // }
 
   onSelectFile(event: FileSelectEvent) {
     const currentFiles = this.selectedFiles();
@@ -129,7 +99,7 @@ export class AddFileModalComponent {
       return;
     }
 
-    // 📦 Check if total size (existing + new valid files) exceeds limit
+    // ? Check if total size (existing + new valid files) exceeds limit
     const totalSize = [...currentFiles, ...validFiles].reduce(
       (sum, file) => sum + file.size,
       0
@@ -153,19 +123,6 @@ export class AddFileModalComponent {
     this.selectedFiles.set(updated);
   }
 
-  // onSubmit() {
-  //   this.form.markAllAsTouched();
-
-  //   const files = this.selectedFiles();
-  //   const fileNames = files.map(f => f.name);
-
-  //   const request = {
-  //     blobNames: fileNames,
-  //   };
-
-  //   this.uploadFiles(request, files);
-  // }
-
   onSubmit() {
     const files = this.selectedFiles();
 
@@ -177,24 +134,18 @@ export class AddFileModalComponent {
       return;
     }
 
+    // ? Unique blob name with SchoolId
     const timestamp = Date.now();
+    const schoolId = this.user()?.school ? this.user()?.school?.id : '';
     const blobNames = files.map(file => {
       const dotIndex = file.name.lastIndexOf('.');
       const base = file.name.substring(0, dotIndex);
       const ext = file.name.substring(dotIndex);
-      return `${base}_${timestamp}${ext}`;
+      return `${base}_${timestamp}_${schoolId}${ext}`;
     });
 
     this.uploadFiles(blobNames, files);
   }
-
-  // getErrorMessage(controlName: string): string {
-  //   const control = this.form.get(controlName);
-  //   if (control?.hasError('required')) {
-  //     return 'Trường này không được để trống';
-  //   }
-  //   return '';
-  // }
 
   formatSize(bytes: number) {
     const k = 1024;
@@ -244,14 +195,10 @@ export class AddFileModalComponent {
         .createLessonMaterials(request)
         .pipe(
           switchMap(() => {
-            const request: GetLessonMaterialsRequest = {
-              folderId,
-            };
-            return this.lessonMaterialsService.getLessonMaterials(request);
+            return this.lessonMaterialsService.getLessonMaterials(folderId);
           })
         )
         .subscribe(() => {
-          this.modalData.addFileSuccess();
           this.closeModal();
         });
     });

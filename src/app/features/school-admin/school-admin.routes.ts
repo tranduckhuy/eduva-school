@@ -41,16 +41,25 @@ export const schoolAdminRoutes: Routes = [
           import('./payments/payment.routes').then(mod => mod.paymentRoute),
       },
       {
-        path: 'lessons',
-        loadChildren: () =>
-          import('./lessons/lessons.routes').then(mod => mod.lessonsRoute),
+        path: 'shared-lessons',
+        loadComponent: () =>
+          import(
+            '../../shared/pages/shared-lessons/shared-lessons.component'
+          ).then(mod => mod.SharedLessonsComponent),
       },
       {
         path: 'moderate-lessons',
-        loadChildren: () =>
-          import('./moderate-lessons/moderate-lessons.routes').then(
-            mod => mod.moderateLessonsRoute
+        loadComponent: () =>
+          import('./moderate-lessons/moderate-lessons.component').then(
+            mod => mod.ModerateLessonsComponent
           ),
+      },
+      {
+        path: 'view-lesson/:materialId',
+        loadComponent: () =>
+          import(
+            '../../shared/components/lesson-details/preview-lesson/preview-lesson.component'
+          ).then(mod => mod.PreviewLessonComponent),
       },
       {
         path: 'subscription-plans',

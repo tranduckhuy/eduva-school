@@ -21,7 +21,7 @@ export const teacherRoutes: Routes = [
       {
         path: 'file-manager',
         data: {
-          breadcrumb: 'Quản lý bài giảng',
+          breadcrumb: 'Quản lý thư mục',
         },
         loadComponent: () =>
           import(
@@ -55,11 +55,18 @@ export const teacherRoutes: Routes = [
           ),
       },
       {
-        path: 'view-lesson/:folderId/:materialId',
+        path: 'view-lesson/:materialId',
         loadComponent: () =>
           import(
             '../../shared/components/lesson-details/preview-lesson/preview-lesson.component'
           ).then(mod => mod.PreviewLessonComponent),
+      },
+      {
+        path: 'shared-lessons',
+        loadComponent: () =>
+          import(
+            '../../shared/pages/shared-lessons/shared-lessons.component'
+          ).then(mod => mod.SharedLessonsComponent),
       },
       {
         path: 'settings',

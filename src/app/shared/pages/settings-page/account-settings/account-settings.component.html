@@ -96,7 +96,7 @@
             variant="outlined"
             size="small"
             [loading]="isLoading()"
-            [disabled]="form.invalid || passwordMisMatch" />
+            [disabled]="form.invalid || passwordMisMatch || isLoading()" />
           <a
             routerLink="/auth/forgot-password"
             class="font-semibold text-primary underline">

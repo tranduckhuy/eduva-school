@@ -65,6 +65,7 @@
       icon="pi pi-download"
       size="small"
       [loading]="isLoadingTemplate()"
+      [disabled]="isLoadingTemplate()"
       (onClick)="downloadTemplate()" />
     <div class="flex items-center gap-2">
       <p-button
@@ -81,6 +82,7 @@
         icon="pi pi-upload"
         size="small"
         [loading]="isLoadingUpload()"
+        [disabled]="isLoadingUpload()"
         (onClick)="uploadData()" />
     </div>
   </div>

@@ -26,10 +26,10 @@
         <ng-template #header>
           <tr>
             <th scope="col" class="!w-[25%]">Tài liệu bài học</th>
-            <th scope="col" class="!w-[15%]">Người tạo tài liệu</th>
-            <th scope="col" class="!text-center">Ngày tạo tài liệu</th>
-            <th scope="col" class="!text-center">Kích thước tệp</th>
-            <th scope="col" class="!w-[15%] !text-center">Trạng thái</th>
+            <th scope="col" class="!w-[15%]">Người sở hữu</th>
+            <th scope="col" class="!w-[20%]">Ngày tạo tài liệu</th>
+            <th scope="col" class="!w-[10%] !text-center">Kích thước tệp</th>
+            <th scope="col" class="!w-[15%] !text-center">Chia sẻ</th>
             <th scope="col" class="!w-[10%] !text-center">Hành động</th>
           </tr>
         </ng-template>
@@ -37,11 +37,7 @@
           <tr>
             <td>
               <a
-                [routerLink]="['/school-admin/view-lesson', material.id]"
-                [queryParams]="{
-                  page: currentPage(),
-                  pageSize: pageSize(),
-                }"
+                [routerLink]="[viewLessonLink(), material.id]"
                 class="group flex items-center gap-2">
                 <i
                   class="material-symbols-outlined"
@@ -54,16 +50,16 @@
               </a>
             </td>
             <td>{{ material.createdByName }}</td>
-            <td class="!text-center">
+            <td>
               {{ material.createdAt | date: 'fullDate' }}
             </td>
             <td class="!text-center">
               {{ material.fileSize | bytesToReadable: 'MB' : 2 }}
             </td>
             <td class="!text-center">
-              <div class="flex flex-col items-center gap-2">
-                <app-badge class="self-center whitespace-nowrap">
-                  Chờ xử lý
+              <div class="flex items-center justify-center">
+                <app-badge variant="info" class="whitespace-nowrap">
+                  Trong trường
                 </app-badge>
               </div>
             </td>
@@ -96,8 +92,8 @@
           class="pointer-events-none absolute left-0 right-0 top-[60%] -translate-y-[50%]">
           <app-table-empty-state
             icon="task_alt"
-            title="Không có tài liệu cần kiểm duyệt"
-            subtitle="Hiện tại chưa có tài liệu nào được giáo viên đăng tải. Vui lòng quay lại sau để kiểm duyệt khi có nội dung mới." />
+            title="Chưa có tài liệu được chia sẻ"
+            subtitle="Hiện tại trường của bạn chưa có tài liệu nào được chia sẻ. Vui lòng kiểm tra lại sau khi có nội dung mới từ giáo viên." />
         </div>
       }
     </div>

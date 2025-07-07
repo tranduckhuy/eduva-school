@@ -124,7 +124,7 @@
             type="submit"
             size="small"
             [loading]="isLoading()"
-            [disabled]="form.invalid" />
+            [disabled]="form.invalid || isLoading()" />
         } @else {
           <p-button
             label="Chỉnh sửa thông tin"

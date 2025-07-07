@@ -35,11 +35,11 @@
       size="small"
       (onClick)="closeModal()" />
     <p-button
-      (onClick)="onSubmit(reasonForm)"
       label="Xác nhận"
       variant="outlined"
       icon="pi pi-check"
+      size="small"
       [disabled]="!reason()"
-      size="small" />
+      (onClick)="onSubmit(reasonForm)" />
   </div>
 </div>
