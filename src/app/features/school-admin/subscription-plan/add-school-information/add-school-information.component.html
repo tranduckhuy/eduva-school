@@ -89,7 +89,7 @@
             size="small"
             icon="pi pi-check"
             [loading]="isLoading()"
-            [disabled]="form.invalid" />
+            [disabled]="form.invalid || isLoading()" />
         </div>
       </form>
     </div>

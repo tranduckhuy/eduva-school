@@ -17,19 +17,16 @@ import { LessonMaterialsService } from '../../../shared/services/api/lesson-mate
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
 
 import { PAGE_SIZE } from '../../../shared/constants/common.constant';
-import {
-  ContentType,
-  LessonMaterialStatus,
-} from '../../../shared/models/enum/lesson-material.enum';
+import { ContentType } from '../../../shared/models/enum/lesson-material.enum';
 
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { BadgeComponent } from '../../../shared/components/badge/badge.component';
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
-import { GetLessonMaterialsRequest } from '../../../shared/models/api/request/query/get-lesson-materials-request.model';
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
 
 import { type LessonMaterial } from '../../../shared/models/entities/lesson-material.model';
+import { type GetPendingLessonMaterialsRequest } from '../../../shared/models/api/request/query/get-lesson-materials-request.model';
 
 @Component({
   selector: 'app-lessons',
@@ -57,7 +54,7 @@ export class ModerateLessonsComponent implements OnInit {
 
   materials = this.lessonMaterialsService.lessonMaterials;
   totalRecords = this.lessonMaterialsService.totalRecords;
-  isLoading = this.loadingService.isLoading;
+  isLoading = this.loadingService.is('get-materials');
 
   currentPage = signal(1);
   pageSize = signal(PAGE_SIZE);
@@ -124,13 +121,12 @@ export class ModerateLessonsComponent implements OnInit {
   }
 
   private loadMaterials(): void {
-    const request: GetLessonMaterialsRequest = {
+    const request: GetPendingLessonMaterialsRequest = {
       searchTerm: this.searchTerm(),
       pageIndex: this.currentPage(),
       pageSize: this.pageSize(),
-      lessonStatus: LessonMaterialStatus.Draft,
     };
 
-    this.lessonMaterialsService.getLessonMaterials(request).subscribe();
+    this.lessonMaterialsService.getPendingLessonMaterials(request).subscribe();
   }
 }

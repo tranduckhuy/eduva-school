@@ -158,7 +158,7 @@
       icon="pi pi-plus"
       size="small"
       [loading]="isLoading()"
-      [disabled]="selectedFiles().length === 0"
+      [disabled]="selectedFiles().length === 0 || isLoading()"
       (onClick)="onSubmit()" />
   </footer>
 </div>

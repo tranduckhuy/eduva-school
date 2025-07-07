@@ -57,9 +57,8 @@
     [icon]="!isCurrent() ? 'pi pi-arrow-up-right' : ''"
     [label]="isCurrent() ? 'Gói hiện tại của bạn' : 'Mua ngay'"
     [loading]="isPlanLoading(subscriptionPlan().id)"
-    [disabled]="isDisabled()"
-    (onClick)="onClickBuyButton()">
-  </p-button>
+    [disabled]="isDisabled() || isPlanLoading(subscriptionPlan().id)"
+    (onClick)="onClickBuyButton()" />
 
   <!-- ? Plan Options -->
   <ul class="mt-6 flex flex-col gap-3">
