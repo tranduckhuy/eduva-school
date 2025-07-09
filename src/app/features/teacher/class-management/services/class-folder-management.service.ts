@@ -13,19 +13,23 @@ import { StatusCode } from '../../../../shared/constants/status-code.constant';
 @Injectable({
   providedIn: 'root',
 })
-export class ClassStudentManagementService {
+export class ClassFolderManagementService {
   private readonly requestService = inject(RequestService);
   private readonly toastHandlingService = inject(ToastHandlingService);
 
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly BASE_CLASS_API_URL = `${this.BASE_API_URL}/classes`;
 
-  removeStudentFromClass(
+  removeMaterialsFromClass(
     classId: string,
+    folderId: string,
     request?: string[]
   ): Observable<void> {
     return this.requestService
-      .deleteWithBody(`${this.BASE_CLASS_API_URL}/${classId}/students`, request)
+      .deleteWithBody(
+        `${this.BASE_CLASS_API_URL}/${classId}/folders/${folderId}/lesson-materials`,
+        request
+      )
       .pipe(
         tap(res => this.handleRemoveResponse(res)),
         map(() => void 0),

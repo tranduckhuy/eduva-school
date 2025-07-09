@@ -6,6 +6,7 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { ButtonModule } from 'primeng/button';
@@ -29,6 +30,7 @@ import { FolderOwnerType } from '../../../../../../shared/models/enum/folder-own
   selector: 'class-overview',
   standalone: true,
   imports: [
+    RouterLink,
     CommonModule,
     ButtonModule,
     AccordionModule,
