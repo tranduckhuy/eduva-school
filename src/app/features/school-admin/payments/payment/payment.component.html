@@ -4,22 +4,20 @@
       class="rounded border border-gray-100 bg-white shadow-main dark:border-dark-500 dark:bg-dark-200">
       <div
         class="flex items-center justify-between border-b border-gray-100 p-5 dark:border-gray-800">
-        <a href="/" class="flex items-center gap-2">
-          <img
-            src="./images/logo.png"
-            alt="EDUVA"
-            class="size-8 rounded-md object-contain" />
-          <span class="text-base font-bold leading-none dark:text-white"
-            >EDUVA INVOICE:
-            <span class="text-primary"
-              >#{{
-                isCreditPack()
-                  ? creditTransactionDetail()?.id
-                  : schoolSubscriptionDetail()?.id
-              }}</span
-            ></span
-          >
-        </a>
+        <img
+          src="./images/logo.png"
+          alt="EDUVA"
+          class="size-8 rounded-md object-contain" />
+        <span class="text-base font-bold leading-none dark:text-white"
+          >EDUVA INVOICE:
+          <span class="text-primary"
+            >#{{
+              isCreditPack()
+                ? creditTransactionDetail()?.id
+                : schoolSubscriptionDetail()?.id
+            }}</span
+          ></span
+        >
         <app-export-invoice-pdf
           [isCreditPack]="isCreditPack()"
           [creditTransactionDetail]="creditTransactionDetail()"
