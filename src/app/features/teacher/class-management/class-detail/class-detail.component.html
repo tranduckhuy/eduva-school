@@ -21,7 +21,10 @@
 
       <!-- ? Class Members -->
       <p-tabpanel value="member">
-        <class-member [classModel]="classModel()" [students]="students()" />
+        <class-member
+          [classModel]="classModel()"
+          [students]="students()"
+          (removeStudent)="loadData()" />
       </p-tabpanel>
 
       <!-- ? Folder List -->

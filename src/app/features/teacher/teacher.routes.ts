@@ -35,6 +35,7 @@ export const teacherRoutes: Routes = [
       {
         path: 'class-management',
         data: {
+          title: 'Danh sách lớp học',
           heading: 'Quản lý lớp học',
           breadcrumb: 'Danh sách lớp học',
         },
@@ -46,6 +47,7 @@ export const teacherRoutes: Routes = [
       {
         path: 'class-management/:classId',
         data: {
+          title: 'Chi tiết lớp học',
           heading: 'Chi tiết lớp học',
           breadcrumb: 'Chi tiết lớp học',
         },
@@ -56,6 +58,9 @@ export const teacherRoutes: Routes = [
       },
       {
         path: 'view-lesson/:materialId',
+        data: {
+          title: 'Chi tiết bài học',
+        },
         loadComponent: () =>
           import(
             '../../shared/components/lesson-details/preview-lesson/preview-lesson.component'
@@ -63,6 +68,9 @@ export const teacherRoutes: Routes = [
       },
       {
         path: 'shared-lessons',
+        data: {
+          title: 'Bài học chia sẻ trong trường',
+        },
         loadComponent: () =>
           import(
             '../../shared/pages/shared-lessons/shared-lessons.component'

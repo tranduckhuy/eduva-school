@@ -139,14 +139,13 @@ export class ClassDetailComponent implements OnInit {
       materials: any[];
     }[]
   ): void {
-    this.folderMaterials.set([...folderWithMaterials]);
-
     const totalFolders = folderWithMaterials.length;
     const totalMaterials = folderWithMaterials.reduce(
-      (sum, item) => sum + item.materials.length,
+      (sum, item) => sum + (item.folder.countLessonMaterial ?? 0),
       0
     );
 
+    this.folderMaterials.set([...folderWithMaterials]);
     this.folderCount.set(totalFolders);
     this.materialCount.set(totalMaterials);
   }

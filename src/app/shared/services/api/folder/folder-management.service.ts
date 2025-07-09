@@ -40,72 +40,91 @@ export class FolderManagementService {
         tap(res => {
           if (res.statusCode === StatusCode.CREATED && res.data) {
             this.toastHandlingService.success(
-              'Tạo bài giảng thành công',
-              `Bài giảng "${res.data.name}" đã được tạo thành công.`
+              'Tạo thư mục thành công',
+              `Thư mục "${res.data.name}" đã được tạo thành công.`
             );
           } else {
             this.toastHandlingService.error(
-              'Tạo bài giảng thất bại',
-              'Đã xảy ra sự cố trong quá trình tạo bài giảng. Vui lòng thử lại sau.'
+              'Tạo thư mục thất bại',
+              'Đã xảy ra sự cố trong quá trình tạo thư mục. Vui lòng thử lại sau.'
             );
           }
         }),
-        map(res => this.extractSingleData<Folder>(res)),
+        map(res => this.extractSingleData(res)),
         catchError((err: HttpErrorResponse) => this.handleCreateError(err))
       );
   }
 
-  getAllFolders(request: GetFoldersRequest): Observable<Folder[] | null> {
-    return this.fetchFolders(this.BASE_FOLDERS_API_URL, request);
-  }
-
   getPersonalFolders(request: GetFoldersRequest): Observable<Folder[] | null> {
-    return this.fetchFolders(`${this.BASE_FOLDERS_API_URL}/user`, request);
+    return this.requestService
+      .get<GetFoldersResponse>(`${this.BASE_FOLDERS_API_URL}/user`, request, {
+        loadingKey: 'get-folders',
+      })
+      .pipe(
+        tap(res => this.handlePagingFoldersResponse(res)),
+        map(res => this.extractPagingListData(res)),
+        catchError(() => this.handleGetError())
+      );
   }
 
   getClassFolders(classId: string): Observable<Folder[] | null> {
-    return this.fetchFolders(`${this.BASE_FOLDERS_API_URL}/class/${classId}`);
+    return this.requestService
+      .get<GetFoldersResponse>(
+        `${this.BASE_FOLDERS_API_URL}/class/${classId}`,
+        {
+          loadingKey: 'get-folders',
+        }
+      )
+      .pipe(
+        tap(res => this.handleFoldersResponse(res)),
+        map(res => this.extractListData(res)),
+        catchError(() => this.handleGetError())
+      );
   }
 
   // ---------------------------
   //  Private Helper Functions
   // ---------------------------
 
-  private fetchFolders(
-    apiUrl: string,
-    request?: GetFoldersRequest
-  ): Observable<Folder[] | null> {
-    return this.requestService
-      .get<GetFoldersResponse>(apiUrl, request, {
-        loadingKey: 'get-folders',
-      })
-      .pipe(
-        tap(res => {
-          if (res.statusCode === StatusCode.SUCCESS && res.data) {
-            this.folderListSignal.set([...(res.data.data ?? [])]);
-            this.totalRecordsSignal.set(res.data.count ?? 0);
-          } else {
-            this.toastHandlingService.error(
-              'Lấy danh sách bài giảng thất bại',
-              'Không thể lấy được danh sách bài giảng. Vui lòng thử lại sau.'
-            );
-          }
-        }),
-        map(res => this.extractListData<Folder>(res)),
-        catchError(() => this.handleGetError())
+  private handlePagingFoldersResponse(res: any) {
+    if (res.statusCode === StatusCode.SUCCESS && res.data) {
+      this.folderListSignal.set([...(res.data.data ?? [])]);
+      this.totalRecordsSignal.set(res.data.count ?? 0);
+    } else {
+      this.toastHandlingService.error(
+        'Lấy danh sách thư mục thất bại',
+        'Không thể lấy được danh sách thư mục. Vui lòng thử lại sau.'
       );
+    }
   }
 
-  private extractListData<T>(res: any): T[] | null {
+  private extractPagingListData(res: any): Folder[] | null {
     return res.statusCode === StatusCode.SUCCESS && res.data
-      ? (res.data.data as T[])
+      ? (res.data.data as Folder[])
       : null;
   }
 
-  private extractSingleData<T>(res: any): T | null {
+  private handleFoldersResponse(res: any) {
+    if (res.statusCode === StatusCode.SUCCESS && res.data) {
+      this.folderListSignal.set([...(res.data ?? [])]);
+    } else {
+      this.toastHandlingService.error(
+        'Lấy danh sách thư mục thất bại',
+        'Không thể lấy được danh sách thư mục. Vui lòng thử lại sau.'
+      );
+    }
+  }
+
+  private extractListData(res: any): Folder[] | null {
     return [StatusCode.SUCCESS, StatusCode.CREATED].includes(res.statusCode) &&
       res.data
-      ? (res.data as T)
+      ? (res.data as Folder[])
+      : null;
+  }
+
+  private extractSingleData(res: any): Folder | null {
+    return res.statusCode === StatusCode.SUCCESS && res.data
+      ? (res.data as Folder)
       : null;
   }
 

@@ -25,6 +25,8 @@
           <p-button
             variant="text"
             styleClass="relative -top-[1.5px]"
+            tooltipPosition="bottom"
+            [pTooltip]="isCopied() ? 'Đã sao chép' : 'Sao chép mã lớp'"
             (onClick)="copyClassCode()">
             <ng-template #icon>
               <span
@@ -51,7 +53,7 @@
       </div>
       @if (folderWithMaterials()?.length !== 0) {
         <p-button
-          label="Thêm bài giảng"
+          label="Thêm thư mục mới"
           icon="pi pi-plus"
           variant="outlined"
           size="small"

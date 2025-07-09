@@ -4,8 +4,8 @@ export const fileManagerRoutes: Routes = [
   {
     path: '',
     data: {
-      heading: 'Tất cả bài giảng',
-      breadcrumb: 'Tất cả bài giảng',
+      heading: 'Tất cả thư mục',
+      breadcrumb: '',
     },
     loadComponent: () =>
       import('./my-drive/my-drive.component').then(mod => mod.MyDriveComponent),
@@ -13,7 +13,8 @@ export const fileManagerRoutes: Routes = [
       {
         path: '',
         data: {
-          breadcrumb: 'Danh sách bài giảng',
+          title: 'Danh sách thư mục',
+          breadcrumb: 'Danh sách thư mục',
         },
         loadComponent: () =>
           import('./lesson-table/lesson-table.component').then(
@@ -23,6 +24,7 @@ export const fileManagerRoutes: Routes = [
       {
         path: ':folderId',
         data: {
+          title: 'Danh sách bài học',
           heading: 'Danh sách bài học',
           breadcrumb: 'Danh sách bài học',
         },
@@ -34,6 +36,7 @@ export const fileManagerRoutes: Routes = [
       {
         path: ':folderId/:materialId',
         data: {
+          title: 'Chi tiết bài học',
           heading: 'Chi tiết bài học',
           breadcrumb: 'Chi tiết bài học',
         },
