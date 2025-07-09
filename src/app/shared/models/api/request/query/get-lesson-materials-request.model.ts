@@ -1,18 +1,34 @@
+import { EntityStatus } from '../../../enum/entity-status.enum';
 import {
   ContentType,
   LessonMaterialStatus,
-  LessonMaterialVisibility,
 } from '../../../enum/lesson-material.enum';
 
 export interface GetLessonMaterialsRequest {
-  schoolId?: number;
-  classId?: string;
-  folderId?: string;
-  createdByUserId?: string;
+  searchTerm?: string;
+  sortBy?: string;
+  sortDirection?: string;
+  lessonStatus?: LessonMaterialStatus;
+  status?: EntityStatus;
+}
+
+export interface GetPendingLessonMaterialsRequest {
   tag?: string;
   contentType?: ContentType;
-  lessonStatus?: LessonMaterialStatus;
-  visibility?: LessonMaterialVisibility;
+  classId?: string;
+  folderId?: string;
+  pageIndex?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDirection?: string;
+  searchTerm?: string;
+}
+
+export interface GetSharedLessonMaterialsRequest {
+  createdByUser?: string;
+  tag?: string;
+  contentType?: ContentType;
+  entityStatus?: EntityStatus;
   pageIndex?: number;
   pageSize?: number;
   sortBy?: string;

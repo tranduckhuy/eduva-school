@@ -128,19 +128,21 @@ export class NavbarComponent implements OnInit {
   }
 
   private getNavbarConfigByRole(role: UserRole): NavbarConfig[] {
-    const isSchoolAdmin =
+    const isAdmin =
       role === UserRoles.SCHOOL_ADMIN || role === UserRoles.SYSTEM_ADMIN;
     const isTeacher = role === UserRoles.TEACHER;
-    const isContentModerator = role === UserRoles.CONTENT_MODERATOR;
-    const isTeacherOrMod = isTeacher || isContentModerator;
+    const isModerator = role === UserRoles.CONTENT_MODERATOR;
+    const isTeacherOrMod = isTeacher || isModerator;
 
-    const dashboardLink = isSchoolAdmin ? '/school-admin' : '/teacher';
-    const profileLink = isSchoolAdmin
+    const schoolMissing = this.schoolAndPlanMissing();
+
+    const dashboardLink = isAdmin ? '/school-admin' : '/teacher';
+    const profileLink = isAdmin
       ? '/school-admin/settings'
       : '/teacher/settings';
 
     // ? School admin management menu
-    const schoolAdminNav: NavItem[] = isSchoolAdmin
+    const schoolAdminNav: NavItem[] = isAdmin
       ? [
           {
             label: 'Giáo viên',
@@ -202,17 +204,17 @@ export class NavbarComponent implements OnInit {
 
     // ? Learning management submenu (dynamic based on role)
     const learningSubmenu: NavItem['submenuItems'] = [];
-    if (isSchoolAdmin) {
+    if (isAdmin) {
       learningSubmenu.push(
         {
-          label: 'Danh sách bài học',
-          link: this.schoolAndPlanMissing()
+          label: 'Tài liệu chia sẻ',
+          link: schoolMissing
             ? '/school-admin/subscription-plans'
-            : '/school-admin/lessons',
+            : '/school-admin/shared-lessons',
         },
         {
           label: 'Kiểm duyệt nội dung',
-          link: this.schoolAndPlanMissing()
+          link: schoolMissing
             ? '/school-admin/subscription-plans'
             : '/school-admin/moderate-lessons',
         }
@@ -220,26 +222,34 @@ export class NavbarComponent implements OnInit {
     }
 
     if (isTeacherOrMod) {
-      learningSubmenu.push(
-        {
-          label: 'Danh sách lớp học',
-          link: '/teacher/class-management',
-          isDisabled: this.schoolAndPlanMissing(),
-        },
-        {
-          label: 'Tạo bài giảng tự động',
-          link: '/teacher/generate-lesson',
-          isDisabled: this.schoolAndPlanMissing(),
-        }
-      );
-    }
-
-    if (isContentModerator && !isSchoolAdmin) {
       learningSubmenu.push({
-        label: 'Kiểm duyệt nội dung',
-        link: '/school-admin/moderate-lessons',
-        isDisabled: this.schoolAndPlanMissing(),
+        label: 'Tài liệu chia sẻ',
+        link: '/teacher/shared-lessons',
+        isDisabled: schoolMissing,
       });
+
+      if (isTeacher) {
+        learningSubmenu.push(
+          {
+            label: 'Danh sách lớp học',
+            link: '/teacher/class-management',
+            isDisabled: schoolMissing,
+          },
+          {
+            label: 'Tạo bài giảng tự động',
+            link: '/teacher/generate-lesson',
+            isDisabled: schoolMissing,
+          }
+        );
+      }
+
+      if (isModerator && !isAdmin) {
+        learningSubmenu.push({
+          label: 'Kiểm duyệt nội dung',
+          link: '/school-admin/moderate-lessons',
+          isDisabled: schoolMissing,
+        });
+      }
     }
 
     const learningNav: NavItem = {

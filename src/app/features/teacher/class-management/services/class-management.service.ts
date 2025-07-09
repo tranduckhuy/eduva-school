@@ -62,7 +62,10 @@ export class ClassManagementService {
       .pipe(
         tap(res => this.handleGetTeacherClassesResponse(res)),
         map(res => this.extractTeacherClassesFromResponse(res)),
-        catchError(() => EMPTY)
+        catchError(() => {
+          this.toastHandlingService.errorGeneral();
+          return of(null);
+        })
       );
   }
 

@@ -8,7 +8,7 @@ import {
 import { Router } from '@angular/router';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 
-import { PaymentService } from '../service/payment.service';
+import { SchoolPaymentService } from '../service/school-payment.service';
 import { StorageFormatPipe } from '../../../../shared/pipes/storage-format.pipe';
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 import { ExportInvoicePdfComponent } from '../export-invoice-pdf/export-invoice-pdf.component';
@@ -29,7 +29,7 @@ import { ExportInvoicePdfComponent } from '../export-invoice-pdf/export-invoice-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentComponent {
-  private readonly paymentService = inject(PaymentService);
+  private readonly paymentService = inject(SchoolPaymentService);
   private readonly loadingService = inject(LoadingService);
   private readonly router = inject(Router);
 

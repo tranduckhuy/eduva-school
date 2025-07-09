@@ -29,7 +29,7 @@
       styleClass="mt-4 w-full"
       type="submit"
       [loading]="isLoading()"
-      [disabled]="form.invalid" />
+      [disabled]="form.invalid || isLoading()" />
     <p
       class="mx-auto mt-1 text-center text-[12px] opacity-80 dark:text-[#64748b]">
       Việc bạn tiếp tục sử dụng trang web này đồng nghĩa bạn đồng ý với

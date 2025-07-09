@@ -11,8 +11,11 @@ import { StatusCode } from '../../../constants/status-code.constant';
 
 import { type LessonMaterial } from '../../../models/entities/lesson-material.model';
 import { type CreateLessonMaterialsRequest } from '../../../models/api/request/command/create-lesson-material-request.model';
-import { type GetLessonMaterialsRequest } from '../../../models/api/request/query/get-lesson-materials-request.model';
-import { type GetLessonMaterialsResponse } from '../../../models/api/response/query/get-lesson-materials-response.model';
+import {
+  type GetPendingLessonMaterialsRequest,
+  type GetLessonMaterialsRequest,
+} from '../../../models/api/request/query/get-lesson-materials-request.model';
+import { type GetPagingLessonMaterialsResponse } from '../../../models/api/response/query/get-lesson-materials-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +26,7 @@ export class LessonMaterialsService {
 
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly LESSON_MATERIALS_API_URL = `${this.BASE_API_URL}/lesson-materials`;
+  private readonly LESSON_MATERIALS_BY_FOLDER_API_URL = `${this.BASE_API_URL}/folders`;
 
   private readonly lessonMaterialsSignal = signal<LessonMaterial[]>([]);
   lessonMaterials = this.lessonMaterialsSignal.asReadonly();
@@ -46,15 +50,56 @@ export class LessonMaterialsService {
   }
 
   getLessonMaterials(
-    request: GetLessonMaterialsRequest
-  ): Observable<GetLessonMaterialsResponse | null> {
+    folderId: string,
+    request?: GetLessonMaterialsRequest
+  ): Observable<LessonMaterial[] | null> {
     return this.requestService
-      .get<GetLessonMaterialsResponse>(this.LESSON_MATERIALS_API_URL, request, {
-        loadingKey: 'get-materials',
-      })
+      .get<LessonMaterial[]>(
+        `${this.LESSON_MATERIALS_BY_FOLDER_API_URL}/${folderId}/lesson-materials`,
+        request,
+        {
+          loadingKey: 'get-materials',
+        }
+      )
       .pipe(
         tap(res => this.handleListResponse(res)),
         map(res => this.extractListResponse(res)),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  getPendingLessonMaterials(
+    request: GetPendingLessonMaterialsRequest
+  ): Observable<LessonMaterial[] | null> {
+    return this.requestService
+      .get<GetPagingLessonMaterialsResponse>(
+        `${this.LESSON_MATERIALS_API_URL}/pending-approval`,
+        request,
+        {
+          loadingKey: 'get-materials',
+        }
+      )
+      .pipe(
+        tap(res => this.handlePagingListResponse(res)),
+        map(res => this.extractPagingListResponse(res)),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  getSharedLessonMaterials(
+    request: GetPendingLessonMaterialsRequest
+  ): Observable<LessonMaterial[] | null> {
+    return this.requestService
+      .get<GetPagingLessonMaterialsResponse>(
+        `${this.LESSON_MATERIALS_API_URL}/school-public`,
+        request,
+        {
+          loadingKey: 'get-materials',
+        }
+      )
+      .pipe(
+        tap(res => this.handlePagingListResponse(res)),
+        map(res => this.extractPagingListResponse(res)),
         catchError((err: HttpErrorResponse) => this.handleError(err))
       );
   }
@@ -101,6 +146,15 @@ export class LessonMaterialsService {
 
   private handleListResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS && res.data) {
+      this.lessonMaterialsSignal.set(res.data ?? []);
+      this.totalRecordsSignal.set(res.data.count ?? 0);
+    } else {
+      this.toastHandlingService.errorGeneral();
+    }
+  }
+
+  private handlePagingListResponse(res: any): void {
+    if (res.statusCode === StatusCode.SUCCESS && res.data) {
       this.lessonMaterialsSignal.set(res.data.data ?? []);
       this.totalRecordsSignal.set(res.data.count ?? 0);
     } else {
@@ -108,8 +162,12 @@ export class LessonMaterialsService {
     }
   }
 
-  private extractListResponse(res: any): GetLessonMaterialsResponse | null {
+  private extractListResponse(res: any): LessonMaterial[] | null {
     return res.statusCode === StatusCode.SUCCESS ? res.data : null;
+  }
+
+  private extractPagingListResponse(res: any): LessonMaterial[] | null {
+    return res.statusCode === StatusCode.SUCCESS ? res.data.data : null;
   }
 
   private handleDetailResponse(res: any): void {

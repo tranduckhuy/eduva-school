@@ -113,6 +113,8 @@ export class AuthService {
     return this.requestService
       .post(this.LOGOUT_API_URL, undefined, { bypassAuthError: true })
       .pipe(
+        catchError(() => of(void 0)),
+        map(() => void 0),
         tap(() => {
           // ? Clear user profile cache
           this.clearSession();
@@ -131,9 +133,7 @@ export class AuthService {
           window.dispatchEvent(new Event('close-all-submenus'));
 
           this.router.navigateByUrl('/auth/login', { replaceUrl: true });
-        }),
-        map(() => void 0),
-        catchError(() => of(void 0))
+        })
       );
   }
 

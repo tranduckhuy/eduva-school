@@ -17,7 +17,7 @@ import { SearchInputComponent } from '../../../shared/components/search-input/se
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
-import { PaymentService } from './service/payment.service';
+import { SchoolPaymentService } from './service/school-payment.service';
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
 import { PAGE_SIZE } from '../../../shared/constants/common.constant';
 import { PaymentListParams } from './model/payment-list-params';
@@ -45,7 +45,7 @@ import { TableEmptyStateComponent } from '../../../shared/components/table-empty
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentsComponent implements OnInit {
-  private readonly paymentService = inject(PaymentService);
+  private readonly paymentService = inject(SchoolPaymentService);
   private readonly loadingService = inject(LoadingService);
 
   // Pagination & Sorting signals
