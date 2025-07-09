@@ -196,7 +196,9 @@ export class ContentModeratorsComponent {
   }
 
   openAddContentModeratorModal() {
-    this.globalModalService.open(AddContentModeratorComponent);
+    this.globalModalService.open(AddContentModeratorComponent, {
+      onSuccess: () => this.loadData(),
+    });
   }
 
   private loadData(): void {
