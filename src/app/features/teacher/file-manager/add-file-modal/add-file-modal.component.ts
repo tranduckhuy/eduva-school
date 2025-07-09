@@ -38,7 +38,6 @@ import {
   CreateLessonMaterialRequest,
   CreateLessonMaterialsRequest,
 } from '../../../../shared/models/api/request/command/create-lesson-material-request.model';
-import { type GetLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
 
 @Component({
   selector: 'app-add-file-modal',

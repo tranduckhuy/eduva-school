@@ -50,9 +50,9 @@
       [class.invisible]="!showMobileControls()">
       <div class="flex items-center">
         <!-- ? Rewind -->
-        <!-- <button class="control-btn sm:hidden" (click)="rewind()">
-          <fa-icon [icon]="'rotate-left'"></fa-icon>
-        </button> -->
+        <button class="control-btn" (click)="rewind()">
+          <span class="material-symbols-outlined">replay</span>
+        </button>
         <!-- ? Play -->
         <button class="control-btn" (click)="togglePlayPause()">
           <span class="material-symbols-outlined" style="font-size: 20px">
@@ -60,9 +60,9 @@
           </span>
         </button>
         <!-- ? Forward -->
-        <!-- <button class="control-btn sm:hidden" (click)="forward()">
-          <fa-icon [icon]="'rotate-right'"></fa-icon>
-        </button> -->
+        <button class="control-btn" (click)="forward()">
+          <span class="material-symbols-outlined">forward_media</span>
+        </button>
         <!-- ? Volume -->
         <div class="flex items-center gap-1">
           <button class="control-btn" (click)="toggleMute()">

@@ -26,7 +26,6 @@ import { ClassFoldersComponent } from './class-folders/class-folders.component';
 
 import { type Folder } from '../../../../shared/models/entities/folder.model';
 import { type LessonMaterial } from '../../../../shared/models/entities/lesson-material.model';
-import { type GetLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
 import { type StudentClassResponse } from '../models/response/query/get-students-class-response.model';
 
 export interface FolderWithMaterials {
