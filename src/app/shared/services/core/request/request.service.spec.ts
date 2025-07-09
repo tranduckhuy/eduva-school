@@ -1,10 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { RequestService } from './request.service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpHeaders } from '@angular/common/http';
 import { of } from 'rxjs';
 import { BaseResponse } from '../../../models/api/base-response.model';
 import { HttpResponse } from '@angular/common/http';
 import { vi } from 'vitest';
+import * as requestUtils from '../../../utils/request-utils';
 
 vi.mock('../../../utils/request-utils', async () => {
   const actual = await vi.importActual<any>('../../../utils/request-utils');
@@ -81,8 +82,26 @@ describe('RequestService', () => {
   });
 
   it('should send POST request with empty body', () => {
+    const expectedHeaders = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
+    const expectedContext = new HttpContext();
+
+    // Mock dependencies
     (httpClient.post as any).mockReturnValue(of(mockResponse));
-    service.post<any>('url').subscribe();
+    vi.spyOn(service as any, 'getJsonHeaders').mockReturnValue(expectedHeaders);
+    vi.spyOn(requestUtils, 'buildHttpContext').mockReturnValue(
+      new HttpContext()
+    );
+
+    service.post<any>('url').subscribe(response => {
+      expect(response).toEqual(mockResponse);
+    });
+
+    expect(httpClient.post).toHaveBeenCalledWith('url', JSON.stringify({}), {
+      headers: expectedHeaders,
+      context: expectedContext,
+    });
   });
 
   it('should send POST FormData request', () => {
@@ -111,8 +130,26 @@ describe('RequestService', () => {
   });
 
   it('should send PUT request with empty body', () => {
+    const expectedHeaders = new HttpHeaders({
+      'Content-Type': 'application/json',
+    });
+    const expectedContext = new HttpContext();
+
+    // Mock dependencies
     (httpClient.put as any).mockReturnValue(of(mockResponse));
-    service.put<any>('url').subscribe();
+    vi.spyOn(service as any, 'getJsonHeaders').mockReturnValue(expectedHeaders);
+    vi.spyOn(requestUtils, 'buildHttpContext').mockReturnValue(
+      new HttpContext()
+    );
+
+    service.put<any>('url').subscribe(response => {
+      expect(response).toEqual(mockResponse);
+    });
+
+    expect(httpClient.put).toHaveBeenCalledWith('url', JSON.stringify({}), {
+      headers: expectedHeaders,
+      context: expectedContext,
+    });
   });
 
   it('should send DELETE request', () => {

@@ -19,4 +19,4 @@ export const PAGE_SIZE = 12;
 export const VIETNAM_PHONE_REGEX =
   /^(?:0|\+84(?:0)?)(?:2\d{9}|[35789][2-9]\d{7})$/;
 export const WELL_URI_REGEX =
-  /^(https?:\/\/)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/;
+  /^(https?:\/\/)?(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/;

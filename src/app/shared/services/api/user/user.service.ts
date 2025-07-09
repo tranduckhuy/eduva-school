@@ -160,16 +160,18 @@ export class UserService {
         'Hồ sơ của bạn đã được thay đổi thành công'
       );
 
-      const currentUser = this.currentUser();
-      const updated = res.data;
+      const updated = res.data as User;
 
-      if (!currentUser || !updated) {
+      if (!updated) {
         this.toastHandlingService.errorGeneral();
         return;
       }
 
-      const mergedUser = this.mergeUser(currentUser, updated);
-      this.setCurrentUser(mergedUser);
+      this.updateCurrentUserPartial({
+        fullName: updated.fullName,
+        phoneNumber: updated.phoneNumber,
+        avatarUrl: updated.avatarUrl,
+      });
     } else {
       this.toastHandlingService.errorGeneral();
     }
@@ -185,17 +187,6 @@ export class UserService {
   private handleErrorResponse(): Observable<null> {
     this.toastHandlingService.errorGeneral();
     return of(null);
-  }
-
-  private mergeUser(current: User, updated: Partial<User>): User {
-    return {
-      ...current,
-      ...updated,
-      roles: updated.roles?.length ? updated.roles : current.roles,
-      isEmailConfirmed: updated.isEmailConfirmed ?? current.isEmailConfirmed,
-      userSubscriptionResponse:
-        updated.userSubscriptionResponse ?? current.userSubscriptionResponse,
-    };
   }
 
   private loadUserFromStorage(): User | null {

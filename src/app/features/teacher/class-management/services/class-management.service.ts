@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 
-import { EMPTY, Observable, catchError, map, of, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 
