@@ -45,7 +45,7 @@ export class AddTeacherModalComponent {
   // function
   onSubmit() {
     this.submitted.set(true);
-    this.form.markAllAsTouched;
+    this.form.markAllAsTouched();
 
     if (this.form.invalid) return;
   }
