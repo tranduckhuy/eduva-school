@@ -25,6 +25,7 @@ import {
   strongPasswordValidator,
   matchPasswordValidator,
   minWordCountValidator,
+  customEmailValidator,
 } from '../../utils/form-validators';
 import { VIETNAM_PHONE_REGEX } from '../../constants/common.constant';
 
@@ -172,7 +173,7 @@ export class FormControlComponent
     if (this.phone()) validators.push(Validators.pattern(VIETNAM_PHONE_REGEX));
     else if (this.pattern())
       validators.push(Validators.pattern(this.pattern()!));
-    if (this.email()) validators.push(Validators.email);
+    if (this.email()) validators.push(customEmailValidator);
     if (this.minWords() > 0)
       validators.push((c: AbstractControl) =>
         minWordCountValidator(c, this.minWords())
