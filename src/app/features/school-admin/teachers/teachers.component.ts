@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
   inject,
   signal,
 } from '@angular/core';
@@ -30,6 +29,7 @@ import { AddTeacherModalComponent } from './add-teacher-modal/add-teacher-modal.
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 import { ImportAccountModalsComponent } from '../../../shared/components/import-accounts/import-account-modals/import-account-modals.component';
 import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
+import { EntityStatus } from '../../../shared/models/enum/entity-status.enum';
 
 interface StatusOption {
   name: string;
@@ -56,7 +56,7 @@ interface StatusOption {
   styleUrl: './teachers.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TeachersComponent implements OnInit {
+export class TeachersComponent {
   private readonly globalModalService = inject(GlobalModalService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly userService = inject(UserService);
@@ -66,7 +66,7 @@ export class TeachersComponent implements OnInit {
   first = signal<number>(0);
   rows = signal<number>(PAGE_SIZE);
   sortField = signal<string | null>(null);
-  sortOrder = signal<number>(0); // 1 = asc, -1 = desc
+  sortOrder = signal<number>(-1); // 1 = asc, -1 = desc
   statusSelect = signal<StatusOption | undefined>(undefined);
   selectedTimeFilter = signal<
     { name: string; value: string | undefined } | undefined
@@ -82,8 +82,8 @@ export class TeachersComponent implements OnInit {
   ]);
 
   readonly statusSelectOptions = signal<StatusOption[]>([
-    { name: 'Đang hoạt động', code: 0 },
-    { name: 'Vô hiệu hóa', code: 3 },
+    { name: 'Đang hoạt động', code: EntityStatus.Active },
+    { name: 'Vô hiệu hóa', code: EntityStatus.Archived },
     { name: 'Tất cả', code: undefined },
   ]);
 
@@ -115,7 +115,7 @@ export class TeachersComponent implements OnInit {
       this.sortOrder.set(selected.value === 'desc' ? -1 : 1);
     } else {
       this.sortField.set(null);
-      this.sortOrder.set(1);
+      this.sortOrder.set(-1);
     }
 
     this.first.set(0);
@@ -131,11 +131,13 @@ export class TeachersComponent implements OnInit {
       this.sortField.set(
         Array.isArray(event.sortField) ? event.sortField[0] : event.sortField
       );
-      this.sortOrder.set(event.sortOrder ?? 1);
+      this.sortOrder.set(event.sortOrder ?? -1);
     }
 
     this.first.set(first);
     this.rows.set(rows);
+
+    this.loadData();
   }
 
   onStatusSelectChange(selected: StatusOption | undefined): void {
@@ -147,7 +149,7 @@ export class TeachersComponent implements OnInit {
   onSearchTriggered(term: string): void {
     this.searchTerm.set(term);
     this.sortField.set(null);
-    this.sortOrder.set(1);
+    this.sortOrder.set(-1);
     this.first.set(0); // Reset to first page when search changes
     this.loadData();
   }
@@ -219,16 +221,9 @@ export class TeachersComponent implements OnInit {
       searchTerm: this.searchTerm(),
       sortBy: this.sortField() ?? 'createdAt',
       sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
-      activeOnly: this.getActiveOnlyStatus(),
+      status: this.statusSelect()?.code,
     };
 
     this.userService.getUsers(params).subscribe();
-  }
-
-  private getActiveOnlyStatus(): boolean | undefined {
-    const statusCode = this.statusSelect()?.code;
-    if (statusCode === 0) return true;
-    if (statusCode === 1) return false;
-    return undefined;
   }
 }

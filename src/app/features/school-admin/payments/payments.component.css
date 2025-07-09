@@ -63,6 +63,7 @@
 }
 ::ng-deep .dark .p-select {
   color: #fff !important;
+  min-width: 200px !important;
   border-color: var(--color-gray-500) !important;
 }
 
