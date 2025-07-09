@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
   inject,
   signal,
 } from '@angular/core';
@@ -27,6 +26,9 @@ import { BadgeComponent } from '../../../shared/components/badge/badge.component
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
+import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
+import { AddContentModeratorComponent } from './add-content-moderator/add-content-moderator.component';
+import { EntityStatus } from '../../../shared/models/enum/entity-status.enum';
 
 interface StatusOption {
   name: string;
@@ -52,16 +54,17 @@ interface StatusOption {
   styleUrl: './content-moderators.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentModeratorsComponent implements OnInit {
+export class ContentModeratorsComponent {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly userService = inject(UserService);
   private readonly loadingService = inject(LoadingService);
+  private readonly globalModalService = inject(GlobalModalService);
 
   // Pagination & Sorting signals
   first = signal<number>(0);
   rows = signal<number>(PAGE_SIZE);
   sortField = signal<string | null>(null);
-  sortOrder = signal<number>(0); // 1 = asc, -1 = desc
+  sortOrder = signal<number>(-1); // 1 = asc, -1 = desc
   statusSelect = signal<StatusOption | undefined>(undefined);
   selectedTimeFilter = signal<
     { name: string; value: string | undefined } | undefined
@@ -77,8 +80,8 @@ export class ContentModeratorsComponent implements OnInit {
   ]);
 
   readonly statusSelectOptions = signal<StatusOption[]>([
-    { name: 'Đang hoạt động', code: 0 },
-    { name: 'Vô hiệu hóa', code: 3 },
+    { name: 'Đang hoạt động', code: EntityStatus.Active },
+    { name: 'Vô hiệu hóa', code: EntityStatus.Archived },
     { name: 'Tất cả', code: undefined },
   ]);
 
@@ -97,10 +100,6 @@ export class ContentModeratorsComponent implements OnInit {
   currentUser = this.userService.currentUser;
   totalUsers = this.userService.totalUsers;
 
-  ngOnInit(): void {
-    this.loadData();
-  }
-
   onTimeFilterChange(
     selected: { name: string; value: string | undefined } | undefined
   ): void {
@@ -111,7 +110,7 @@ export class ContentModeratorsComponent implements OnInit {
       this.sortOrder.set(selected.value === 'desc' ? -1 : 1);
     } else {
       this.sortField.set(null);
-      this.sortOrder.set(1);
+      this.sortOrder.set(-1);
     }
 
     this.first.set(0);
@@ -127,11 +126,13 @@ export class ContentModeratorsComponent implements OnInit {
       this.sortField.set(
         Array.isArray(event.sortField) ? event.sortField[0] : event.sortField
       );
-      this.sortOrder.set(event.sortOrder ?? 1);
+      this.sortOrder.set(event.sortOrder ?? -1);
     }
 
     this.first.set(first);
     this.rows.set(rows);
+
+    this.loadData();
   }
 
   onStatusSelectChange(selected: StatusOption | undefined): void {
@@ -143,7 +144,7 @@ export class ContentModeratorsComponent implements OnInit {
   onSearchTriggered(term: string): void {
     this.searchTerm.set(term);
     this.sortField.set(null);
-    this.sortOrder.set(1);
+    this.sortOrder.set(-1);
     this.first.set(0); // Reset to first page when search changes
     this.loadData();
   }
@@ -192,6 +193,10 @@ export class ContentModeratorsComponent implements OnInit {
         });
       },
     });
+  }
+
+  openAddContentModeratorModal() {
+    this.globalModalService.open(AddContentModeratorComponent);
   }
 
   private loadData(): void {

@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
   inject,
   signal,
 } from '@angular/core';
@@ -48,7 +47,7 @@ import { type GetPendingLessonMaterialsRequest } from '../../../shared/models/ap
   styleUrl: './moderate-lessons.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ModerateLessonsComponent implements OnInit {
+export class ModerateLessonsComponent {
   private readonly lessonMaterialsService = inject(LessonMaterialsService);
   private readonly loadingService = inject(LoadingService);
 
@@ -82,6 +81,8 @@ export class ModerateLessonsComponent implements OnInit {
     this.currentPage.set(page);
     this.pageSize.set(rows);
     this.firstRecordIndex.set(first);
+
+    this.loadMaterials();
   }
 
   onSearch(term?: string): void {
