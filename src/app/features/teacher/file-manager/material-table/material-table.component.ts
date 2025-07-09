@@ -10,7 +10,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { TooltipModule } from 'primeng/tooltip';
-import { TableModule, TableLazyLoadEvent } from 'primeng/table';
+import { TableModule } from 'primeng/table';
 
 import { BytesToReadablePipe } from '../../../../shared/pipes/byte-to-readable.pipe';
 

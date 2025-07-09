@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { EMPTY, Observable, catchError, map, of, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap } from 'rxjs';
 
 import { ConfirmationService } from 'primeng/api';
 

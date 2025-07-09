@@ -5,7 +5,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
@@ -14,13 +14,21 @@ import { FormControlComponent } from '../../../../shared/components/form-control
 @Component({
   selector: 'app-add-student-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, FormControlComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ButtonModule,
+    FormControlComponent,
+  ],
   templateUrl: './add-student-modal.component.html',
   styleUrl: './add-student-modal.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddStudentModalComponent {
+  private readonly fb = inject(FormBuilder);
   private readonly globalModalService = inject(GlobalModalService);
+
+  form: FormGroup;
 
   // signal
   submitted = signal<boolean>(false);
@@ -29,13 +37,16 @@ export class AddStudentModalComponent {
   password = signal<string>('');
   confirmPassword = signal<string>('');
 
+  constructor() {
+    this.form = this.fb.group({});
+  }
+
   // function
-  onSubmit(form: NgForm) {
+  onSubmit() {
     this.submitted.set(true);
-    if (form.invalid) {
-      Object.values(form.controls).forEach(control => control.markAsTouched());
-      return;
-    }
+    this.form.markAllAsTouched();
+
+    if (this.form.invalid) return;
     // Submit logic
   }
 

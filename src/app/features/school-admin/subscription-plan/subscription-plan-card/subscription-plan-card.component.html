@@ -50,15 +50,17 @@
   </p>
 
   <!-- ? Checkout Button -->
-  <p-button
-    styleClass="rounded"
-    [fluid]="true"
-    [iconPos]="'right'"
-    [icon]="!isCurrent() ? 'pi pi-arrow-up-right' : ''"
-    [label]="isCurrent() ? 'Gói hiện tại của bạn' : 'Mua ngay'"
-    [loading]="isPlanLoading(subscriptionPlan().id)"
-    [disabled]="isDisabled() || isPlanLoading(subscriptionPlan().id)"
-    (onClick)="onClickBuyButton()" />
+  @if (!isShowToggle()) {
+    <p-button
+      styleClass="rounded"
+      [fluid]="true"
+      [iconPos]="'right'"
+      [icon]="!isCurrent() ? 'pi pi-arrow-up-right' : ''"
+      [label]="isCurrent() ? 'Gói hiện tại của bạn' : 'Mua ngay'"
+      [loading]="isPlanLoading(subscriptionPlan().id)"
+      [disabled]="isDisabled() || isPlanLoading(subscriptionPlan().id)"
+      (onClick)="onClickBuyButton()" />
+  }
 
   <!-- ? Plan Options -->
   <ul class="mt-6 flex flex-col gap-3">

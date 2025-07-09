@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 
-import { catchError, EMPTY, map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 
 import { Payment } from '../model/payment.model';
 import { PaymentListParams } from '../model/payment-list-params';
