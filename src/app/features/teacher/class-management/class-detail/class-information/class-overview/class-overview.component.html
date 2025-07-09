@@ -25,6 +25,8 @@
           <p-button
             variant="text"
             styleClass="relative -top-[1.5px]"
+            tooltipPosition="bottom"
+            [pTooltip]="isCopied() ? 'Đã sao chép' : 'Sao chép mã lớp'"
             (onClick)="copyClassCode()">
             <ng-template #icon>
               <span
@@ -51,7 +53,7 @@
       </div>
       @if (folderWithMaterials()?.length !== 0) {
         <p-button
-          label="Thêm bài giảng"
+          label="Thêm thư mục mới"
           icon="pi pi-plus"
           variant="outlined"
           size="small"
@@ -70,7 +72,9 @@
               <ul class="pl-3">
                 @for (material of folderWithMaterials.materials; track $index) {
                   <li class="px-3">
-                    <a href="" class="flex w-full items-center gap-3">
+                    <a
+                      [routerLink]="['/teacher/view-lesson', material.id]"
+                      class="flex w-full items-center gap-3">
                       <span
                         class="icon-wrapper"
                         [ngClass]="

@@ -160,6 +160,32 @@ export class RequestService {
   }
 
   /**
+   * Sends an HTTP DELETE request with an optional JSON body and custom request options.
+   *
+   * This method is useful for DELETE operations that require additional data in the request body,
+   * such as batch deletions or conditional deletions based on filters or flags.
+   *
+   * ⚠️ Note: Not all servers or proxies support bodies in DELETE requests.
+   *
+   * @template T - The expected type of the response payload inside `BaseResponse<T>`.
+   * @param url - The target URL to send the DELETE request to.
+   * @param body - Optional body payload to send with the DELETE request (e.g., filter conditions, list of IDs).
+   * @param options - Optional request options (e.g., loading indicator key, toast messages, custom context).
+   * @returns An `Observable` of type `BaseResponse<T>`, representing the HTTP response.
+   */
+  deleteWithBody<T>(
+    url: string,
+    body?: any,
+    options?: RequestOptions
+  ): Observable<BaseResponse<T>> {
+    return this.http.delete<BaseResponse<T>>(url, {
+      headers: this.getJsonHeaders(),
+      body: JSON.stringify(body ?? {}),
+      context: buildHttpContext(options),
+    });
+  }
+
+  /**
    * Constructs and returns JSON-specific HttpHeaders.
    *
    * @returns HttpHeaders with 'Content-Type: application/json'.

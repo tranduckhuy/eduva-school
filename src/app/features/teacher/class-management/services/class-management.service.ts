@@ -123,6 +123,7 @@ export class ClassManagementService {
   // ---------------------------
   //  Private Helper Functions
   // ---------------------------
+
   private handleCreateTeacherClassResponse(res: any) {
     if (res.statusCode === StatusCode.CREATED && res.data) {
       this.toastHandlingService.success(

@@ -1,3 +1,9 @@
+:host ::ng-deep .p-accordionheader,
+:host ::ng-deep .p-accordioncontent,
+:host ::ng-deep .p-accordioncontent-content {
+  background-color: var(--color-bg-primary) !important;
+}
+
 :host ::ng-deep .p-accordionheader {
   font-size: 16px;
 }

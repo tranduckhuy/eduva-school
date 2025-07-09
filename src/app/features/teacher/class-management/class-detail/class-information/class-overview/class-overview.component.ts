@@ -6,11 +6,13 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { ButtonModule } from 'primeng/button';
 import { AccordionModule } from 'primeng/accordion';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmationService } from 'primeng/api';
 
 import { ClassManagementService } from '../../../services/class-management.service';
@@ -27,7 +29,14 @@ import { FolderOwnerType } from '../../../../../../shared/models/enum/folder-own
 @Component({
   selector: 'class-overview',
   standalone: true,
-  imports: [CommonModule, ButtonModule, AccordionModule, ConfirmPopupModule],
+  imports: [
+    RouterLink,
+    CommonModule,
+    ButtonModule,
+    AccordionModule,
+    ConfirmPopupModule,
+    TooltipModule,
+  ],
   templateUrl: './class-overview.component.html',
   styleUrl: './class-overview.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
