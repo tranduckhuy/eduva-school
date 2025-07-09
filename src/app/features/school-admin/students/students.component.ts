@@ -198,7 +198,9 @@ export class StudentsComponent {
   }
 
   openAddStudentModal() {
-    this.globalModalService.open(AddStudentModalComponent);
+    this.globalModalService.open(AddStudentModalComponent, {
+      onSuccess: () => this.loadData(),
+    });
   }
 
   openImportModal() {

@@ -64,6 +64,7 @@ describe('UserService', () => {
     requestService = {
       get: vi.fn(),
       put: vi.fn(),
+      post: vi.fn(),
     } as any;
     toastHandlingService = {
       errorGeneral: vi.fn(),
@@ -296,6 +297,75 @@ describe('UserService', () => {
             expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
             resolve();
           },
+        });
+      });
+    });
+  });
+
+  describe('createUser', () => {
+    const mockCreateUserRequest = {
+      fullName: 'New User',
+      email: 'newuser@eduva.com',
+      initialPassword: 'password123',
+      role: 1, // Use a valid Role enum value if available
+    };
+
+    it('should return true and show success toast on successful creation', async () => {
+      (requestService.post as any) = vi
+        .fn()
+        .mockReturnValue(of({ statusCode: StatusCode.SUCCESS }));
+      await new Promise<void>(resolve => {
+        service.createUser(mockCreateUserRequest as any).subscribe(result => {
+          expect(result).toBe(true);
+          expect(toastHandlingService.success).toHaveBeenCalledWith(
+            'Thành công!',
+            'Tài khoản người dùng đã được tạo thành công'
+          );
+          resolve();
+        });
+      });
+    });
+
+    it('should return false and show errorGeneral toast on non-success status', async () => {
+      (requestService.post as any) = vi
+        .fn()
+        .mockReturnValue(of({ statusCode: StatusCode.SYSTEM_ERROR }));
+      await new Promise<void>(resolve => {
+        service.createUser(mockCreateUserRequest as any).subscribe(result => {
+          expect(result).toBe(false);
+          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+          resolve();
+        });
+      });
+    });
+
+    it('should return false and show EMAIL_ALREADY_EXISTS toast on email exists error', async () => {
+      (requestService.post as any) = vi.fn().mockReturnValue(
+        throwError(() => ({
+          error: { statusCode: StatusCode.EMAIL_ALREADY_EXISTS },
+        }))
+      );
+      await new Promise<void>(resolve => {
+        service.createUser(mockCreateUserRequest as any).subscribe(result => {
+          expect(result).toBe(false);
+          expect(toastHandlingService.error).toHaveBeenCalledWith(
+            'Đăng ký thất bại',
+            'Email đã tồn tại. Vui lòng chọn email khác!'
+          );
+          resolve();
+        });
+      });
+    });
+
+    it('should return false and show errorGeneral toast on generic error', async () => {
+      (requestService.post as any) = vi
+        .fn()
+        .mockReturnValue(throwError(() => ({ error: { statusCode: 9999 } })));
+      await new Promise<void>(resolve => {
+        service.createUser(mockCreateUserRequest as any).subscribe(result => {
+          expect(result).toBe(false);
+          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+          resolve();
         });
       });
     });
