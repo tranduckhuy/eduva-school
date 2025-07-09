@@ -14,6 +14,7 @@ import { ButtonModule } from 'primeng/button';
 import { SubmenuDirective } from '../../../../../shared/directives/submenu/submenu.directive';
 
 import { ClassFolderManagementService } from '../../services/class-folder-management.service';
+import { FolderManagementService } from '../../../../../shared/services/api/folder/folder-management.service';
 
 import { ContentType } from '../../../../../shared/models/enum/lesson-material.enum';
 
@@ -30,14 +31,21 @@ import { type FolderWithMaterials } from '../class-detail.component';
 })
 export class ClassFoldersComponent {
   private readonly classFolderService = inject(ClassFolderManagementService);
+  private readonly folderService = inject(FolderManagementService);
 
   classModel = input<ClassModel | null>();
   folderWithMaterials = input<FolderWithMaterials[]>();
 
-  removeMaterials = output<void>();
+  removeFolderMaterials = output<void>();
 
   readonly openedMenuFolderId = signal<string | null>(null);
   readonly openedMenuMaterialId = signal<string | null>(null);
+
+  onRemoveFolder(folderId: string) {
+    this.folderService
+      .removeFolder(folderId)
+      .subscribe(() => this.removeFolderMaterials.emit());
+  }
 
   onRemoveMaterials(folderId: string, materialId?: string) {
     const classId = this.classModel()?.id;
@@ -47,7 +55,7 @@ export class ClassFoldersComponent {
 
     this.classFolderService
       .removeMaterialsFromClass(classId, folderId, request)
-      .subscribe(() => this.removeMaterials.emit());
+      .subscribe(() => this.removeFolderMaterials.emit());
   }
 
   toggleMenuFolderItem(id: string) {

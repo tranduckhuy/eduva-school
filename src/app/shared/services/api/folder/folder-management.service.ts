@@ -63,7 +63,7 @@ export class FolderManagementService {
       .pipe(
         tap(res => this.handlePagingFoldersResponse(res)),
         map(res => this.extractPagingListData(res)),
-        catchError(() => this.handleGetError())
+        catchError((err: HttpErrorResponse) => this.handleError(err))
       );
   }
 
@@ -78,7 +78,17 @@ export class FolderManagementService {
       .pipe(
         tap(res => this.handleFoldersResponse(res)),
         map(res => this.extractListData(res)),
-        catchError(() => this.handleGetError())
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  removeFolder(folderId: string): Observable<null> {
+    return this.requestService
+      .delete(`${this.BASE_FOLDERS_API_URL}/${folderId}`)
+      .pipe(
+        tap(res => this.handleRemoveResponse(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
       );
   }
 
@@ -98,12 +108,6 @@ export class FolderManagementService {
     }
   }
 
-  private extractPagingListData(res: any): Folder[] | null {
-    return res.statusCode === StatusCode.SUCCESS && res.data
-      ? (res.data.data as Folder[])
-      : null;
-  }
-
   private handleFoldersResponse(res: any) {
     if (res.statusCode === StatusCode.SUCCESS && res.data) {
       this.folderListSignal.set([...(res.data ?? [])]);
@@ -113,6 +117,20 @@ export class FolderManagementService {
         'Không thể lấy được danh sách thư mục. Vui lòng thử lại sau.'
       );
     }
+  }
+
+  private handleRemoveResponse(res: any): void {
+    if (res.statusCode === StatusCode.SUCCESS) {
+      this.toastHandlingService.successGeneral();
+    } else {
+      this.toastHandlingService.errorGeneral();
+    }
+  }
+
+  private extractPagingListData(res: any): Folder[] | null {
+    return res.statusCode === StatusCode.SUCCESS && res.data
+      ? (res.data.data as Folder[])
+      : null;
   }
 
   private extractListData(res: any): Folder[] | null {
@@ -126,11 +144,6 @@ export class FolderManagementService {
     return res.statusCode === StatusCode.SUCCESS && res.data
       ? (res.data as Folder)
       : null;
-  }
-
-  private handleGetError(): Observable<null> {
-    this.toastHandlingService.errorGeneral();
-    return of(null);
   }
 
   private handleCreateError(err: HttpErrorResponse): Observable<null> {
@@ -150,6 +163,11 @@ export class FolderManagementService {
       default:
         this.toastHandlingService.errorGeneral();
     }
+    return throwError(() => err);
+  }
+
+  private handleError(err: HttpErrorResponse): Observable<null> {
+    this.toastHandlingService.errorGeneral();
     return throwError(() => err);
   }
 }

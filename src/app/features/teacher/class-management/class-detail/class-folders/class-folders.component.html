@@ -57,6 +57,12 @@
                   </button>
                   <button
                     class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
+                    (click)="onRemoveFolder(folderWithMaterials.folder.id)">
+                    <span class="pi pi-trash" style="font-size: 14px"></span>
+                    <span>Xóa thư mục</span>
+                  </button>
+                  <button
+                    class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
                     (click)="onRemoveMaterials(folderWithMaterials.folder.id)">
                     <span class="pi pi-trash" style="font-size: 14px"></span>
                     <span>Xóa toàn bộ tài liệu</span>
