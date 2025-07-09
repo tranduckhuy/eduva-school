@@ -46,7 +46,7 @@ export class AddTeacherModalComponent {
   submitted = signal<boolean>(false);
   passwordLevel = signal<number | undefined>(undefined);
 
-  constructor(@Optional() @Inject(MODAL_DATA) private data: any) {
+  constructor(@Optional() @Inject(MODAL_DATA) private readonly data: any) {
     this.form = this.fb.group({
       fullName: [''],
       email: [''],

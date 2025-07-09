@@ -7,12 +7,7 @@ import {
   Inject,
   Optional,
 } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  NgForm,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
 
@@ -51,7 +46,7 @@ export class AddContentModeratorComponent {
   submitted = signal<boolean>(false);
   passwordLevel = signal<number | undefined>(undefined);
 
-  constructor(@Optional() @Inject(MODAL_DATA) private data: any) {
+  constructor(@Optional() @Inject(MODAL_DATA) private readonly data: any) {
     this.form = this.fb.group({
       fullName: [''],
       email: [''],

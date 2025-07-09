@@ -285,16 +285,17 @@ export class UserService {
   private handleCreateUserError(err: HttpErrorResponse): void {
     const statusCode = err.error?.statusCode;
 
-    switch (statusCode) {
-      case StatusCode.EMAIL_ALREADY_EXISTS:
-        this.toastHandlingService.error(
-          'Đăng ký thất bại',
-          'Email đã tồn tại. Vui lòng chọn email khác!'
-        );
-        break;
-
-      default:
-        this.toastHandlingService.errorGeneral();
+    if (
+      statusCode &&
+      typeof statusCode === 'object' &&
+      statusCode.EMAIL_ALREADY_EXISTS
+    ) {
+      this.toastHandlingService.error(
+        'Đăng ký thất bại',
+        'Email đã tồn tại. Vui lòng chọn email khác!'
+      );
+    } else {
+      this.toastHandlingService.errorGeneral();
     }
   }
 
