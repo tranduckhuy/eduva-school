@@ -101,10 +101,6 @@ export class TeachersComponent {
   currentUser = this.userService.currentUser;
   totalUsers = this.userService.totalUsers;
 
-  ngOnInit(): void {
-    this.loadData();
-  }
-
   onTimeFilterChange(
     selected: { name: string; value: string | undefined } | undefined
   ): void {
@@ -202,7 +198,9 @@ export class TeachersComponent {
   }
 
   openAddTeacherModal() {
-    this.globalModalService.open(AddTeacherModalComponent);
+    this.globalModalService.open(AddTeacherModalComponent, {
+      onSuccess: () => this.loadData(),
+    });
   }
 
   openImportModal() {

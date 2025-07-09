@@ -4,39 +4,96 @@ import {
   Component,
   inject,
   signal,
+  Inject,
+  Optional,
 } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+
 import { ButtonModule } from 'primeng/button';
+
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
+import { MODAL_DATA } from '../../../../shared/tokens/injection/modal-data.token';
+import { UserService } from '../../../../shared/services/api/user/user.service';
+import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
+import { Role } from '../../../../shared/models/enum/role.enum';
+import { CreateUserRequest } from '../../../../shared/models/api/request/command/create-user-request.model';
 
 @Component({
   selector: 'app-add-content-moderator',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonModule, FormControlComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ButtonModule,
+    FormControlComponent,
+  ],
   templateUrl: './add-content-moderator.component.html',
   styleUrl: './add-content-moderator.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddContentModeratorComponent {
+  private readonly fb = inject(FormBuilder);
   private readonly globalModalService = inject(GlobalModalService);
+  private readonly userService = inject(UserService);
+  private readonly loadingService = inject(LoadingService);
+
+  readonly isLoading = this.loadingService.is('create-user');
+
+  form: FormGroup;
 
   // signal
   submitted = signal<boolean>(false);
-  name = signal<string>('');
-  email = signal<string>('');
-  password = signal<string>('');
-  confirmPassword = signal<string>('');
-  isContentModerator = signal<boolean>(false);
+  passwordLevel = signal<number | undefined>(undefined);
+
+  constructor(@Optional() @Inject(MODAL_DATA) private readonly data: any) {
+    this.form = this.fb.group({
+      fullName: [''],
+      email: [''],
+      initialPassword: [''],
+      confirmPassword: [''],
+    });
+
+    this.form
+      .get('initialPassword')!
+      .valueChanges.subscribe((password: string) => {
+        this.passwordLevel.set(this.calcPasswordLevel(password));
+      });
+  }
+
+  private calcPasswordLevel(password: string): number | undefined {
+    if (!password) return undefined;
+    let level = 0;
+    if (password.length >= 6) level++;
+    if (/[a-z]/.test(password)) level++;
+    if (/[A-Z]/.test(password)) level++;
+    if (/\d/.test(password)) level++;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) level++;
+    return level;
+  }
 
   // function
-  onSubmit(form: NgForm) {
+  onSubmit() {
     this.submitted.set(true);
-    if (form.invalid) {
-      Object.values(form.controls).forEach(control => control.markAsTouched());
-      return;
-    }
-    // Submit logic
+    this.form.markAllAsTouched();
+
+    if (this.form.invalid) return;
+
+    const createUserRequest: CreateUserRequest = {
+      email: this.form.value.email,
+      fullName: this.form.value.fullName,
+      initialPassword: this.form.value.initialPassword,
+      role: Role.ContentModerator,
+    };
+
+    this.userService.createUser(createUserRequest).subscribe(success => {
+      if (success) {
+        if (this.data && typeof this.data.onSuccess === 'function') {
+          this.data.onSuccess();
+        }
+        this.closeModal();
+      }
+    });
   }
 
   closeModal() {

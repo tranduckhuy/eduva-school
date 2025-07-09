@@ -64,6 +64,7 @@ describe('UserService', () => {
     requestService = {
       get: vi.fn(),
       put: vi.fn(),
+      post: vi.fn(),
     } as any;
     toastHandlingService = {
       errorGeneral: vi.fn(),
@@ -296,6 +297,79 @@ describe('UserService', () => {
             expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
             resolve();
           },
+        });
+      });
+    });
+  });
+
+  describe('createUser', () => {
+    const mockCreateUserRequest = {
+      fullName: 'New User',
+      email: 'new@eduva.com',
+      password: 'password',
+      phoneNumber: '0123456789',
+      role: 1,
+      schoolId: 1,
+    };
+
+    it('should show success toast and return true on success', async () => {
+      (requestService.post as any) = vi
+        .fn()
+        .mockReturnValue(of({ statusCode: StatusCode.SUCCESS }));
+      await new Promise<void>(resolve => {
+        service.createUser(mockCreateUserRequest as any).subscribe(result => {
+          expect(result).toBe(true);
+          expect(toastHandlingService.success).toHaveBeenCalledWith(
+            'Thành công!',
+            expect.stringContaining('Tài khoản người dùng')
+          );
+          resolve();
+        });
+      });
+    });
+
+    it('should show errorGeneral and return false on non-success', async () => {
+      (requestService.post as any) = vi
+        .fn()
+        .mockReturnValue(of({ statusCode: StatusCode.SYSTEM_ERROR }));
+      await new Promise<void>(resolve => {
+        service.createUser(mockCreateUserRequest as any).subscribe(result => {
+          expect(result).toBe(false);
+          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+          resolve();
+        });
+      });
+    });
+
+    it('should show EMAIL_ALREADY_EXISTS error and return false', async () => {
+      (requestService.post as any) = vi.fn().mockReturnValue(
+        throwError(() => ({
+          error: {
+            statusCode: { EMAIL_ALREADY_EXISTS: 'EMAIL_ALREADY_EXISTS' },
+          },
+        }))
+      );
+      await new Promise<void>(resolve => {
+        service.createUser(mockCreateUserRequest as any).subscribe(result => {
+          expect(result).toBe(false);
+          expect(toastHandlingService.error).toHaveBeenCalledWith(
+            'Đăng ký thất bại',
+            expect.stringContaining('Email đã tồn tại')
+          );
+          resolve();
+        });
+      });
+    });
+
+    it('should show errorGeneral and return false on other errors', async () => {
+      (requestService.post as any) = vi
+        .fn()
+        .mockReturnValue(throwError(() => new Error('Network error')));
+      await new Promise<void>(resolve => {
+        service.createUser(mockCreateUserRequest as any).subscribe(result => {
+          expect(result).toBe(false);
+          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+          resolve();
         });
       });
     });

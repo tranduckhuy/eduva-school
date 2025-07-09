@@ -13,6 +13,7 @@ import { type UpdateProfileRequest } from '../../../pages/settings-page/personal
 import { EntityListResponse } from '../../../models/api/response/query/entity-list-response.model';
 import { BaseResponse } from '../../../models/api/base-response.model';
 import { UserListParams } from '../../../models/api/request/query/user-list-params';
+import { CreateUserRequest } from '../../../models/api/request/command/create-user-request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -96,6 +97,31 @@ export class UserService {
         errorHandler: () => this.resetUsers(),
       }
     );
+  }
+
+  createUser(request: CreateUserRequest): Observable<boolean> {
+    return this.requestService
+      .post<void>(this.USER_API_URL, request, {
+        loadingKey: 'create-user',
+      })
+      .pipe(
+        map(res => {
+          if (res.statusCode === StatusCode.SUCCESS) {
+            this.toastHandlingService.success(
+              'Thành công!',
+              'Tài khoản người dùng đã được tạo thành công'
+            );
+            return true;
+          } else {
+            this.toastHandlingService.errorGeneral();
+            return false;
+          }
+        }),
+        catchError(err => {
+          this.handleCreateUserError(err);
+          return of(false);
+        })
+      );
   }
 
   /**
@@ -254,6 +280,23 @@ export class UserService {
         return throwError(() => err);
       })
     );
+  }
+
+  private handleCreateUserError(err: HttpErrorResponse): void {
+    const statusCode = err.error?.statusCode;
+
+    if (
+      statusCode &&
+      typeof statusCode === 'object' &&
+      statusCode.EMAIL_ALREADY_EXISTS
+    ) {
+      this.toastHandlingService.error(
+        'Đăng ký thất bại',
+        'Email đã tồn tại. Vui lòng chọn email khác!'
+      );
+    } else {
+      this.toastHandlingService.errorGeneral();
+    }
   }
 
   private resetUsers(): void {
