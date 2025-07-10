@@ -117,9 +117,9 @@ export class UserService {
             return false;
           }
         }),
-        catchError(err => {
+        catchError((err: HttpErrorResponse) => {
           this.handleCreateUserError(err);
-          return throwError(() => err);
+          return of(false);
         })
       );
   }
@@ -286,13 +286,13 @@ export class UserService {
     const statusCode = err.error?.statusCode;
 
     switch (statusCode) {
-      case StatusCode?.EMAIL_ALREADY_EXISTS:
+      case StatusCode.EMAIL_ALREADY_EXISTS:
         this.toastHandlingService.error(
           'Đăng ký thất bại',
           'Email đã tồn tại. Vui lòng chọn email khác!'
         );
         break;
-      case StatusCode?.EXCEED_USER_LIMIT:
+      case StatusCode.EXCEED_USER_LIMIT:
         this.toastHandlingService.error(
           'Đăng ký thất bại',
           'Số lượng tài khoản được phép tạo đã đạt đến mức tối đa!'

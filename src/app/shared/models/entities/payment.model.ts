@@ -1,13 +1,17 @@
-type PaymentPurpose =
-  | 0 //CreditPackage
-  | 1; //SchoolSubscription
+export enum PaymentPurpose {
+  CreditPackage = 0,
+  SchoolSubscription = 1,
+}
 
-type PaymentMethod =
-  | 0 //VNPAY
-  | 1; //PayOS
-type PaymentStatus =
-  | 0 //Pending
-  | 1; //Paid
+export enum PaymentMethod {
+  VNPAY = 0,
+  PayOS = 1,
+}
+
+export enum PaymentStatus {
+  Pending = 0,
+  Paid = 1,
+}
 
 interface User {
   id: string;
