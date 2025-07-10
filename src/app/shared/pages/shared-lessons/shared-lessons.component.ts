@@ -32,9 +32,10 @@ import { SearchInputComponent } from '../../components/search-input/search-input
 import { TableEmptyStateComponent } from '../../components/table-empty-state/table-empty-state.component';
 import { TableSkeletonComponent } from '../../components/skeleton/table-skeleton/table-skeleton.component';
 
+import { UserRoles } from '../../constants/user-roles.constant';
+
 import { type LessonMaterial } from '../../models/entities/lesson-material.model';
 import { type GetSharedLessonMaterialsRequest } from '../../models/api/request/query/get-lesson-materials-request.model';
-import { UserRoles } from '../../constants/user-roles.constant';
 
 @Component({
   selector: 'app-lessons',

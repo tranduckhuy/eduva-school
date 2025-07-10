@@ -9,12 +9,15 @@
   <div class="p-[25px]">
     <!-- ? Storage -->
     <h3 class="text-base">Dung lượng lưu trữ</h3>
-    <p class="mt-3 text-sm dark:text-[#e6e6e6]">Đã sử dụng 7.5 GB / 15 GB</p>
+    <p class="mt-3 text-sm dark:text-[#e6e6e6]">
+      Đã sử dụng {{ formatStorage(usedStorage()) }} /
+      {{ formatStorage(limitStorage()) }}
+    </p>
     <p-progressbar
-      pTooltip="7.5 GB / 15 GB"
+      styleClass="!h-[4px] mt-3 cursor-pointer"
       tooltipPosition="bottom"
-      [value]="50"
-      [showValue]="false"
-      styleClass="!h-[4px] mt-3 cursor-pointer" />
+      [pTooltip]="tooltipText()"
+      [value]="usagePercentage()"
+      [showValue]="false" />
   </div>
 </div>

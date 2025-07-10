@@ -38,7 +38,11 @@ export class FolderManagementService {
       })
       .pipe(
         tap(res => {
-          if (res.statusCode === StatusCode.CREATED && res.data) {
+          if (
+            (res.statusCode === StatusCode.CREATED ||
+              res.statusCode === StatusCode.SUCCESS) &&
+            res.data
+          ) {
             this.toastHandlingService.success(
               'Tạo thư mục thành công',
               `Thư mục "${res.data.name}" đã được tạo thành công.`
@@ -82,6 +86,16 @@ export class FolderManagementService {
       );
   }
 
+  archiveFolder(folderId: string): Observable<null> {
+    return this.requestService
+      .put(`${this.BASE_FOLDERS_API_URL}/${folderId}/archive`)
+      .pipe(
+        tap(res => this.handleArchiveResponse(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
   removeFolder(folderId: string): Observable<null> {
     return this.requestService
       .delete(`${this.BASE_FOLDERS_API_URL}/${folderId}`)
@@ -119,8 +133,16 @@ export class FolderManagementService {
     }
   }
 
-  private handleRemoveResponse(res: any): void {
+  private handleArchiveResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS) {
+      this.toastHandlingService.successGeneral();
+    } else {
+      this.toastHandlingService.errorGeneral();
+    }
+  }
+
+  private handleRemoveResponse(res: any): void {
+    if (res.statusCode === StatusCode.DELETED) {
       this.toastHandlingService.successGeneral();
     } else {
       this.toastHandlingService.errorGeneral();

@@ -34,10 +34,16 @@ import {
 
 import { getContentTypeFromMime } from '../../../../shared/utils/util-functions';
 
+import { type FileStorageRequest } from '../../../../shared/models/api/request/command/file-storage-request.model';
 import {
-  CreateLessonMaterialRequest,
-  CreateLessonMaterialsRequest,
+  type CreateLessonMaterialRequest,
+  type CreateLessonMaterialsRequest,
 } from '../../../../shared/models/api/request/command/create-lesson-material-request.model';
+
+type FileMetadata = {
+  blobName: string;
+  file: File;
+};
 
 @Component({
   selector: 'app-add-file-modal',
@@ -124,7 +130,6 @@ export class AddFileModalComponent {
 
   onSubmit() {
     const files = this.selectedFiles();
-
     if (files.length === 0) {
       this.toastHandlingService.error(
         'Lỗi',
@@ -133,17 +138,18 @@ export class AddFileModalComponent {
       return;
     }
 
-    // ? Unique blob name with SchoolId
     const timestamp = Date.now();
-    const schoolId = this.user()?.school ? this.user()?.school?.id : '';
-    const blobNames = files.map(file => {
-      const dotIndex = file.name.lastIndexOf('.');
-      const base = file.name.substring(0, dotIndex);
-      const ext = file.name.substring(dotIndex);
-      return `${base}_${timestamp}_${schoolId}${ext}`;
-    });
+    const schoolId = this.user()?.school?.id ?? 0;
+    const fileMetadata = this.buildFileMetadata(files, timestamp, schoolId);
 
-    this.uploadFiles(blobNames, files);
+    const fileStorageRequest: FileStorageRequest = {
+      files: fileMetadata.map(m => ({
+        blobName: m.blobName,
+        fileSize: m.file.size,
+      })),
+    };
+
+    this.uploadFiles(fileStorageRequest, fileMetadata, this.modalData.folderId);
   }
 
   formatSize(bytes: number) {
@@ -164,42 +170,61 @@ export class AddFileModalComponent {
     this.globalModalService.close();
   }
 
-  private uploadFiles(blobNames: string[], files: File[]) {
-    if (!files?.length || !blobNames?.length) return;
+  private uploadFiles(
+    request: FileStorageRequest,
+    fileMetadata: FileMetadata[],
+    folderId: string
+  ) {
+    if (!request?.files?.length || !fileMetadata.length) return;
 
-    this.uploadFileService.uploadBlobs(blobNames, files).subscribe(res => {
-      if (!res) return;
+    const files = fileMetadata.map(f => f.file);
 
-      const folderId = this.modalData.folderId;
-      const sourceUrls = res.uploadTokens;
-      const materials: CreateLessonMaterialRequest[] = files.map(
-        (file, index) => ({
-          title: file.name,
-          description: '',
-          tag: '',
-          contentType: getContentTypeFromMime(file.type),
-          duration: 0,
-          fileSize: file.size,
-          isAIContent: false,
-          sourceUrl: sourceUrls[index],
-        })
-      );
+    this.uploadFileService.uploadBlobs(request, files).subscribe({
+      next: res => {
+        if (!res) return;
 
-      const request: CreateLessonMaterialsRequest = {
-        folderId,
-        blobNames,
-        lessonMaterials: materials,
-      };
-      this.lessonMaterialsService
-        .createLessonMaterials(request)
-        .pipe(
-          switchMap(() => {
-            return this.lessonMaterialsService.getLessonMaterials(folderId);
+        const materials: CreateLessonMaterialRequest[] = fileMetadata.map(
+          ({ file }, index) => ({
+            title: file.name,
+            description: '',
+            tag: '',
+            contentType: getContentTypeFromMime(file.type),
+            duration: 0,
+            fileSize: file.size,
+            isAIContent: false,
+            sourceUrl: res.uploadTokens[index],
           })
-        )
-        .subscribe(() => {
-          this.closeModal();
-        });
+        );
+
+        const createRequest: CreateLessonMaterialsRequest = {
+          folderId,
+          blobNames: fileMetadata.map(m => m.blobName),
+          lessonMaterials: materials,
+        };
+
+        this.lessonMaterialsService
+          .createLessonMaterials(createRequest)
+          .pipe(
+            switchMap(() =>
+              this.lessonMaterialsService.getLessonMaterials(folderId)
+            )
+          )
+          .subscribe(() => this.closeModal());
+      },
+    });
+  }
+
+  private buildFileMetadata(
+    files: File[],
+    timestamp: number,
+    schoolId: number
+  ): FileMetadata[] {
+    return files.map(file => {
+      const dotIndex = file.name.lastIndexOf('.');
+      const base = file.name.substring(0, dotIndex);
+      const ext = file.name.substring(dotIndex);
+      const blobName = `${base}_${timestamp}_${schoolId}${ext}`;
+      return { blobName, file };
     });
   }
 }
