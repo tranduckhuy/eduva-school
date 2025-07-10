@@ -468,54 +468,46 @@ describe('PaymentService', () => {
   });
 
   describe('Private helper functions', () => {
-    it('should extract plan data correctly from response', () => {
+    it('should extract data correctly from response with SUCCESS status', () => {
       const successResponse = {
         statusCode: StatusCode.SUCCESS,
         data: mockCreatePlanResponse,
       };
 
-      const result = (service as any).extractPlanDataFromResponse(
-        successResponse
-      );
+      const result = (service as any).extractDataFromResponse(successResponse);
 
       expect(result).toEqual(mockCreatePlanResponse);
     });
 
-    it('should return null for plan data when status is not SUCCESS', () => {
+    it('should return null when status is not SUCCESS', () => {
       const errorResponse = {
         statusCode: StatusCode.SYSTEM_ERROR,
         data: mockCreatePlanResponse,
       };
 
-      const result = (service as any).extractPlanDataFromResponse(
-        errorResponse
-      );
+      const result = (service as any).extractDataFromResponse(errorResponse);
 
       expect(result).toBeNull();
     });
 
-    it('should return null for plan data when data is missing', () => {
+    it('should return null when data is missing', () => {
       const noDataResponse = {
         statusCode: StatusCode.SUCCESS,
         data: null,
       };
 
-      const result = (service as any).extractPlanDataFromResponse(
-        noDataResponse
-      );
+      const result = (service as any).extractDataFromResponse(noDataResponse);
 
       expect(result).toBeNull();
     });
 
-    it('should extract credit data correctly from response', () => {
+    it('should extract credit data correctly from response with SUCCESS status', () => {
       const successResponse = {
         statusCode: StatusCode.SUCCESS,
         data: mockCreateCreditResponse,
       };
 
-      const result = (service as any).extractCreditDataFromResponse(
-        successResponse
-      );
+      const result = (service as any).extractDataFromResponse(successResponse);
 
       expect(result).toEqual(mockCreateCreditResponse);
     });
@@ -526,9 +518,7 @@ describe('PaymentService', () => {
         data: mockCreateCreditResponse,
       };
 
-      const result = (service as any).extractCreditDataFromResponse(
-        errorResponse
-      );
+      const result = (service as any).extractDataFromResponse(errorResponse);
 
       expect(result).toBeNull();
     });
@@ -539,9 +529,7 @@ describe('PaymentService', () => {
         data: null,
       };
 
-      const result = (service as any).extractCreditDataFromResponse(
-        noDataResponse
-      );
+      const result = (service as any).extractDataFromResponse(noDataResponse);
 
       expect(result).toBeNull();
     });
