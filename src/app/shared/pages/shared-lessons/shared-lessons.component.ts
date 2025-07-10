@@ -139,8 +139,6 @@ export class SharedLessonsComponent {
 
   getMaterialStatusLabel(status: LessonMaterialStatus): string {
     switch (status) {
-      case LessonMaterialStatus.Draft:
-        return 'Bản nháp';
       case LessonMaterialStatus.Pending:
         return 'Chờ duyệt';
       case LessonMaterialStatus.Approved:
@@ -160,7 +158,6 @@ export class SharedLessonsComponent {
         return 'warning';
       case LessonMaterialStatus.Rejected:
         return 'danger';
-      case LessonMaterialStatus.Draft:
       default:
         return 'gray';
     }
