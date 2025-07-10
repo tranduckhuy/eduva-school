@@ -1,14 +1,24 @@
 <section
-  class="min-h-[calc(100vh-80px)] rounded-2xl bg-white shadow-main dark:border-dark-500 dark:bg-dark-200">
+  class="min-h-[calc(100vh-80px)] rounded-2xl bg-white shadow-main dark:border-dark-500 dark:bg-dark-200 lg:h-[calc(100vh-170px)] lg:shadow-none">
   <!-- ? Section Header -->
   <div
-    class="flex h-12 items-center justify-between border-b border-[#dde1eb] px-4">
+    class="flex h-12 items-center justify-between border-b border-[#dde1eb] px-4 lg:hidden">
     <h2 class="text-base font-medium dark:border-[#37383b]">Xem trước</h2>
     <p-button variant="text" [rounded]="true" (onClick)="openModal()">
       <ng-template #icon>
         <span class="pi pi-cog dark:!text-white" style="font-size: 20px"></span>
       </ng-template>
     </p-button>
+  </div>
+
+  <div class="hidden px-4 lg:block">
+    <p-button
+      icon="pi pi-cog"
+      label="Cài đặt bài giảng AI"
+      styleClass="mt-4"
+      [rounded]="true"
+      [fluid]="true"
+      (onClick)="openModal()" />
   </div>
 
   <!-- ? Section Content -->

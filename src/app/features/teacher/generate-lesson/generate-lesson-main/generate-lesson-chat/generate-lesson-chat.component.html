@@ -1,13 +1,13 @@
 <section
-  class="h-[calc(100vh-80px)] rounded-2xl bg-white shadow-main dark:border-dark-500 dark:bg-dark-200">
+  class="h-[calc(100vh-80px)] rounded-2xl bg-white shadow-main dark:border-dark-500 dark:bg-dark-200 lg:h-[calc(100vh-170px)] lg:shadow-none">
   <!-- ? Section Header -->
   <div
-    class="flex h-12 items-center justify-between border-b border-[#dde1eb] px-4">
+    class="flex h-12 items-center justify-between border-b border-[#dde1eb] px-4 lg:hidden">
     <h2 class="text-base font-medium dark:border-[#37383b]">Yêu cầu</h2>
   </div>
 
   <!-- ? Section Content -->
-  <div class="mt-4 h-[calc(100%-65px)] px-4">
+  <div class="mt-4 h-[calc(100%-65px)] px-4 lg:h-[calc(100%-(-20px))]">
     <div class="flex h-full flex-col">
       <div
         #scrollContainer
@@ -64,7 +64,7 @@
             <form
               [formGroup]="form"
               (ngSubmit)="submitMessage()"
-              class="flex w-full items-center px-4">
+              class="flex min-h-[51px] w-full items-center px-4">
               <textarea
                 pTextarea
                 formControlName="query"
@@ -114,7 +114,9 @@
                 class="chip-btn border border-[#dde1eb] bg-transparent hover:!bg-[#f0f1f1] dark:text-[#e6e6e6] dark:hover:!bg-dark-400"
                 [disabled]="isLoading()"
                 (click)="handleChipClick(button.title)">
-                Tạo bài giảng về {{ button.title }}
+                <span class="line-clamp-1"
+                  >Tạo bài giảng về {{ button.title }}</span
+                >
               </button>
             </ng-template>
           </p-carousel>
