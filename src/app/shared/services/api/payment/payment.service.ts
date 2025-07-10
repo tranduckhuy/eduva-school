@@ -46,7 +46,9 @@ export class PaymentService {
       )
       .pipe(
         tap(res => this.handleCreatePlanPaymentLinkResponse(res)),
-        map(res => this.extractPlanDataFromResponse(res)),
+        map(res =>
+          this.extractDataFromResponse<CreatePlanPaymentLinkResponse>(res)
+        ),
         catchError(() => {
           this.toastHandlingService.errorGeneral();
           return of(null);
@@ -63,7 +65,9 @@ export class PaymentService {
       })
       .pipe(
         tap(res => this.handleCreateCreditPaymentLinkResponse(res)),
-        map(res => this.extractCreditDataFromResponse(res)),
+        map(res =>
+          this.extractDataFromResponse<CreateCreditPaymentLinkResponse>(res)
+        ),
         catchError(() => {
           this.toastHandlingService.errorGeneral();
           return of(null);
@@ -183,20 +187,9 @@ export class PaymentService {
     return throwError(() => err);
   }
 
-  private extractPlanDataFromResponse(
-    res: any
-  ): CreatePlanPaymentLinkResponse | null {
+  private extractDataFromResponse<T>(res: any): T | null {
     if (res.statusCode === StatusCode.SUCCESS && res.data) {
-      return res.data;
-    }
-    return null;
-  }
-
-  private extractCreditDataFromResponse(
-    res: any
-  ): CreateCreditPaymentLinkResponse | null {
-    if (res.statusCode === StatusCode.SUCCESS && res.data) {
-      return res.data;
+      return res.data as T;
     }
     return null;
   }
