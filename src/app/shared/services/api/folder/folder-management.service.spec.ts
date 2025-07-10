@@ -61,6 +61,7 @@ describe('FolderManagementService', () => {
     requestService = {
       post: vi.fn(),
       get: vi.fn(),
+      put: vi.fn(),
       delete: vi.fn(),
     } as any;
 
@@ -104,7 +105,7 @@ describe('FolderManagementService', () => {
   describe('createFolder', () => {
     it('should create folder successfully and show success toast', async () => {
       const successResponse = {
-        statusCode: StatusCode.CREATED, // Changed back to CREATED for toast
+        statusCode: StatusCode.CREATED,
         data: mockFolder,
       };
 
@@ -120,6 +121,25 @@ describe('FolderManagementService', () => {
         mockCreateRequest,
         { loadingKey: 'create-folder' }
       );
+      expect(toastHandlingService.success).toHaveBeenCalledWith(
+        'Tạo thư mục thành công',
+        `Thư mục "${mockFolder.name}" đã được tạo thành công.`
+      );
+    });
+
+    it('should create folder with SUCCESS status and return data', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: mockFolder,
+      };
+
+      (requestService.post as any).mockReturnValue(of(successResponse));
+
+      const result = await firstValueFrom(
+        service.createFolder(mockCreateRequest)
+      );
+
+      expect(result).toEqual(mockFolder); // extractSingleData returns data for SUCCESS
       expect(toastHandlingService.success).toHaveBeenCalledWith(
         'Tạo thư mục thành công',
         `Thư mục "${mockFolder.name}" đã được tạo thành công.`
@@ -343,12 +363,58 @@ describe('FolderManagementService', () => {
     });
   });
 
+  describe('archiveFolder', () => {
+    const folderId = 'folder-123';
+
+    it('should archive folder successfully and show success toast', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+      };
+
+      (requestService.put as any).mockReturnValue(of(successResponse));
+
+      const result = await firstValueFrom(service.archiveFolder(folderId));
+
+      expect(result).toBeNull();
+      expect(requestService.put).toHaveBeenCalledWith(
+        expect.stringContaining(`/folders/${folderId}/archive`)
+      );
+      expect(toastHandlingService.successGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle archive failure and show error toast', async () => {
+      const failureResponse = {
+        statusCode: StatusCode.SYSTEM_ERROR,
+      };
+
+      (requestService.put as any).mockReturnValue(of(failureResponse));
+
+      const result = await firstValueFrom(service.archiveFolder(folderId));
+
+      expect(result).toBeNull();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle error and call errorGeneral', async () => {
+      const error = new HttpErrorResponse({
+        error: new Error('Network error'),
+      });
+
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        firstValueFrom(service.archiveFolder(folderId))
+      ).rejects.toBe(error);
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+  });
+
   describe('removeFolder', () => {
     const folderId = 'folder-123';
 
     it('should remove folder successfully and show success toast', async () => {
       const successResponse = {
-        statusCode: StatusCode.SUCCESS,
+        statusCode: StatusCode.DELETED,
       };
 
       (requestService.delete as any).mockReturnValue(of(successResponse));
@@ -463,7 +529,7 @@ describe('FolderManagementService', () => {
         service.getPersonalFolders(mockGetFoldersRequest)
       );
 
-      expect(result).toBeNull(); // Changed from [] to null because extractPagingListData returns null when data.data is null
+      expect(result).toBeNull();
       expect(service.folderList()).toEqual([]);
     });
 
@@ -488,7 +554,7 @@ describe('FolderManagementService', () => {
     it('should handle empty folder name in create success message', async () => {
       const folderWithEmptyName = { ...mockFolder, name: '' };
       const successResponse = {
-        statusCode: StatusCode.CREATED, // Changed back to CREATED for toast
+        statusCode: StatusCode.CREATED,
         data: folderWithEmptyName,
       };
 
@@ -498,11 +564,60 @@ describe('FolderManagementService', () => {
         service.createFolder(mockCreateRequest)
       );
 
-      expect(result).toBeNull(); // extractSingleData returns null for CREATED
+      expect(result).toBeNull();
       expect(toastHandlingService.success).toHaveBeenCalledWith(
         'Tạo thư mục thành công',
         'Thư mục "" đã được tạo thành công.'
       );
+    });
+
+    it('should handle null data in create response', async () => {
+      const responseWithNullData = {
+        statusCode: StatusCode.CREATED,
+        data: null,
+      };
+
+      (requestService.post as any).mockReturnValue(of(responseWithNullData));
+
+      const result = await firstValueFrom(
+        service.createFolder(mockCreateRequest)
+      );
+
+      expect(result).toBeNull();
+      expect(toastHandlingService.error).toHaveBeenCalledWith(
+        'Tạo thư mục thất bại',
+        'Đã xảy ra sự cố trong quá trình tạo thư mục. Vui lòng thử lại sau.'
+      );
+    });
+
+    it('should handle undefined data in class folders response', async () => {
+      const responseWithUndefinedData = {
+        statusCode: StatusCode.SUCCESS,
+        data: undefined,
+      };
+
+      (requestService.get as any).mockReturnValue(
+        of(responseWithUndefinedData)
+      );
+
+      const result = await firstValueFrom(service.getClassFolders('class-123'));
+
+      expect(result).toBeNull();
+      expect(service.folderList()).toEqual([]);
+    });
+
+    it('should handle null data in class folders response', async () => {
+      const responseWithNullData = {
+        statusCode: StatusCode.SUCCESS,
+        data: null,
+      };
+
+      (requestService.get as any).mockReturnValue(of(responseWithNullData));
+
+      const result = await firstValueFrom(service.getClassFolders('class-123'));
+
+      expect(result).toBeNull();
+      expect(service.folderList()).toEqual([]);
     });
   });
 });

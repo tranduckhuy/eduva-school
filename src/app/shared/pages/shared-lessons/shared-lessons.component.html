@@ -28,7 +28,7 @@
             <th scope="col" class="!w-[25%]">Tài liệu bài học</th>
             <th scope="col" class="!w-[15%]">Người sở hữu</th>
             <th scope="col" class="!w-[20%]">Ngày tạo tài liệu</th>
-            <th scope="col" class="!w-[10%] !text-center">Kích thước tệp</th>
+            <th scope="col" class="!w-[12%] !text-center">Kích thước tệp</th>
             <th scope="col" class="!w-[15%] !text-center">Chia sẻ</th>
             <th scope="col" class="!w-[10%] !text-center">Hành động</th>
           </tr>
@@ -44,7 +44,10 @@
                   [ngClass]="getMaterialIconColor(material)">
                   {{ getMaterialIcon(material) }}
                 </i>
-                <span class="transition-colors group-hover:text-primary">
+                <span
+                  [pTooltip]="material.title"
+                  tooltipPosition="bottom"
+                  class="line-clamp-1 transition-colors group-hover:text-primary">
                   {{ material.title }}
                 </span>
               </a>

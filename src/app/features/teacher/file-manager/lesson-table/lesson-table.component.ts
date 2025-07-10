@@ -82,12 +82,18 @@ export class LessonTableComponent implements OnInit {
     });
   }
 
-  onSearch(value: string): void {
-    this.searchValue.set(value);
+  onSearch(searchTerm: string): void {
+    this.searchValue.set(searchTerm);
     this.currentPage.set(1);
     this.firstRecordIndex.set(0);
 
     this.loadFolders();
+  }
+
+  onArchiveFolder(folderId: string) {
+    this.folderService.archiveFolder(folderId).subscribe({
+      next: () => this.loadFolders(),
+    });
   }
 
   onLazyLoad(event: TableLazyLoadEvent): void {
@@ -98,16 +104,6 @@ export class LessonTableComponent implements OnInit {
     this.currentPage.set(page);
     this.pageSize.set(rows);
     this.firstRecordIndex.set(first);
-  }
-
-  private loadFolders(): void {
-    const request: GetFoldersRequest = {
-      name: this.searchValue(),
-      pageIndex: this.currentPage(),
-      pageSize: this.pageSize(),
-    };
-
-    this.folderService.getPersonalFolders(request).subscribe();
   }
 
   openAddFolderModal(): void {
@@ -127,5 +123,15 @@ export class LessonTableComponent implements OnInit {
         pageSize: this.pageSize(),
       },
     });
+  }
+
+  private loadFolders(): void {
+    const request: GetFoldersRequest = {
+      name: this.searchValue(),
+      pageIndex: this.currentPage(),
+      pageSize: this.pageSize(),
+    };
+
+    this.folderService.getPersonalFolders(request).subscribe();
   }
 }

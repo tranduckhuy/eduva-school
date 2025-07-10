@@ -345,7 +345,7 @@ describe('UserService', () => {
       (requestService.post as any) = vi.fn().mockReturnValue(
         throwError(() => ({
           error: {
-            statusCode: { EMAIL_ALREADY_EXISTS: 'EMAIL_ALREADY_EXISTS' },
+            statusCode: StatusCode.EMAIL_ALREADY_EXISTS,
           },
         }))
       );

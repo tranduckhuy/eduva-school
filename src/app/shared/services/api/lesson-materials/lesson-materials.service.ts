@@ -16,6 +16,7 @@ import {
   type GetLessonMaterialsRequest,
 } from '../../../models/api/request/query/get-lesson-materials-request.model';
 import { type GetPagingLessonMaterialsResponse } from '../../../models/api/response/query/get-lesson-materials-response.model';
+import { type ApproveRejectMaterialRequest } from '../../../../features/school-admin/moderate-lessons/models/approve-reject-material-request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -114,6 +115,25 @@ export class LessonMaterialsService {
       );
   }
 
+  approveRejectMaterial(
+    request: ApproveRejectMaterialRequest,
+    lessonMaterialId: string
+  ): Observable<null> {
+    return this.requestService
+      .put(
+        `${this.LESSON_MATERIALS_API_URL}/${lessonMaterialId}/pending-approval`,
+        request,
+        {
+          loadingKey: 'approve-reject-material',
+        }
+      )
+      .pipe(
+        tap(res => this.handleApproveRejectMaterialResponse(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
   // ---------------------------
   //  Private Helper Functions
   // ---------------------------
@@ -130,18 +150,6 @@ export class LessonMaterialsService {
         'Không thể tải lên tài liệu. Vui lòng thử lại sau.'
       );
     }
-  }
-
-  private handleCreateError(err: HttpErrorResponse): Observable<void> {
-    if (err.error?.statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND) {
-      this.toastHandlingService.warn(
-        'Thiếu gói đăng ký',
-        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
-      );
-    } else {
-      this.toastHandlingService.errorGeneral();
-    }
-    return of(void 0);
   }
 
   private handleListResponse(res: any): void {
@@ -162,14 +170,6 @@ export class LessonMaterialsService {
     }
   }
 
-  private extractListResponse(res: any): LessonMaterial[] | null {
-    return res.statusCode === StatusCode.SUCCESS ? res.data : null;
-  }
-
-  private extractPagingListResponse(res: any): LessonMaterial[] | null {
-    return res.statusCode === StatusCode.SUCCESS ? res.data.data : null;
-  }
-
   private handleDetailResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS && res.data) {
       this.lessonMaterialSignal.set(res.data);
@@ -178,8 +178,38 @@ export class LessonMaterialsService {
     }
   }
 
+  private handleApproveRejectMaterialResponse(res: any): void {
+    if (res.statusCode === StatusCode.SUCCESS) {
+      this.toastHandlingService.successGeneral();
+    } else {
+      this.toastHandlingService.errorGeneral();
+    }
+  }
+
+  private extractListResponse(res: any): LessonMaterial[] | null {
+    return res.statusCode === StatusCode.SUCCESS && res.data ? res.data : null;
+  }
+
+  private extractPagingListResponse(res: any): LessonMaterial[] | null {
+    return res.statusCode === StatusCode.SUCCESS
+      ? (res.data?.data ?? [])
+      : null;
+  }
+
   private extractDetailResponse(res: any): LessonMaterial | null {
     return res.statusCode === StatusCode.SUCCESS ? res.data : null;
+  }
+
+  private handleCreateError(err: HttpErrorResponse): Observable<void> {
+    if (err.error?.statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND) {
+      this.toastHandlingService.warn(
+        'Thiếu gói đăng ký',
+        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+      );
+    } else {
+      this.toastHandlingService.errorGeneral();
+    }
+    return of(void 0);
   }
 
   private handleError(err: HttpErrorResponse): Observable<null> {

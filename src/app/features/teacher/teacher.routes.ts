@@ -90,6 +90,13 @@ export const teacherRoutes: Routes = [
             mod => mod.settingRoutes
           ),
       },
+      {
+        path: 'credit-pack',
+        loadComponent: () =>
+          import('./credit-pack/credit-pack.component').then(
+            mod => mod.CreditPackComponent
+          ),
+      },
     ],
   },
   {

@@ -1,5 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClient } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpContext,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
@@ -7,7 +11,9 @@ import { UploadFileService } from './upload-file.service';
 import { RequestService } from '../../../../shared/services/core/request/request.service';
 import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
 import { StatusCode } from '../../../../shared/constants/status-code.constant';
-import { type FileStorageResponse } from '../../../../shared/models/api/response/command/file-storage-response.model';
+import { BYPASS_AUTH } from '../../../tokens/context/http-context.token';
+import { type FileStorageRequest } from '../../../models/api/request/command/file-storage-request.model';
+import { type FileStorageResponse } from '../../../models/api/response/command/file-storage-response.model';
 
 // Mock Supabase
 const mockSupabaseClient = {
@@ -53,7 +59,12 @@ describe('UploadFileService', () => {
     new File(['content2'], 'file2.txt', { type: 'text/plain' }),
   ];
 
-  const mockRequest = ['file1.txt', 'file2.txt'];
+  const mockRequest: FileStorageRequest = {
+    files: [
+      { blobName: 'file1.txt', fileSize: 100 },
+      { blobName: 'file2.txt', fileSize: 200 },
+    ],
+  };
 
   beforeEach(() => {
     requestService = {
@@ -62,6 +73,7 @@ describe('UploadFileService', () => {
     toastHandlingService = {
       errorGeneral: vi.fn(),
       error: vi.fn(),
+      warn: vi.fn(),
     } as any;
     httpClient = {
       put: vi.fn(),
@@ -82,8 +94,10 @@ describe('UploadFileService', () => {
     vi.clearAllMocks();
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
+  describe('Service Creation', () => {
+    it('should be created', () => {
+      expect(service).toBeTruthy();
+    });
   });
 
   describe('uploadBlobs', () => {
@@ -103,10 +117,26 @@ describe('UploadFileService', () => {
             ],
           });
           expect(requestService.post).toHaveBeenCalledWith(
-            'http://localhost:3000/api/file-storage/upload-tokens',
+            'http://localhost:3000/api/file-storage/upload-tokens-with-quota',
             mockRequest
           );
           expect(httpClient.put).toHaveBeenCalledTimes(2);
+          expect(httpClient.put).toHaveBeenCalledWith(
+            'https://storage.blob.core.windows.net/container/file1?token=abc',
+            mockFiles[0],
+            {
+              headers: { 'x-ms-blob-type': 'BlockBlob' },
+              context: expect.any(HttpContext),
+            }
+          );
+          expect(httpClient.put).toHaveBeenCalledWith(
+            'https://storage.blob.core.windows.net/container/file2?token=def',
+            mockFiles[1],
+            {
+              headers: { 'x-ms-blob-type': 'BlockBlob' },
+              context: expect.any(HttpContext),
+            }
+          );
           resolve();
         });
       });
@@ -192,16 +222,99 @@ describe('UploadFileService', () => {
       });
     });
 
-    it('should handle API error and show errorGeneral', async () => {
+    it('should handle multiple upload failures', async () => {
       (requestService.post as any).mockReturnValue(
-        throwError(() => new Error('Network error'))
+        of({ statusCode: StatusCode.SUCCESS, data: mockFileStorageResponse })
       );
+      (httpClient.put as any)
+        .mockReturnValueOnce(throwError(() => new Error('Upload failed 1')))
+        .mockReturnValueOnce(throwError(() => new Error('Upload failed 2')));
 
       await new Promise<void>(resolve => {
         service.uploadBlobs(mockRequest, mockFiles).subscribe(result => {
-          expect(result).toBeNull();
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+          expect(result).toEqual({
+            ...mockFileStorageResponse,
+            uploadTokens: [
+              'https://storage.blob.core.windows.net/container/file1',
+              'https://storage.blob.core.windows.net/container/file2',
+            ],
+          });
+          expect(toastHandlingService.error).toHaveBeenCalledWith(
+            'Lỗi',
+            'Không thể upload các file sau: file1.txt, file2.txt'
+          );
           resolve();
+        });
+      });
+    });
+
+    it('should handle STORAGE_QUOTA_EXCEEDED error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.STORAGE_QUOTA_EXCEEDED },
+      });
+
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      await new Promise<void>(resolve => {
+        service.uploadBlobs(mockRequest, mockFiles).subscribe({
+          error: () => {
+            expect(toastHandlingService.warn).toHaveBeenCalledWith(
+              'Đã đạt giới hạn lưu trữ',
+              'Vui lòng liên hệ quản trị viên để nâng cấp gói và tiếp tục sử dụng.'
+            );
+            resolve();
+          },
+        });
+      });
+    });
+
+    it('should handle error with undefined error property', async () => {
+      const error = new HttpErrorResponse({
+        error: undefined,
+      });
+
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      await new Promise<void>(resolve => {
+        service.uploadBlobs(mockRequest, mockFiles).subscribe({
+          error: () => {
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            resolve();
+          },
+        });
+      });
+    });
+
+    it('should handle other API errors with errorGeneral', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.SYSTEM_ERROR },
+      });
+
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      await new Promise<void>(resolve => {
+        service.uploadBlobs(mockRequest, mockFiles).subscribe({
+          error: () => {
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            resolve();
+          },
+        });
+      });
+    });
+
+    it('should handle network error with errorGeneral', async () => {
+      const error = new HttpErrorResponse({
+        error: new Error('Network error'),
+      });
+
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      await new Promise<void>(resolve => {
+        service.uploadBlobs(mockRequest, mockFiles).subscribe({
+          error: () => {
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            resolve();
+          },
         });
       });
     });
@@ -238,7 +351,7 @@ describe('UploadFileService', () => {
       );
     });
 
-    it('should return null if upload fails', async () => {
+    it('should return null if upload fails with error', async () => {
       mockSupabaseClient.storage.upload.mockResolvedValue({
         data: null,
         error: { message: 'Upload failed' },
@@ -347,7 +460,7 @@ describe('UploadFileService', () => {
       expect(mockSupabaseClient.storage.list).toHaveBeenCalled();
     });
 
-    it('should return empty array if list fails', async () => {
+    it('should return empty array if list fails with error', async () => {
       mockSupabaseClient.storage.list.mockResolvedValue({
         data: null,
         error: { message: 'List failed' },
@@ -381,46 +494,94 @@ describe('UploadFileService', () => {
     });
   });
 
-  it('should handle edge case: empty files array', async () => {
-    (requestService.post as any).mockReturnValue(
-      of({ statusCode: StatusCode.SUCCESS, data: { uploadTokens: [] } })
-    );
+  describe('Edge Cases', () => {
+    it('should handle empty files array', async () => {
+      (requestService.post as any).mockReturnValue(
+        of({ statusCode: StatusCode.SUCCESS, data: { uploadTokens: [] } })
+      );
 
-    await new Promise<void>(resolve => {
-      service.uploadBlobs([], []).subscribe({
-        next: result => {
-          expect(result).toEqual({ uploadTokens: [] });
-        },
-        complete: () => resolve(),
-      });
-    });
-  });
-
-  it('should handle edge case: single file upload', async () => {
-    const singleFile = [new File(['content'], 'single.txt')];
-    const singleRequest = ['single.txt'];
-    const singleResponse = {
-      uploadTokens: [
-        'https://storage.blob.core.windows.net/container/single?token=abc',
-      ],
-    };
-
-    (requestService.post as any).mockReturnValue(
-      of({ statusCode: StatusCode.SUCCESS, data: singleResponse })
-    );
-    (httpClient.put as any).mockReturnValue(of({}));
-
-    await new Promise<void>(resolve => {
-      service.uploadBlobs(singleRequest, singleFile).subscribe(result => {
-        expect(result).toEqual({
-          ...singleResponse,
-          uploadTokens: [
-            'https://storage.blob.core.windows.net/container/single',
-          ],
+      await new Promise<void>(resolve => {
+        service.uploadBlobs({ files: [] }, []).subscribe({
+          next: result => {
+            expect(result).toEqual({ uploadTokens: [] });
+          },
+          complete: () => resolve(),
         });
-        expect(httpClient.put).toHaveBeenCalledTimes(1);
-        resolve();
       });
     });
+
+    it('should handle single file upload', async () => {
+      const singleFile = [new File(['content'], 'single.txt')];
+      const singleRequest = {
+        files: [{ blobName: 'single.txt', fileSize: 100 }],
+      };
+      const singleResponse = {
+        uploadTokens: [
+          'https://storage.blob.core.windows.net/container/single?token=abc',
+        ],
+      };
+
+      (requestService.post as any).mockReturnValue(
+        of({ statusCode: StatusCode.SUCCESS, data: singleResponse })
+      );
+      (httpClient.put as any).mockReturnValue(of({}));
+
+      await new Promise<void>(resolve => {
+        service.uploadBlobs(singleRequest, singleFile).subscribe(result => {
+          expect(result).toEqual({
+            ...singleResponse,
+            uploadTokens: [
+              'https://storage.blob.core.windows.net/container/single',
+            ],
+          });
+          expect(httpClient.put).toHaveBeenCalledTimes(1);
+          resolve();
+        });
+      });
+    });
+
+    it('should handle null data in upload response', async () => {
+      (requestService.post as any).mockReturnValue(
+        of({ statusCode: StatusCode.SUCCESS, data: null })
+      );
+
+      await new Promise<void>(resolve => {
+        service.uploadBlobs(mockRequest, mockFiles).subscribe(result => {
+          expect(result).toBeNull();
+          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+          resolve();
+        });
+      });
+    });
+
+    it('should handle undefined uploadTokens in response', async () => {
+      const responseWithoutTokens = {
+        uploadTokens: undefined,
+      };
+
+      (requestService.post as any).mockReturnValue(
+        of({ statusCode: StatusCode.SUCCESS, data: responseWithoutTokens })
+      );
+
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('Test timeout'));
+        }, 3000);
+
+        service.uploadBlobs(mockRequest, mockFiles).subscribe({
+          next: result => {
+            clearTimeout(timeout);
+            expect(result).toBeNull();
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            resolve();
+          },
+          error: err => {
+            clearTimeout(timeout);
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            resolve();
+          },
+        });
+      });
+    }, 5000);
   });
 });

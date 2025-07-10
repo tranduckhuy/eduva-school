@@ -51,33 +51,40 @@
   }
 </nav>
 
-@if (isSchoolAdmin()) {
+<div
+  class="absolute bottom-0 left-0 z-[2] w-full border-t border-t-gray-100 bg-white dark:border-dark-500 dark:bg-dark-200">
   <div
-    class="absolute bottom-0 left-0 z-[2] w-full border-t border-t-gray-100 bg-white dark:border-dark-500 dark:bg-dark-200">
-    <div
-      class="flex h-16 w-full items-center px-5 py-4 pl-2 pt-5"
-      [ngClass]="{
-        'gap-3': !isSidebarCollapsed(),
-        'justify-center': isSidebarCollapsed(),
-      }">
-      <a routerLink="/school-admin/subscription-plans">
-        <img
-          src="./images/icons/view-subscription-plan.svg"
-          alt=""
-          class="size-8 dark:invert" />
+    class="flex h-16 w-full items-center px-5 py-4 pl-2 pt-5"
+    [ngClass]="{
+      'gap-3': !isSidebarCollapsed(),
+      'justify-center': isSidebarCollapsed(),
+    }">
+    <a
+      [routerLink]="
+        isSchoolAdmin()
+          ? '/school-admin/subscription-plans'
+          : '/teacher/credit-pack'
+      ">
+      <img
+        src="./images/icons/view-subscription-plan.svg"
+        alt=""
+        class="size-8 dark:invert" />
+    </a>
+    @if (!isSidebarCollapsed()) {
+      <a
+        [routerLink]="
+          isSchoolAdmin()
+            ? '/school-admin/subscription-plans'
+            : '/teacher/credit-pack'
+        "
+        class="flex grow flex-col">
+        <span class="text-base font-semibold dark:text-white">
+          {{ isSchoolAdmin() ? 'Nâng cấp gói dịch vụ' : 'Mua gói Ecoin' }}
+        </span>
+        <span class="text-xs text-gray-500 dark:text-gray-300">
+          Xem bảng giá chi tiết tại đây.
+        </span>
       </a>
-      @if (!isSidebarCollapsed()) {
-        <a
-          routerLink="/school-admin/subscription-plans"
-          class="flex grow flex-col">
-          <span class="text-base font-semibold dark:text-white">
-            Nâng cấp gói dịch vụ
-          </span>
-          <span class="text-xs text-gray-500 dark:text-gray-300">
-            Xem bảng giá chi tiết tại đây.
-          </span>
-        </a>
-      }
-    </div>
+    }
   </div>
-}
+</div>

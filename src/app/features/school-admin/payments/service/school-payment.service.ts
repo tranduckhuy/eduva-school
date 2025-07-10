@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 
 import { catchError, map, Observable, of } from 'rxjs';
 
-import { Payment } from '../model/payment.model';
+import { Payment } from '../../../../shared/models/entities/payment.model';
 import { PaymentListParams } from '../model/payment-list-params';
 import { SchoolSubscriptionDetail } from '../model/school-subscription-detail.model';
 import { CreditTransactionDetail } from '../model/credit-transaction-detail';
@@ -12,7 +12,6 @@ import { environment } from '../../../../../environments/environment';
 import { EntityListResponse } from '../../../../shared/models/api/response/query/entity-list-response.model';
 import { StatusCode } from '../../../../shared/constants/status-code.constant';
 import { BaseResponse } from '../../../../shared/models/api/base-response.model';
-import { UserService } from '../../../../shared/services/api/user/user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +19,6 @@ import { UserService } from '../../../../shared/services/api/user/user.service';
 export class SchoolPaymentService {
   private readonly requestService = inject(RequestService);
   private readonly toastService = inject(ToastHandlingService);
-  private readonly userService = inject(UserService);
 
   // API URLs
   private readonly PAYMENT_URL = `${environment.baseApiUrl}/payments/my`;
@@ -43,8 +41,6 @@ export class SchoolPaymentService {
   readonly creditTransactionDetail =
     this.creditTransactionDetailSignal.asReadonly();
 
-  private readonly currentUser = this.userService.currentUser;
-
   /**
    * Fetches a list of payments
    * @param params List parameters
@@ -56,7 +52,7 @@ export class SchoolPaymentService {
     return this.handleRequest<EntityListResponse<Payment>>(
       this.requestService.get<EntityListResponse<Payment>>(
         this.PAYMENT_URL,
-        { ...params, userId: this.currentUser()?.id },
+        params,
         {
           loadingKey: 'get-payments',
         }

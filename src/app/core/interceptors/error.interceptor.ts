@@ -30,7 +30,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const isByPass = req.context.get(BYPASS_AUTH_ERROR);
   const isByPassPayment = req.context.get(BYPASS_PAYMENT_ERROR);
 
-  const handleServerError = () => router.navigateByUrl('/errors/500');
+  const handleServerError = () => {
+    globalModalService.close();
+    router.navigateByUrl('/errors/500');
+  };
 
   const handleUnauthorized = () => {
     if (hasShownUnauthorizedDialog) return;
@@ -54,7 +57,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     });
   };
 
-  const handleForbidden = () => router.navigateByUrl('/errors/403');
+  const handleForbidden = () => {
+    globalModalService.close();
+    router.navigateByUrl('/errors/403');
+  };
 
   const handleMissingSchoolOrSubscription = () => {
     const roles = user()?.roles ?? [];

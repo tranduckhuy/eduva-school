@@ -281,9 +281,6 @@ export class NavbarComponent implements OnInit {
 
     if (isTeacher || isModerator) {
       push('Tài liệu chia sẻ', '/teacher/shared-lessons', schoolMissing);
-    }
-
-    if (isTeacher) {
       push('Danh sách lớp học', '/teacher/class-management', schoolMissing);
       push('Tạo bài giảng tự động', '/teacher/generate-lesson', schoolMissing);
     }

@@ -7,7 +7,7 @@ import { RequestService } from '../../../../shared/services/core/request/request
 import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
 import { UserService } from '../../../../shared/services/api/user/user.service';
 import { StatusCode } from '../../../../shared/constants/status-code.constant';
-import { Payment } from '../model/payment.model';
+import { Payment } from '../../../../shared/models/entities/payment.model';
 import { PaymentListParams } from '../model/payment-list-params';
 import { SchoolSubscriptionDetail } from '../model/school-subscription-detail.model';
 import { CreditTransactionDetail } from '../model/credit-transaction-detail';
@@ -25,7 +25,6 @@ describe('SchoolPaymentService', () => {
   let service: SchoolPaymentService;
   let requestService: RequestService;
   let toastService: ToastHandlingService;
-  let userService: UserService;
 
   const mockRequestService = {
     get: vi.fn(),
@@ -33,14 +32,6 @@ describe('SchoolPaymentService', () => {
 
   const mockToastService = {
     errorGeneral: vi.fn(),
-  };
-
-  const mockUserService = {
-    currentUser: vi.fn(() => ({
-      id: 'user123',
-      fullName: 'Test User',
-      email: 'test@example.com',
-    })),
   };
 
   const mockPayment: Payment = {
@@ -121,14 +112,12 @@ describe('SchoolPaymentService', () => {
         SchoolPaymentService,
         { provide: RequestService, useValue: mockRequestService },
         { provide: ToastHandlingService, useValue: mockToastService },
-        { provide: UserService, useValue: mockUserService },
       ],
     });
 
     service = TestBed.inject(SchoolPaymentService);
     requestService = TestBed.inject(RequestService);
     toastService = TestBed.inject(ToastHandlingService);
-    userService = TestBed.inject(UserService);
   });
 
   it('should be created', () => {
@@ -163,7 +152,7 @@ describe('SchoolPaymentService', () => {
           next: result => {
             expect(mockRequestService.get).toHaveBeenCalledWith(
               'http://localhost:3000/api/payments/my',
-              { ...mockParams, userId: 'user123' },
+              mockParams,
               {
                 loadingKey: 'get-payments',
               }

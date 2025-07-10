@@ -158,8 +158,6 @@ export class MaterialTableComponent implements OnInit {
 
   getMaterialStatusLabel(status: LessonMaterialStatus): string {
     switch (status) {
-      case LessonMaterialStatus.Draft:
-        return 'Bản nháp';
       case LessonMaterialStatus.Pending:
         return 'Chờ duyệt';
       case LessonMaterialStatus.Approved:
@@ -179,7 +177,6 @@ export class MaterialTableComponent implements OnInit {
         return 'warning';
       case LessonMaterialStatus.Rejected:
         return 'danger';
-      case LessonMaterialStatus.Draft:
       default:
         return 'gray';
     }
