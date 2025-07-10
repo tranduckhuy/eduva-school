@@ -294,6 +294,11 @@ export class UserService {
         'Đăng ký thất bại',
         'Email đã tồn tại. Vui lòng chọn email khác!'
       );
+    } else if (statusCode && statusCode.EXCEED_USER_LIMIT) {
+      this.toastHandlingService.error(
+        'Đăng ký thất bại',
+        'Số lượng tài khoản được phép tạo đã đạt đến mức tối đa!'
+      );
     } else {
       this.toastHandlingService.errorGeneral();
     }
