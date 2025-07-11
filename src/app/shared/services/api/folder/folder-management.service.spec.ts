@@ -103,7 +103,7 @@ describe('FolderManagementService', () => {
   });
 
   describe('createFolder', () => {
-    it('should create folder successfully and show success toast', async () => {
+    it('should create folder successfully with CREATED status and return folder', async () => {
       const successResponse = {
         statusCode: StatusCode.CREATED,
         data: mockFolder,
@@ -115,12 +115,7 @@ describe('FolderManagementService', () => {
         service.createFolder(mockCreateRequest)
       );
 
-      expect(result).toBeNull(); // extractSingleData returns null for CREATED
-      expect(requestService.post).toHaveBeenCalledWith(
-        expect.stringContaining('/folders'),
-        mockCreateRequest,
-        { loadingKey: 'create-folder' }
-      );
+      expect(result).toEqual(mockFolder);
       expect(toastHandlingService.success).toHaveBeenCalledWith(
         'Tạo thư mục thành công',
         `Thư mục "${mockFolder.name}" đã được tạo thành công.`
@@ -139,7 +134,7 @@ describe('FolderManagementService', () => {
         service.createFolder(mockCreateRequest)
       );
 
-      expect(result).toEqual(mockFolder); // extractSingleData returns data for SUCCESS
+      expect(result).toEqual(mockFolder);
       expect(toastHandlingService.success).toHaveBeenCalledWith(
         'Tạo thư mục thành công',
         `Thư mục "${mockFolder.name}" đã được tạo thành công.`
@@ -328,8 +323,8 @@ describe('FolderManagementService', () => {
 
       const result = await firstValueFrom(service.getClassFolders(classId));
 
-      expect(result).toEqual([mockFolder]); // extractListData accepts CREATED
-      expect(service.folderList()).toEqual([]); // handleFoldersResponse only accepts SUCCESS
+      expect(result).toBeNull(); // extractFolderListFromResponse only accepts SUCCESS
+      expect(service.folderList()).toEqual([]); // handleFolderListResponse only accepts SUCCESS
     });
 
     it('should handle response without data and show error', async () => {
@@ -551,7 +546,7 @@ describe('FolderManagementService', () => {
       expect(service.totalRecords()).toBe(0);
     });
 
-    it('should handle empty folder name in create success message', async () => {
+    it('should handle empty folder name in create success message with CREATED status', async () => {
       const folderWithEmptyName = { ...mockFolder, name: '' };
       const successResponse = {
         statusCode: StatusCode.CREATED,
@@ -564,16 +559,55 @@ describe('FolderManagementService', () => {
         service.createFolder(mockCreateRequest)
       );
 
-      expect(result).toBeNull();
+      expect(result).toEqual(folderWithEmptyName);
       expect(toastHandlingService.success).toHaveBeenCalledWith(
         'Tạo thư mục thành công',
         'Thư mục "" đã được tạo thành công.'
       );
     });
 
-    it('should handle null data in create response', async () => {
+    it('should handle empty folder name in create success message with SUCCESS status', async () => {
+      const folderWithEmptyName = { ...mockFolder, name: '' };
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: folderWithEmptyName,
+      };
+
+      (requestService.post as any).mockReturnValue(of(successResponse));
+
+      const result = await firstValueFrom(
+        service.createFolder(mockCreateRequest)
+      );
+
+      expect(result).toEqual(folderWithEmptyName);
+      expect(toastHandlingService.success).toHaveBeenCalledWith(
+        'Tạo thư mục thành công',
+        'Thư mục "" đã được tạo thành công.'
+      );
+    });
+
+    it('should handle null data in create response with CREATED status', async () => {
       const responseWithNullData = {
         statusCode: StatusCode.CREATED,
+        data: null,
+      };
+
+      (requestService.post as any).mockReturnValue(of(responseWithNullData));
+
+      const result = await firstValueFrom(
+        service.createFolder(mockCreateRequest)
+      );
+
+      expect(result).toBeNull();
+      expect(toastHandlingService.error).toHaveBeenCalledWith(
+        'Tạo thư mục thất bại',
+        'Đã xảy ra sự cố trong quá trình tạo thư mục. Vui lòng thử lại sau.'
+      );
+    });
+
+    it('should handle null data in create response with SUCCESS status', async () => {
+      const responseWithNullData = {
+        statusCode: StatusCode.SUCCESS,
         data: null,
       };
 

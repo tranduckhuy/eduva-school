@@ -15,11 +15,13 @@ import { SubmenuDirective } from '../../../../../shared/directives/submenu/subme
 
 import { ClassFolderManagementService } from '../../services/class-folder-management.service';
 import { FolderManagementService } from '../../../../../shared/services/api/folder/folder-management.service';
+import { GlobalModalService } from '../../../../../shared/services/layout/global-modal/global-modal.service';
 
 import { ContentType } from '../../../../../shared/models/enum/lesson-material.enum';
 
 import { type ClassModel } from '../../../../../shared/models/entities/class.model';
 import { type FolderWithMaterials } from '../class-detail.component';
+import { AddClassMaterialsModalComponent } from './add-class-materials-modal/add-class-materials-modal.component';
 
 @Component({
   selector: 'class-folders',
@@ -32,10 +34,12 @@ import { type FolderWithMaterials } from '../class-detail.component';
 export class ClassFoldersComponent {
   private readonly classFolderService = inject(ClassFolderManagementService);
   private readonly folderService = inject(FolderManagementService);
+  private readonly globalModalService = inject(GlobalModalService);
 
   classModel = input<ClassModel | null>();
   folderWithMaterials = input<FolderWithMaterials[]>();
 
+  addFolderMaterials = output<void>();
   removeFolderMaterials = output<void>();
 
   readonly openedMenuFolderId = signal<string | null>(null);
@@ -66,6 +70,14 @@ export class ClassFoldersComponent {
     this.openedMenuMaterialId.set(
       this.openedMenuMaterialId() === id ? null : id
     );
+  }
+
+  openAddClassMaterialModal(folderId: string) {
+    this.globalModalService.open(AddClassMaterialsModalComponent, {
+      classId: this.classModel()?.id,
+      targetFolderId: folderId,
+      addSuccess: () => this.addFolderMaterials.emit(),
+    });
   }
 
   getMaterialIconConfig(type: ContentType): {
