@@ -1,0 +1,26 @@
+<div class="relative w-full space-y-9 rounded-[20px] bg-transparent pt-[20%]">
+  <div class="absolute inset-0">
+    <img
+      src="./images/credit-pack/credit-pack-carousel.png"
+      alt="Illustrator"
+      class="h-full w-full rounded-[20px] object-cover" />
+  </div>
+  <div class="absolute inset-0 flex flex-col items-start pl-20 text-white">
+    <p class="text-lg tracking-wider">Tận dụng tối đa sức mạnh AI</p>
+    <h2 class="mt-1 text-3xl font-bold tracking-wider !text-white">
+      Mở khóa AI với <strong class="text-primary">Ecoin</strong>
+    </h2>
+  </div>
+</div>
+
+<div class="mt-10">
+  <h3 class="text-xl font-semibold text-gray-700">Nạp Ecoin</h3>
+  <list-credit-pack [creditPacks]="creditPacks()" />
+</div>
+
+<div class="mt-10">
+  <h3 class="text-xl font-semibold text-gray-700">Lịch sử giao dịch</h3>
+  <credit-transaction-history
+    [creditTransactions]="creditTransactions()"
+    [totalRecords]="totalRecords()" />
+</div>

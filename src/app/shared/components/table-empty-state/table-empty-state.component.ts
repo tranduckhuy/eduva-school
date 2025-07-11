@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableEmptyStateComponent {
-  icon = input<string>('info');
+  icon = input<string>('');
   title = input<string>('Không có dữ liệu');
-  subtitle = input<string>('Vui lòng thêm mới để bắt đầu');
+  subtitle = input<string>('');
 }

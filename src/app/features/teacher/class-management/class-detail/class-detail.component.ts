@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
-import { forkJoin, map, of, switchMap } from 'rxjs';
+import { forkJoin, map, of, switchMap, tap } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { TabsModule } from 'primeng/tabs';
@@ -26,7 +26,6 @@ import { ClassFoldersComponent } from './class-folders/class-folders.component';
 
 import { type Folder } from '../../../../shared/models/entities/folder.model';
 import { type LessonMaterial } from '../../../../shared/models/entities/lesson-material.model';
-import { type GetLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
 import { type StudentClassResponse } from '../models/response/query/get-students-class-response.model';
 
 export interface FolderWithMaterials {
@@ -88,64 +87,66 @@ export class ClassDetailComponent implements OnInit {
     });
   }
 
-  loadData() {
+  loadData(): void {
     this.classManagementService
       .getTeacherClassById(this.classId())
       .pipe(
         switchMap(classModel => {
-          if (!classModel?.id) {
-            this.folderMaterials.set([]);
-            this.folderCount.set(0);
-            this.materialCount.set(0);
-            this.students.set([]);
-            return of([]);
-          }
+          if (!classModel?.id) return this.handleEmptyClass();
 
-          // ? Load Students
-          this.classManagementService
-            .getStudentsClass(classModel.id)
-            .subscribe(students => {
-              this.students.set(students ?? []);
-            });
-
-          // ? Load Folders
-          return this.folderManagementService
-            .getClassFolders(classModel.id)
-            .pipe(
-              switchMap(folderRes => {
-                const folders = folderRes ?? [];
-
-                if (folders.length === 0) return of([]);
-
-                const requests = folders.map(folder => {
-                  // ? Get Materials of each Folders
-                  return this.lessonMaterialsService
-                    .getLessonMaterials(folder.id)
-                    .pipe(
-                      map(materialRes => ({
-                        folder,
-                        materials: materialRes ?? [],
-                      }))
-                    );
-                });
-
-                // ? Use forkJoin to fetch materials for all folders in parallel and combine results to an array
-                return forkJoin(requests);
-              })
-            );
-        })
+          this.loadStudents(classModel.id);
+          return this.loadFolderWithMaterials(classModel.id);
+        }),
+        tap(folderWithMaterials => this.updateFolderStats(folderWithMaterials))
       )
-      .subscribe(folderWithMaterials => {
-        this.folderMaterials.set([...folderWithMaterials]);
+      .subscribe();
+  }
 
-        const totalFolders = folderWithMaterials.length;
-        const totalMaterials = folderWithMaterials.reduce(
-          (acc, curr) => acc + curr.materials.length,
-          0
+  private handleEmptyClass() {
+    this.folderMaterials.set([]);
+    this.folderCount.set(0);
+    this.materialCount.set(0);
+    this.students.set([]);
+    return of([]);
+  }
+
+  private loadStudents(classId: string): void {
+    this.classManagementService
+      .getStudentsClass(classId)
+      .subscribe(students => this.students.set(students ?? []));
+  }
+
+  private loadFolderWithMaterials(classId: string) {
+    return this.folderManagementService.getClassFolders(classId).pipe(
+      switchMap(folders => {
+        if (!folders || folders.length === 0) return of([]);
+        const requests = folders.map(folder =>
+          this.lessonMaterialsService.getLessonMaterials(folder.id).pipe(
+            map(materials => ({
+              folder,
+              materials: materials ?? [],
+            }))
+          )
         );
+        return forkJoin(requests);
+      })
+    );
+  }
 
-        this.folderCount.set(totalFolders);
-        this.materialCount.set(totalMaterials);
-      });
+  private updateFolderStats(
+    folderWithMaterials: {
+      folder: any;
+      materials: any[];
+    }[]
+  ): void {
+    const totalFolders = folderWithMaterials.length;
+    const totalMaterials = folderWithMaterials.reduce(
+      (sum, item) => sum + (item.folder.countLessonMaterial ?? 0),
+      0
+    );
+
+    this.folderMaterials.set([...folderWithMaterials]);
+    this.folderCount.set(totalFolders);
+    this.materialCount.set(totalMaterials);
   }
 }

@@ -9,43 +9,6 @@
   </header>
 
   <div class="mt-[25px] px-[25px] pb-0">
-    <!-- <form [formGroup]="form"> -->
-    <!-- <div class="w-[500px]">
-        <label for="title" class="font-bold dark:text-white">
-          Tên tài liệu
-        </label>
-        <div
-          class="relative mt-3 h-[55px] w-full rounded-md border-[1.5px] border-[#e9edf6] bg-white px-5 transition-colors duration-200 ease-in focus-within:border-primary dark:bg-dark-400"
-          [ngClass]="{
-            '!border-[#f33a58] dark:!border-[#f33a58]':
-              title.invalid && title.touched,
-          }"
-          [style.backgroundColor]="
-            title.invalid && title.touched ? '#ff00001a' : ''
-          ">
-          <input
-            type="text"
-            name="title"
-            id="title"
-            placeholder="E.g. Tài liệu ôn tập môn Văn"
-            formControlName="title"
-            (blur)="onBlur('title')"
-            class="h-full w-full border-none bg-transparent outline-none placeholder:font-medium placeholder:tracking-wide placeholder:text-gray-500 dark:text-white dark:placeholder:text-gray-400"
-            [class.text-[#f33a58]]="
-              title.invalid && title.touched && title.dirty
-            " />
-          @if (title.invalid && title.touched) {
-            <i
-              class="fa-solid fa-triangle-exclamation absolute right-[14px] top-[50%] block -translate-y-[50%] animate-shake text-base text-[#f33a58]"></i>
-          }
-        </div>
-        @if (title.invalid && title.touched) {
-          <div class="mt-2 font-medium leading-normal text-[#f33a58]">
-            {{ getErrorMessage('title') }}
-          </div>
-        }
-      </div> -->
-
     <div class="mt-[25px] w-[550px] sm:w-[480px] xs:w-[280px]">
       <label for="files" class="font-bold dark:text-white">
         Chọn tệp từ thiết bị
@@ -140,7 +103,6 @@
         </p-fileupload>
       </div>
     </div>
-    <!-- </form> -->
   </div>
 
   <footer

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { EMPTY, Observable, catchError, map, of, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 
 import { ConfirmationService } from 'primeng/api';
 
@@ -14,10 +14,12 @@ import { ToastHandlingService } from '../../core/toast/toast-handling.service';
 
 import { StatusCode } from '../../../constants/status-code.constant';
 
+import { type RefreshTokenRequest } from '../../../../core/auth/models/request/refresh-token-request.model';
 import { type CreatePlanPaymentLinkRequest } from '../../../models/api/request/command/create-plan-payment-link-request.model';
 import { type CreatePlanPaymentLinkResponse } from '../../../models/api/response/command/create-plan-payment-link-response.model';
 import { type ConfirmPaymentReturnRequest } from '../../../models/api/request/query/confirm-payment-return-request.model';
-import { type RefreshTokenRequest } from '../../../../core/auth/models/request/refresh-token-request.model';
+import { type CreateCreditPaymentLinkRequest } from '../../../models/api/request/command/create-credit-payment-link-request.model';
+import { type CreateCreditPaymentLinkResponse } from '../../../models/api/response/command/create-credit-payment-link-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -31,6 +33,7 @@ export class PaymentService {
 
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly CREATE_PLAN_PAYMENT_LINK_API_URL = `${this.BASE_API_URL}/school-subscriptions/payment-link`;
+  private readonly CREATE_CREDIT_PAYMENT_LINK_API_URL = `${this.BASE_API_URL}/credit-transactions/payment-link`;
   private readonly CONFIRM_PAYMENT_RETURN_API_URL = `${this.BASE_API_URL}/payments/payos-return`;
 
   createPlanPaymentLink(
@@ -42,8 +45,29 @@ export class PaymentService {
         request
       )
       .pipe(
-        tap(res => this.handleCreatePaymentLinkResponse(res)),
-        map(res => this.extractDataFromResponse(res)),
+        tap(res => this.handleCreatePlanPaymentLinkResponse(res)),
+        map(res =>
+          this.extractDataFromResponse<CreatePlanPaymentLinkResponse>(res)
+        ),
+        catchError(() => {
+          this.toastHandlingService.errorGeneral();
+          return of(null);
+        })
+      );
+  }
+
+  createCreditPaymentLink(
+    request: CreateCreditPaymentLinkRequest
+  ): Observable<CreateCreditPaymentLinkResponse | null> {
+    return this.requestService
+      .post(this.CREATE_CREDIT_PAYMENT_LINK_API_URL, request, {
+        loadingKey: 'create-credit-payment-link',
+      })
+      .pipe(
+        tap(res => this.handleCreateCreditPaymentLinkResponse(res)),
+        map(res =>
+          this.extractDataFromResponse<CreateCreditPaymentLinkResponse>(res)
+        ),
         catchError(() => {
           this.toastHandlingService.errorGeneral();
           return of(null);
@@ -73,7 +97,7 @@ export class PaymentService {
   //  Private Helper Functions
   // ---------------------------
 
-  private handleCreatePaymentLinkResponse(res: any): void {
+  private handleCreatePlanPaymentLinkResponse(res: any): void {
     if (res.statusCode !== StatusCode.SUCCESS || !res.data) {
       this.toastHandlingService.error(
         'Sự cố hệ thống',
@@ -117,6 +141,14 @@ export class PaymentService {
     }
   }
 
+  private handleCreateCreditPaymentLinkResponse(res: any): void {
+    if (res.statusCode === StatusCode.SUCCESS && res.data) {
+      this.redirectToUrl(res.data.checkoutUrl);
+    } else {
+      this.toastHandlingService.errorGeneral();
+    }
+  }
+
   private handleConfirmPaymentReturnResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS) {
       this.toastHandlingService.success(
@@ -152,14 +184,12 @@ export class PaymentService {
         break;
     }
 
-    return of(void 0);
+    return throwError(() => err);
   }
 
-  private extractDataFromResponse(
-    res: any
-  ): CreatePlanPaymentLinkResponse | null {
+  private extractDataFromResponse<T>(res: any): T | null {
     if (res.statusCode === StatusCode.SUCCESS && res.data) {
-      return res.data;
+      return res.data as T;
     }
     return null;
   }

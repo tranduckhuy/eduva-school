@@ -13,6 +13,7 @@ import { type UpdateProfileRequest } from '../../../pages/settings-page/personal
 import { EntityListResponse } from '../../../models/api/response/query/entity-list-response.model';
 import { BaseResponse } from '../../../models/api/base-response.model';
 import { UserListParams } from '../../../models/api/request/query/user-list-params';
+import { CreateUserRequest } from '../../../models/api/request/command/create-user-request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -98,6 +99,31 @@ export class UserService {
     );
   }
 
+  createUser(request: CreateUserRequest): Observable<boolean> {
+    return this.requestService
+      .post<void>(this.USER_API_URL, request, {
+        loadingKey: 'create-user',
+      })
+      .pipe(
+        map(res => {
+          if (res.statusCode === StatusCode.SUCCESS) {
+            this.toastHandlingService.success(
+              'Thành công!',
+              'Tài khoản người dùng đã được tạo thành công'
+            );
+            return true;
+          } else {
+            this.toastHandlingService.errorGeneral();
+            return false;
+          }
+        }),
+        catchError((err: HttpErrorResponse) => {
+          this.handleCreateUserError(err);
+          return of(false);
+        })
+      );
+  }
+
   /**
    * Fetches user details by ID
    * @param id User ID
@@ -160,16 +186,18 @@ export class UserService {
         'Hồ sơ của bạn đã được thay đổi thành công'
       );
 
-      const currentUser = this.currentUser();
-      const updated = res.data;
+      const updated = res.data as User;
 
-      if (!currentUser || !updated) {
+      if (!updated) {
         this.toastHandlingService.errorGeneral();
         return;
       }
 
-      const mergedUser = this.mergeUser(currentUser, updated);
-      this.setCurrentUser(mergedUser);
+      this.updateCurrentUserPartial({
+        fullName: updated.fullName,
+        phoneNumber: updated.phoneNumber,
+        avatarUrl: updated.avatarUrl,
+      });
     } else {
       this.toastHandlingService.errorGeneral();
     }
@@ -185,17 +213,6 @@ export class UserService {
   private handleErrorResponse(): Observable<null> {
     this.toastHandlingService.errorGeneral();
     return of(null);
-  }
-
-  private mergeUser(current: User, updated: Partial<User>): User {
-    return {
-      ...current,
-      ...updated,
-      roles: updated.roles?.length ? updated.roles : current.roles,
-      isEmailConfirmed: updated.isEmailConfirmed ?? current.isEmailConfirmed,
-      userSubscriptionResponse:
-        updated.userSubscriptionResponse ?? current.userSubscriptionResponse,
-    };
   }
 
   private loadUserFromStorage(): User | null {
@@ -263,6 +280,27 @@ export class UserService {
         return throwError(() => err);
       })
     );
+  }
+
+  private handleCreateUserError(err: HttpErrorResponse): void {
+    const statusCode = err.error?.statusCode;
+
+    switch (statusCode) {
+      case StatusCode.EMAIL_ALREADY_EXISTS:
+        this.toastHandlingService.error(
+          'Đăng ký thất bại',
+          'Email đã tồn tại. Vui lòng chọn email khác!'
+        );
+        break;
+      case StatusCode.EXCEED_USER_LIMIT:
+        this.toastHandlingService.error(
+          'Đăng ký thất bại',
+          'Số lượng tài khoản được phép tạo đã đạt đến mức tối đa!'
+        );
+        break;
+      default:
+        this.toastHandlingService.errorGeneral();
+    }
   }
 
   private resetUsers(): void {

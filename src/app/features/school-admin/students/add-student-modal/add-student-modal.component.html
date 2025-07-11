@@ -1,26 +1,25 @@
 <div
   class="max-h-[calc(100vh-40px)] max-w-[550px] overflow-y-auto rounded-lg bg-white dark:bg-dark-300">
-  <header
-    class="sticky left-0 top-0 z-[1] block w-full rounded-t-lg bg-gray-50 p-[25px] dark:bg-dark-400">
-    <h2 class="text-lg">Thêm học sinh</h2>
-    <span
-      class="pi pi-times absolute right-[5px] top-[50%] -translate-y-[50%] cursor-pointer px-5 py-3 text-xl"
-      (click)="closeModal()"></span>
-  </header>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <header
+      class="sticky left-0 top-0 z-[1] block w-full rounded-t-lg bg-gray-50 p-[25px] dark:bg-dark-400">
+      <h2 class="text-lg">Thêm học sinh</h2>
+      <span
+        class="pi pi-times absolute right-[5px] top-[50%] -translate-y-[50%] cursor-pointer px-5 py-3 text-xl"
+        (click)="closeModal()"></span>
+    </header>
 
-  <div class="mt-[25px] px-[25px] pb-0">
-    <form #createForm="ngForm" (ngSubmit)="onSubmit(createForm)">
+    <div class="mt-[25px] px-[25px] pb-0">
       <div class="e-row e-row-cols-1 e-g-3">
         <div class="e-col mt-4">
           <app-form-control
             label="Tên"
             type="text"
-            [name]="'name'"
+            [name]="'fullName'"
+            formControlName="fullName"
             placeholder="Tên đầy đủ..."
-            [(ngModel)]="name"
             [required]="true"
-            [submitted]="submitted()"
-            #nameCtrl="ngModel">
+            [submitted]="submitted()">
           </app-form-control>
         </div>
         <div class="e-col">
@@ -28,65 +27,96 @@
             label="Email"
             type="email"
             [name]="'email'"
+            formControlName="email"
             [required]="true"
             [email]="true"
             placeholder="Email..."
-            [(ngModel)]="email"
-            [submitted]="submitted()"
-            #emailCtrl="ngModel">
+            [submitted]="submitted()">
           </app-form-control>
         </div>
-        <div class="e-col">
-          <app-form-control
-            label="Mật khẩu"
-            type="password"
-            placeholder="Mật khẩu..."
-            [validatePassword]="true"
-            [name]="'password'"
-            [(ngModel)]="password"
-            [submitted]="submitted()"
-            #passwordCtrl="ngModel"
-            [errorMessages]="{
-              passwordWeak: 'Độ khó mật khẩu chưa đạt yêu cầu.',
-            }"
-            [required]="true">
-          </app-form-control>
+        <app-form-control
+          type="password"
+          label="Mật khẩu"
+          placeholder="Mật khẩu"
+          formControlName="initialPassword"
+          [name]="'initialPassword'"
+          [maxLength]="18"
+          [submitted]="submitted()"
+          [required]="true" />
+        <div class="mx-1 mt-3 pb-4 pr-[18px]">
+          <div class="flex gap-1">
+            <div
+              class="h-[5px] flex-1 rounded-[4px]"
+              [ngClass]="{
+                'bg-[#e1e4eb]': !passwordLevel(),
+                'bg-[#d43031]': passwordLevel()! < 4,
+                'bg-[#faa61b]': passwordLevel() === 4,
+                'bg-[#02875a]': passwordLevel() === 5,
+              }"></div>
+            <div
+              class="h-[5px] flex-1 rounded-[4px]"
+              [ngClass]="{
+                'bg-[#e1e4eb]': !passwordLevel() || passwordLevel()! < 3,
+                'bg-[#d43031]': passwordLevel() === 3,
+                'bg-[#faa61b]': passwordLevel() === 4,
+                'bg-[#02875a]': passwordLevel() === 5,
+              }"></div>
+            <div
+              class="h-[5px] flex-1 rounded-[4px]"
+              [ngClass]="{
+                'bg-[#e1e4eb]': !passwordLevel() || passwordLevel()! < 4,
+                'bg-[#faa61b]': passwordLevel() === 4,
+                'bg-[#02875a]': passwordLevel() === 5,
+              }"></div>
+            <div
+              class="h-[5px] flex-1 rounded-[4px]"
+              [ngClass]="{
+                'bg-[#e1e4eb]': passwordLevel() !== 5,
+                'bg-[#02875a]': passwordLevel() === 5,
+              }"></div>
+          </div>
+          <div class="py-2 text-right text-xs font-medium text-[#666]">
+            {{
+              passwordLevel() &&
+                (passwordLevel() === 5
+                  ? 'Mật khẩu mạnh'
+                  : passwordLevel() === 4
+                    ? 'Mật khẩu trung bình'
+                    : 'Mật khẩu yếu')
+            }}
+          </div>
         </div>
-        <div class="e-col">
-          <app-form-control
-            label="Nhập lại mật khẩu"
-            type="password"
-            placeholder="Nhập lại mật khẩu..."
-            [name]="'confirmPassword'"
-            [(ngModel)]="confirmPassword"
-            [confirmPassword]="password()"
-            [submitted]="submitted()"
-            #confirmPasswordCtrl="ngModel"
-            [errorMessages]="{
-              required: 'Vui lòng nhập mật khẩu',
-            }"
-            [required]="true">
-          </app-form-control>
-        </div>
-      </div>
-    </form>
-  </div>
 
-  <div
-    class="sticky bottom-0 left-0 z-[1] flex justify-end gap-2 bg-white p-[25px] dark:bg-dark-300">
-    <p-button
-      label="Hủy"
-      variant="outlined"
-      severity="danger"
-      icon="pi pi-times"
-      size="small"
-      (onClick)="closeModal()" />
-    <p-button
-      type="submit"
-      label="Thêm học sinh"
-      variant="outlined"
-      icon="pi pi-plus"
-      size="small"
-      (onClick)="createForm.ngSubmit.emit()" />
-  </div>
+        <app-form-control
+          type="password"
+          label="Xác nhận mật khẩu"
+          placeholder="Mật khẩu"
+          formControlName="confirmPassword"
+          [name]="'confirmPassword'"
+          [maxLength]="18"
+          [confirmPassword]="form.value.initialPassword"
+          class="-mt-4"
+          [submitted]="submitted()"
+          [required]="true" />
+      </div>
+    </div>
+
+    <div
+      class="sticky bottom-0 left-0 z-[1] flex justify-end gap-2 bg-white p-[25px] dark:bg-dark-300">
+      <p-button
+        label="Hủy"
+        variant="outlined"
+        severity="danger"
+        icon="pi pi-times"
+        size="small"
+        (onClick)="closeModal()" />
+      <p-button
+        type="submit"
+        label="Thêm học sinh"
+        variant="outlined"
+        icon="pi pi-plus"
+        [loading]="isLoading()"
+        size="small" />
+    </div>
+  </form>
 </div>

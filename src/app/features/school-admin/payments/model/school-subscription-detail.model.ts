@@ -1,4 +1,4 @@
-import { Payment } from './payment.model';
+import { Payment } from '../../../../shared/models/entities/payment.model';
 
 type Status =
   | 0 // Active

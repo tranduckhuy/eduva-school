@@ -128,170 +128,41 @@ export class NavbarComponent implements OnInit {
   }
 
   private getNavbarConfigByRole(role: UserRole): NavbarConfig[] {
-    const isAdmin =
-      role === UserRoles.SCHOOL_ADMIN || role === UserRoles.SYSTEM_ADMIN;
+    const isAdmin = this.isAdminRole(role);
     const isTeacher = role === UserRoles.TEACHER;
     const isModerator = role === UserRoles.CONTENT_MODERATOR;
     const isTeacherOrMod = isTeacher || isModerator;
-
     const schoolMissing = this.schoolAndPlanMissing();
 
     const dashboardLink = isAdmin ? '/school-admin' : '/teacher';
     const profileLink = isAdmin
-      ? '/school-admin/settings'
-      : '/teacher/settings';
+      ? '/school-admin/settings/account-settings'
+      : '/teacher/settings/account-settings';
 
-    // ? School admin management menu
-    const schoolAdminNav: NavItem[] = isAdmin
-      ? [
-          {
-            label: 'Giáo viên',
-            icon: 'co_present',
-            link: this.schoolAndPlanMissing()
-              ? '/school-admin/subscription-plans'
-              : '/school-admin/teachers',
-            type: 'link',
-            isActive: false,
-            submenuItems: [],
-          },
-          {
-            label: 'Kiểm duyệt viên',
-            icon: 'person_check',
-            link: this.schoolAndPlanMissing()
-              ? '/school-admin/subscription-plans'
-              : '/school-admin/content-moderators',
-            type: 'link',
-            isActive: false,
-            submenuItems: [],
-          },
-          {
-            label: 'Học sinh',
-            icon: 'person_edit',
-            link: this.schoolAndPlanMissing()
-              ? '/school-admin/subscription-plans'
-              : '/school-admin/students',
-            type: 'link',
-            isActive: false,
-            submenuItems: [],
-          },
-          {
-            label: 'Lịch sử giao dịch',
-            icon: 'receipt_long',
-            link: this.schoolAndPlanMissing()
-              ? '/school-admin/subscription-plans'
-              : '/school-admin/payments',
-            type: 'link',
-            isActive: false,
-            submenuItems: [],
-          },
-        ]
-      : [];
-
-    // ? Only teachers and content moderators can access file manager
-    const fileManagerNav: NavItem[] = isTeacherOrMod
-      ? [
-          {
-            label: 'Quản lý Tài liệu',
-            icon: 'folder_open',
-            link: '/teacher/file-manager',
-            type: 'link',
-            isActive: false,
-            isDisabled: this.schoolAndPlanMissing(),
-            submenuItems: [],
-          },
-        ]
-      : [];
-
-    // ? Learning management submenu (dynamic based on role)
-    const learningSubmenu: NavItem['submenuItems'] = [];
-    if (isAdmin) {
-      learningSubmenu.push(
-        {
-          label: 'Tài liệu chia sẻ',
-          link: schoolMissing
-            ? '/school-admin/subscription-plans'
-            : '/school-admin/shared-lessons',
-        },
-        {
-          label: 'Kiểm duyệt nội dung',
-          link: schoolMissing
-            ? '/school-admin/subscription-plans'
-            : '/school-admin/moderate-lessons',
-        }
-      );
-    }
-
-    if (isTeacherOrMod) {
-      learningSubmenu.push({
-        label: 'Tài liệu chia sẻ',
-        link: '/teacher/shared-lessons',
-        isDisabled: schoolMissing,
-      });
-
-      if (isTeacher) {
-        learningSubmenu.push(
-          {
-            label: 'Danh sách lớp học',
-            link: '/teacher/class-management',
-            isDisabled: schoolMissing,
-          },
-          {
-            label: 'Tạo bài giảng tự động',
-            link: '/teacher/generate-lesson',
-            isDisabled: schoolMissing,
-          }
-        );
-      }
-
-      if (isModerator && !isAdmin) {
-        learningSubmenu.push({
-          label: 'Kiểm duyệt nội dung',
-          link: '/school-admin/moderate-lessons',
-          isDisabled: schoolMissing,
-        });
-      }
-    }
-
-    const learningNav: NavItem = {
-      label: 'Quản lý học tập',
-      icon: 'auto_stories',
-      type: 'accordion',
-      isActive: false,
-      submenuItems: learningSubmenu,
-    };
-
-    // ? Merge management items
-    const managementNav = [...schoolAdminNav, ...fileManagerNav, learningNav];
-
-    return [
+    const navItems: NavbarConfig[] = [
       {
         section: 'Thống kê',
         navItems: [
-          {
-            label: 'Bảng thống kê',
-            icon: 'dashboard',
-            type: 'link',
-            link: dashboardLink,
-            isActive: true,
-            submenuItems: [],
-          },
+          this.buildNavItem('Bảng thống kê', 'dashboard', dashboardLink),
         ],
       },
       {
         section: 'Quản lý',
-        navItems: managementNav,
+        navItems: [
+          ...this.buildAdminNav(isAdmin, schoolMissing),
+          ...this.buildFileManagerNav(isTeacherOrMod, schoolMissing),
+          this.buildLearningNav({
+            isAdmin,
+            isTeacher,
+            isModerator,
+            schoolMissing,
+          }),
+        ],
       },
       {
         section: 'Khác',
         navItems: [
-          {
-            label: 'Trang cá nhân',
-            icon: 'account_circle',
-            link: profileLink,
-            type: 'link',
-            isActive: false,
-            submenuItems: [],
-          },
+          this.buildNavItem('Cài đặt', 'settings', profileLink),
           {
             label: 'Đăng xuất',
             icon: 'logout',
@@ -302,5 +173,132 @@ export class NavbarComponent implements OnInit {
         ],
       },
     ];
+
+    return navItems;
+  }
+
+  private isAdminRole(role: UserRole): boolean {
+    return role === UserRoles.SCHOOL_ADMIN || role === UserRoles.SYSTEM_ADMIN;
+  }
+
+  private buildNavItem(
+    label: string,
+    icon: string,
+    link: string,
+    isDisabled = false
+  ): NavItem {
+    return {
+      label,
+      icon,
+      type: 'link',
+      link,
+      isActive: false,
+      isDisabled,
+      submenuItems: [],
+    };
+  }
+
+  private buildAdminNav(isAdmin: boolean, schoolMissing: boolean): NavItem[] {
+    if (!isAdmin) return [];
+
+    const fallback = '/school-admin/subscription-plans';
+
+    const links = [
+      {
+        label: 'Giáo viên',
+        icon: 'co_present',
+        path: '/school-admin/teachers',
+      },
+      {
+        label: 'Kiểm duyệt viên',
+        icon: 'person_check',
+        path: '/school-admin/content-moderators',
+      },
+      {
+        label: 'Học sinh',
+        icon: 'person_edit',
+        path: '/school-admin/students',
+      },
+      {
+        label: 'Lịch sử giao dịch',
+        icon: 'receipt_long',
+        path: '/school-admin/payments',
+      },
+    ];
+
+    return links.map(item =>
+      this.buildNavItem(
+        item.label,
+        item.icon,
+        schoolMissing ? fallback : item.path
+      )
+    );
+  }
+
+  private buildFileManagerNav(
+    isAllowed: boolean,
+    schoolMissing: boolean
+  ): NavItem[] {
+    if (!isAllowed) return [];
+    return [
+      this.buildNavItem(
+        'Quản lý Tài liệu',
+        'folder_open',
+        '/teacher/file-manager',
+        schoolMissing
+      ),
+    ];
+  }
+
+  private buildLearningNav({
+    isAdmin,
+    isTeacher,
+    isModerator,
+    schoolMissing,
+  }: {
+    isAdmin: boolean;
+    isTeacher: boolean;
+    isModerator: boolean;
+    schoolMissing: boolean;
+  }): NavItem {
+    const submenu: NavItem['submenuItems'] = [];
+
+    const push = (label: string, link: string, isDisabled?: boolean) => {
+      submenu.push({ label, link, isDisabled });
+    };
+
+    if (isAdmin) {
+      const fallback = '/school-admin/subscription-plans';
+      push(
+        'Tài liệu chia sẻ',
+        schoolMissing ? fallback : '/school-admin/shared-lessons'
+      );
+      push(
+        'Kiểm duyệt nội dung',
+        schoolMissing ? fallback : '/school-admin/moderate-lessons'
+      );
+    }
+
+    if (isTeacher || isModerator) {
+      push('Tài liệu chia sẻ', '/teacher/shared-lessons', schoolMissing);
+      push('Danh sách lớp học', '/teacher/class-management', schoolMissing);
+      push('Tạo bài giảng tự động', '/teacher/generate-lesson', schoolMissing);
+    }
+
+    if (isModerator && !isAdmin) {
+      push(
+        'Kiểm duyệt nội dung',
+        '/school-admin/moderate-lessons',
+        schoolMissing
+      );
+    }
+
+    return {
+      label: 'Quản lý học tập',
+      icon: 'auto_stories',
+      type: 'accordion',
+      isActive: false,
+      submenuItems: submenu,
+    };
   }
 }

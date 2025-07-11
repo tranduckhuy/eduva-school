@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 
-import { EMPTY, Observable, catchError, map, of, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 
@@ -123,6 +123,7 @@ export class ClassManagementService {
   // ---------------------------
   //  Private Helper Functions
   // ---------------------------
+
   private handleCreateTeacherClassResponse(res: any) {
     if (res.statusCode === StatusCode.CREATED && res.data) {
       this.toastHandlingService.success(

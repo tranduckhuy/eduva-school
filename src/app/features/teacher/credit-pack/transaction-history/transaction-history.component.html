@@ -1,0 +1,69 @@
+<div class="mt-4 w-full">
+  @if (isLoading()) {
+    <app-table-skeleton [tableHead]="tableHeadSkeleton()" />
+  } @else {
+    <div class="relative">
+      <p-table
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [scrollHeight]="'600px'"
+        [lazy]="true"
+        [scrollable]="true"
+        [showCurrentPageReport]="false"
+        [value]="creditTransactions()"
+        [rows]="pageSize()"
+        [first]="firstRecordIndex()"
+        [totalRecords]="totalRecords()"
+        [paginator]="creditTransactions().length > 0"
+        (onLazyLoad)="onLazyLoad($event)">
+        <ng-template #header>
+          <tr>
+            <th scope="col">Thời gian giao dịch</th>
+            <th scope="col">Mã giao dịch</th>
+            <th scope="col" class="!text-center">Số tiền</th>
+            <th scope="col" class="!text-center">Số Ecoin</th>
+            <th scope="col" class="!text-center">Trạng thái giao dịch</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-transaction let-i="rowIndex">
+          <tr>
+            <td>
+              {{
+                transaction.createdAt | date: 'hh:mm:ss - EEEE, dd MMMM YYYY'
+              }}
+            </td>
+            <td>GD-{{ transaction.transactionCode }}</td>
+            <td class="!text-center">
+              {{
+                transaction.amount
+                  | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN'
+              }}
+            </td>
+            <td class="!text-center">{{ transaction.totalCredits }} Ecoin</td>
+            <td class="!text-center">
+              <div class="flex items-center justify-center">
+                <app-badge
+                  class="whitespace-nowrap"
+                  [variant]="getPaymentStatusBadge(transaction.paymentStatus)">
+                  {{ getPaymentStatusLabel(transaction.paymentStatus) }}
+                </app-badge>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="100%">
+              <div class="h-[30px]"></div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+      @if (creditTransactions().length === 0) {
+        <div
+          class="pointer-events-none absolute left-0 right-0 top-[70%] -translate-y-[50%]">
+          <app-table-empty-state title="Không tìm thấy dữ liệu" />
+        </div>
+      }
+    </div>
+  }
+</div>

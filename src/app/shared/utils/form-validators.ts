@@ -85,3 +85,21 @@ export function normalizeUrl(input?: string): string | undefined {
   const trimmed = input.trim();
   return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
 }
+
+/**
+ * Validates whether the control's value is a valid email address.
+ *
+ * Uses a stricter regex than Angular's built-in Validators.email.
+ *
+ * @param control - The form control containing the email string.
+ * @returns An object with the key 'email' if invalid, otherwise null.
+ */
+export function customEmailValidator(
+  control: AbstractControl
+): ValidationErrors | null {
+  const value: string = control.value ?? '';
+  // RFC 5322 Official Standard (simplified)
+  const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!value) return null;
+  return EMAIL_REGEX.test(value) ? null : { email: true };
+}

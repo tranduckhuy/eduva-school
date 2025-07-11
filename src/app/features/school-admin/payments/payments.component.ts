@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
-  OnInit,
   signal,
 } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
@@ -44,7 +43,7 @@ import { TableEmptyStateComponent } from '../../../shared/components/table-empty
   styleUrl: './payments.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PaymentsComponent implements OnInit {
+export class PaymentsComponent {
   private readonly paymentService = inject(SchoolPaymentService);
   private readonly loadingService = inject(LoadingService);
 
@@ -52,7 +51,7 @@ export class PaymentsComponent implements OnInit {
   first = signal<number>(0);
   rows = signal<number>(PAGE_SIZE);
   sortField = signal<string | null>(null);
-  sortOrder = signal<number>(0); // 1 = asc, -1 = desc
+  sortOrder = signal<number>(-1); // 1 = asc, -1 = desc
   paymentPurpose = signal<0 | 1 | undefined>(undefined); // 1 = SchoolSubscription, 0 = CreditPackage
   selectedTimeFilter = signal<
     { name: string; value: string | undefined } | undefined
@@ -80,10 +79,6 @@ export class PaymentsComponent implements OnInit {
   payments = this.paymentService.payments;
   totalPayments = this.paymentService.totalPayments;
 
-  ngOnInit(): void {
-    this.loadData();
-  }
-
   onTimeFilterChange(
     selected: { name: string; value: string | undefined } | undefined
   ): void {
@@ -94,7 +89,7 @@ export class PaymentsComponent implements OnInit {
       this.sortOrder.set(selected.value === 'desc' ? -1 : 1);
     } else {
       this.sortField.set(null);
-      this.sortOrder.set(1);
+      this.sortOrder.set(-1);
     }
 
     this.first.set(0);
@@ -115,6 +110,8 @@ export class PaymentsComponent implements OnInit {
 
     this.first.set(first);
     this.rows.set(rows);
+
+    this.loadData();
   }
 
   getCreditPayments() {
@@ -135,7 +132,7 @@ export class PaymentsComponent implements OnInit {
   onSearchTriggered(term: string): void {
     this.searchTerm.set(term);
     this.sortField.set(null);
-    this.sortOrder.set(1);
+    this.sortOrder.set(-1);
     this.first.set(0); // Reset to first page when search changes
     this.loadData();
   }
