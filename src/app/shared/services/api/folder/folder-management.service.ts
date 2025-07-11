@@ -55,19 +55,31 @@ export class FolderManagementService {
           }
         }),
         map(res => this.extractSingleData(res)),
-        catchError((err: HttpErrorResponse) => this.handleCreateError(err))
+        catchError(err => this.handleCreateError(err))
       );
   }
 
   getPersonalFolders(request: GetFoldersRequest): Observable<Folder[] | null> {
     return this.requestService
-      .get<GetFoldersResponse>(`${this.BASE_FOLDERS_API_URL}/user`, request, {
-        loadingKey: 'get-folders',
-      })
+      .get<GetFoldersResponse | Folder[]>(
+        `${this.BASE_FOLDERS_API_URL}/user`,
+        request,
+        {
+          loadingKey: 'get-folders',
+        }
+      )
       .pipe(
-        tap(res => this.handlePagingFoldersResponse(res)),
-        map(res => this.extractPagingListData(res)),
-        catchError((err: HttpErrorResponse) => this.handleError(err))
+        tap(res =>
+          this.handleFolderListResponse(res, {
+            isPaging: request.isPaging !== false,
+          })
+        ),
+        map(res =>
+          this.extractFolderListFromResponse(res, {
+            isPaging: request.isPaging !== false,
+          })
+        ),
+        catchError(err => this.handleError(err))
       );
   }
 
@@ -80,9 +92,9 @@ export class FolderManagementService {
         }
       )
       .pipe(
-        tap(res => this.handleFoldersResponse(res)),
-        map(res => this.extractListData(res)),
-        catchError((err: HttpErrorResponse) => this.handleError(err))
+        tap(res => this.handleFolderListResponse(res)),
+        map(res => this.extractFolderListFromResponse(res)),
+        catchError(err => this.handleError(err))
       );
   }
 
@@ -92,7 +104,7 @@ export class FolderManagementService {
       .pipe(
         tap(res => this.handleArchiveResponse(res)),
         map(() => null),
-        catchError((err: HttpErrorResponse) => this.handleError(err))
+        catchError(err => this.handleError(err))
       );
   }
 
@@ -102,7 +114,7 @@ export class FolderManagementService {
       .pipe(
         tap(res => this.handleRemoveResponse(res)),
         map(() => null),
-        catchError((err: HttpErrorResponse) => this.handleError(err))
+        catchError(err => this.handleError(err))
       );
   }
 
@@ -110,10 +122,16 @@ export class FolderManagementService {
   //  Private Helper Functions
   // ---------------------------
 
-  private handlePagingFoldersResponse(res: any) {
+  private handleFolderListResponse(
+    res: any,
+    options: { isPaging?: boolean } = {}
+  ) {
     if (res.statusCode === StatusCode.SUCCESS && res.data) {
-      this.folderListSignal.set([...(res.data.data ?? [])]);
-      this.totalRecordsSignal.set(res.data.count ?? 0);
+      const isPaging = options.isPaging ?? false;
+      const folders = isPaging ? (res.data.data ?? []) : (res.data ?? []);
+
+      this.folderListSignal.set([...folders]);
+      if (isPaging) this.totalRecordsSignal.set(res.data.count ?? 0);
     } else {
       this.toastHandlingService.error(
         'Lấy danh sách thư mục thất bại',
@@ -122,15 +140,24 @@ export class FolderManagementService {
     }
   }
 
-  private handleFoldersResponse(res: any) {
-    if (res.statusCode === StatusCode.SUCCESS && res.data) {
-      this.folderListSignal.set([...(res.data ?? [])]);
-    } else {
-      this.toastHandlingService.error(
-        'Lấy danh sách thư mục thất bại',
-        'Không thể lấy được danh sách thư mục. Vui lòng thử lại sau.'
-      );
-    }
+  private extractFolderListFromResponse(
+    res: any,
+    options: { isPaging?: boolean } = {}
+  ): Folder[] | null {
+    if (res.statusCode !== StatusCode.SUCCESS || !res.data) return null;
+
+    const isPaging = options.isPaging ?? false;
+    return isPaging
+      ? ((res.data.data as Folder[]) ?? null)
+      : ((res.data as Folder[]) ?? null);
+  }
+
+  private extractSingleData(res: any): Folder | null {
+    return (res.statusCode === StatusCode.SUCCESS ||
+      res.statusCode === StatusCode.CREATED) &&
+      res.data
+      ? (res.data as Folder)
+      : null;
   }
 
   private handleArchiveResponse(res: any): void {
@@ -147,25 +174,6 @@ export class FolderManagementService {
     } else {
       this.toastHandlingService.errorGeneral();
     }
-  }
-
-  private extractPagingListData(res: any): Folder[] | null {
-    return res.statusCode === StatusCode.SUCCESS && res.data
-      ? (res.data.data as Folder[])
-      : null;
-  }
-
-  private extractListData(res: any): Folder[] | null {
-    return [StatusCode.SUCCESS, StatusCode.CREATED].includes(res.statusCode) &&
-      res.data
-      ? (res.data as Folder[])
-      : null;
-  }
-
-  private extractSingleData(res: any): Folder | null {
-    return res.statusCode === StatusCode.SUCCESS && res.data
-      ? (res.data as Folder)
-      : null;
   }
 
   private handleCreateError(err: HttpErrorResponse): Observable<null> {

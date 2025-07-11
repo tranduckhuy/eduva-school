@@ -48,6 +48,106 @@ describe('ClassFolderManagementService', () => {
     expect(service).toBeTruthy();
   });
 
+  describe('addMaterialsForClass', () => {
+    const classId = 'class-123';
+    const folderId = 'folder-456';
+    const request = ['material-1', 'material-2'];
+
+    beforeEach(() => {
+      (requestService as any).post = vi.fn();
+    });
+
+    it('should call post and show success toast on SUCCESS', async () => {
+      (requestService.post as any).mockReturnValue(
+        of({ statusCode: StatusCode.SUCCESS })
+      );
+
+      await new Promise<void>(resolve => {
+        service
+          .addMaterialsForClass(classId, folderId, request)
+          .subscribe(result => {
+            expect(result).toBeUndefined();
+            expect(requestService.post).toHaveBeenCalledOnce();
+            expect(toastHandlingService.successGeneral).toHaveBeenCalledOnce();
+            expect(toastHandlingService.errorGeneral).not.toHaveBeenCalled();
+            resolve();
+          });
+      });
+    });
+
+    it('should call post and show error toast on non-SUCCESS statusCode', async () => {
+      (requestService.post as any).mockReturnValue(
+        of({ statusCode: StatusCode.SYSTEM_ERROR })
+      );
+
+      await new Promise<void>(resolve => {
+        service
+          .addMaterialsForClass(classId, folderId, request)
+          .subscribe(result => {
+            expect(result).toBeUndefined();
+            expect(requestService.post).toHaveBeenCalledOnce();
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
+            expect(toastHandlingService.successGeneral).not.toHaveBeenCalled();
+            resolve();
+          });
+      });
+    });
+
+    it('should handle HttpErrorResponse and show error toast', async () => {
+      const error = new HttpErrorResponse({
+        status: 400,
+        statusText: 'Bad Request',
+      });
+
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      await new Promise<void>(resolve => {
+        service.addMaterialsForClass(classId, folderId, request).subscribe({
+          next: () => {
+            throw new Error('Should not reach next');
+          },
+          error: err => {
+            expect(err).toBe(error);
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
+            resolve();
+          },
+        });
+      });
+    });
+
+    it('should still call API and show error toast if request array is empty', async () => {
+      (requestService.post as any).mockReturnValue(
+        of({ statusCode: StatusCode.SYSTEM_ERROR })
+      );
+
+      await new Promise<void>(resolve => {
+        service
+          .addMaterialsForClass(classId, folderId, [])
+          .subscribe(result => {
+            expect(result).toBeUndefined();
+            expect(requestService.post).toHaveBeenCalledOnce();
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
+            resolve();
+          });
+      });
+    });
+
+    it('should handle case where folderId or classId is empty string', async () => {
+      (requestService.post as any).mockReturnValue(
+        of({ statusCode: StatusCode.SUCCESS })
+      );
+
+      await new Promise<void>(resolve => {
+        service.addMaterialsForClass('', '', request).subscribe(result => {
+          expect(result).toBeUndefined();
+          expect(requestService.post).toHaveBeenCalledOnce();
+          expect(toastHandlingService.successGeneral).toHaveBeenCalledOnce();
+          resolve();
+        });
+      });
+    });
+  });
+
   describe('removeMaterialsFromClass', () => {
     const classId = 'class-123';
     const folderId = 'folder-456';

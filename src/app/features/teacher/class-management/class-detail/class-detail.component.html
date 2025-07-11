@@ -32,6 +32,7 @@
         <class-folders
           [classModel]="classModel()"
           [folderWithMaterials]="folderMaterials()"
+          (addFolderMaterials)="loadData()"
           (removeFolderMaterials)="loadData()" />
       </p-tabpanel>
     </p-tabpanels>
