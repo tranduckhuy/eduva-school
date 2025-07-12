@@ -242,7 +242,7 @@ export class NavbarComponent implements OnInit {
     if (!isAllowed) return [];
     return [
       this.buildNavItem(
-        'Quản lý Tài liệu',
+        'Quản lý tài liệu',
         'folder_open',
         '/teacher/file-manager',
         schoolMissing

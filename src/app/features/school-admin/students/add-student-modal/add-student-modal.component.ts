@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -7,17 +6,32 @@ import {
   Inject,
   Optional,
 } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 import { ButtonModule } from 'primeng/button';
 
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
-import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
-import { UserService } from '../../../../shared/services/api/user/user.service';
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
-import { CreateUserRequest } from '../../../../shared/models/api/request/command/create-user-request.model';
+import { UserService } from '../../../../shared/services/api/user/user.service';
+
 import { Role } from '../../../../shared/models/enum/role.enum';
 import { MODAL_DATA } from '../../../../shared/tokens/injection/modal-data.token';
+
+import { isFormFieldMismatch } from '../../../../shared/utils/util-functions';
+import {
+  customEmailValidator,
+  strongPasswordValidator,
+} from '../../../../shared/utils/form-validators';
+
+import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
+
+import { type CreateUserRequest } from '../../../../shared/models/api/request/command/create-user-request.model';
 
 @Component({
   selector: 'app-add-student-modal',
@@ -48,10 +62,10 @@ export class AddStudentModalComponent {
 
   constructor(@Optional() @Inject(MODAL_DATA) private readonly data: any) {
     this.form = this.fb.group({
-      fullName: [''],
-      email: [''],
-      initialPassword: [''],
-      confirmPassword: [''],
+      fullName: ['', Validators.required],
+      email: ['', [Validators.required, customEmailValidator]],
+      initialPassword: ['', [Validators.required, strongPasswordValidator]],
+      confirmPassword: ['', Validators.required],
     });
 
     this.form
@@ -61,15 +75,8 @@ export class AddStudentModalComponent {
       });
   }
 
-  private calcPasswordLevel(password: string): number | undefined {
-    if (!password) return undefined;
-    let level = 0;
-    if (password.length >= 6) level++;
-    if (/[a-z]/.test(password)) level++;
-    if (/[A-Z]/.test(password)) level++;
-    if (/\d/.test(password)) level++;
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) level++;
-    return level;
+  get passwordMisMatch() {
+    return isFormFieldMismatch(this.form, 'initialPassword');
   }
 
   // function
@@ -98,5 +105,16 @@ export class AddStudentModalComponent {
 
   closeModal() {
     this.globalModalService.close();
+  }
+
+  private calcPasswordLevel(password: string): number | undefined {
+    if (!password) return undefined;
+    let level = 0;
+    if (password.length >= 6) level++;
+    if (/[a-z]/.test(password)) level++;
+    if (/[A-Z]/.test(password)) level++;
+    if (/\d/.test(password)) level++;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) level++;
+    return level;
   }
 }

@@ -5,7 +5,12 @@ import {
   signal,
   viewChildren,
 } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
 
@@ -15,6 +20,8 @@ import { UserService } from '../../../../shared/services/api/user/user.service';
 
 import { AuthLayoutComponent } from '../../auth-layout/auth-layout.component';
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
+
+import { customEmailValidator } from '../../../../shared/utils/form-validators';
 
 import { type EmailLinkRequest } from '../../models/request/email-link-request.model';
 
@@ -47,7 +54,10 @@ export class ForgotPasswordComponent {
 
   constructor() {
     this.form = this.fb.group({
-      email: this.currentUser() ? this.currentUser()?.email : '',
+      email: [
+        this.currentUser() ? this.currentUser()?.email : '',
+        [Validators.required, customEmailValidator],
+      ],
     });
   }
 

@@ -99,6 +99,19 @@ export class ButtonComponent {
     return `spinner ${this.spinnerSizeClass} ${this.spinnerColorClass}`;
   }
 
+  get sizePaddingClass(): string {
+    switch (this.size()) {
+      case 'xs':
+        return 'py-2 px-2';
+      case 'lg':
+        return 'px-4 py-3';
+      case 'xl':
+        return 'px-5 py-4';
+      default:
+        return 'px-3 py-2';
+    }
+  }
+
   @HostBinding('class') get classes() {
     const loadingClass = this.loading() ? 'loading-state' : '';
     return `${this.buttonVariants()} ${loadingClass}`;
@@ -120,10 +133,10 @@ export class ButtonComponent {
     };
 
     const sizeClasses: Record<ButtonSize, string> = {
-      default: 'rounded px-3 py-2 text-[14px]',
-      xs: 'rounded py-2 px-2 text-[12px]',
-      lg: 'rounded px-4 py-3 text-base',
-      xl: 'rounded px-5 py-4 text-lg',
+      default: 'rounded text-[14px]',
+      xs: 'rounded text-[12px]',
+      lg: 'rounded text-base',
+      xl: 'rounded text-lg',
     };
 
     const variantClasses: Record<ButtonVariant, string> = {

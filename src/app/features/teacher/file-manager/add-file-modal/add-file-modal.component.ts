@@ -39,6 +39,7 @@ import {
   type CreateLessonMaterialRequest,
   type CreateLessonMaterialsRequest,
 } from '../../../../shared/models/api/request/command/create-lesson-material-request.model';
+import { FileStorageService } from '../services/file-storage.service';
 
 type FileMetadata = {
   blobName: string;
@@ -60,6 +61,7 @@ export class AddFileModalComponent {
   private readonly toastHandlingService = inject(ToastHandlingService);
   private readonly userService = inject(UserService);
   private readonly uploadFileService = inject(UploadFileService);
+  private readonly fileStorageService = inject(FileStorageService);
   private readonly lessonMaterialsService = inject(LessonMaterialsService);
   private readonly modalData = inject(MODAL_DATA);
 
@@ -84,7 +86,13 @@ export class AddFileModalComponent {
       );
 
       if (isValidType) {
-        validFiles.push(file);
+        const isDuplicate = currentFiles.some(
+          f => f.name === file.name && f.size === file.size
+        );
+
+        if (!isDuplicate) {
+          validFiles.push(file);
+        }
       } else {
         invalidFiles.push(file);
       }
@@ -94,8 +102,8 @@ export class AddFileModalComponent {
     if (invalidFiles.length > 0) {
       const fileNames = invalidFiles.map(f => f.name).join(', ');
       this.toastHandlingService.warn(
-        'Warning',
-        `The following files are invalid and have been skipped: ${fileNames}.`
+        'Cảnh báo',
+        `Các tệp sau không hợp lệ và đã bị bỏ qua: ${fileNames}.`
       );
     }
 
@@ -112,8 +120,8 @@ export class AddFileModalComponent {
 
     if (totalSize > MAX_TOTAL_UPLOAD_FILE_SIZE) {
       this.toastHandlingService.error(
-        'Error',
-        `Total file size must not exceed ${(MAX_TOTAL_UPLOAD_FILE_SIZE / 1024 / 1024).toFixed(0)}MB.`
+        'Lỗi',
+        `Tổng dung lượng tệp không được vượt quá ${(MAX_TOTAL_UPLOAD_FILE_SIZE / 1024 / 1024).toFixed(0)}MB.`
       );
       return;
     }
@@ -207,7 +215,8 @@ export class AddFileModalComponent {
           .pipe(
             switchMap(() =>
               this.lessonMaterialsService.getLessonMaterials(folderId)
-            )
+            ),
+            switchMap(() => this.fileStorageService.getFileStorageQuota())
           )
           .subscribe(() => this.closeModal());
       },
