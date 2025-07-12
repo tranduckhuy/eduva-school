@@ -5,7 +5,12 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
@@ -17,6 +22,7 @@ import { AuthLayoutComponent } from '../../auth-layout/auth-layout.component';
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 
 import { isFormFieldMismatch } from '../../../../shared/utils/util-functions';
+import { strongPasswordValidator } from '../../../../shared/utils/form-validators';
 
 import { type ResetPasswordRequest } from './models/reset-password-request.model';
 
@@ -50,8 +56,8 @@ export class ResetPasswordComponent implements OnInit {
 
   constructor() {
     this.form = this.fb.group({
-      password: '',
-      confirmPassword: '',
+      password: ['', [Validators.required, strongPasswordValidator]],
+      confirmPassword: ['', Validators.required],
     });
   }
 

@@ -87,12 +87,11 @@
           <div class="e-col-6 e-col-xs-12">
             <app-form-control
               label="Số điện thoại"
-              placeholder="0912345678"
+              placeholder="Nhập số điện thoại"
               formControlName="phoneNumber"
               name="phoneNumber"
               [readOnly]="!isEdit()"
               [phone]="true"
-              [required]="true"
               [errorMessages]="{
                 pattern: 'Số điện thoại không hợp lệ',
               }" />

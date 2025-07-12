@@ -7,8 +7,6 @@ import {
   Validators,
 } from '@angular/forms';
 
-import { switchMap } from 'rxjs';
-
 import { ButtonModule } from 'primeng/button';
 
 import { LoadingService } from '../../services/core/loading/loading.service';
@@ -17,11 +15,9 @@ import { FolderManagementService } from '../../services/api/folder/folder-manage
 
 import { MODAL_DATA } from '../../tokens/injection/modal-data.token';
 
-import { PAGE_SIZE } from '../../constants/common.constant';
 import { FolderOwnerType } from '../../models/enum/folder-owner-type.enum';
 
 import { type CreateFolderRequest } from '../../models/api/request/command/create-folder-request.model';
-import { type GetFoldersRequest } from '../../models/api/request/query/get-folders-request.model';
 
 interface AddLessonModalData {
   ownerType: FolderOwnerType;
@@ -67,21 +63,10 @@ export class AddLessonModalComponent {
     const { ownerType, classId } = this.modalData;
 
     if (ownerType === FolderOwnerType.Personal) {
-      this.folderService
-        .createFolder(baseRequest)
-        .pipe(
-          switchMap(() => {
-            const req: GetFoldersRequest = {
-              pageIndex: 1,
-              pageSize: PAGE_SIZE,
-            };
-            return this.folderService.getPersonalFolders(req);
-          })
-        )
-        .subscribe({
-          next: () => this.handleCreateSuccess(),
-          error: () => this.resetForm(),
-        });
+      this.folderService.createFolder(baseRequest).subscribe({
+        next: () => this.handleCreateSuccess(),
+        error: () => this.resetForm(),
+      });
     } else {
       const request: CreateFolderRequest = { ...baseRequest, classId };
       this.folderService.createFolder(request).subscribe({

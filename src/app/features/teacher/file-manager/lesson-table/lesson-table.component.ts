@@ -11,12 +11,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
 import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
+import { ConfirmationService } from 'primeng/api';
 
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 
 import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
 import { FolderOwnerType } from '../../../../shared/models/enum/folder-owner-type.enum';
+import { EntityStatus } from '../../../../shared/models/enum/entity-status.enum';
 
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { FolderManagementService } from '../../../../shared/services/api/folder/folder-management.service';
@@ -48,6 +50,7 @@ export class LessonTableComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly modalService = inject(GlobalModalService);
   private readonly loadingService = inject(LoadingService);
+  private readonly confirmationService = inject(ConfirmationService);
   private readonly folderService = inject(FolderManagementService);
 
   folders = this.folderService.folderList;
@@ -77,22 +80,44 @@ export class LessonTableComponent implements OnInit {
 
       const firstIndex = (this.currentPage() - 1) * this.pageSize();
       this.firstRecordIndex.set(firstIndex);
-
-      this.loadFolders();
     });
   }
 
-  onSearch(searchTerm: string): void {
-    this.searchValue.set(searchTerm);
+  onSearch(searchTerm?: string): void {
+    this.searchValue.set(searchTerm ?? '');
     this.currentPage.set(1);
     this.firstRecordIndex.set(0);
 
-    this.loadFolders();
+    const request: GetFoldersRequest = {
+      name: this.searchValue(),
+      pageIndex: this.currentPage(),
+      pageSize: this.pageSize(),
+      status: EntityStatus.Active,
+    };
+
+    this.folderService.getPersonalFolders(request).subscribe();
   }
 
   onArchiveFolder(folderId: string) {
-    this.folderService.archiveFolder(folderId).subscribe({
-      next: () => this.loadFolders(),
+    this.confirmationService.confirm({
+      header: 'Chuyển vào thùng rác?',
+      message:
+        'Thư mục này sẽ được chuyển vào thùng rác. Bạn có chắc chắn muốn tiếp tục?',
+      icon: 'pi pi-info-circle',
+      rejectButtonProps: {
+        label: 'Không, giữ lại',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Có, chuyển vào thùng rác',
+        severity: 'danger',
+      },
+      accept: () => {
+        this.folderService.archiveFolder(folderId).subscribe({
+          next: () => this.onSearch(),
+        });
+      },
     });
   }
 
@@ -110,7 +135,7 @@ export class LessonTableComponent implements OnInit {
     this.modalService.open(AddLessonModalComponent, {
       ownerType: FolderOwnerType.Personal,
       addLessonSuccess: () => {
-        this.currentPage.set(0);
+        this.onSearch();
       },
     });
   }
@@ -123,15 +148,5 @@ export class LessonTableComponent implements OnInit {
         pageSize: this.pageSize(),
       },
     });
-  }
-
-  private loadFolders(): void {
-    const request: GetFoldersRequest = {
-      name: this.searchValue(),
-      pageIndex: this.currentPage(),
-      pageSize: this.pageSize(),
-    };
-
-    this.folderService.getPersonalFolders(request).subscribe();
   }
 }

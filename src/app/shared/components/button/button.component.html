@@ -1,5 +1,6 @@
 <button
-  [attr.type]="type()"
+  [ngClass]="sizePaddingClass"
+  [type]="type()"
   [disabled]="disabled() || loading()"
   (click)="onClick($event)">
   <!-- Left position spinner -->

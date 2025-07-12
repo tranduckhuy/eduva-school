@@ -94,7 +94,7 @@
           formControlName="confirmPassword"
           [name]="'confirmPassword'"
           [maxLength]="18"
-          [confirmPassword]="form.value.initialPassword"
+          [confirmPassword]="form.get('initialPassword')?.value"
           class="-mt-4"
           [submitted]="submitted()"
           [required]="true" />
@@ -115,8 +115,9 @@
         label="Thêm kiểm duyệt viên"
         variant="outlined"
         icon="pi pi-plus"
+        size="small"
         [loading]="isLoading()"
-        size="small" />
+        [disabled]="form.invalid || passwordMisMatch || isLoading()" />
     </div>
   </form>
 </div>
