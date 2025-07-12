@@ -84,7 +84,13 @@ export class AddFileModalComponent {
       );
 
       if (isValidType) {
-        validFiles.push(file);
+        const isDuplicate = currentFiles.some(
+          f => f.name === file.name && f.size === file.size
+        );
+
+        if (!isDuplicate) {
+          validFiles.push(file);
+        }
       } else {
         invalidFiles.push(file);
       }
@@ -94,8 +100,8 @@ export class AddFileModalComponent {
     if (invalidFiles.length > 0) {
       const fileNames = invalidFiles.map(f => f.name).join(', ');
       this.toastHandlingService.warn(
-        'Warning',
-        `The following files are invalid and have been skipped: ${fileNames}.`
+        'Cảnh báo',
+        `Các tệp sau không hợp lệ và đã bị bỏ qua: ${fileNames}.`
       );
     }
 
@@ -112,8 +118,8 @@ export class AddFileModalComponent {
 
     if (totalSize > MAX_TOTAL_UPLOAD_FILE_SIZE) {
       this.toastHandlingService.error(
-        'Error',
-        `Total file size must not exceed ${(MAX_TOTAL_UPLOAD_FILE_SIZE / 1024 / 1024).toFixed(0)}MB.`
+        'Lỗi',
+        `Tổng dung lượng tệp không được vượt quá ${(MAX_TOTAL_UPLOAD_FILE_SIZE / 1024 / 1024).toFixed(0)}MB.`
       );
       return;
     }

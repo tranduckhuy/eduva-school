@@ -72,7 +72,12 @@
             </td>
             <td class="!text-center">
               <div class="flex items-center justify-center gap-2">
-                <a [routerLink]="[material.id]">
+                <a
+                  [routerLink]="['/school-admin/view-lesson', material.id]"
+                  [queryParams]="{
+                    page: currentPage(),
+                    pageSize: pageSize(),
+                  }">
                   <app-button
                     pTooltip="Xem chi tiết"
                     tooltipPosition="top"

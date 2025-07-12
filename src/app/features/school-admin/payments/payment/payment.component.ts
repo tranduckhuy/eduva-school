@@ -23,9 +23,9 @@ import { ExportInvoicePdfComponent } from '../export-invoice-pdf/export-invoice-
     CommonModule,
     ExportInvoicePdfComponent,
   ],
+  providers: [DatePipe],
   templateUrl: './payment.component.html',
   styleUrl: './payment.component.css',
-  providers: [DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentComponent {

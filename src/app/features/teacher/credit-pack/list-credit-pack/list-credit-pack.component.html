@@ -10,16 +10,16 @@
     </div>
   }
 
-  <div class="e-row e-row-cols-3 e-g-1 e-gy-0">
+  <div class="e-row e-row-cols-3 e-g-1 e-gy-3">
     @for (creditPack of creditPacks(); track creditPack.id) {
       <div class="e-col">
         <div class="flex flex-col rounded-xl border border-gray-200 bg-white">
           <!-- ? Coin Value -->
           <label
-            for="creditPackId"
+            [for]="creditPack.id.toString()"
             class="mt-4 flex w-full cursor-pointer items-center justify-between px-8 py-6">
             <label
-              for="creditPackId"
+              [for]="creditPack.id.toString()"
               class="flex cursor-pointer items-center gap-1">
               <span class="text-[28px] font-semibold">
                 {{ creditPack.credits }}
@@ -39,9 +39,9 @@
             <p-radiobutton
               formControlName="creditPackId"
               name="creditPackId"
-              inputId="creditPackId"
               styleClass="relative -top-[3px]"
-              [value]="creditPack.id" />
+              [value]="creditPack.id"
+              [inputId]="creditPack.id.toString()" />
           </label>
 
           @if (creditPack.bonusCredits > 0) {
@@ -50,7 +50,7 @@
 
             <!-- ? Bonus Value -->
             <label
-              for="creditPackId"
+              [for]="creditPack.id.toString()"
               class="flex w-full cursor-pointer items-center gap-2 px-8 py-2">
               <span>
                 Được tặng

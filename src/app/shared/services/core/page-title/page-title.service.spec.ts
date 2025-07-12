@@ -70,6 +70,6 @@ describe('PageTitleService', () => {
 
     routerEvents$.next(new NavigationEnd(2, '/dashboard', '/dashboard'));
 
-    expect(mockTitle.setTitle).toHaveBeenCalledWith('Dashboard | by EDUVA');
+    expect(mockTitle.setTitle).toHaveBeenCalledWith('Dashboard | EDUVA');
   });
 });

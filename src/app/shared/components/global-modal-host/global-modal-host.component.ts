@@ -43,10 +43,6 @@ export class GlobalModalHostComponent {
     return this.modalService.injector;
   }
 
-  get data() {
-    return this.modalService.data();
-  }
-
   get modalClass() {
     return this.modalService.modalClass();
   }

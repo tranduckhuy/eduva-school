@@ -23,7 +23,7 @@ export class PageTitleService {
       )
       .subscribe(data => {
         const titleText = data['title']
-          ? `${data['title']} | by EDUVA`
+          ? `${data['title']} | EDUVA`
           : 'EDUVA - Học, Học Nữa, Học Mãi';
         this.title.setTitle(titleText);
       });
