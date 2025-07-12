@@ -39,7 +39,7 @@
   } @else {
     <div class="mt-5 flex items-center justify-between sm:flex-wrap">
       <h1 class="font-nold text-2xl">{{ lessonMaterial()?.title }}</h1>
-      @if (isSchoolAdmin()) {
+      @if (isSchoolAdminOrMod()) {
         <div class="flex items-center gap-3 sm:mt-4">
           <p-button
             label="Duyệt"
@@ -58,29 +58,13 @@
       }
     </div>
 
-  <!-- Info -->
-  @if (isLoading() && !lessonMaterial()) {
-    <app-preview-lesson-skeleton />
-  } @else {
-    <div class="mt-5 flex items-center justify-between sm:flex-wrap">
-      <h1 class="font-nold text-2xl">{{ lessonMaterial()?.title }}</h1>
-      @if (isSchoolAdminOrMod()) {
-        <div class="flex items-center gap-3 sm:mt-4">
-          <p-button
-            label="Duyệt"
-            icon="pi pi-check"
-            variant="outlined"
-            size="small"
-            (onClick)="approveLesson()" />
-          <p-button
-            label="Từ chối"
-            icon="pi pi-times"
-            variant="outlined"
-            size="small"
-            severity="danger"
-            (onClick)="refuseLesson()" />
-        </div>
-      }
+    <p class="my-3 dark:text-white">
+      {{ formatUpdateDate(lessonMaterial()?.lastModifiedAt) }}
+    </p>
+    @if (lessonMaterial()?.description) {
+      <div
+        class="lesson-content"
+        [innerHTML]="lessonMaterial()!.description | safeHtml"></div>
     }
   }
 </div>
