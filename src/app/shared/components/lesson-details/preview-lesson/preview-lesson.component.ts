@@ -97,6 +97,7 @@ export class PreviewLessonComponent implements OnInit {
   openModerateReasonModal(isApproved: boolean) {
     this.isApprovedLesson.set(isApproved);
     this.globalModalService.open(ModerateReasonModalComponent, {
+      materialId: this.materialId(),
       isApproved,
     });
   }

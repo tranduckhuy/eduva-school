@@ -10,4 +10,5 @@ export interface GetFoldersRequest {
   sortBy?: string;
   sortDirection?: string;
   searchTerm?: string;
+  isPaging?: boolean;
 }

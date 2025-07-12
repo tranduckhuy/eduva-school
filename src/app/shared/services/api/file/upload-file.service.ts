@@ -1,9 +1,21 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpContext } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpContext,
+  HttpErrorResponse,
+} from '@angular/common/http';
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
+import {
+  Observable,
+  catchError,
+  forkJoin,
+  map,
+  of,
+  switchMap,
+  throwError,
+} from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 
@@ -13,6 +25,7 @@ import { ToastHandlingService } from '../../../../shared/services/core/toast/toa
 import { StatusCode } from '../../../../shared/constants/status-code.constant';
 import { BYPASS_AUTH } from '../../../tokens/context/http-context.token';
 
+import { type FileStorageRequest } from '../../../models/api/request/command/file-storage-request.model';
 import { type FileStorageResponse } from '../../../models/api/response/command/file-storage-response.model';
 
 @Injectable({
@@ -26,7 +39,7 @@ export class UploadFileService {
   private readonly toastHandlingService = inject(ToastHandlingService);
 
   private readonly BASE_API_URL = environment.baseApiUrl;
-  private readonly UPLOAD_FILE_TO_STORAGE_API_URL = `${this.BASE_API_URL}/file-storage/upload-tokens`;
+  private readonly UPLOAD_FILE_TO_STORAGE_API_URL = `${this.BASE_API_URL}/file-storage/upload-tokens-with-quota`;
 
   private readonly SUPABASE_URL = environment.supabase.url;
   private readonly SUPABASE_KEY = environment.supabase.key;
@@ -36,7 +49,7 @@ export class UploadFileService {
   }
 
   uploadBlobs(
-    request: string[],
+    request: FileStorageRequest,
     files: File[]
   ): Observable<FileStorageResponse | null> {
     return this.requestService
@@ -69,7 +82,7 @@ export class UploadFileService {
                 catchError(() => {
                   // ? If have 1 file got error then continue with other files and notify list error file later
                   failedFiles.push(files[index].name);
-                  return of(null); // Continue with other files
+                  return of(null); // ? Continue with other files
                 })
               )
           );
@@ -92,9 +105,16 @@ export class UploadFileService {
             })
           );
         }),
-        catchError(() => {
-          this.toastHandlingService.errorGeneral();
-          return of(null);
+        catchError((err: HttpErrorResponse) => {
+          if (err.error?.statusCode === StatusCode.STORAGE_QUOTA_EXCEEDED) {
+            this.toastHandlingService.warn(
+              'Đã đạt giới hạn lưu trữ',
+              'Vui lòng liên hệ quản trị viên để nâng cấp gói và tiếp tục sử dụng.'
+            );
+          } else {
+            this.toastHandlingService.errorGeneral();
+          }
+          return throwError(() => err);
         })
       );
   }

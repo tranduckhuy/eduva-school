@@ -40,6 +40,13 @@ export class InformationComponent {
     return this.themeService.isDarkMode();
   });
 
+  readonly isTeacher = computed(() => {
+    return (
+      this.user()?.roles.includes(UserRoles.TEACHER) ||
+      this.user()?.roles.includes(UserRoles.CONTENT_MODERATOR)
+    );
+  });
+
   readonly profileLink = computed(() => {
     const role = this.user()?.roles[0];
     if (!role) return '/settings';

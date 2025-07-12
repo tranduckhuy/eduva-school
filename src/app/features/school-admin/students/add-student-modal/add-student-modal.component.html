@@ -15,7 +15,8 @@
           <app-form-control
             label="Tên"
             type="text"
-            [name]="'name'"
+            [name]="'fullName'"
+            formControlName="fullName"
             placeholder="Tên đầy đủ..."
             [required]="true"
             [submitted]="submitted()">
@@ -26,40 +27,77 @@
             label="Email"
             type="email"
             [name]="'email'"
+            formControlName="email"
             [required]="true"
             [email]="true"
             placeholder="Email..."
             [submitted]="submitted()">
           </app-form-control>
         </div>
-        <div class="e-col">
-          <app-form-control
-            label="Mật khẩu"
-            type="password"
-            placeholder="Mật khẩu..."
-            [validatePassword]="true"
-            [name]="'password'"
-            [submitted]="submitted()"
-            [errorMessages]="{
-              passwordWeak: 'Độ khó mật khẩu chưa đạt yêu cầu.',
-            }"
-            [required]="true">
-          </app-form-control>
+        <app-form-control
+          type="password"
+          label="Mật khẩu"
+          placeholder="Mật khẩu"
+          formControlName="initialPassword"
+          [name]="'initialPassword'"
+          [maxLength]="18"
+          [submitted]="submitted()"
+          [required]="true" />
+        <div class="mx-1 mt-3 pb-4 pr-[18px]">
+          <div class="flex gap-1">
+            <div
+              class="h-[5px] flex-1 rounded-[4px]"
+              [ngClass]="{
+                'bg-[#e1e4eb]': !passwordLevel(),
+                'bg-[#d43031]': passwordLevel()! < 4,
+                'bg-[#faa61b]': passwordLevel() === 4,
+                'bg-[#02875a]': passwordLevel() === 5,
+              }"></div>
+            <div
+              class="h-[5px] flex-1 rounded-[4px]"
+              [ngClass]="{
+                'bg-[#e1e4eb]': !passwordLevel() || passwordLevel()! < 3,
+                'bg-[#d43031]': passwordLevel() === 3,
+                'bg-[#faa61b]': passwordLevel() === 4,
+                'bg-[#02875a]': passwordLevel() === 5,
+              }"></div>
+            <div
+              class="h-[5px] flex-1 rounded-[4px]"
+              [ngClass]="{
+                'bg-[#e1e4eb]': !passwordLevel() || passwordLevel()! < 4,
+                'bg-[#faa61b]': passwordLevel() === 4,
+                'bg-[#02875a]': passwordLevel() === 5,
+              }"></div>
+            <div
+              class="h-[5px] flex-1 rounded-[4px]"
+              [ngClass]="{
+                'bg-[#e1e4eb]': passwordLevel() !== 5,
+                'bg-[#02875a]': passwordLevel() === 5,
+              }"></div>
+          </div>
+          <div class="py-2 text-right text-xs font-medium text-[#666]">
+            {{
+              passwordLevel() &&
+                (passwordLevel() === 5
+                  ? 'Mật khẩu mạnh'
+                  : passwordLevel() === 4
+                    ? 'Mật khẩu trung bình'
+                    : 'Mật khẩu yếu')
+            }}
+          </div>
         </div>
-        <div class="e-col">
-          <app-form-control
-            label="Nhập lại mật khẩu"
-            type="password"
-            placeholder="Nhập lại mật khẩu..."
-            [name]="'confirmPassword'"
-            [confirmPassword]="password()"
-            [submitted]="submitted()"
-            [errorMessages]="{
-              required: 'Vui lòng nhập mật khẩu',
-            }"
-            [required]="true">
-          </app-form-control>
-        </div>
+
+        <app-form-control
+          type="password"
+          label="Xác nhận mật khẩu"
+          placeholder="Mật khẩu"
+          formControlName="confirmPassword"
+          [name]="'confirmPassword'"
+          [maxLength]="18"
+          [confirmPassword]="form.value.initialPassword"
+          class="-mt-4"
+          [submitted]="submitted()"
+          [required]="true" />
       </div>
     </div>
 
@@ -77,6 +115,7 @@
         label="Thêm học sinh"
         variant="outlined"
         icon="pi pi-plus"
+        [loading]="isLoading()"
         size="small" />
     </div>
   </form>

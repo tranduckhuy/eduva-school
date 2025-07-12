@@ -14,7 +14,7 @@
           class="border-primary bg-transparent !text-primary shadow-none hover:bg-primary hover:!text-white">
           <div class="flex items-center gap-2">
             <span class="pi pi-plus"></span>
-            <span>Thêm bài giảng mới</span>
+            <span>Thêm thư mục mới</span>
           </div>
         </app-button>
       </div>
@@ -88,7 +88,7 @@
                       [variant]="'outline'"
                       [size]="'xs'"
                       (clicked)="goToFolderMaterials(folder.id)"
-                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
+                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg shadow-none hover:bg-transparent">
                       visibility
                     </app-button>
                     <app-button
@@ -96,7 +96,7 @@
                       tooltipPosition="top"
                       [variant]="'outline'"
                       [size]="'xs'"
-                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-gray shadow-none hover:bg-transparent">
+                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg shadow-none hover:bg-transparent">
                       edit
                     </app-button>
                     <app-button
@@ -104,7 +104,8 @@
                       tooltipPosition="bottom"
                       [variant]="'outline'"
                       [size]="'xs'"
-                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-danger shadow-none hover:bg-transparent">
+                      (clicked)="onArchiveFolder(folder.id)"
+                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg shadow-none hover:bg-transparent">
                       delete
                     </app-button>
                   </div>

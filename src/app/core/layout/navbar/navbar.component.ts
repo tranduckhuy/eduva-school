@@ -136,8 +136,8 @@ export class NavbarComponent implements OnInit {
 
     const dashboardLink = isAdmin ? '/school-admin' : '/teacher';
     const profileLink = isAdmin
-      ? '/school-admin/settings'
-      : '/teacher/settings';
+      ? '/school-admin/settings/account-settings'
+      : '/teacher/settings/account-settings';
 
     const navItems: NavbarConfig[] = [
       {
@@ -162,7 +162,7 @@ export class NavbarComponent implements OnInit {
       {
         section: 'Khác',
         navItems: [
-          this.buildNavItem('Trang cá nhân', 'account_circle', profileLink),
+          this.buildNavItem('Cài đặt', 'settings', profileLink),
           {
             label: 'Đăng xuất',
             icon: 'logout',
@@ -281,9 +281,6 @@ export class NavbarComponent implements OnInit {
 
     if (isTeacher || isModerator) {
       push('Tài liệu chia sẻ', '/teacher/shared-lessons', schoolMissing);
-    }
-
-    if (isTeacher) {
       push('Danh sách lớp học', '/teacher/class-management', schoolMissing);
       push('Tạo bài giảng tự động', '/teacher/generate-lesson', schoolMissing);
     }

@@ -1,38 +1,56 @@
 <div
   class="rounded border border-gray-100 bg-white p-5 shadow-main dark:border-dark-500 dark:bg-dark-200">
   <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
-    <app-search-input (search)="onSearchTriggered($event)" class="md:w-64" />
+    <app-search-input
+      (search)="onSearchTriggered($event)"
+      class="lg:w-[300px]" />
 
-    <div class="flex flex-wrap gap-3">
-      <!-- Time filter -->
-      <p-select
-        [options]="timeFilterOptions()"
-        [ngModel]="selectedTimeFilter()"
-        (ngModelChange)="onTimeFilterChange($event)"
-        optionLabel="name"
-        placeholder="Sắp xếp theo thời gian"
-        class="!dark:bg-dark-200 flex h-11 items-center sm:w-56" />
+    <div class="flex flex-wrap gap-5">
+      <div class="flex items-center gap-3">
+        <!-- Time filter -->
+        <p-select
+          [options]="timeFilterOptions()"
+          [ngModel]="selectedTimeFilter()"
+          (ngModelChange)="onTimeFilterChange($event)"
+          optionLabel="name"
+          placeholder="Sắp xếp theo thời gian"
+          class="!dark:bg-dark-200 flex h-11 min-w-[200px] items-center sm:w-56" />
 
-      <!-- Status filter -->
-      <p-select
-        [options]="statusSelectOptions()"
-        [ngModel]="statusSelect()"
-        (ngModelChange)="onStatusSelectChange($event)"
-        optionLabel="name"
-        placeholder="Chọn trạng thái hoạt động"
-        class="!dark:bg-dark-200 flex h-11 items-center sm:w-56" />
+        <!-- Status filter -->
+        <p-select
+          [options]="statusSelectOptions()"
+          [ngModel]="statusSelect()"
+          (ngModelChange)="onStatusSelectChange($event)"
+          optionLabel="name"
+          placeholder="Chọn trạng thái hoạt động"
+          class="!dark:bg-dark-200 flex h-11 min-w-[200px] items-center sm:w-56" />
+      </div>
 
-      <!--  Export button -->
-      <div class="flex gap-2">
-        <a routerLink="create">
-          <app-button [variant]="'outline'" class="flex items-center">
-            <span
-              class="material-symbols-outlined relative top-[3px] mr-1 text-lg leading-none"
-              >download</span
-            >
-            <span>Export</span>
-          </app-button>
-        </a>
+      <div class="flex items-center gap-3">
+        <!-- Add button -->
+        <app-button
+          [variant]="'outline'"
+          class="flex items-center"
+          (clicked)="openAddContentModeratorModal()">
+          <span
+            class="material-symbols-outlined relative top-[3px] mr-1 text-lg leading-none">
+            add
+          </span>
+          <span>Thêm kiểm duyệt viên</span>
+        </app-button>
+
+        <!--  Export button -->
+        <div class="flex gap-2">
+          <a routerLink="create">
+            <app-button [variant]="'outline'" class="flex items-center">
+              <span
+                class="material-symbols-outlined relative top-[3px] mr-1 text-lg leading-none"
+                >download</span
+              >
+              <span>Export</span>
+            </app-button>
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -50,6 +68,7 @@
         [first]="first()"
         [showCurrentPageReport]="true"
         (onLazyLoad)="loadDataLazy($event)"
+        [lazyLoadOnInit]="false"
         [totalRecords]="totalUsers()"
         currentPageReportTemplate="
         Hiển thị {first} đến {last} trên {totalRecords} người kiểm duyệt nội dung

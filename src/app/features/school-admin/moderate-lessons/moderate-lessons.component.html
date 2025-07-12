@@ -18,6 +18,7 @@
         [rows]="pageSize()"
         [first]="firstRecordIndex()"
         [paginator]="materials().length > 0"
+        [lazyLoadOnInit]="false"
         [totalRecords]="totalRecords()"
         (onLazyLoad)="onLazyLoad($event)"
         currentPageReportTemplate="
@@ -62,8 +63,10 @@
             </td>
             <td class="!text-center">
               <div class="flex flex-col items-center gap-2">
-                <app-badge class="self-center whitespace-nowrap">
-                  Chờ xử lý
+                <app-badge
+                  variant="warning"
+                  class="self-center whitespace-nowrap">
+                  Chờ duyệt
                 </app-badge>
               </div>
             </td>
