@@ -15,12 +15,15 @@
           <span class="font-medium text-textBlack dark:text-white">
             {{ user()?.fullName }}
           </span>
-          <span class="flex items-center gap-1 text-xs dark:text-[#e6e6e6]">
-            Bạn có: {{ user()?.creditBalance }}
-            <span class="material-symbols-outlined text-xs text-yellow-500">
-              paid
+          @if (isTeacher()) {
+            <span class="flex items-center gap-1 text-xs dark:text-[#e6e6e6]">
+              Bạn có: {{ user()?.creditBalance }}
+              <img
+                src="./images/icons/ecoin.png"
+                alt="EDUVA Coin"
+                class="size-4" />
             </span>
-          </span>
+          }
         </div>
       </div>
       <ul>

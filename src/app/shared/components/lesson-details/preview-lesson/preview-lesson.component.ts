@@ -61,8 +61,10 @@ export class PreviewLessonComponent implements OnInit {
   lessonMaterial = this.lessonMaterialService.lessonMaterial;
   isLoading = this.loadingService.isLoading;
 
-  isSchoolAdmin = computed(() =>
-    this.user()?.roles.includes(UserRoles.SCHOOL_ADMIN)
+  isSchoolAdminOrMod = computed(
+    () =>
+      this.user()?.roles.includes(UserRoles.SCHOOL_ADMIN) ||
+      this.user()?.roles.includes(UserRoles.CONTENT_MODERATOR)
   );
 
   currentPage = signal<number>(1);

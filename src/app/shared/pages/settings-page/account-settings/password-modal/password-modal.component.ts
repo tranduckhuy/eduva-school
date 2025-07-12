@@ -5,7 +5,7 @@ import {
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -27,12 +27,13 @@ import { type RequestEnableDisable2FA } from '../models/toggle-2fa-request.model
 @Component({
   selector: 'app-password-modal',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, ButtonModule],
+  imports: [CommonModule, ReactiveFormsModule, ButtonModule],
   templateUrl: './password-modal.component.html',
   styleUrl: './password-modal.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PasswordModalComponent {
+  private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly twoFactorService = inject(TwoFactorService);
   private readonly loadingService = inject(LoadingService);
@@ -95,6 +96,12 @@ export class PasswordModalComponent {
     this.globalModalService.open(OtpModalComponent, {
       enabled: this.modalData.enabled,
     });
+  }
+
+  navigateToForgotPassword(event: MouseEvent): void {
+    event.preventDefault();
+    this.closeModal();
+    this.router.navigate(['/auth/forgot-password']);
   }
 
   closeModal() {
