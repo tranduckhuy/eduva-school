@@ -32,6 +32,7 @@ import {
   ContentType,
   LessonMaterialStatus,
 } from '../../../../../../shared/models/enum/lesson-material.enum';
+import { EntityStatus } from '../../../../../../shared/models/enum/entity-status.enum';
 
 import { type Folder } from '../../../../../../shared/models/entities/folder.model';
 import { type LessonMaterial } from '../../../../../../shared/models/entities/lesson-material.model';
@@ -237,9 +238,9 @@ export class AddClassMaterialsModalComponent implements OnInit {
 
   private loadPersonalFolders() {
     const request: GetFoldersRequest = {
+      status: EntityStatus.Active,
       sortBy: 'createdAt',
       sortDirection: 'desc',
-      isPaging: false,
     };
     this.folderService.getPersonalFolders(request).subscribe();
   }

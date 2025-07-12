@@ -104,18 +104,33 @@
                     variant="text"
                     styleClass="group"
                     [rounded]="true"
-                    (onClick)="toggleMenuMaterialItem(material.id)">
+                    (onClick)="
+                      toggleMenuMaterialItem(
+                        folderWithMaterials.folder.id,
+                        material.id
+                      )
+                    ">
                     <ng-template #icon>
                       <span
                         class="pi pi-ellipsis-v !opacity-60 transition-opacity group-hover:!opacity-100"
                         style="font-size: 16px"></span>
                     </ng-template>
                   </p-button>
-                  @if (openedMenuMaterialId() === material.id) {
+                  @if (
+                    isMenuMaterialOpened(
+                      folderWithMaterials.folder.id,
+                      material.id
+                    )
+                  ) {
                     <div
                       class="absolute left-0 top-[40px] z-[1] flex min-w-[150px] max-w-[280px] origin-top-left animate-scaleIn flex-col overflow-hidden rounded bg-[#f0f4f9] dark:bg-dark-400 sm:left-auto sm:right-0 sm:origin-top-right"
                       clickOutsideSubmenu
-                      (clickOutside)="toggleMenuMaterialItem(material.id)">
+                      (clickOutside)="
+                        toggleMenuMaterialItem(
+                          folderWithMaterials.folder.id,
+                          material.id
+                        )
+                      ">
                       <button
                         class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
                         (click)="

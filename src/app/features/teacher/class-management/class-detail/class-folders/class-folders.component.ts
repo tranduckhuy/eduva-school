@@ -43,7 +43,10 @@ export class ClassFoldersComponent {
   removeFolderMaterials = output<void>();
 
   readonly openedMenuFolderId = signal<string | null>(null);
-  readonly openedMenuMaterialId = signal<string | null>(null);
+  readonly openedMenuMaterialKey = signal<{
+    folderId: string;
+    materialId: string;
+  } | null>(null);
 
   onRemoveFolder(folderId: string) {
     this.folderService
@@ -66,10 +69,17 @@ export class ClassFoldersComponent {
     this.openedMenuFolderId.set(this.openedMenuFolderId() === id ? null : id);
   }
 
-  toggleMenuMaterialItem(id: string) {
-    this.openedMenuMaterialId.set(
-      this.openedMenuMaterialId() === id ? null : id
-    );
+  toggleMenuMaterialItem(folderId: string, materialId: string) {
+    const current = this.openedMenuMaterialKey();
+    const isSame =
+      current?.folderId === folderId && current?.materialId === materialId;
+
+    this.openedMenuMaterialKey.set(isSame ? null : { folderId, materialId });
+  }
+
+  isMenuMaterialOpened(folderId: string, materialId: string): boolean {
+    const current = this.openedMenuMaterialKey();
+    return current?.folderId === folderId && current?.materialId === materialId;
   }
 
   openAddClassMaterialModal(folderId: string) {

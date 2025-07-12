@@ -26,6 +26,8 @@ import { ToastHandlingService } from '../../../services/core/toast/toast-handlin
 import { FormControlComponent } from '../../../components/form-control/form-control.component';
 import { UpdateAvatarModalComponent } from './update-avatar-modal/update-avatar-modal.component';
 
+import { VIETNAM_PHONE_REGEX } from '../../../constants/common.constant';
+
 import { type User } from '../../../models/entities/user.model';
 import { type UpdateProfileRequest } from './models/update-profile-request.model';
 
@@ -59,7 +61,7 @@ export class PersonalInformationComponent implements OnInit {
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       fullName: [''],
-      phoneNumber: ['', Validators.required],
+      phoneNumber: ['', [Validators.pattern(VIETNAM_PHONE_REGEX)]],
     });
   }
 

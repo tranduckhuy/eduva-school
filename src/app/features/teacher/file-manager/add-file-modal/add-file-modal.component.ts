@@ -39,6 +39,7 @@ import {
   type CreateLessonMaterialRequest,
   type CreateLessonMaterialsRequest,
 } from '../../../../shared/models/api/request/command/create-lesson-material-request.model';
+import { FileStorageService } from '../services/file-storage.service';
 
 type FileMetadata = {
   blobName: string;
@@ -60,6 +61,7 @@ export class AddFileModalComponent {
   private readonly toastHandlingService = inject(ToastHandlingService);
   private readonly userService = inject(UserService);
   private readonly uploadFileService = inject(UploadFileService);
+  private readonly fileStorageService = inject(FileStorageService);
   private readonly lessonMaterialsService = inject(LessonMaterialsService);
   private readonly modalData = inject(MODAL_DATA);
 
@@ -213,7 +215,8 @@ export class AddFileModalComponent {
           .pipe(
             switchMap(() =>
               this.lessonMaterialsService.getLessonMaterials(folderId)
-            )
+            ),
+            switchMap(() => this.fileStorageService.getFileStorageQuota())
           )
           .subscribe(() => this.closeModal());
       },

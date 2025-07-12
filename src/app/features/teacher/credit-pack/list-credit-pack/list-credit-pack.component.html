@@ -13,7 +13,8 @@
   <div class="e-row e-row-cols-3 e-g-1 e-gy-3">
     @for (creditPack of creditPacks(); track creditPack.id) {
       <div class="e-col">
-        <div class="flex flex-col rounded-xl border border-gray-200 bg-white">
+        <div
+          class="flex flex-col rounded-xl border border-gray-200 bg-white dark:bg-dark-200 dark:text-white">
           <!-- ? Coin Value -->
           <label
             [for]="creditPack.id.toString()"

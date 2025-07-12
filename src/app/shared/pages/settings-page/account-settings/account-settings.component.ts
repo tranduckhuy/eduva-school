@@ -9,10 +9,11 @@ import {
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {
+  ReactiveFormsModule,
   FormsModule,
   FormBuilder,
   FormGroup,
-  ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
@@ -25,6 +26,7 @@ import { PasswordService } from '../../../../core/auth/services/password.service
 import { UserService } from '../../../services/api/user/user.service';
 
 import { isFormFieldMismatch } from '../../../utils/util-functions';
+import { strongPasswordValidator } from '../../../utils/form-validators';
 
 import { LogoutBehavior } from '../../../models/enum/logout-behavior.enum';
 
@@ -71,9 +73,9 @@ export class AccountSettingsComponent {
 
   constructor() {
     this.form = this.fb.group({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
+      currentPassword: ['', Validators.required],
+      newPassword: ['', [Validators.required, strongPasswordValidator]],
+      confirmPassword: ['', Validators.required],
     });
   }
 
