@@ -9,12 +9,11 @@ import { RequestService } from '../../../../../../shared/services/core/request/r
 import { ToastHandlingService } from '../../../../../../shared/services/core/toast/toast-handling.service';
 
 import { StatusCode } from '../../../../../../shared/constants/status-code.constant';
+import { LessonGenerationType } from '../../../../../../shared/models/enum/lesson-generation-type.enum';
 
 import { type CreateAiJobsRequest } from '../../models/request/command/create-ai-jobs-request.model';
 import { type CreateAiJobsResponse } from '../../models/response/command/create-ai-jobs-response.model';
-import { ConfirmCreateContent } from '../../models/request/command/confirm-create-content-request.model';
-import { UpdateAiJobProgressResponse } from '../../models/response/command/update-ai-job-progress-response.model';
-import { LessonGenerationType } from '../../../../../../shared/models/enum/lesson-generation-type.enum';
+import { type ConfirmCreateContent } from '../../models/request/command/confirm-create-content-request.model';
 
 @Injectable({
   providedIn: 'root',

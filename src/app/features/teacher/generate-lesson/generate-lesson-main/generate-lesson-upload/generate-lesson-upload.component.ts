@@ -75,39 +75,6 @@ export class GenerateLessonUploadComponent {
     this.selectAll.set(allChecked);
   }
 
-  openUploadModal() {
-    if (this.currentCount() >= this.maxCount) return;
-
-    this.modalService.open(UploadResourcesModalComponent, {
-      onUploaded: (file: File) => {
-        const isAllChecked = this.selectAll();
-        const fileExt = file.name.split('.').pop()?.toLowerCase() ?? 'txt';
-        const fileType = fileExt === 'pdf' ? 'pdf' : 'txt';
-
-        const newItem: SourceItem = {
-          id: Date.now().toString(),
-          name: file.name,
-          checked: isAllChecked,
-          type: fileType,
-          isUploading: true,
-          file,
-        };
-
-        this.resourcesStateService.updateSourceList(list => [...list, newItem]);
-
-        setTimeout(() => {
-          this.resourcesStateService.updateSourceList(list =>
-            list.map(item =>
-              item.id === newItem.id ? { ...item, isUploading: false } : item
-            )
-          );
-        }, 2000);
-      },
-      current: this.currentCount(),
-      max: this.maxCount,
-    });
-  }
-
   removeItem(id: string) {
     this.resourcesStateService.updateSourceList(items =>
       items.filter(item => item.id !== id)
@@ -122,5 +89,44 @@ export class GenerateLessonUploadComponent {
 
   toggleMenu(id: string) {
     this.openedMenuId.set(this.openedMenuId() === id ? null : id);
+  }
+
+  openUploadModal() {
+    if (this.currentCount() >= this.maxCount) return;
+
+    const handleUploadedFile = (file: File) => {
+      const isAllChecked = this.selectAll();
+      const fileExt = file.name.split('.').pop()?.toLowerCase() ?? 'txt';
+      const fileType = fileExt === 'pdf' ? 'pdf' : 'txt';
+
+      const newItem: SourceItem = {
+        id: Date.now().toString(),
+        name: file.name,
+        checked: isAllChecked,
+        type: fileType,
+        isUploading: true,
+        file,
+      };
+
+      this.resourcesStateService.updateSourceList(list => [...list, newItem]);
+
+      this.markFileAsUploadedAfterDelay(newItem.id);
+    };
+
+    this.modalService.open(UploadResourcesModalComponent, {
+      onUploaded: handleUploadedFile,
+      current: this.currentCount(),
+      max: this.maxCount,
+    });
+  }
+
+  private markFileAsUploadedAfterDelay(fileId: string) {
+    setTimeout(() => {
+      this.resourcesStateService.updateSourceList(list =>
+        list.map(item =>
+          item.id === fileId ? { ...item, isUploading: false } : item
+        )
+      );
+    }, 2000);
   }
 }

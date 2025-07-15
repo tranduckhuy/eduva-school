@@ -29,7 +29,6 @@ import { AiSocketService } from '../services/api/ai-socket.service';
 import { ChatMessageComponent } from './chat-message/chat-message.component';
 
 import { type CreateAiJobsRequest } from '../models/request/command/create-ai-jobs-request.model';
-import { type UpdateAiJobProgressResponse } from '../models/response/command/update-ai-job-progress-response.model';
 
 interface ChatMessage {
   sender: 'user' | 'system';
