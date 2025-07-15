@@ -1,12 +1,12 @@
-.input-length:checked + .button-length {
+.input-speed:checked + .button-speed {
   background-color: var(--color-button-active);
 }
 
-.input-length:checked + .button-length .pi-check {
+.input-speed:checked + .button-speed .pi-check {
   display: block;
 }
 
-.button-length {
+.button-speed {
   display: flex;
   align-items: center;
   justify-content: center;

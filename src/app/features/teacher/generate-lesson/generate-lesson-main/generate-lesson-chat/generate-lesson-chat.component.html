@@ -67,7 +67,8 @@
               class="flex min-h-[51px] w-full items-center px-4">
               <textarea
                 pTextarea
-                formControlName="query"
+                formControlName="topic"
+                name="topic"
                 placeholder="Nhập yêu cầu..."
                 [autoResize]="true"
                 (keydown.enter)="onEnterKey($event)"
@@ -81,13 +82,10 @@
                   }
                 </span>
                 <p-button
-                  [rounded]="true"
+                  type="submit"
                   styleClass="my-2"
-                  [styleClass]="
-                    form.invalid || isLoading()
-                      ? 'pointer-events-none cursor-default opacity-50'
-                      : ''
-                  "
+                  [rounded]="true"
+                  [disabled]="form.invalid || disabledSendButton()"
                   (onClick)="submitMessage()">
                   <ng-template #icon>
                     <span class="material-symbols-outlined text-white">
@@ -114,9 +112,9 @@
                 class="chip-btn border border-[#dde1eb] bg-transparent hover:!bg-[#f0f1f1] dark:text-[#e6e6e6] dark:hover:!bg-dark-400"
                 [disabled]="isLoading()"
                 (click)="handleChipClick(button.title)">
-                <span class="line-clamp-1"
-                  >Tạo bài giảng về {{ button.title }}</span
-                >
+                <span class="line-clamp-1">
+                  Tạo bài giảng về {{ button.title }}
+                </span>
               </button>
             </ng-template>
           </p-carousel>

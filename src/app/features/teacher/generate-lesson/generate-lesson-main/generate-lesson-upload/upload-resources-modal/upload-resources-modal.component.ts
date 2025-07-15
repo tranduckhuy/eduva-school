@@ -14,7 +14,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { GlobalModalService } from '../../../../../../shared/services/layout/global-modal/global-modal.service';
 
 type UploadModalData = {
-  onUploaded: (file: { fileName: string; lastModified: number }) => void;
+  onUploaded: (file: File) => void;
   current: number;
   max: number;
 };
@@ -47,10 +47,7 @@ export class UploadResourcesModalComponent {
   onSelectFile(event: FileSelectEvent) {
     const file = event.files?.[0];
     if (file) {
-      this.modalData.onUploaded?.({
-        fileName: file.name,
-        lastModified: file.lastModified,
-      });
+      this.modalData.onUploaded?.(file);
       this.closeModal();
     }
   }

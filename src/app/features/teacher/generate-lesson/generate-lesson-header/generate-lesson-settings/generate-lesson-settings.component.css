@@ -1,32 +1,9 @@
-.settings-link {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 0;
-  color: #3a4252;
-  transition: color 0.2s linear;
-}
-
-.settings-link:hover span,
-.settings-link:hover .settings-icon {
-  color: var(--color-primary-500) !important;
-}
-
-.settings-icon {
+.action-btn {
   position: relative;
-  top: 1px;
-  font-size: 18px;
-  color: #3a4252;
+  top: 4px;
+  transition: color 0.2s ease;
 }
 
-.settings-icon,
-.settings-link span {
-  transition: color 0.2s linear;
-}
-
-.separator {
-  display: block;
-  width: 100%;
-  height: 1px;
-  background-color: var(--color-border-primary);
+.action-btn:hover .action-btn-icon {
+  color: var(--color-primary-500);
 }

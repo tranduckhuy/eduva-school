@@ -46,9 +46,9 @@
     </div>
     @if (headerSubmenuService.getActiveSubmenuMenu() === 'information') {
       <header-information
-        (clickOutside)="headerSubmenuService.close()"
         [isFullScreen]="isFullscreen()"
-        (toggleFullSCreen)="toggleFullscreen()" />
+        (toggleFullSCreen)="toggleFullscreen()"
+        (clickOutside)="headerSubmenuService.close()" />
     }
   </div>
 </div>
