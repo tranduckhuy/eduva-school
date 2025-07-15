@@ -174,6 +174,16 @@ export const StatusCode = {
   // ? System Config Errors
   KEY_CONFIG_NOT_FOUND: 5001,
   KEY_CONFIG_ALREADY_EXIST: 5002,
+
+  // ? Job Errors
+  JOB_NOT_FOUND: 5100,
+  JOB_CONTENT_NOT_GENERATED: 5101,
+
+  // ? User Credit
+  INSUFFICIENT_USER_CREDIT: 5200,
+
+  // ? Notification Errors
+  NOTIFICATION_NOT_FOUND: 4950,
 } as const;
 
 export type StatusCodeValue = (typeof StatusCode)[keyof typeof StatusCode];

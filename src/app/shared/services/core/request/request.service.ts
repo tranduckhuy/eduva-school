@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import {
   createRequestParams,
   buildHttpContext,
+  buildFormDataFromObject,
 } from '../../../utils/request-utils';
 
 import { type BaseResponse } from '../../../models/api/base-response.model';
@@ -77,19 +78,20 @@ export class RequestService {
   }
 
   /**
-   * Sends a POST request with FormData.
-   * Commonly used for file upload scenarios.
+   * Convenience method to send POST requests with form data.
+   * Automatically converts input `data` to `FormData`.
    *
-   * @template T The expected data type within the BaseResponse.
-   * @param url The target API endpoint.
-   * @param formData A FormData object with fields and optional files.
-   * @returns An Observable of BaseResponse<T>.
+   * @template T The expected response type.
+   * @param url API endpoint.
+   * @param data Object containing primitive values, File, FileList, or File[].
+   * @param options Optional request options.
    */
-  postFormData<T>(
+  postWithFormData<T>(
     url: string,
-    formData: FormData,
+    data: Record<string, any>,
     options?: RequestOptions
   ): Observable<BaseResponse<T>> {
+    const formData = buildFormDataFromObject(data);
     return this.http.post<BaseResponse<T>>(url, formData, {
       context: buildHttpContext(options),
     });

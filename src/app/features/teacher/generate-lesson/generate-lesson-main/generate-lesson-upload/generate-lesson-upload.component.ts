@@ -14,7 +14,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SubmenuDirective } from '../../../../../shared/directives/submenu/submenu.directive';
 
 import { GlobalModalService } from '../../../../../shared/services/layout/global-modal/global-modal.service';
-import { ResourcesStateService } from '../services/resources-state.service';
+import { ResourcesStateService } from '../services/utils/resources-state.service';
 
 import { UploadResourcesModalComponent } from './upload-resources-modal/upload-resources-modal.component';
 
@@ -24,6 +24,7 @@ interface SourceItem {
   checked: boolean;
   isUploading?: boolean;
   type: 'pdf' | 'txt';
+  file?: File;
 }
 
 @Component({
@@ -78,16 +79,18 @@ export class GenerateLessonUploadComponent {
     if (this.currentCount() >= this.maxCount) return;
 
     this.modalService.open(UploadResourcesModalComponent, {
-      onUploaded: (file: { fileName: string; lastModified: number }) => {
+      onUploaded: (file: File) => {
         const isAllChecked = this.selectAll();
-        const fileExt = file.fileName.split('.').pop()?.toLowerCase() ?? 'txt';
+        const fileExt = file.name.split('.').pop()?.toLowerCase() ?? 'txt';
         const fileType = fileExt === 'pdf' ? 'pdf' : 'txt';
+
         const newItem: SourceItem = {
           id: Date.now().toString(),
-          name: file.fileName,
+          name: file.name,
           checked: isAllChecked,
           type: fileType,
           isUploading: true,
+          file,
         };
 
         this.resourcesStateService.updateSourceList(list => [...list, newItem]);

@@ -22,66 +22,129 @@
     </div>
 
     <form [formGroup]="form" class="mt-6 w-full">
-      <!-- ? Length -->
+      <!-- ? Speed -->
       <div class="flex flex-col">
-        <span class="text-base font-semibold dark:text-white">Length</span>
+        <span class="text-base font-semibold dark:text-white">Tốc độ đọc</span>
         <div class="mt-4 flex gap-3">
           <input
             type="radio"
-            name="length"
-            id="shorter"
-            class="input-length hidden" />
+            formControlName="speed"
+            name="speed"
+            id="slower"
+            value="0.5"
+            class="input-speed hidden" />
           <label
-            for="shorter"
-            class="button-length text-[#5f6368] hover:bg-[#ecf2fc] dark:text-[#e6e6e6] dark:hover:bg-dark-400">
+            for="slower"
+            class="button-speed text-[#5f6368] hover:bg-[#ecf2fc] dark:text-[#e6e6e6] dark:hover:bg-dark-400">
             <span class="pi pi-check hidden"></span>
-            <span>Shorter</span>
+            <span>Rất Chậm</span>
           </label>
 
           <input
             type="radio"
-            name="length"
+            formControlName="speed"
+            name="speed"
+            id="slow"
+            value="0.75"
+            class="input-speed hidden" />
+          <label
+            for="slow"
+            class="button-speed text-[#5f6368] hover:bg-[#ecf2fc] dark:text-[#e6e6e6] dark:hover:bg-dark-400">
+            <span class="pi pi-check hidden"></span>
+            <span>Chậm</span>
+          </label>
+
+          <input
+            type="radio"
+            formControlName="speed"
+            name="speed"
             id="default"
-            class="input-length hidden"
+            value="1"
+            class="input-speed hidden"
             checked />
           <label
             for="default"
-            class="button-length text-[#5f6368] hover:bg-[#ecf2fc] dark:text-[#e6e6e6] dark:hover:bg-dark-400">
+            class="button-speed text-[#5f6368] hover:bg-[#ecf2fc] dark:text-[#e6e6e6] dark:hover:bg-dark-400">
             <span class="pi pi-check hidden"></span>
-            <span>Default</span>
+            <span>Bình thường</span>
           </label>
 
           <input
             type="radio"
-            name="length"
-            id="longer"
-            class="input-length hidden" />
+            formControlName="speed"
+            name="speed"
+            id="fast"
+            value="1.2"
+            class="input-speed hidden" />
           <label
-            for="longer"
-            class="button-length text-[#5f6368] hover:bg-[#ecf2fc] dark:text-[#e6e6e6] dark:hover:bg-dark-400">
+            for="fast"
+            class="button-speed text-[#5f6368] hover:bg-[#ecf2fc] dark:text-[#e6e6e6] dark:hover:bg-dark-400">
             <span class="pi pi-check hidden"></span>
-            <span>Longer</span>
+            <span>Nhanh</span>
+          </label>
+
+          <input
+            type="radio"
+            formControlName="speed"
+            name="speed"
+            id="faster"
+            value="1.5"
+            class="input-speed hidden" />
+          <label
+            for="faster"
+            class="button-speed text-[#5f6368] hover:bg-[#ecf2fc] dark:text-[#e6e6e6] dark:hover:bg-dark-400">
+            <span class="pi pi-check hidden"></span>
+            <span>Rất Nhanh</span>
           </label>
         </div>
       </div>
 
       <!-- ? Voice Type -->
-      <div class="mt-5 flex flex-col">
-        <span class="text-base font-semibold dark:text-white">Giọng đọc</span>
-        <div class="mt-2 flex w-full gap-3">
-          <p-select
-            formControlName="voice"
-            name="voice"
-            placeholder="Chọn giọng phù hợp yêu cầu"
-            filterPlaceholder="Tìm kiếm..."
-            emptyFilterMessage="Không có kết quả tìm thấy"
-            emptyMessage="Chưa có giọng đọc nào."
-            class="w-full"
-            [options]="options()"
-            [checkmark]="true"
-            [filter]="true"
-            [resetFilterOnHide]="true"
-            [showClear]="true" />
+      <div class="mt-5 flex w-full gap-4">
+        <div class="flex grow flex-col">
+          <span class="text-base font-semibold dark:text-white">Giọng đọc</span>
+          <div class="mt-2 flex w-full gap-3">
+            <p-select
+              formControlName="voice"
+              name="voice"
+              placeholder="Chọn giọng đọc phù hợp yêu cầu"
+              filterPlaceholder="Tìm kiếm..."
+              emptyFilterMessage="Không có kết quả tìm thấy"
+              emptyMessage="Chưa có giọng đọc nào."
+              class="w-full"
+              [checkmark]="true"
+              [filter]="true"
+              [resetFilterOnHide]="true"
+              [showClear]="true"
+              [options]="voiceOptions()">
+              <ng-template let-selectedVoice #selectedItem>
+                {{ selectedVoice.name }}
+              </ng-template>
+              <ng-template let-voice #item>
+                {{ voice.name }}
+              </ng-template>
+            </p-select>
+          </div>
+        </div>
+        <div class="flex grow flex-col">
+          <span class="text-base font-semibold dark:text-white">
+            Ngôn ngữ đọc
+          </span>
+          <div class="mt-2 flex w-full gap-3">
+            <p-select
+              formControlName="language"
+              name="voice"
+              placeholder="Chọn ngôn ngữ phù hợp yêu cầu"
+              filterPlaceholder="Tìm kiếm..."
+              emptyFilterMessage="Không có kết quả tìm thấy"
+              emptyMessage="Chưa có ngôn ngữ nào."
+              class="w-full"
+              [checkmark]="true"
+              [filter]="true"
+              [resetFilterOnHide]="true"
+              [showClear]="true"
+              [options]="languageOptions()" />
+          </div>
         </div>
       </div>
 
@@ -92,18 +155,26 @@
         </span>
         <div class="mt-2 flex gap-3">
           <p-select
-            formControlName="folderId"
-            name="folderId"
+            formControlName="folder"
+            name="folder"
             placeholder="Chọn thư mục bạn muốn lưu trữ"
             filterPlaceholder="Tìm kiếm..."
             emptyFilterMessage="Không có kết quả tìm thấy"
             emptyMessage="Chưa có thư mục nào. Vui lòng tạo thư mục mới để bắt đầu."
             class="w-full"
-            [options]="options()"
             [checkmark]="true"
             [filter]="true"
             [resetFilterOnHide]="true"
-            [showClear]="true" />
+            [showClear]="true"
+            [options]="folderList()"
+            [loading]="isFolderLoading()">
+            <ng-template let-selectedFolder #selectedItem>
+              {{ selectedFolder.name }}
+            </ng-template>
+            <ng-template let-folder #item>
+              {{ folder.name }}
+            </ng-template>
+          </p-select>
         </div>
       </div>
     </form>
@@ -117,6 +188,10 @@
       variant="outlined"
       severity="danger"
       (onClick)="closeModal()" />
-    <p-button label="Lưu" icon="pi pi-check" variant="outlined" />
+    <p-button
+      label="Lưu"
+      icon="pi pi-check"
+      variant="outlined"
+      (onClick)="save()" />
   </footer>
 </div>

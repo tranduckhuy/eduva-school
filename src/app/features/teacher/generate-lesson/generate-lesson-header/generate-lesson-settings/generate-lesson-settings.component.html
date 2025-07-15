@@ -1,96 +1,54 @@
-<div
-  class="absolute right-0 top-[46px] z-10 rounded border border-gray-100 shadow-main dark:border-dark-500"
-  clickOutsideSubmenu
-  (clickOutside)="clickOutside.emit()">
-  <div
-    class="animate-fadeInForward rounded-md bg-white shadow-2xl transition-all duration-300 ease-in-out will-change-[opacity,transform] dark:bg-dark-200">
-    <div class="w-[195px] p-5">
-      <div
-        class="flex items-center gap-3 border-b border-b-gray-100 pb-3 dark:border-b-dark-500">
-        <img
-          src="https://htmlcss.fullstack.edu.vn/assets/f8_icon.png"
-          alt="Quy Nguyen"
-          class="h-[30px] w-[30px] rounded-[50%] object-contain outline outline-[#C2CDFF]" />
-        <div class="flex flex-col">
-          <span class="font-medium text-textBlack dark:text-white">
-            Quy Nguyen
-          </span>
-          <span class="flex items-center gap-1 text-xs dark:text-[#e6e6e6]">
-            Bạn có: 9.523
-            <span class="material-symbols-outlined text-xs text-yellow-500">
-              paid
-            </span>
-          </span>
-        </div>
+<div class="flex items-center justify-center gap-6">
+  <button
+    class="action-btn cubic-bezier(0.4, 0, 0.2, 1) text-xl transition duration-100 hover:text-primary dark:text-dark-100 dark:hover:text-primary sm:hidden"
+    (click)="toggleDarkMode()">
+    @if (isDarkMode()) {
+      <span class="material-symbols-outlined text-xl">light_mode</span>
+    } @else {
+      <span class="material-symbols-outlined text-xl">dark_mode</span>
+    }
+  </button>
+  <button
+    class="action-btn cubic-bezier(0.4, 0, 0.2, 1) transition duration-100 hover:text-primary dark:text-dark-100 dark:hover:text-primary sm:hidden"
+    (click)="toggleFullscreen()">
+    <span class="material-symbols-rounded action-btn-icon text-xl">
+      {{ isFullscreen() ? 'fullscreen_exit' : 'fullscreen' }}
+    </span>
+  </button>
+  <div class="relative">
+    <button
+      class="action-btn cubic-bezier(0.4, 0, 0.2, 1) transition duration-100 hover:text-primary dark:text-dark-100 dark:hover:text-primary"
+      (click)="toggleMenu('notifications')">
+      <span class="material-symbols-outlined text-xl">notifications</span>
+    </button>
+    @if (headerSubmenuService.getActiveSubmenuMenu() === 'notifications') {
+      <header-notifications (clickOutside)="headerSubmenuService.close()" />
+    }
+  </div>
+
+  <div class="relative">
+    <div
+      class="flex cursor-pointer items-center gap-2"
+      (click)="toggleMenu('information')">
+      <img
+        [src]="user()?.avatarUrl"
+        [alt]="user()?.fullName"
+        class="h-[30px] w-[30px] flex-shrink-0 rounded-[50%] object-contain outline outline-[#C2CDFF]" />
+      <div class="flex items-center gap-1 xs:hidden">
+        <span class="select-none font-semibold text-textBlack dark:text-white">
+          {{ user()?.fullName }}
+        </span>
+        <span
+          class="material-symbols-outlined text-xl text-textBlack dark:text-white">
+          keyboard_arrow_down
+        </span>
       </div>
-      <ul>
-        <li>
-          <a href="#!" class="settings-link py-3">
-            <span class="material-symbols-outlined dark:text-white">
-              account_circle
-            </span>
-            <span class="dark:text-white">Trang cá nhân</span>
-          </a>
-        </li>
-        <li>
-          <a href="#!" class="settings-link">
-            <span class="material-symbols-outlined dark:text-white">
-              credit_card
-            </span>
-            <span class="dark:text-white">Nạp xu</span>
-          </a>
-        </li>
-      </ul>
-
-      <div class="separator dark:border-b-dark-500"></div>
-
-      <ul>
-        <li>
-          <button (click)="toggleDarkMode()" class="settings-link pb-2 pt-3">
-            <span
-              class="material-symbols-outlined action-btn-icon dark:text-white">
-              {{ isDarkMode() ? 'light_mode' : 'dark_mode' }}
-            </span>
-            <span class="dark:text-white">
-              {{ isDarkMode() ? 'Bật giao diện sáng' : 'Bật giao diện tối' }}
-            </span>
-          </button>
-        </li>
-        <li>
-          <button
-            (click)="toggleFullSCreen.emit()"
-            class="settings-link pb-2 pt-3">
-            <span
-              class="material-symbols-rounded action-btn-icon dark:text-white">
-              {{ isFullScreen() ? 'fullscreen_exit' : 'fullscreen' }}
-            </span>
-            <span class="dark:text-white">
-              {{ isFullScreen() ? 'Thu nhỏ màn hình' : 'Toàn màn hình' }}
-            </span>
-          </button>
-        </li>
-      </ul>
-
-      <div class="separator dark:border-b-dark-500"></div>
-
-      <ul>
-        <li>
-          <a href="#!" class="settings-link pb-2 pt-3">
-            <span class="material-symbols-outlined dark:text-white">
-              settings
-            </span>
-            <span class="dark:text-white">Cài đặt</span>
-          </a>
-        </li>
-        <li>
-          <a href="#!" class="settings-link !pb-0 pt-2">
-            <span class="material-symbols-outlined dark:text-white">
-              logout
-            </span>
-            <span class="dark:text-white">Đăng xuất</span>
-          </a>
-        </li>
-      </ul>
     </div>
+    @if (headerSubmenuService.getActiveSubmenuMenu() === 'information') {
+      <header-information
+        [isFullScreen]="isFullscreen()"
+        (toggleFullSCreen)="toggleFullscreen()"
+        (clickOutside)="headerSubmenuService.close()" />
+    }
   </div>
 </div>

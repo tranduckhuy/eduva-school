@@ -108,10 +108,10 @@ export const teacherRoutes: Routes = [
     children: [
       {
         path: 'generate-lesson',
-        loadComponent: () =>
-          import(
-            './generate-lesson/generate-lesson-layout/generate-lesson-layout.component'
-          ).then(mod => mod.GenerateLessonLayoutComponent),
+        loadChildren: () =>
+          import('./generate-lesson/generate-lesson.routes').then(
+            mod => mod.generateLessonRoutes
+          ),
       },
     ],
   },

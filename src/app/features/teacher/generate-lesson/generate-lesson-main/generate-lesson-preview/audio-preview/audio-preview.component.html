@@ -19,14 +19,14 @@
         </div>
       </div>
       <p-button
-        pTooltip="Hãy tải tài liệu hoặc nhập yêu cầu trước khi tạo"
+        pTooltip="Hãy tải tài liệu lên, nhập yêu cầu và chọn cài đặt giọng đọc trước khi tạo"
         tooltipPosition="bottom"
         label="Tạo nội dung"
         styleClass="mt-4"
         [rounded]="true"
         [fluid]="true"
         [disabled]="disableGenerate()"
-        (onClick)="simulateAudioGeneration()" />
+        (onClick)="confirmGenerateAudio()" />
     }
 
     @case ('loading') {
@@ -40,7 +40,7 @@
         </div>
         <div class="flex flex-col">
           <span class="font-semibold dark:text-white">
-            Đang tạo bài giảng dựa trên {{ totalResourcesChecked() }} tài liệu
+            Đang tạo bài giảng dựa trên {{ totalCheckedSources() }} tài liệu
           </span>
           <span class="text-gray-500 dark:text-gray-300">
             Quá trình này sẽ mất vài phút. Bạn có thể làm việc khác trong lúc
@@ -115,8 +115,8 @@
         (mouseenter)="setAsActive()">
         <audio
           #audio
-          src="./audioplayback.mp3"
           class="hidden"
+          [src]="audioUrl()"
           (loadedmetadata)="onMetadataLoaded()"></audio>
         <p-button
           [rounded]="true"

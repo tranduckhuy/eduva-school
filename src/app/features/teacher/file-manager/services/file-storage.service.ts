@@ -9,7 +9,7 @@ import { RequestService } from '../../../../shared/services/core/request/request
 
 import { StatusCode } from '../../../../shared/constants/status-code.constant';
 
-import { type FileStorageQuotaResponse } from '../../models/file-storage-quota-response.model';
+import { type FileStorageQuotaResponse } from '../models/file-storage-quota-response.model';
 
 @Injectable({
   providedIn: 'root',
