@@ -51,8 +51,9 @@ export class ExportInvoicePdfComponent {
     const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
       let binary = '';
       const bytes = new Uint8Array(buffer);
-      for (let i = 0; i < bytes.length; i++)
-        binary += String.fromCharCode(bytes[i]);
+      for (const byte of bytes) {
+        binary += String.fromCharCode(byte);
+      }
       return window.btoa(binary);
     };
 
