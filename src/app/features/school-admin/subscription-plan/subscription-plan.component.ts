@@ -108,6 +108,13 @@ export class SubscriptionPlanComponent implements OnInit {
     const current = this.currentSchoolPlan();
     if (!current) return false;
 
+    // ? If current user's plan have been expired then do not disabled anything
+    const subscriptionEnd =
+      this.user()?.userSubscriptionResponse?.subscriptionEndDate;
+    if (subscriptionEnd && new Date(subscriptionEnd) < new Date()) {
+      return false;
+    }
+
     // ? All plans sorted from lowest to highest index
     const allPlans = this.subscriptionPlans();
 

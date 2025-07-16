@@ -10,95 +10,46 @@
     </header>
 
     <div class="mt-[25px] px-[25px] pb-0">
-      <div class="e-row e-row-cols-1 e-g-3">
-        <div class="e-col mt-4">
-          <app-form-control
-            label="Tên"
-            type="text"
-            [name]="'fullName'"
-            formControlName="fullName"
-            placeholder="Tên đầy đủ..."
-            [required]="true"
-            [submitted]="submitted()">
-          </app-form-control>
-        </div>
-        <div class="e-col">
-          <app-form-control
-            label="Email"
-            type="email"
-            [name]="'email'"
-            formControlName="email"
-            [required]="true"
-            [email]="true"
-            placeholder="Email..."
-            [submitted]="submitted()">
-          </app-form-control>
-        </div>
-        <app-form-control
-          type="password"
-          label="Mật khẩu"
-          placeholder="Mật khẩu"
-          formControlName="initialPassword"
-          [name]="'initialPassword'"
-          [maxLength]="18"
-          [submitted]="submitted()"
-          [required]="true" />
-        <div class="mx-1 mt-3 pb-4 pr-[18px]">
-          <div class="flex gap-1">
-            <div
-              class="h-[5px] flex-1 rounded-[4px]"
-              [ngClass]="{
-                'bg-[#e1e4eb]': !passwordLevel(),
-                'bg-[#d43031]': passwordLevel()! < 4,
-                'bg-[#faa61b]': passwordLevel() === 4,
-                'bg-[#02875a]': passwordLevel() === 5,
-              }"></div>
-            <div
-              class="h-[5px] flex-1 rounded-[4px]"
-              [ngClass]="{
-                'bg-[#e1e4eb]': !passwordLevel() || passwordLevel()! < 3,
-                'bg-[#d43031]': passwordLevel() === 3,
-                'bg-[#faa61b]': passwordLevel() === 4,
-                'bg-[#02875a]': passwordLevel() === 5,
-              }"></div>
-            <div
-              class="h-[5px] flex-1 rounded-[4px]"
-              [ngClass]="{
-                'bg-[#e1e4eb]': !passwordLevel() || passwordLevel()! < 4,
-                'bg-[#faa61b]': passwordLevel() === 4,
-                'bg-[#02875a]': passwordLevel() === 5,
-              }"></div>
-            <div
-              class="h-[5px] flex-1 rounded-[4px]"
-              [ngClass]="{
-                'bg-[#e1e4eb]': passwordLevel() !== 5,
-                'bg-[#02875a]': passwordLevel() === 5,
-              }"></div>
-          </div>
-          <div class="py-2 text-right text-xs font-medium text-[#666]">
-            {{
-              passwordLevel() &&
-                (passwordLevel() === 5
-                  ? 'Mật khẩu mạnh'
-                  : passwordLevel() === 4
-                    ? 'Mật khẩu trung bình'
-                    : 'Mật khẩu yếu')
-            }}
-          </div>
-        </div>
+      <app-form-control
+        formControlName="fullName"
+        name="fullName"
+        label="Tên"
+        type="text"
+        placeholder="Tên đầy đủ..."
+        [required]="true"
+        [submitted]="submitted()">
+      </app-form-control>
 
-        <app-form-control
-          type="password"
-          label="Xác nhận mật khẩu"
-          placeholder="Mật khẩu"
-          formControlName="confirmPassword"
-          [name]="'confirmPassword'"
-          [maxLength]="18"
-          [confirmPassword]="form.get('initialPassword')?.value"
-          class="-mt-4"
-          [submitted]="submitted()"
-          [required]="true" />
-      </div>
+      <app-form-control
+        formControlName="email"
+        name="email"
+        label="Email"
+        type="email"
+        placeholder="Email..."
+        [required]="true"
+        [email]="true"
+        [submitted]="submitted()">
+      </app-form-control>
+
+      <app-form-control
+        formControlName="initialPassword"
+        name="initialPassword"
+        type="password"
+        label="Mật khẩu"
+        placeholder="Mật khẩu"
+        [required]="true"
+        [validatePassword]="true"
+        [submitted]="submitted()" />
+
+      <app-form-control
+        formControlName="confirmPassword"
+        name="confirmPassword"
+        type="password"
+        label="Xác nhận mật khẩu"
+        placeholder="Xác nhận mật khẩu"
+        [required]="true"
+        [submitted]="submitted()"
+        [confirmPassword]="form.get('initialPassword')?.value" />
     </div>
 
     <div

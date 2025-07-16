@@ -12,15 +12,18 @@ import { Select } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 
-import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
-import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
-import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
+
 import { SchoolPaymentService } from './service/school-payment.service';
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
+
 import { PAGE_SIZE } from '../../../shared/constants/common.constant';
-import { PaymentListParams } from './model/payment-list-params';
+
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
+
+import { type PaymentListParams } from './model/payment-list-params';
 
 @Component({
   selector: 'app-payments',
@@ -28,7 +31,6 @@ import { TableEmptyStateComponent } from '../../../shared/components/table-empty
   imports: [
     CurrencyPipe,
     DatePipe,
-    SearchInputComponent,
     ButtonComponent,
     TableModule,
     LeadingZeroPipe,
@@ -131,7 +133,7 @@ export class PaymentsComponent {
 
   onSearchTriggered(term: string): void {
     this.searchTerm.set(term);
-    this.sortField.set(null);
+    this.sortField.set('name');
     this.sortOrder.set(-1);
     this.first.set(0); // Reset to first page when search changes
     this.loadData();

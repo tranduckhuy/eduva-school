@@ -127,31 +127,34 @@
                   <app-button
                     pTooltip="Xem chi tiết"
                     tooltipPosition="top"
-                    [variant]="'light'"
-                    class="material-symbols-outlined rounded-full px-[7px] pb-[6px] pt-[8px] text-lg leading-none"
-                    >visibility</app-button
-                  >
+                    variant="rounded"
+                    size="xs"
+                    class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
+                    visibility
+                  </app-button>
                 </a>
                 @if (teacher.status === 0) {
                   <app-button
                     pTooltip="Vô hiệu hóa"
                     tooltipPosition="top"
+                    variant="rounded"
+                    size="xs"
+                    class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-danger shadow-none hover:bg-transparent"
                     [loading]="isLoadingArchive()"
-                    (clicked)="openConfirmArchiveDialog($event, teacher.id)"
-                    [variant]="'light-danger'"
-                    class="material-symbols-outlined rounded-full px-[7px] py-[7px] text-lg leading-none"
-                    >archive</app-button
-                  >
+                    (clicked)="openConfirmArchiveDialog($event, teacher.id)">
+                    archive
+                  </app-button>
                 } @else if (teacher.status === 1) {
                   <app-button
                     pTooltip="Kích hoạt"
                     tooltipPosition="top"
+                    variant="rounded"
+                    size="xs"
+                    class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-success shadow-none hover:bg-transparent"
                     [loading]="isLoadingActive()"
-                    (clicked)="openConfirmActiveDialog($event, teacher.id)"
-                    [variant]="'light'"
-                    class="material-symbols-outlined rounded-full px-[7px] py-[7px] text-lg leading-none"
-                    >unarchive</app-button
-                  >
+                    (clicked)="openConfirmActiveDialog($event, teacher.id)">
+                    unarchive
+                  </app-button>
                 }
               </div>
             </td>

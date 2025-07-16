@@ -47,6 +47,17 @@ export class PaymentComponent {
     this.loadData();
   }
 
+  get deductedAmount() {
+    const amount = this.schoolSubscriptionDetail()?.paymentTransaction.amount;
+    const planPrice = this.schoolSubscriptionDetail()?.plan.price;
+
+    if (!amount || !planPrice) return 0;
+
+    const deductedAmount = amount - planPrice;
+
+    return deductedAmount;
+  }
+
   private loadData(): void {
     const currentUrl = this.router.url;
     const paymentType = currentUrl.split('/')[3];

@@ -10,18 +10,18 @@
 
         <div>
           <app-button
-            [variant]="'outline'"
-            (clicked)="goBackToLessonList()"
-            class="mr-3 border-primary bg-transparent !text-primary shadow-none hover:bg-primary hover:!text-white lg:mr-2 sm:mr-3">
+            variant="outline"
+            class="mr-3 border-primary bg-transparent !text-primary shadow-none hover:bg-primary hover:!text-white lg:mr-2 sm:mr-3"
+            (clicked)="goBackToLessonList()">
             <div class="flex items-center gap-2">
               <span class="pi pi-angle-left"></span>
               <span>Quay lại</span>
             </div>
           </app-button>
           <app-button
-            [variant]="'outline'"
-            (clicked)="openAddMaterialModal()"
-            class="border-primary bg-transparent !text-primary shadow-none hover:bg-primary hover:!text-white">
+            variant="outline"
+            class="border-primary bg-transparent !text-primary shadow-none hover:bg-primary hover:!text-white"
+            (clicked)="openAddMaterialModal()">
             <div class="flex items-center gap-2">
               <span class="pi pi-plus"></span>
               <span>Thêm tài liệu mới</span>
@@ -141,8 +141,8 @@
                         <app-button
                           pTooltip="Xem chi tiết"
                           tooltipPosition="top"
-                          [variant]="'outline'"
-                          [size]="'xs'"
+                          variant="rounded"
+                          size="xs"
                           class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
                           visibility
                         </app-button>
@@ -150,16 +150,16 @@
                       <app-button
                         pTooltip="Chỉnh sửa"
                         tooltipPosition="top"
-                        [variant]="'outline'"
-                        [size]="'xs'"
-                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-gray shadow-none hover:bg-transparent">
+                        variant="rounded"
+                        size="xs"
+                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
                         edit
                       </app-button>
                       <app-button
                         pTooltip="Chuyển vào thùng rác"
                         tooltipPosition="bottom"
-                        [variant]="'outline'"
-                        [size]="'xs'"
+                        variant="rounded"
+                        size="xs"
                         class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-danger shadow-none hover:bg-transparent">
                         delete
                       </app-button>

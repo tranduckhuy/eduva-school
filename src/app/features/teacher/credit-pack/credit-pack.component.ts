@@ -59,6 +59,7 @@ export class CreditPackComponent implements OnInit {
         this.paymentService.confirmPaymentReturn(confirmRequest).subscribe({
           complete: () => {
             this.userService.getCurrentProfile().subscribe();
+            this.loadCreditTransactions(1);
           },
         });
       }
@@ -77,9 +78,9 @@ export class CreditPackComponent implements OnInit {
     this.creditPackService.getCreditPacks(request).subscribe();
   }
 
-  loadCreditTransactions() {
+  loadCreditTransactions(page?: number) {
     const request: GetCreditTransactionRequest = {
-      pageIndex: this.currentPage(),
+      pageIndex: page ?? this.currentPage(),
       pageSize: this.pageSize(),
       sortBy: 'createdAt',
       sortDirection: 'desc',

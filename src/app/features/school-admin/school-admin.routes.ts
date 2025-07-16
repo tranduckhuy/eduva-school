@@ -48,20 +48,6 @@ export const schoolAdminRoutes: Routes = [
           ).then(mod => mod.SharedLessonsComponent),
       },
       {
-        path: 'moderate-lessons',
-        loadComponent: () =>
-          import('./moderate-lessons/moderate-lessons.component').then(
-            mod => mod.ModerateLessonsComponent
-          ),
-      },
-      {
-        path: 'view-lesson/:materialId',
-        loadComponent: () =>
-          import(
-            '../../shared/components/lesson-details/preview-lesson/preview-lesson.component'
-          ).then(mod => mod.PreviewLessonComponent),
-      },
-      {
         path: 'subscription-plans',
         loadComponent: () =>
           import('./subscription-plan/subscription-plan.component').then(

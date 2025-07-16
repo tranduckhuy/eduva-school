@@ -64,12 +64,16 @@
                     <span class="pi pi-trash" style="font-size: 14px"></span>
                     <span>Xóa thư mục</span>
                   </button>
-                  <button
-                    class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
-                    (click)="onRemoveMaterials(folderWithMaterials.folder.id)">
-                    <span class="pi pi-trash" style="font-size: 14px"></span>
-                    <span>Xóa toàn bộ tài liệu</span>
-                  </button>
+                  @if (folderWithMaterials.materials.length > 0) {
+                    <button
+                      class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
+                      (click)="
+                        onRemoveMaterials(folderWithMaterials.folder.id)
+                      ">
+                      <span class="pi pi-trash" style="font-size: 14px"></span>
+                      <span>Xóa toàn bộ tài liệu</span>
+                    </button>
+                  }
                 </div>
               }
             </div>
@@ -78,11 +82,7 @@
             @for (material of folderWithMaterials.materials; track $index) {
               <li class="material-item flex items-center justify-between">
                 <a
-                  [routerLink]="[
-                    '/teacher/view-lesson',
-                    folderWithMaterials.folder.id,
-                    material.id,
-                  ]"
+                  [routerLink]="['/teacher/view-lesson', material.id]"
                   class="flex w-full grow items-center gap-3 pr-2">
                   <span
                     class="icon-wrapper"

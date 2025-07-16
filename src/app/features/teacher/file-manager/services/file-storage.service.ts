@@ -1,7 +1,7 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { Observable, map, catchError, throwError } from 'rxjs';
+import { Observable, map, catchError, throwError, tap } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 
@@ -20,10 +20,20 @@ export class FileStorageService {
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly GET_FILE_STORAGE_QUOTA = `${this.BASE_API_URL}/file-storage/storage-quota`;
 
+  private readonly fileStorageSignal = signal<FileStorageQuotaResponse | null>(
+    null
+  );
+  fileStorage = this.fileStorageSignal.asReadonly();
+
   getFileStorageQuota(): Observable<FileStorageQuotaResponse | null> {
     return this.requestService
       .get<FileStorageQuotaResponse>(this.GET_FILE_STORAGE_QUOTA)
       .pipe(
+        tap(res => {
+          if (res.statusCode === StatusCode.SUCCESS && res.data) {
+            this.fileStorageSignal.set(res.data);
+          }
+        }),
         map(res => {
           if (res.statusCode === StatusCode.SUCCESS && res.data) {
             return res.data;

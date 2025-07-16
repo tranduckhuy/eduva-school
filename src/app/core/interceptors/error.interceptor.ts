@@ -27,7 +27,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const confirmationService = inject(ConfirmationService);
 
   const user = userService.currentUser;
-  const isByPass = req.context.get(BYPASS_AUTH_ERROR);
+  const isByPassAuth = req.context.get(BYPASS_AUTH_ERROR);
   const isByPassPayment = req.context.get(BYPASS_PAYMENT_ERROR);
 
   const handleServerError = () => {
@@ -141,17 +141,19 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
-      if (isUnauthorized && !isByPass) {
+      if (isUnauthorized && !isByPassAuth) {
         handleUnauthorized();
         return throwError(() => error);
       }
 
       if (isPaymentRequired && !isByPassPayment) {
-        handleSubscriptionExpired();
-        return throwError(() => error);
+        if (statusCode && statusCode.SUBSCRIPTION_EXPIRED_WITH_DATA_LOSS_RISK) {
+          handleSubscriptionExpired();
+          return throwError(() => error);
+        }
       }
 
-      if (isForbidden && !isByPass) {
+      if (isForbidden && !isByPassAuth) {
         if (
           statusCode &&
           statusCode === StatusCode.SCHOOL_AND_SUBSCRIPTION_REQUIRED

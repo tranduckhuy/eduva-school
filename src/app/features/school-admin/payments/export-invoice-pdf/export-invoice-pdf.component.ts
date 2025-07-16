@@ -30,14 +30,16 @@ export class ExportInvoicePdfComponent {
   readonly schoolSubscriptionDetail = input<SchoolSubscriptionDetail | null>();
 
   async exportToPdf() {
-    await this.createFormattedPdf({}, 'Hóa_đơn_EDUVA.pdf');
+    await this.createFormattedPdf('Hóa_đơn_EDUVA.pdf');
   }
 
-  private async createFormattedPdf(
-    data: any,
-    fileName: string = 'document.pdf'
-  ) {
+  private async createFormattedPdf(fileName: string = 'document.pdf') {
     const pdf = new jsPDF();
+    const amount = this.schoolSubscriptionDetail()?.paymentTransaction.amount;
+    const planPrice = this.schoolSubscriptionDetail()?.plan.price;
+    let deductedAmount = 0;
+
+    if (amount && planPrice) deductedAmount = amount - planPrice;
 
     // Helper function to convert ArrayBuffer to base64 safely
     function arrayBufferToBase64(buffer: ArrayBuffer): string {
@@ -87,8 +89,8 @@ export class ExportInvoicePdfComponent {
     pdf.text(
       `EDUVA Hóa Đơn: #${
         this.isCreditPack()
-          ? this.creditTransactionDetail()?.id
-          : this.schoolSubscriptionDetail()?.id
+          ? this.creditTransactionDetail()?.transactionCode
+          : this.schoolSubscriptionDetail()?.paymentTransaction.transactionCode
       }`,
       24,
       17
@@ -102,9 +104,9 @@ export class ExportInvoicePdfComponent {
     pdf.setFont('Nunito', 'bold');
     pdf.text('EDUVA', 10, 36);
     pdf.setFont('Nunito', 'normal');
-    pdf.text('Địa chỉ: thành phố Quy Nhơn, tỉnh Bình Định', 10, 42);
+    pdf.text('Địa chỉ: Đại học FPT Quy Nhơn, Tỉnh Gia Lai', 10, 42);
     pdf.text('Số điện thoại: 01234543234', 10, 48);
-    pdf.text('Email: eduva@gmail.com', 10, 54);
+    pdf.text('Email: eduva@contact.com', 10, 54);
 
     // Invoice To
     const rightColX = 110;
@@ -157,8 +159,8 @@ export class ExportInvoicePdfComponent {
     pdf.text(
       `${
         this.isCreditPack()
-          ? this.creditTransactionDetail()?.aiCreditPack?.id
-          : this.schoolSubscriptionDetail()?.id
+          ? this.creditTransactionDetail()?.transactionCode
+          : this.schoolSubscriptionDetail()?.paymentTransaction.transactionCode
       }`,
       10,
       77
@@ -210,7 +212,14 @@ export class ExportInvoicePdfComponent {
       head: [
         this.isCreditPack()
           ? ['STT', 'TÊN GÓI', 'SỐ LƯỢNG CREDITS', 'CREDITS TẶNG THÊM', 'GIÁ']
-          : ['STT', 'TÊN GÓI', 'LƯU TRỮ', 'TÀI KHOẢN', 'LOẠI', 'GIÁ'],
+          : [
+              'STT',
+              'TÊN GÓI',
+              'DUNG LƯỢNG LƯU TRỮ',
+              'SỐ LƯỢNG TÀI KHOẢN',
+              'LOẠI GÓI',
+              'GIÁ',
+            ],
       ],
       body: [
         this.isCreditPack()
@@ -250,14 +259,15 @@ export class ExportInvoicePdfComponent {
               'Tổng:',
               `${this.creditTransactionDetail()?.aiCreditPack.price} ₫`,
             ]
-          : [
-              '',
-              '',
-              '',
-              '',
-              'Tổng:',
-              `${this.schoolSubscriptionDetail()?.paymentTransaction?.amount} ₫`,
-            ],
+          : ['', '', '', '', 'Giảm giá:', `${deductedAmount} ₫`],
+        [
+          '',
+          '',
+          '',
+          '',
+          'Tổng:',
+          `${this.schoolSubscriptionDetail()?.paymentTransaction?.amount} ₫`,
+        ],
       ],
       footStyles: {
         fillColor: [255, 255, 255],
