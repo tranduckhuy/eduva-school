@@ -273,10 +273,7 @@ export class NavbarComponent implements OnInit {
         'Tài liệu chia sẻ',
         schoolMissing ? fallback : '/school-admin/shared-lessons'
       );
-      push(
-        'Kiểm duyệt nội dung',
-        schoolMissing ? fallback : '/school-admin/moderate-lessons'
-      );
+      push('Kiểm duyệt nội dung', schoolMissing ? fallback : '/moderation');
     }
 
     if (isTeacher || isModerator) {
@@ -286,11 +283,7 @@ export class NavbarComponent implements OnInit {
     }
 
     if (isModerator && !isAdmin) {
-      push(
-        'Kiểm duyệt nội dung',
-        '/school-admin/moderate-lessons',
-        schoolMissing
-      );
+      push('Kiểm duyệt nội dung', '/moderation', schoolMissing);
     }
 
     return {

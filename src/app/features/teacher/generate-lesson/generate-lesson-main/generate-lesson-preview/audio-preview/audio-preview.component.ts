@@ -19,7 +19,15 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SubmenuDirective } from '../../../../../../shared/directives/submenu/submenu.directive';
 
 import { MediaFocusService } from '../services/media-focus.service';
-import { ResourcesStateService } from '../../services/resources-state.service';
+import { ResourcesStateService } from '../../services/utils/resources-state.service';
+import { GenerateSettingsSelectionService } from '../services/generate-settings-selection.service';
+import { AiJobsService } from '../../services/api/ai-jobs.service';
+import { AiSocketService } from '../../services/api/ai-socket.service';
+
+import { JobStatus } from '../../../../../../shared/models/enum/job-status.enum';
+import { LessonGenerationType } from '../../../../../../shared/models/enum/lesson-generation-type.enum';
+
+import { type ConfirmCreateContent } from '../../models/request/command/confirm-create-content-request.model';
 
 @Component({
   selector: 'generated-audio-preview',
@@ -41,9 +49,27 @@ export class AudioPreviewComponent {
 
   private readonly mediaFocusService = inject(MediaFocusService);
   private readonly resourcesStateService = inject(ResourcesStateService);
+  private readonly generateSettingsService = inject(
+    GenerateSettingsSelectionService
+  );
+  private readonly aiJobService = inject(AiJobsService);
+  private readonly aiSocketService = inject(AiSocketService);
+
+  jobUpdateProgress = this.aiSocketService.jobUpdateProgress;
+  jobId = this.aiJobService.jobId;
+  generationType = this.aiJobService.generationType;
+
+  isLoading = this.resourcesStateService.isLoading;
+  totalCheckedSources = this.resourcesStateService.totalCheckedSources;
+  hasInteracted = this.resourcesStateService.hasInteracted;
+
+  speedRate = this.generateSettingsService.selectedRate;
+  voice = this.generateSettingsService.selectedVoice;
+  language = this.generateSettingsService.selectedLanguage;
 
   isActive = this.mediaFocusService.isActive('audio');
-  totalResourcesChecked = this.resourcesStateService.checkedSources;
+
+  audioUrl = signal<string>('');
 
   isPlaying = signal(false);
   currentTime = signal(0);
@@ -58,11 +84,16 @@ export class AudioPreviewComponent {
     const uploading = this.resourcesStateService
       .sourceList()
       .some(x => x.isUploading);
+    const generated = this.resourcesStateService.hasGeneratedSuccessfully();
+
     return (
-      (this.resourcesStateService.totalSources() === 0 &&
-        !this.resourcesStateService.hasInteracted()) ||
-      this.resourcesStateService.isLoading() ||
-      uploading
+      (this.totalCheckedSources() === 0 && !this.hasInteracted()) ||
+      this.isLoading() ||
+      uploading ||
+      !generated ||
+      !this.speedRate() ||
+      !this.voice() ||
+      !this.language()
     );
   });
 
@@ -88,6 +119,26 @@ export class AudioPreviewComponent {
         audioEl.playbackRate = rate;
       }
     });
+
+    effect(
+      () => {
+        const generationType = this.generationType();
+        const payload = this.jobUpdateProgress();
+        const jobStatus = payload?.status;
+        const failureReason = payload?.failureReason;
+
+        if (
+          payload &&
+          jobStatus === JobStatus.Completed &&
+          !failureReason &&
+          generationType === LessonGenerationType.Audio
+        ) {
+          this.audioUrl.set(payload?.productBlobNameUrl);
+          this.audioState.set('generated');
+        }
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   get volumeIcon() {
@@ -95,6 +146,26 @@ export class AudioPreviewComponent {
     if (v === 0) return 'volume_off';
     if (v < 50) return 'volume_down';
     return 'volume_up';
+  }
+
+  // ? Confirm Generate
+  confirmGenerateAudio() {
+    this.audioState.set('loading');
+
+    const jobId = this.jobId();
+
+    if (!jobId) return;
+
+    const request: ConfirmCreateContent = {
+      type: LessonGenerationType.Audio,
+      voiceConfig: {
+        language_code: this.language() ?? 'vi-VN',
+        name: this.voice() ?? '',
+        speaking_rate: this.speedRate() ?? 1,
+      },
+    };
+
+    this.aiJobService.confirmCreateContent(jobId, request).subscribe();
   }
 
   togglePlayPause() {
@@ -193,17 +264,6 @@ export class AudioPreviewComponent {
       return `${h}:${pad(m)}:${pad(s)}`;
     }
     return `${pad(m)}:${pad(s)}`;
-  }
-
-  // ? Simulation
-  simulateAudioGeneration() {
-    this.audioState.set('loading');
-
-    const delay = 3000 + Math.floor(Math.random() * 2000); // 3-5s
-
-    setTimeout(() => {
-      this.audioState.set('generated');
-    }, delay);
   }
 
   toggleMenu() {

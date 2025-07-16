@@ -35,7 +35,6 @@ export const authRoutes: Routes = [
       {
         path: 'reset-password',
         canActivate: [requireQueryParamsGuard(['token', 'email'])],
-        canMatch: [requireQueryParamsGuard(['token', 'email'])],
         data: {
           title: 'Đổi Mật Khẩu',
         },

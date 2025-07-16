@@ -28,7 +28,7 @@ import { AudioViewerComponent } from '../audio-viewer/audio-viewer.component';
 import { DocViewerComponent } from '../doc-viewer/doc-viewer.component';
 import { PdfViewerComponent } from '../pdf-viewer/pdf-viewer.component';
 import { PreviewLessonSkeletonComponent } from '../../skeleton/preview-lesson-skeleton/preview-lesson-skeleton.component';
-import { ModerateReasonModalComponent } from '../../../../features/school-admin/moderate-lessons/moderate-reason-modal/moderate-reason-modal.component';
+import { ModerateReasonModalComponent } from '../../../../features/moderation/moderate-lessons/moderate-reason-modal/moderate-reason-modal.component';
 
 @Component({
   selector: 'app-preview-lesson',

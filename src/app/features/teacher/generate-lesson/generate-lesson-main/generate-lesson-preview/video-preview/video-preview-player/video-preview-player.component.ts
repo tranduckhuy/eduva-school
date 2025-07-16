@@ -4,6 +4,7 @@ import {
   ElementRef,
   HostListener,
   inject,
+  input,
   signal,
   viewChild,
 } from '@angular/core';
@@ -45,6 +46,8 @@ export class VideoPreviewPlayerComponent {
 
   private vgApi = inject(VgApiService);
   private readonly mediaFocusService = inject(MediaFocusService);
+
+  videoUrl = input<string>('');
 
   isActive = this.mediaFocusService.isActive('video');
 

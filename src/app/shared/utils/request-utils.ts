@@ -1,5 +1,4 @@
 import { HttpContext, HttpParams } from '@angular/common/http';
-import { FormGroup } from '@angular/forms';
 
 import {
   BYPASS_AUTH,
@@ -32,23 +31,28 @@ export function createRequestParams(
 }
 
 /**
- * Converts a FormGroup's value into a FormData object.
- * Useful for submitting multipart/form-data payloads (e.g., for file uploads).
- * File inputs (as FileList) will have the first file appended.
+ * Converts a plain object into FormData.
+ * Useful when you have mixed data (e.g., form fields + files).
  *
- * @param form The FormGroup containing fields and optional file inputs.
- * @returns A FormData object representing the form's values.
+ * @param data An object with primitive values or arrays/files.
+ * @returns A FormData object representing the data.
  */
-export function buildFormDataFromFormGroup(form: FormGroup): FormData {
+export function buildFormDataFromObject(data: Record<string, any>): FormData {
   const formData = new FormData();
 
-  for (const [key, value] of Object.entries(form.value)) {
-    if (value instanceof FileList) {
+  for (const [key, value] of Object.entries(data)) {
+    if (value instanceof File) {
+      formData.append(key, value);
+    } else if (value instanceof FileList) {
       for (let i = 0; i < value.length; i++) {
         formData.append(key, value.item(i)!);
       }
+    } else if (Array.isArray(value) && value[0] instanceof File) {
+      for (const file of value) {
+        formData.append(key, file);
+      }
     } else if (value !== null && value !== undefined) {
-      formData.append(key, JSON.stringify(value));
+      formData.append(key, value);
     }
   }
 

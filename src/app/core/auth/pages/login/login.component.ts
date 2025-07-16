@@ -6,7 +6,12 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
 
@@ -16,10 +21,12 @@ import { EmailVerificationService } from '../../services/email-verification.serv
 
 import { AuthLayoutComponent } from '../../auth-layout/auth-layout.component';
 
+import { customEmailValidator } from '../../../../shared/utils/form-validators';
+
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 
 import { type LoginRequest } from './models/login-request.model';
-import { ConfirmEmailRequest } from '../../models/request/confirm-email-request.model';
+import { type ConfirmEmailRequest } from '../../models/request/confirm-email-request.model';
 
 @Component({
   selector: 'app-login',
@@ -48,8 +55,8 @@ export class LoginComponent implements OnInit {
 
   constructor() {
     this.form = this.fb.group({
-      email: '',
-      password: '',
+      email: ['', [Validators.required, customEmailValidator]],
+      password: ['', Validators.required],
     });
   }
 

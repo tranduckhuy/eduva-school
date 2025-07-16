@@ -10,12 +10,7 @@
     @if (isLoading()) {
       <div class="loader"></div>
     } @else {
-      <div>
-        <p class="font-bold text-[#47484c] dark:text-white">Chào bạn,</p>
-        <p
-          [innerHTML]="content() | safeHtml"
-          class="text-[#47484c] dark:text-white"></p>
-      </div>
+      <div [innerHTML]="content() | safeHtml"></div>
     }
   </div>
 }

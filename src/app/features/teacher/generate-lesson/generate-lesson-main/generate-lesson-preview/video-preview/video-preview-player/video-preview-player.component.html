@@ -8,15 +8,8 @@
     [class.paused]="isPaused()">
     <!-- ? Video Player -->
     <vg-player (onPlayerReady)="onPlayerReady($event)">
-      <video
-        #video
-        crossorigin
-        src="./videoplayback.mp4"
-        [vgMedia]="$any(video)"
-        [preload]="preload()">
-        <source
-          src="https://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
-          type="video/mp4" />
+      <video #video crossorigin [vgMedia]="$any(video)" [preload]="preload()">
+        <source [src]="videoUrl()" type="video/mp4" />
       </video>
     </vg-player>
 

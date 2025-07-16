@@ -39,6 +39,21 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'moderation',
+    canMatch: [authGuard, roleGuard],
+    data: {
+      roles: [
+        UserRoles.SCHOOL_ADMIN,
+        UserRoles.CONTENT_MODERATOR,
+        UserRoles.SYSTEM_ADMIN,
+      ],
+    },
+    loadChildren: () =>
+      import('./features/moderation/moderation.routes').then(
+        mod => mod.moderationRoutes
+      ),
+  },
+  {
     path: 'errors',
     loadChildren: () =>
       import('./shared/pages/errors/errors.routes').then(

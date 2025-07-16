@@ -90,7 +90,7 @@ export class ModerateReasonModalComponent implements OnInit {
       .subscribe({
         next: () => {
           this.closeModal();
-          this.router.navigateByUrl('/school-admin/moderate-lessons');
+          this.router.navigateByUrl('/moderation');
         },
       });
   }

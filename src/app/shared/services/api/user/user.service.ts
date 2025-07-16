@@ -102,6 +102,7 @@ export class UserService {
   createUser(request: CreateUserRequest): Observable<boolean> {
     return this.requestService
       .post<void>(this.USER_API_URL, request, {
+        bypassAuthError: true,
         loadingKey: 'create-user',
       })
       .pipe(
