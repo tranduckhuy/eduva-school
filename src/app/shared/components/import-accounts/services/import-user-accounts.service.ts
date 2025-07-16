@@ -40,6 +40,7 @@ export class ImportUserAccountsService {
   ): Observable<HttpResponse<Blob>> {
     return this.requestService
       .postFile(this.IMPORT_USER_ACCOUNTS_API_URL, formData, {
+        bypassAuthError: true,
         loadingKey: 'upload',
       })
       .pipe(

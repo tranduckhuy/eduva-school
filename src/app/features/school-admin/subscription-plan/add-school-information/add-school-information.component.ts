@@ -6,7 +6,12 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { switchMap, of, filter, take } from 'rxjs';
@@ -20,8 +25,14 @@ import { JwtService } from '../../../../core/auth/services/jwt.service';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { PaymentService } from '../../../../shared/services/api/payment/payment.service';
 
-import { normalizeUrl } from '../../../../shared/utils/form-validators';
-import { WELL_URI_REGEX } from '../../../../shared/constants/common.constant';
+import {
+  customEmailValidator,
+  normalizeUrl,
+} from '../../../../shared/utils/form-validators';
+import {
+  VIETNAM_PHONE_REGEX,
+  WELL_URI_REGEX,
+} from '../../../../shared/constants/common.constant';
 
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 import { SubscriptionPlanCardComponent } from '../subscription-plan-card/subscription-plan-card.component';
@@ -72,11 +83,14 @@ export class AddSchoolInformationComponent implements OnInit {
 
   constructor() {
     this.form = this.fb.group({
-      name: '',
-      contactEmail: '',
-      contactPhone: '',
-      address: '',
-      websiteUrl: '',
+      name: ['', Validators.required],
+      contactEmail: ['', [Validators.required, customEmailValidator]],
+      contactPhone: [
+        '',
+        [Validators.required, Validators.pattern(VIETNAM_PHONE_REGEX)],
+      ],
+      address: ['', Validators.required],
+      websiteUrl: ['', Validators.pattern(WELL_URI_REGEX)],
     });
   }
 

@@ -109,7 +109,7 @@ describe('ImportUserAccountsService', () => {
         expect(requestService.postFile).toHaveBeenCalledWith(
           expect.stringContaining('/users/import'),
           formData,
-          { loadingKey: 'upload' }
+          { bypassAuthError: true, loadingKey: 'upload' }
         );
         resolve();
       });

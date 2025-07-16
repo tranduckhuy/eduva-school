@@ -15,7 +15,6 @@
       </label>
       <div class="mt-3">
         <p-fileupload
-          name="files[]"
           mode="advanced"
           accept="video/*, audio/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           previewWidth="60"
@@ -52,7 +51,7 @@
                   [rounded]="true"
                   [outlined]="true"
                   [disabled]="!files || files.length === 0"
-                  (onClick)="clearCallback()" />
+                  (onClick)="onClearFiles(clearCallback)" />
               </div>
             </div>
           </ng-template>

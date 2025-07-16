@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
+import { UserService } from '../../../shared/services/api/user/user.service';
 import { PaymentService } from '../../../shared/services/api/payment/payment.service';
 
 import { StatCardComponent } from './stat-card/stat-card.component';
@@ -50,6 +51,7 @@ interface SubItem {
 })
 export class DashboardComponent implements OnInit {
   private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly userService = inject(UserService);
   private readonly paymentService = inject(PaymentService);
 
   usersStatCard = signal<StatCard>({
@@ -110,7 +112,11 @@ export class DashboardComponent implements OnInit {
           status,
           orderCode: +orderCode,
         };
-        this.paymentService.confirmPaymentReturn(confirmRequest).subscribe();
+        this.paymentService.confirmPaymentReturn(confirmRequest).subscribe({
+          complete: () => {
+            this.userService.getCurrentProfile().subscribe();
+          },
+        });
       }
     });
   }

@@ -6,9 +6,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { switchMap } from 'rxjs';
+import { finalize, switchMap } from 'rxjs';
 
-import { PrimeNG } from 'primeng/config';
 import {
   FileUpload,
   FileSelectEvent,
@@ -17,7 +16,6 @@ import {
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
 import { UserService } from '../../../../shared/services/api/user/user.service';
@@ -55,8 +53,6 @@ type FileMetadata = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddFileModalComponent {
-  private readonly config = inject(PrimeNG);
-  private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
   private readonly toastHandlingService = inject(ToastHandlingService);
   private readonly userService = inject(UserService);
@@ -68,8 +64,8 @@ export class AddFileModalComponent {
   maxUploadFileSize = MAX_UPLOAD_FILE_SIZE;
 
   user = this.userService.currentUser;
-  isLoading = this.loadingService.isLoading;
 
+  isLoading = signal(false);
   selectedFiles = signal<File[]>([]);
 
   onSelectFile(event: FileSelectEvent) {
@@ -136,6 +132,11 @@ export class AddFileModalComponent {
     this.selectedFiles.set(updated);
   }
 
+  onClearFiles(clearCallback: () => void) {
+    clearCallback();
+    this.selectedFiles.set([]);
+  }
+
   onSubmit() {
     const files = this.selectedFiles();
     if (files.length === 0) {
@@ -160,13 +161,12 @@ export class AddFileModalComponent {
     this.uploadFiles(fileStorageRequest, fileMetadata, this.modalData.folderId);
   }
 
-  formatSize(bytes: number) {
-    const k = 1024;
-    const dm = 3;
-    const sizes = this.config.translation.fileSizeTypes!;
-    if (bytes === 0) {
-      return `0 ${sizes[0]}`;
-    }
+  formatSize(bytes: number): string {
+    const k = 1000;
+    const dm = 2;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+
+    if (bytes === 0) return `0 ${sizes[0]}`;
 
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
@@ -187,40 +187,51 @@ export class AddFileModalComponent {
 
     const files = fileMetadata.map(f => f.file);
 
-    this.uploadFileService.uploadBlobs(request, files).subscribe({
-      next: res => {
-        if (!res) return;
+    this.isLoading.set(true);
 
-        const materials: CreateLessonMaterialRequest[] = fileMetadata.map(
-          ({ file }, index) => ({
-            title: file.name,
-            description: '',
-            tag: '',
-            contentType: getContentTypeFromMime(file.type),
-            duration: 0,
-            fileSize: file.size,
-            isAIContent: false,
-            sourceUrl: res.uploadTokens[index],
-          })
-        );
+    this.uploadFileService
+      .uploadBlobs(request, files)
+      .pipe(
+        switchMap(res => {
+          if (!res) throw new Error();
 
-        const createRequest: CreateLessonMaterialsRequest = {
-          folderId,
-          blobNames: fileMetadata.map(m => m.blobName),
-          lessonMaterials: materials,
-        };
+          const materials: CreateLessonMaterialRequest[] = fileMetadata.map(
+            ({ file }, index) => ({
+              title: file.name,
+              description: '',
+              tag: '',
+              contentType: getContentTypeFromMime(file.type),
+              duration: 0,
+              fileSize: file.size,
+              isAIContent: false,
+              sourceUrl: res.uploadTokens[index],
+            })
+          );
 
-        this.lessonMaterialsService
-          .createLessonMaterials(createRequest)
-          .pipe(
-            switchMap(() =>
-              this.lessonMaterialsService.getLessonMaterials(folderId)
-            ),
-            switchMap(() => this.fileStorageService.getFileStorageQuota())
-          )
-          .subscribe(() => this.closeModal());
-      },
-    });
+          const createRequest: CreateLessonMaterialsRequest = {
+            folderId,
+            blobNames: fileMetadata.map(m => m.blobName),
+            lessonMaterials: materials,
+          };
+
+          return this.lessonMaterialsService.createLessonMaterials(
+            createRequest
+          );
+        }),
+        switchMap(() =>
+          this.lessonMaterialsService.getLessonMaterials(folderId)
+        ),
+        switchMap(() => this.fileStorageService.getFileStorageQuota()),
+        finalize(() => this.isLoading.set(false))
+      )
+      .subscribe({
+        next: () => {
+          this.closeModal();
+        },
+        error: () => {
+          this.toastHandlingService.errorGeneral();
+        },
+      });
   }
 
   private buildFileMetadata(

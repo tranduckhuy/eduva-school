@@ -16,7 +16,7 @@ import {
   type GetLessonMaterialsRequest,
 } from '../../../models/api/request/query/get-lesson-materials-request.model';
 import { type GetPagingLessonMaterialsResponse } from '../../../models/api/response/query/get-lesson-materials-response.model';
-import { type ApproveRejectMaterialRequest } from '../../../../features/school-admin/moderate-lessons/models/approve-reject-material-request.model';
+import { type ApproveRejectMaterialRequest } from '../../../../features/moderation/moderate-lessons/models/approve-reject-material-request.model';
 
 @Injectable({
   providedIn: 'root',

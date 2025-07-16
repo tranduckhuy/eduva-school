@@ -58,7 +58,7 @@ export class ClassFoldersComponent {
     const classId = this.classModel()?.id;
     if (!classId) return;
 
-    const request = materialId ? [materialId] : undefined;
+    const request = materialId ? [materialId] : [];
 
     this.classFolderService
       .removeMaterialsFromClass(classId, folderId, request)

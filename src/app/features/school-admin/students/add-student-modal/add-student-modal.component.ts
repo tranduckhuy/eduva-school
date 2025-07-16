@@ -48,9 +48,10 @@ import { type CreateUserRequest } from '../../../../shared/models/api/request/co
 })
 export class AddStudentModalComponent {
   private readonly fb = inject(FormBuilder);
-  private readonly globalModalService = inject(GlobalModalService);
-  private readonly loadingService = inject(LoadingService);
   private readonly userService = inject(UserService);
+  private readonly loadingService = inject(LoadingService);
+  private readonly globalModalService = inject(GlobalModalService);
+  private readonly data = inject(MODAL_DATA, { optional: true });
 
   readonly isLoading = this.loadingService.is('create-user');
 
@@ -60,19 +61,13 @@ export class AddStudentModalComponent {
   submitted = signal<boolean>(false);
   passwordLevel = signal<number | undefined>(undefined);
 
-  constructor(@Optional() @Inject(MODAL_DATA) private readonly data: any) {
+  constructor() {
     this.form = this.fb.group({
       fullName: ['', Validators.required],
       email: ['', [Validators.required, customEmailValidator]],
       initialPassword: ['', [Validators.required, strongPasswordValidator]],
       confirmPassword: ['', Validators.required],
     });
-
-    this.form
-      .get('initialPassword')!
-      .valueChanges.subscribe((password: string) => {
-        this.passwordLevel.set(this.calcPasswordLevel(password));
-      });
   }
 
   get passwordMisMatch() {
@@ -105,16 +100,5 @@ export class AddStudentModalComponent {
 
   closeModal() {
     this.globalModalService.close();
-  }
-
-  private calcPasswordLevel(password: string): number | undefined {
-    if (!password) return undefined;
-    let level = 0;
-    if (password.length >= 6) level++;
-    if (/[a-z]/.test(password)) level++;
-    if (/[A-Z]/.test(password)) level++;
-    if (/\d/.test(password)) level++;
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) level++;
-    return level;
   }
 }

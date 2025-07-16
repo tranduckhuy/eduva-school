@@ -8,23 +8,22 @@
         [class]="
           paymentPurpose() === undefined ? '!bg-primary !text-white' : ''
         ">
-        Tất cả</app-button
-      >
+        Tất cả
+      </app-button>
       <app-button
         (clicked)="getCreditPayments()"
         [variant]="'outline'"
         [class]="paymentPurpose() === 0 ? '!bg-primary !text-white' : ''">
-        Gói credit</app-button
-      >
+        Gói credit
+      </app-button>
       <app-button
         (clicked)="getSubscriptionPlansPayments()"
         [variant]="'outline'"
         [class]="paymentPurpose() === 1 ? '!bg-primary !text-white' : ''">
-        Gói trường</app-button
-      >
+        Gói trường
+      </app-button>
     </div>
     <div class="flex flex-wrap gap-3 sm:flex-row sm:items-center sm:gap-4">
-      <app-search-input (search)="onSearchTriggered($event)" />
       <!-- Time filter -->
       <p-select
         [options]="timeFilterOptions()"
@@ -65,8 +64,8 @@
               ><p-sortIcon field="fullname" />
             </th>
             <th scope="col" class="!min-w-[150px]">Mã đơn</th>
-            <th scope="col" class="!min-w-[150px]" pSortableColumn="price">
-              <span class="mr-2">Giá</span><p-sortIcon field="price" />
+            <th scope="col" class="!min-w-[150px]" pSortableColumn="amount">
+              <span class="mr-2">Giá</span><p-sortIcon field="amount" />
             </th>
             <th scope="col" class="!min-w-[150px]">Loại đơn</th>
             <th scope="col" class="!min-w-[150px]">Phương thức</th>
@@ -119,11 +118,11 @@
                   <app-button
                     pTooltip="Xem chi tiết"
                     tooltipPosition="top"
-                    [variant]="'light'"
+                    variant="rounded"
                     [size]="'xs'"
-                    class="material-symbols-outlined rounded-full px-[7px] pb-[6px] pt-[8px] text-lg leading-none"
-                    >visibility</app-button
-                  >
+                    class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
+                    visibility
+                  </app-button>
                 </a>
               </div>
             </td>

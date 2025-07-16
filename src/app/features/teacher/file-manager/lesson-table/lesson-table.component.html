@@ -85,27 +85,27 @@
                     <app-button
                       pTooltip="Xem chi tiết"
                       tooltipPosition="top"
-                      [variant]="'outline'"
-                      [size]="'xs'"
-                      (clicked)="goToFolderMaterials(folder.id)"
-                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg shadow-none hover:bg-transparent">
+                      variant="rounded"
+                      size="xs"
+                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent"
+                      (clicked)="goToFolderMaterials(folder.id)">
                       visibility
                     </app-button>
                     <app-button
                       pTooltip="Chỉnh sửa"
                       tooltipPosition="top"
-                      [variant]="'outline'"
-                      [size]="'xs'"
-                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg shadow-none hover:bg-transparent">
+                      variant="rounded"
+                      size="xs"
+                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
                       edit
                     </app-button>
                     <app-button
                       pTooltip="Chuyển vào thùng rác"
                       tooltipPosition="bottom"
-                      [variant]="'outline'"
-                      [size]="'xs'"
-                      (clicked)="onArchiveFolder(folder.id)"
-                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg shadow-none hover:bg-transparent">
+                      variant="rounded"
+                      size="xs"
+                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-danger shadow-none hover:bg-transparent"
+                      (clicked)="onArchiveFolder(folder.id)">
                       delete
                     </app-button>
                   </div>
