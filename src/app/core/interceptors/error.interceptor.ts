@@ -136,6 +136,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
       const statusCode = error.error?.statusCode;
 
+      if (!statusCode) return throwError(() => error);
+
       if (isServerError) {
         handleServerError();
         return throwError(() => error);
@@ -146,18 +148,17 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
-      if (isPaymentRequired && !isByPassPayment) {
-        if (statusCode && statusCode.SUBSCRIPTION_EXPIRED_WITH_DATA_LOSS_RISK) {
-          handleSubscriptionExpired();
-          return throwError(() => error);
-        }
+      if (
+        isPaymentRequired &&
+        !isByPassPayment &&
+        statusCode === statusCode?.SUBSCRIPTION_EXPIRED_WITH_DATA_LOSS_RISK
+      ) {
+        handleSubscriptionExpired();
+        return throwError(() => error);
       }
 
       if (isForbidden && !isByPassAuth) {
-        if (
-          statusCode &&
-          statusCode === StatusCode.SCHOOL_AND_SUBSCRIPTION_REQUIRED
-        ) {
+        if (statusCode === StatusCode.SCHOOL_AND_SUBSCRIPTION_REQUIRED) {
           handleMissingSchoolOrSubscription();
         } else {
           handleForbidden();
@@ -165,10 +166,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
-      if (isNotFound && statusCode) {
-        if (statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND) {
-          handleMissingSchoolOrSubscription();
-        }
+      if (
+        isNotFound &&
+        statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND
+      ) {
+        handleMissingSchoolOrSubscription();
         return throwError(() => error);
       }
 
