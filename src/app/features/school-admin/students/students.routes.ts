@@ -26,8 +26,8 @@ export const studentsRoute: Routes = [
     loadComponent: () =>
       import('./student/student.component').then(mod => mod.StudentComponent),
     data: {
-      heading: 'Chi tiết học sinh',
-      breadcrumb: 'Chi tiết học sinh',
+      heading: 'Thông tin học sinh',
+      breadcrumb: 'Thông tin học sinh',
     },
   },
 ];

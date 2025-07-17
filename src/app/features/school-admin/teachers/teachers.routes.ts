@@ -26,8 +26,8 @@ export const teachersRoute: Routes = [
     loadComponent: () =>
       import('./teacher/teacher.component').then(mod => mod.TeacherComponent),
     data: {
-      heading: 'Chi tiết giáo viên',
-      breadcrumb: 'Chi tiết giáo viên',
+      heading: 'Thông tin giáo viên',
+      breadcrumb: 'Thông tin giáo viên',
     },
   },
 ];
