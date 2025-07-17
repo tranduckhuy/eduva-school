@@ -22,6 +22,7 @@ import { GlobalModalService } from '../../../../shared/services/layout/global-mo
 
 import { UserRoles } from '../../../constants/user-roles.constant';
 import { PAGE_SIZE } from '../../../constants/common.constant';
+import { LessonMaterialStatus } from '../../../models/enum/lesson-material.enum';
 
 import { VideoViewerComponent } from '../video-viewer/video-viewer.component';
 import { AudioViewerComponent } from '../audio-viewer/audio-viewer.component';
@@ -65,6 +66,10 @@ export class PreviewLessonComponent implements OnInit {
     () =>
       this.user()?.roles.includes(UserRoles.SCHOOL_ADMIN) ||
       this.user()?.roles.includes(UserRoles.CONTENT_MODERATOR)
+  );
+
+  isMaterialPending = computed(
+    () => this.lessonMaterial()?.lessonStatus === LessonMaterialStatus.Pending
   );
 
   currentPage = signal<number>(1);

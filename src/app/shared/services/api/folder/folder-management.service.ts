@@ -181,13 +181,13 @@ export class FolderManagementService {
       case StatusCode.FOLDER_NAME_ALREADY_EXISTS:
         this.toastHandlingService.warn(
           'Cảnh báo',
-          'Tên bài giảng đã tồn tại. Vui lòng chọn tên khác.'
+          'Tên thư mục đã tồn tại. Vui lòng chọn tên khác.'
         );
         break;
       case StatusCode.FOLDER_CREATE_FAILED:
         this.toastHandlingService.error(
-          'Tạo bài giảng thất bại',
-          'Đã xảy ra sự cố trong quá trình tạo bài giảng. Vui lòng thử lại sau.'
+          'Tạo thư mục thất bại',
+          'Đã xảy ra sự cố trong quá trình tạo thư mục. Vui lòng thử lại sau.'
         );
         break;
       default:

@@ -172,7 +172,7 @@ describe('FolderManagementService', () => {
       ).rejects.toBe(error);
       expect(toastHandlingService.warn).toHaveBeenCalledWith(
         'Cảnh báo',
-        'Tên bài giảng đã tồn tại. Vui lòng chọn tên khác.'
+        'Tên thư mục đã tồn tại. Vui lòng chọn tên khác.'
       );
     });
 
@@ -187,8 +187,8 @@ describe('FolderManagementService', () => {
         firstValueFrom(service.createFolder(mockCreateRequest))
       ).rejects.toBe(error);
       expect(toastHandlingService.error).toHaveBeenCalledWith(
-        'Tạo bài giảng thất bại',
-        'Đã xảy ra sự cố trong quá trình tạo bài giảng. Vui lòng thử lại sau.'
+        'Tạo thư mục thất bại',
+        'Đã xảy ra sự cố trong quá trình tạo thư mục. Vui lòng thử lại sau.'
       );
     });
 

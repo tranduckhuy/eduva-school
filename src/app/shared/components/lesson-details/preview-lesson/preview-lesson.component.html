@@ -39,7 +39,7 @@
   } @else {
     <div class="mt-5 flex items-center justify-between sm:flex-wrap">
       <h1 class="font-nold text-2xl">{{ lessonMaterial()?.title }}</h1>
-      @if (isSchoolAdminOrMod()) {
+      @if (isSchoolAdminOrMod() && isMaterialPending()) {
         <div class="flex items-center gap-3 sm:mt-4">
           <p-button
             label="Duyệt"

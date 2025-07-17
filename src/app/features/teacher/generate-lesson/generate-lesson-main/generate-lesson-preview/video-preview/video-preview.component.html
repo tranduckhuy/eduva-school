@@ -54,6 +54,8 @@
   }
 
   @case ('generated') {
-    <video-preview-player [videoUrl]="videoUrl()" />
+    @if (videoUrl()) {
+      <video-preview-player [videoUrl]="videoUrl()" />
+    }
   }
 }

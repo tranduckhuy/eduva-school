@@ -84,7 +84,7 @@ export class StudentsComponent {
 
   readonly statusSelectOptions = signal<StatusOption[]>([
     { name: 'Đang hoạt động', code: EntityStatus.Active },
-    { name: 'Vô hiệu hóa', code: EntityStatus.Archived },
+    { name: 'Vô hiệu hóa', code: EntityStatus.InActive },
     { name: 'Tất cả', code: undefined },
   ]);
 

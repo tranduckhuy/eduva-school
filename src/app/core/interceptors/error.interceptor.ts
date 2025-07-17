@@ -95,6 +95,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   };
 
   const handleSubscriptionExpired = () => {
+    userService.getCurrentProfile().subscribe();
+
     const roles = user()?.roles ?? [];
     const isAdmin =
       roles.includes(UserRoles.SCHOOL_ADMIN) ||
@@ -151,7 +153,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (
         isPaymentRequired &&
         !isByPassPayment &&
-        statusCode === statusCode?.SUBSCRIPTION_EXPIRED_WITH_DATA_LOSS_RISK
+        statusCode === statusCode.SUBSCRIPTION_EXPIRED_WITH_DATA_LOSS_RISK
       ) {
         handleSubscriptionExpired();
         return throwError(() => error);

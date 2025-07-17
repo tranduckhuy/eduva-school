@@ -50,7 +50,9 @@ export class PersonalInformationComponent implements OnInit {
   form: FormGroup;
 
   isLoading = this.loadingService.isLoading;
-  isEdit = signal(false);
+
+  submitted = signal<boolean>(false);
+  isEdit = signal<boolean>(false);
 
   user = this.userService.currentUser;
   originalUserData!: Partial<User> & { firstName: string; lastName: string };
@@ -105,6 +107,8 @@ export class PersonalInformationComponent implements OnInit {
   }
 
   onSubmit() {
+    this.submitted.set(true);
+
     if (this.form.invalid) return;
 
     const { fullName, phoneNumber, avatar } = this.form.value;
