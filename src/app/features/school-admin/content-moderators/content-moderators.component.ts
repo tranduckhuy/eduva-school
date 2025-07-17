@@ -16,19 +16,20 @@ import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
 
 import { UserService } from '../../../shared/services/api/user/user.service';
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
+import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
 
 import { type UserListParams } from '../../../shared/models/api/request/query/user-list-params';
 import { PAGE_SIZE } from '../../../shared/constants/common.constant';
 import { Role } from '../../../shared/models/enum/role.enum';
+import { EntityStatus } from '../../../shared/models/enum/entity-status.enum';
 
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 import { BadgeComponent } from '../../../shared/components/badge/badge.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
-import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
 import { AddContentModeratorComponent } from './add-content-moderator/add-content-moderator.component';
-import { EntityStatus } from '../../../shared/models/enum/entity-status.enum';
+import { ImportAccountModalsComponent } from '../../../shared/components/import-accounts/import-account-modals/import-account-modals.component';
 
 interface StatusOption {
   name: string;
@@ -149,6 +150,13 @@ export class ContentModeratorsComponent {
     this.loadData();
   }
 
+  openImportModal() {
+    this.globalModalService.open(ImportAccountModalsComponent, {
+      title: 'Import danh sách kiểm duyệt viên',
+      role: Role.ContentModerator,
+    });
+  }
+
   openConfirmArchiveDialog(event: Event, userId: string): void {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
@@ -172,6 +180,7 @@ export class ContentModeratorsComponent {
       },
     });
   }
+
   openConfirmActiveDialog(event: Event, userId: string): void {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
