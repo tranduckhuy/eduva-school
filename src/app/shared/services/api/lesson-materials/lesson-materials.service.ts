@@ -209,7 +209,7 @@ export class LessonMaterialsService {
     } else {
       this.toastHandlingService.errorGeneral();
     }
-    return throwError(() => err);
+    return of(void 0);
   }
 
   private handleError(err: HttpErrorResponse): Observable<null> {
