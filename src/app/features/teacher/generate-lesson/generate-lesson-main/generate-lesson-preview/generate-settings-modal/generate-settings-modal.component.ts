@@ -19,6 +19,7 @@ import {
   type VoiceOption,
 } from '../services/generate-settings-selection.service';
 import { type GetFoldersRequest } from '../../../../../../shared/models/api/request/query/get-folders-request.model';
+import { EntityStatus } from '../../../../../../shared/models/enum/entity-status.enum';
 
 @Component({
   selector: 'app-generate-settings-modal',
@@ -88,6 +89,7 @@ export class GenerateSettingsModalComponent implements OnInit {
       sortBy: 'createdBy',
       sortDirection: 'desc',
       isPaging: true,
+      status: EntityStatus.Active,
     };
     this.folderService.getPersonalFolders(request).subscribe();
   }

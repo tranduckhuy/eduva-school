@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   inject,
   signal,
 } from '@angular/core';
@@ -17,6 +18,7 @@ import { GlobalModalService } from '../../../../../shared/services/layout/global
 import { ResourcesStateService } from '../services/utils/resources-state.service';
 
 import { UploadResourcesModalComponent } from './upload-resources-modal/upload-resources-modal.component';
+import { AiSocketService } from '../services/api/ai-socket.service';
 
 interface SourceItem {
   id: string;
@@ -43,8 +45,10 @@ interface SourceItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GenerateLessonUploadComponent {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly modalService = inject(GlobalModalService);
   private readonly resourcesStateService = inject(ResourcesStateService);
+  private readonly aiSocketService = inject(AiSocketService);
 
   readonly selectAll = signal(false);
   readonly openedMenuId = signal<string | null>(null);
@@ -52,6 +56,13 @@ export class GenerateLessonUploadComponent {
   readonly sourceList = this.resourcesStateService.sourceList;
   readonly currentCount = this.resourcesStateService.totalSources;
   readonly maxCount = 5;
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.aiSocketService.resetSignal();
+      this.aiSocketService.disconnect();
+    });
+  }
 
   toggleAll(checked: boolean) {
     this.selectAll.set(checked);

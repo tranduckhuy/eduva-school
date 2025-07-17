@@ -6,6 +6,7 @@ import {
   inject,
   input,
   output,
+  effect,
   computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -59,9 +60,11 @@ export class NavbarComponent implements OnInit {
   closeSidebar = output();
 
   user = this.userService.currentUser;
+
   isSchoolAdmin = computed(() =>
     this.user()?.roles.includes(UserRoles.SCHOOL_ADMIN)
   );
+
   schoolAndPlanMissing = computed(
     () =>
       !this.user()?.school ||
@@ -70,13 +73,21 @@ export class NavbarComponent implements OnInit {
 
   navConfigs: NavbarConfig[] = [];
 
+  constructor() {
+    effect(
+      () => {
+        const user = this.user();
+        const userRole = user?.roles?.[0] as UserRole;
+
+        this.navConfigs = this.getNavbarConfigByRole(userRole);
+
+        this.setActiveNavItems(this.router.url);
+      },
+      { allowSignalWrites: true }
+    );
+  }
+
   ngOnInit(): void {
-    const user = this.user();
-    const userRole = user?.roles?.[0] as UserRole;
-    this.navConfigs = this.getNavbarConfigByRole(userRole);
-
-    this.setActiveNavItems(this.router.url);
-
     // ? Listen to router events to update active states
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -86,9 +97,7 @@ export class NavbarComponent implements OnInit {
   }
 
   get routerLinkRole() {
-    const link = this.user()?.roles.includes(UserRoles.SCHOOL_ADMIN)
-      ? '/school-admin'
-      : '/teacher';
+    const link = this.isSchoolAdmin() ? '/school-admin' : '/teacher';
     return link;
   }
 

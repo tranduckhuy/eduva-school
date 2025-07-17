@@ -54,8 +54,9 @@
                 placeholder="Nguyen"
                 formControlName="firstName"
                 name="firstName"
+                [required]="true"
                 [readOnly]="!isEdit()"
-                [required]="true" />
+                [submitted]="submitted()" />
             </div>
             <div class="e-col-6 e-col-xs-12">
               <app-form-control
@@ -63,8 +64,9 @@
                 placeholder="Van A"
                 formControlName="lastName"
                 name="lastName"
+                [required]="true"
                 [readOnly]="!isEdit()"
-                [required]="true" />
+                [submitted]="submitted()" />
             </div>
           </div>
         </div>
@@ -90,8 +92,10 @@
               placeholder="Nhập số điện thoại"
               formControlName="phoneNumber"
               name="phoneNumber"
-              [readOnly]="!isEdit()"
+              [required]="true"
               [phone]="true"
+              [readOnly]="!isEdit()"
+              [submitted]="submitted()"
               [errorMessages]="{
                 pattern: 'Số điện thoại không hợp lệ',
               }" />
