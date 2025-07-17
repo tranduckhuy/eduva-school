@@ -105,8 +105,9 @@ export class ImportUserAccountsService {
         'Vượt giới hạn tài khoản',
         'Đã đạt số lượng tài khoản tối đa theo gói. Vui lòng nâng cấp để tiếp tục.'
       );
+    } else {
+      this.toastHandlingService.errorGeneral();
     }
-    this.toastHandlingService.errorGeneral();
     return throwError(() => err);
   }
 }

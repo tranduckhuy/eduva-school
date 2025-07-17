@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   inject,
   signal,
@@ -42,6 +43,7 @@ export class ForgotPasswordComponent {
   private readonly formControls = viewChildren(FormControlComponent);
 
   private readonly fb = inject(FormBuilder);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly loadingService = inject(LoadingService);
   private readonly passwordService = inject(PasswordService);
   private readonly userService = inject(UserService);
@@ -58,6 +60,10 @@ export class ForgotPasswordComponent {
         this.currentUser() ? this.currentUser()?.email : '',
         [Validators.required, customEmailValidator],
       ],
+    });
+
+    this.form.statusChanges.subscribe(() => {
+      this.cdr.markForCheck();
     });
   }
 

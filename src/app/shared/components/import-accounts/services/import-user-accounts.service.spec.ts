@@ -232,7 +232,6 @@ describe('ImportUserAccountsService', () => {
             'Vượt giới hạn tài khoản',
             expect.stringContaining('Đã đạt số lượng tài khoản tối đa')
           );
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
           expect(err).toBe(error);
           resolve();
         },

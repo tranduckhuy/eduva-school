@@ -13,7 +13,7 @@ import {
   GetPendingLessonMaterialsRequest,
 } from '../../../models/api/request/query/get-lesson-materials-request.model';
 import { GetPagingLessonMaterialsResponse } from '../../../models/api/response/query/get-lesson-materials-response.model';
-import { ApproveRejectMaterialRequest } from '../../../../features/school-admin/moderate-lessons/models/approve-reject-material-request.model';
+import { ApproveRejectMaterialRequest } from '../../../../features/moderation/moderate-lessons/models/approve-reject-material-request.model';
 import { LessonMaterialStatus } from '../../../models/enum/lesson-material.enum';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 

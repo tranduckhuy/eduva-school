@@ -41,6 +41,16 @@ export const schoolAdminRoutes: Routes = [
           import('./payments/payment.routes').then(mod => mod.paymentRoute),
       },
       {
+        path: 'view-lesson/:materialId',
+        data: {
+          title: 'Chi tiết bài học',
+        },
+        loadComponent: () =>
+          import(
+            '../../shared/components/lesson-details/preview-lesson/preview-lesson.component'
+          ).then(mod => mod.PreviewLessonComponent),
+      },
+      {
         path: 'shared-lessons',
         loadComponent: () =>
           import(

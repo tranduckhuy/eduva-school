@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { finalize, switchMap } from 'rxjs';
+import { finalize, switchMap, throwError } from 'rxjs';
 
 import {
   FileUpload,
@@ -193,7 +193,7 @@ export class AddFileModalComponent {
       .uploadBlobs(request, files)
       .pipe(
         switchMap(res => {
-          if (!res) throw new Error();
+          if (!res) return throwError(() => new Error());
 
           const materials: CreateLessonMaterialRequest[] = fileMetadata.map(
             ({ file }, index) => ({
