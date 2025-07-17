@@ -63,10 +63,7 @@ export class PersonalInformationComponent implements OnInit {
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       fullName: [''],
-      phoneNumber: [
-        '',
-        [Validators.required, Validators.pattern(VIETNAM_PHONE_REGEX)],
-      ],
+      phoneNumber: ['', [Validators.pattern(VIETNAM_PHONE_REGEX)]],
     });
   }
 
