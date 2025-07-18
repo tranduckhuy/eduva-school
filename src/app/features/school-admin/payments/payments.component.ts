@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   signal,
+  OnInit,
 } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -45,7 +46,7 @@ import { type PaymentListParams } from './model/payment-list-params';
   styleUrl: './payments.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PaymentsComponent {
+export class PaymentsComponent implements OnInit {
   private readonly paymentService = inject(SchoolPaymentService);
   private readonly loadingService = inject(LoadingService);
 
@@ -80,6 +81,10 @@ export class PaymentsComponent {
 
   payments = this.paymentService.payments;
   totalPayments = this.paymentService.totalPayments;
+
+  ngOnInit(): void {
+    this.loadData();
+  }
 
   onTimeFilterChange(
     selected: { name: string; value: string | undefined } | undefined

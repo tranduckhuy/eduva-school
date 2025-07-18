@@ -4,12 +4,13 @@ import {
   OnInit,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { TooltipModule } from 'primeng/tooltip';
-import { TableModule, TableLazyLoadEvent } from 'primeng/table';
+import { TableModule, TableLazyLoadEvent, Table } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
 import { ConfirmationService } from 'primeng/api';
 
@@ -70,6 +71,8 @@ export class LessonTableComponent implements OnInit {
     'Hành động',
   ]);
 
+  private readonly table = viewChild.required<Table>('table');
+
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(params => {
       const page = Number(params.get('page'));
@@ -87,15 +90,10 @@ export class LessonTableComponent implements OnInit {
     this.searchValue.set(searchTerm ?? '');
     this.currentPage.set(1);
     this.firstRecordIndex.set(0);
-
-    const request: GetFoldersRequest = {
-      name: this.searchValue(),
-      pageIndex: this.currentPage(),
-      pageSize: this.pageSize(),
-      status: EntityStatus.Active,
-    };
-
-    this.folderService.getPersonalFolders(request).subscribe();
+    // Force table to reload
+    if (this.table()?.reset) {
+      this.table().reset();
+    }
   }
 
   onArchiveFolder(folderId: string) {
@@ -129,6 +127,14 @@ export class LessonTableComponent implements OnInit {
     this.currentPage.set(page);
     this.pageSize.set(rows);
     this.firstRecordIndex.set(first);
+
+    const request: GetFoldersRequest = {
+      name: this.searchValue(),
+      pageIndex: page,
+      pageSize: rows,
+      status: EntityStatus.Active,
+    };
+    this.folderService.getPersonalFolders(request).subscribe();
   }
 
   openAddFolderModal(): void {

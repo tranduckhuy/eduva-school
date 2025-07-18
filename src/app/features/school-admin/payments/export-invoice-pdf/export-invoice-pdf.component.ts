@@ -92,12 +92,13 @@ export class ExportInvoicePdfComponent {
     pdf.setFont('Nunito', 'bold').text(user?.fullName ?? '', rightColX, 36);
     pdf.setFont('Nunito', 'normal');
     pdf.text(`Số điện thoại: ${user?.phoneNumber ?? ''}`, rightColX, 42);
-    pdf.text(`Email: ${user?.email ?? ''}`, rightColX, 48);
+    pdf.text(`Email: ${user?.email ?? ''}`, rightColX, 48, { maxWidth: 80 });
     if (!isCredit)
       pdf.text(
         `Trường: ${subscriptionDetail?.school?.name ?? ''}`,
         rightColX,
-        54
+        54,
+        { maxWidth: 80 }
       );
 
     pdf.setFont('Nunito', 'normal');
@@ -179,7 +180,7 @@ export class ExportInvoicePdfComponent {
           ],
       footStyles: {
         fillColor: [255, 255, 255],
-        textColor: [34, 197, 94],
+        textColor: [32, 147, 231],
         fontStyle: 'bold',
       },
     });
