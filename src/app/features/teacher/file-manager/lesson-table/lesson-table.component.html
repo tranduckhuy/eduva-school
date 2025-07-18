@@ -22,13 +22,15 @@
 
     <div class="mt-5">
       @if (isLoading()) {
-        <app-table-skeleton [tableHead]="tableHeadSkeleton()" />
+        <app-table-skeleton [tableHead]="tableHeadSkeleton()" [limit]="2" />
       } @else {
         <div class="relative">
           <p-table
+            #table
             [tableStyle]="{ 'min-width': '50rem' }"
             [paginator]="true"
             [lazy]="true"
+            [lazyLoadOnInit]="true"
             [scrollable]="true"
             [showCurrentPageReport]="true"
             [scrollHeight]="'600px'"
