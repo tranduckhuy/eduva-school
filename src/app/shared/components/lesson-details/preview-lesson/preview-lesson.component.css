@@ -42,3 +42,17 @@
 :host ::ng-deep .lesson-content li {
   margin-bottom: 0.5em;
 }
+
+.loading-spinner {
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 82px;
+  height: 82px;
+  margin-top: -43px;
+  margin-left: -45px;
+  border: 3px solid #fff;
+  border-top-color: rgba(255, 255, 255, 0.75);
+  border-radius: 50%;
+}

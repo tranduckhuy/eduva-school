@@ -1,0 +1,42 @@
+@if (variant() === 'icon') {
+  <button
+    class="btn btn--icon"
+    [ngClass]="{ 'btn--disabled': isDisabled() }"
+    tooltipPosition="top"
+    [autoHide]="false"
+    [pTooltip]="tooltipText()"
+    [disabled]="isDisabled()">
+    <span
+      class="icon flex h-[38px] w-full items-center justify-center rounded-[50%] transition-colors duration-300">
+      <img class="object-contain" [src]="imgSrc()" [alt]="tooltipText()" />
+    </span>
+  </button>
+}
+
+@if (variant() === 'text') {
+  <button
+    class="btn btn--text"
+    [ngClass]="{ 'btn--disabled': isDisabled() }"
+    tooltipPosition="top"
+    [autoHide]="false"
+    [pTooltip]="tooltipText()"
+    [disabled]="isDisabled()">
+    <ng-content select="[icon-left]"></ng-content>
+    <span>{{ text() }}</span>
+    <ng-content select="[icon-right]"></ng-content>
+  </button>
+}
+
+@if (variant() === 'outline') {
+  <button
+    class="btn btn--outline"
+    [ngClass]="{ 'btn--disabled': isDisabled() }"
+    tooltipPosition="top"
+    [autoHide]="false"
+    [pTooltip]="tooltipText()"
+    [disabled]="isDisabled()">
+    <ng-content select="[icon-left]"></ng-content>
+    <span>{{ text() }}</span>
+    <ng-content select="[icon-right]"></ng-content>
+  </button>
+}

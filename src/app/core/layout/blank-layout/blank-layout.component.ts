@@ -14,6 +14,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ThemeService } from '../../../shared/services/core/theme/theme.service';
 
 import { GlobalModalHostComponent } from '../../../shared/components/global-modal-host/global-modal-host.component';
+import { ScrollTopModule } from 'primeng/scrolltop';
 
 @Component({
   selector: 'app-blank-layout',
@@ -22,6 +23,7 @@ import { GlobalModalHostComponent } from '../../../shared/components/global-moda
     RouterOutlet,
     ToastModule,
     ConfirmDialogModule,
+    ScrollTopModule,
     GlobalModalHostComponent,
   ],
   template: `
@@ -29,6 +31,10 @@ import { GlobalModalHostComponent } from '../../../shared/components/global-moda
 
     <p-toast />
     <p-confirmDialog [baseZIndex]="1000" [closeOnEscape]="true" />
+    <p-scrolltop
+      icon="pi pi-arrow-up"
+      [buttonProps]="{ raised: true, rounded: true }" />
+
     <app-global-modal-host />
 
     @if (showThemeButton()) {
@@ -51,6 +57,12 @@ export class BlankLayoutComponent {
 
   private readonly currentUrl = signal(this.router.url);
 
+  readonly showThemeButton = computed(() => {
+    return !this.hiddenPaths.some(path => this.currentUrl().includes(path));
+  });
+
+  readonly isDarkMode = computed(() => this.themeService.isDarkMode());
+
   constructor() {
     effect(
       () => {
@@ -59,12 +71,6 @@ export class BlankLayoutComponent {
       { allowSignalWrites: true }
     );
   }
-
-  readonly showThemeButton = computed(() => {
-    return !this.hiddenPaths.some(path => this.currentUrl().includes(path));
-  });
-
-  readonly isDarkMode = computed(() => this.themeService.isDarkMode());
 
   toggleDarkMode() {
     this.themeService.toggleDarkMode();

@@ -1,0 +1,95 @@
+@if (question()) {
+  <div class="mt-6">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <img
+          [src]="question()?.createdByAvatar"
+          [alt]="question()?.createdByName"
+          class="size-10 shrink-0 rounded-[50%]" />
+        <div class="ml-1 flex flex-col">
+          <h3 class="font-bold text-[#0093fc]">
+            {{ question()?.createdByName }}
+          </h3>
+          <span class="text-[13px] font-normal text-[#808b9a]">
+            {{ question()?.createdAt | date: 'fullDate' }}
+          </span>
+        </div>
+      </div>
+      @if (question()!.commentCount > 0) {
+        <div class="flex items-center gap-1">
+          <img
+            src="./images/icons/circle-check-green.svg"
+            alt="Đã trả lời"
+            class="relative top-[1px]" />
+          <span class="text-[13px] text-[#48bd79]">Đã trả lời</span>
+        </div>
+      } @else {
+        <div class="flex items-center gap-1">
+          <img
+            src="./images/icons/circle-question-mark.svg"
+            alt="Chưa trả lời"
+            class="relative top-[1px]" />
+          <span class="text-[13px] text-[#808b9a]">Chưa trả lời</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="content mt-4">
+    @for (block of contentBlocks(); track $index) {
+      @if (block.type === 'html') {
+        <div [innerHTML]="block.html | safeHtml"></div>
+      }
+
+      @if (block.type === 'image') {
+        <p>
+          <p-image
+            [src]="block.src"
+            [alt]="block.alt"
+            [style]="{ width: block.width }"
+            preview="true"
+            loading="lazy"
+            appendTo="body"></p-image>
+        </p>
+      }
+    }
+  </div>
+
+  <div class="relative mt-5 flex items-center">
+    <div class="ml-auto flex w-[122px] items-center justify-center gap-[10px]">
+      <span class="text-xs font-normal text-[#4e586b]">
+        {{ question()?.lastModifiedAt ? 'Đã chỉnh sửa' : '' }}
+      </span>
+      @if (
+        user()?.id === question()?.createdByUserId &&
+        (question()?.canUpdate || question()?.canDelete)
+      ) {
+        <button (click)="toggleFooterOptions()">
+          <span
+            class="pi pi-ellipsis-h relative top-[3px] cursor-pointer text-[#0093fc] hover:opacity-70"></span>
+        </button>
+      }
+    </div>
+    @if (isOptionsOpen()) {
+      <div
+        clickOutsideSubmenu
+        (clickOutside)="closeFooterOptions()"
+        class="content-footer-options absolute right-3 top-[25px] z-10">
+        @if (question()?.canUpdate) {
+          <button
+            class="content-footer-option-item"
+            (click)="editQuestion.emit(question())">
+            <span>Chỉnh sửa</span>
+          </button>
+        }
+        @if (question()?.canDelete) {
+          <button
+            class="content-footer-option-item"
+            (click)="onDeleteQuestion(question()!.id)">
+            <span>Xóa</span>
+          </button>
+        }
+      </div>
+    }
+  </div>
+}

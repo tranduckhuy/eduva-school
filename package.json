@@ -22,6 +22,7 @@
     "@angular/platform-browser": "^18.2.0",
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
+    "@ckeditor/ckeditor5-angular": "^9.1.0",
     "@fortawesome/angular-fontawesome": "^0.15.0",
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
@@ -30,6 +31,7 @@
     "@primeng/themes": "^18.0.2",
     "@supabase/supabase-js": "^2.50.1",
     "@videogular/ngx-videogular": "^10.0.1",
+    "ckeditor5": "^45.1.0",
     "apexcharts": "^3.54.1",
     "dompurify": "^3.2.6",
     "jspdf": "^3.0.1",
@@ -44,6 +46,7 @@
     "primeicons": "^7.0.0",
     "primeng": "^18.0.2",
     "rxjs": "~7.8.0",
+    "tailwindcss-primeui": "^0.6.1",
     "tslib": "^2.3.0"
   },
   "devDependencies": {

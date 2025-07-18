@@ -1,0 +1,79 @@
+<h2 class="text-lg font-semibold leading-[1.4] text-[#808b9a]">
+  {{ !isEditMode() ? 'Đặt câu hỏi mới' : 'Chỉnh sửa câu hỏi' }}
+</h2>
+
+<div class="mt-2 flex flex-col gap-2">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <!-- ? Question Title -->
+    <div>
+      <div
+        class="relative flex w-full items-center justify-between rounded-lg border border-[#eef4fc] bg-[#eef4fc] p-2 pl-4 transition-colors duration-300 ease-linear focus-within:border-primary focus-within:bg-white dark:border-dark-300 dark:bg-dark-300 dark:focus-within:border-primary dark:focus-within:bg-dark-300"
+        [ngClass]="{
+          '!border-[#f33a58] dark:!border-[#f33a58]':
+            title?.invalid && title?.touched,
+        }"
+        [style.backgroundColor]="
+          title?.invalid && title?.touched ? '#ff00001a' : ''
+        ">
+        <input
+          formControlName="title"
+          name="title"
+          type="text"
+          class="w-full border-none bg-transparent leading-6 outline-none"
+          placeholder="Nhập tiêu đề câu hỏi"
+          [class.text-[#f33a58]]="
+            title?.invalid && title?.touched && title?.dirty
+          " />
+        @if (title?.invalid && title?.touched) {
+          <div class="absolute right-[14px] top-1/2 -translate-y-1/2">
+            <i
+              class="fa-solid fa-triangle-exclamation animate-shake text-base text-[#f33a58]">
+            </i>
+          </div>
+        }
+      </div>
+      @if (title?.invalid && title?.touched) {
+        <div class="mt-2 font-medium leading-normal text-[#f33a58]">
+          {{ getErrorMessage('title') }}
+        </div>
+      }
+    </div>
+
+    <!-- ? Question Content -->
+    <div class="mt-3 flex w-full flex-col">
+      <app-rich-text-editor
+        placeholder="Mô tả chi tiết câu hỏi của bạn..."
+        [isHeightTextBox]="true"
+        [invalid]="invalid()"
+        [editorValue]="content()"
+        (valueChange)="getContent($event)" />
+      @if (invalid()) {
+        <div class="mt-3 font-medium leading-normal text-[#f33a58]">
+          {{ getErrorMessage('content') }}
+        </div>
+      }
+    </div>
+
+    <div class="flex justify-end">
+      <div class="ml-auto mt-4 flex gap-2">
+        @if (isEditMode() && questionToEdit()) {
+          <button
+            type="button"
+            class="btn"
+            (click)="cancelUpdateQuestion.emit(questionToEdit()!.id)">
+            <div class="btn-inner">
+              <span>Hủy</span>
+            </div>
+          </button>
+        }
+        <p-button
+          type="submit"
+          size="small"
+          styleClass="!rounded-lg min-w-40 h-8 uppercase tracking-[1px] leading-[1.6] whitespace-nowrap"
+          [label]="!isEditMode() ? 'Đăng câu hỏi' : 'Cập nhật'"
+          [loading]="isLoading()"
+          [disabled]="form.invalid || isLoading()" />
+      </div>
+    </div>
+  </form>
+</div>
