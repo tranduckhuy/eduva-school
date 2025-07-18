@@ -91,7 +91,7 @@ export class LessonTableComponent implements OnInit {
     this.currentPage.set(1);
     this.firstRecordIndex.set(0);
     // Force table to reload
-    if (this.table() && this.table().reset) {
+    if (this.table()?.reset) {
       this.table().reset();
     }
   }
