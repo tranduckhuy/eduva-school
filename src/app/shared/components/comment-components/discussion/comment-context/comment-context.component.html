@@ -1,0 +1,150 @@
+@if (comment() || reply()) {
+  <div
+    class="comment mt-5 p-2"
+    [ngClass]="{
+      'ml-2 pl-4': isReplyMode(),
+      'best-comment': isBestComment(),
+    }">
+    <div class="flex flex-col gap-4">
+      <!-- ? Content Creator -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <img
+            [src]="
+              !isReplyMode()
+                ? comment()?.createdByAvatar
+                : reply()?.createdByAvatar
+            "
+            [alt]="
+              !isReplyMode() ? comment()?.createdByName : reply()?.createdByName
+            "
+            class="size-9 shrink-0 rounded-[50%]" />
+          <div class="ml-1 flex flex-col">
+            <h3 class="text-xs font-bold text-[#0093fc]">
+              {{
+                !isReplyMode()
+                  ? comment()?.createdByName
+                  : reply()?.createdByName
+              }}
+            </h3>
+            <span class="text-xs text-[#808b9a]">
+              {{
+                !isReplyMode()
+                  ? (comment()?.createdAt | date: 'fullDate')
+                  : (reply()?.createdAt | date: 'fullDate')
+              }}
+            </span>
+          </div>
+        </div>
+
+        @if (isBestComment()) {
+          <div class="mr-3 flex items-center gap-2">
+            <img
+              src="./images/icons/circle-check-green.svg"
+              alt="Bình luận tốt nhất" />
+            <span class="text-[#48bd79]">Bình luận tốt nhất</span>
+          </div>
+        }
+      </div>
+
+      <!-- ? Comment Content -->
+      <div class="content">
+        @for (block of contentBlocks(); track $index) {
+          @if (block.type === 'html') {
+            <div [innerHTML]="block.html | safeHtml"></div>
+          }
+
+          @if (block.type === 'image') {
+            <p>
+              <p-image
+                [src]="block.src"
+                [alt]="block.alt"
+                [style]="{ width: block.width }"
+                preview="true"
+                loading="lazy"
+                appendTo="body"></p-image>
+            </p>
+          }
+        }
+      </div>
+
+      <!-- ? Comment Actions -->
+      <div
+        class="relative flex"
+        [ngClass]="{
+          'justify-between': !isEditTextboxOpen(),
+          'justify-end': isEditTextboxOpen(),
+        }">
+        @if (!isEditTextboxOpen()) {
+          <button
+            class="flex items-center gap-2 text-[#0093fc] transition-opacity ease-in hover:opacity-80"
+            (click)="toggleReplyTextbox()">
+            <span
+              class="pi pi-reply"
+              style="font-size: 14px; font-weight: 600"></span>
+            <span class="font-semibold">Phản hồi</span>
+          </button>
+        }
+
+        @if (canShowFooterOptions()) {
+          <div class="flex items-center gap-4">
+            <span class="text-xs text-[#808b9a]">
+              {{ modifiedLabel() }}
+            </span>
+            <button (click)="toggleFooterOptions()">
+              <span
+                class="pi pi-ellipsis-h relative top-[3px] cursor-pointer text-[#0093fc] hover:opacity-70"></span>
+            </button>
+          </div>
+        }
+        @if (isOptionsOpen()) {
+          <div
+            clickOutsideSubmenu
+            (clickOutside)="closeFooterOptions()"
+            class="content-footer-options absolute right-3 top-[25px] z-10">
+            @if (!isReplyMode() ? comment()?.canUpdate : reply()?.canUpdate) {
+              <button
+                class="content-footer-option-item"
+                (click)="toggleEditTextbox()">
+                <span>Chỉnh sửa</span>
+              </button>
+            }
+            @if (!isReplyMode() ? comment()?.canDelete : reply()?.canDelete) {
+              <button
+                class="content-footer-option-item"
+                (click)="onDeleteComment()">
+                <span>Xóa</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      @if (isReplyTextboxOpen()) {
+        <div class="pl-4">
+          <app-user-comment-textbox
+            [questionId]="questionId()"
+            [parentCommentId]="parentCommentId()"
+            [isReply]="true"
+            [mention]="mentionName()"
+            (createCommentSuccess)="createCommentSuccess.emit()"
+            (cancel)="toggleReplyTextbox()" />
+        </div>
+      }
+
+      @if (isEditTextboxOpen()) {
+        <div class="pl-4">
+          <app-user-comment-textbox
+            [questionId]="questionId()"
+            [commentId]="!isReplyMode() ? comment()!.id : reply()!.id"
+            [editCommentValue]="
+              !isReplyMode() ? comment()!.content : reply()!.content
+            "
+            [isEdit]="true"
+            (updateCommentSuccess)="updateCommentSuccess.emit()"
+            (cancel)="toggleEditTextbox()" />
+        </div>
+      }
+    </div>
+  </div>
+}

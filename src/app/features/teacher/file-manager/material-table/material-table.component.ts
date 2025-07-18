@@ -171,10 +171,10 @@ export class MaterialTableComponent implements OnInit {
 
   getMaterialStatusBadge(status: LessonMaterialStatus): BadgeVariant {
     switch (status) {
+      case LessonMaterialStatus.Pending:
+        return 'info';
       case LessonMaterialStatus.Approved:
         return 'success';
-      case LessonMaterialStatus.Pending:
-        return 'warning';
       case LessonMaterialStatus.Rejected:
         return 'danger';
       default:

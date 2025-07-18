@@ -1,0 +1,20 @@
+@if (question()) {
+  <div class="flex items-center gap-2">
+    <h2 class="text-lg font-semibold text-[#4e586b] dark:text-[#dae4f0]">
+      {{ question()?.title }}
+    </h2>
+  </div>
+
+  <comment-question
+    [question]="question()"
+    (editQuestion)="editQuestion.emit($event)"
+    (deleteQuestion)="deleteQuestion.emit()" />
+
+  @if (question()?.canComment) {
+    <comment-discussion
+      [question]="question()"
+      (createCommentSuccess)="createCommentSuccess.emit(question()!.id)"
+      (updateCommentSuccess)="updateCommentSuccess.emit(question()!.id)"
+      (deleteCommentSuccess)="deleteCommentSuccess.emit(question()!.id)" />
+  }
+}

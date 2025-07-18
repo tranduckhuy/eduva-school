@@ -6,12 +6,14 @@ import {
   computed,
   signal,
   input,
+  effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
+import { DrawerModule } from 'primeng/drawer';
 
 import { SafeHtmlPipe } from '../../../pipes/safe-html.pipe';
 
@@ -30,6 +32,7 @@ import { DocViewerComponent } from '../doc-viewer/doc-viewer.component';
 import { PdfViewerComponent } from '../pdf-viewer/pdf-viewer.component';
 import { PreviewLessonSkeletonComponent } from '../../skeleton/preview-lesson-skeleton/preview-lesson-skeleton.component';
 import { ModerateReasonModalComponent } from '../../../../features/moderation/moderate-lessons/moderate-reason-modal/moderate-reason-modal.component';
+import { CommentModalComponent } from '../../comment-components/comment-modal/comment-modal.component';
 
 @Component({
   selector: 'app-preview-lesson',
@@ -38,18 +41,21 @@ import { ModerateReasonModalComponent } from '../../../../features/moderation/mo
     CommonModule,
     SkeletonModule,
     ButtonModule,
+    DrawerModule,
     SafeHtmlPipe,
     PdfViewerComponent,
     DocViewerComponent,
     VideoViewerComponent,
     AudioViewerComponent,
     PreviewLessonSkeletonComponent,
+    CommentModalComponent,
   ],
   templateUrl: './preview-lesson.component.html',
   styleUrl: './preview-lesson.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreviewLessonComponent implements OnInit {
+  private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly userService = inject(UserService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
@@ -62,6 +68,30 @@ export class PreviewLessonComponent implements OnInit {
   lessonMaterial = this.lessonMaterialService.lessonMaterial;
   isLoading = this.loadingService.isLoading;
 
+  currentUrl = signal(this.router.url);
+  currentPage = signal<number>(1);
+  pageSize = signal<number>(PAGE_SIZE);
+  isApprovedLesson = signal<boolean>(false);
+
+  showCommentButton = computed(() => {
+    const lessonMaterial = this.lessonMaterial();
+    const hasShowPath = this.showCommentButtonPaths.some(path =>
+      this.currentUrl().includes(path)
+    );
+
+    return (
+      hasShowPath &&
+      lessonMaterial &&
+      lessonMaterial.lessonStatus === LessonMaterialStatus.Approved
+    );
+  });
+
+  showActionButton = computed(() => {
+    return this.showActionButtonPaths.some(path =>
+      this.currentUrl().includes(path)
+    );
+  });
+
   isSchoolAdminOrMod = computed(
     () =>
       this.user()?.roles.includes(UserRoles.SCHOOL_ADMIN) ||
@@ -72,9 +102,18 @@ export class PreviewLessonComponent implements OnInit {
     () => this.lessonMaterial()?.lessonStatus === LessonMaterialStatus.Pending
   );
 
-  currentPage = signal<number>(1);
-  pageSize = signal<number>(PAGE_SIZE);
-  isApprovedLesson = signal(false);
+  private readonly showCommentButtonPaths = ['/teacher/file-manager'];
+  private readonly showActionButtonPaths = ['/moderation/view-lesson'];
+  visible = false;
+
+  constructor() {
+    effect(
+      () => {
+        this.currentUrl.set(this.router.url);
+      },
+      { allowSignalWrites: true }
+    );
+  }
 
   ngOnInit(): void {
     this.activatedRoute.queryParamMap.subscribe(params => {

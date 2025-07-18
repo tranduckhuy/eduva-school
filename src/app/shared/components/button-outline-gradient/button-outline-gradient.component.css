@@ -1,0 +1,95 @@
+/* Base button */
+.btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+/* Icon variant: circular button */
+.btn--icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-bg-btn-gradient-icon);
+  border: 1px solid transparent;
+}
+
+.btn--icon .icon {
+  background: var(--color-bg-icon-btn-gradient-icon);
+}
+
+.btn--icon:hover .icon {
+  background-color: var(--color-bg-hover-btn-gradient-icon);
+}
+
+/* Outline variant: gradient border, neutral bg */
+.btn--outline {
+  min-width: 100px;
+  height: 32px;
+  padding: 0px 16px;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  background:
+    linear-gradient(var(--color-bg-forth), var(--color-bg-forth)) padding-box,
+    linear-gradient(141.34deg, #5ebbff 0%, #a174ff 91.11%) border-box;
+  color: var(--color-text-btn-gradient);
+}
+
+.btn--outline:hover {
+  color: #fff;
+  background: linear-gradient(141.34deg, #5ebbff 0%, #a174ff 91.11%) border-box;
+}
+
+/* Text variant (e.g., prev button) */
+.btn--text {
+  min-width: 100px;
+  height: 32px;
+  padding: 0 12px;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--color-text-btn-gradient);
+}
+
+.btn--text:hover {
+  background:
+    linear-gradient(var(--color-bg-forth)) padding-box,
+    linear-gradient(141.34deg, #5ebbff 0%, #a174ff 91.11%) border-box;
+}
+
+/* Disabled */
+.btn--disabled {
+  color: #b1b1b1;
+  background: linear-gradient(
+      141.34deg,
+      rgba(94, 187, 255, 0.2) 0%,
+      rgba(161, 116, 255, 0.2) 91.11%
+    )
+    border-box !important;
+  pointer-events: none;
+  cursor: default;
+}
+
+/* Icon inside btn */
+.btn .pi {
+  font-size: 12px;
+}
+
+@media (max-width: 739.98px) {
+  .btn--text,
+  .btn--outline {
+    padding: 0 8px;
+  }
+}

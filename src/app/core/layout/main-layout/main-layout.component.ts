@@ -17,6 +17,7 @@ import { fromEvent } from 'rxjs';
 
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ScrollTopModule } from 'primeng/scrolltop';
 
 import { RouteMetadataDirective } from '../../../shared/directives/route-metadata/route-metadata.directive';
 import { LayoutHeadingService } from '../../../shared/services/layout/layout-heading/layout-heading.service';
@@ -34,6 +35,7 @@ import { GlobalModalHostComponent } from '../../../shared/components/global-moda
     RouterOutlet,
     ToastModule,
     ConfirmDialogModule,
+    ScrollTopModule,
     RouteMetadataDirective,
     HeaderComponent,
     NavbarComponent,
@@ -76,6 +78,10 @@ import { GlobalModalHostComponent } from '../../../shared/components/global-moda
 
     <p-toast />
     <p-confirmdialog [baseZIndex]="1000" [closeOnEscape]="true" />
+    <p-scrolltop
+      icon="pi pi-arrow-up"
+      [buttonProps]="{ raised: true, rounded: true }" />
+
     <app-global-modal-host />
   `,
   styleUrl: './main-layout.component.css',

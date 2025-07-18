@@ -1,0 +1,207 @@
+<div>
+  <!-- ? Lesson Title -->
+  <div class="border-b border-b-[#dae4f0] pb-5">
+    <h3
+      class="text-lg font-semibold leading-6 text-[#808b9a] dark:text-[#a2adbd]">
+      {{ materialTitle() }}
+    </h3>
+  </div>
+  <!-- ? Comment Title -->
+  <div class="mt-4">
+    <!-- ? Comment List -->
+    <div>
+      <h4 class="font-semibold leading-6 text-[#4e586b] dark:text-[#dae4f0]">
+        Các câu hỏi của bài học ({{ totalLessonQuestions() }})
+      </h4>
+
+      <!-- ? Comment List -->
+      <div class="mt-3">
+        @if (lessonQuestions().length > 0) {
+          <ul>
+            @for (
+              lessonQuestion of lessonQuestions();
+              track lessonQuestion.id
+            ) {
+              <li>
+                <button
+                  class="comment-item"
+                  (click)="onSelectQuestion(lessonQuestion.id)">
+                  <div class="comment-content">
+                    @if (lessonQuestion.commentCount > 0) {
+                      <img
+                        src="./images/icons/circle-check-green.svg"
+                        alt="Đã trả lời" />
+                    } @else {
+                      <img
+                        src="./images/icons/circle-question-mark.svg"
+                        alt="Chưa trả lời" />
+                    }
+                    <p
+                      class="line-clamp-1 max-w-[545px] items-center text-base leading-[1.6]">
+                      {{ lessonQuestion.title }}
+                    </p>
+                  </div>
+                </button>
+              </li>
+            }
+          </ul>
+        } @else {
+          <div class="flex w-full flex-col items-center justify-center">
+            <img
+              src="./images/icons/question-empty.svg"
+              alt="Không có câu hỏi" />
+            <p class="mt-3">Chưa có câu hỏi nào tại bài học này.</p>
+          </div>
+        }
+      </div>
+
+      @if (lessonQuestions().length > 0) {
+        <!-- ? Pagination -->
+        <div class="mt-7 flex justify-end">
+          <div class="relative flex items-center justify-center">
+            <div class="flex items-center px-[10px]">
+              <span class="mr-2 select-none text-[#a2adbd]">Trang:</span>
+              <div
+                class="prev"
+                [ngClass]="{
+                  '!hidden': currentLessonPage() === 1,
+                }"
+                (click)="changeLessonPage.emit(currentLessonPage() - 1)">
+                <span
+                  class="pi pi-angle-left text-[#0093fc]"
+                  style="font-size: 20px"></span>
+              </div>
+
+              @for (page of lessonQuestionPages(); track $index) {
+                @if (isNumber(page)) {
+                  <div
+                    class="page"
+                    [class.active]="page === currentLessonPage()"
+                    (click)="changeLessonPage.emit(page)">
+                    {{ page }}
+                  </div>
+                } @else {
+                  <div class="page">...</div>
+                }
+              }
+
+              <div
+                class="next"
+                [ngClass]="{
+                  '!hidden': currentLessonPage() === totalLessonQuestionPages(),
+                }"
+                (click)="changeLessonPage.emit(currentLessonPage() + 1)">
+                <span
+                  class="pi pi-angle-right text-[#0093fc]"
+                  style="font-size: 20px"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- ? New Comment -->
+    <div class="my-10 flex items-center justify-center gap-2 xs:flex-col">
+      <span class="text-base text-[#4e586b] dark:text-[#dae4f0]">
+        Không tìm thấy câu hỏi bạn cần?
+      </span>
+      <app-button-outline-gradient
+        [variant]="'outline'"
+        [text]="'Đặt câu hỏi mới'"
+        (click)="newQuestion.emit()" />
+    </div>
+
+    <!-- ? My Comment -->
+    <div>
+      <h4 class="font-semibold leading-6 text-[#4e586b] dark:text-[#dae4f0]">
+        Các câu hỏi của bạn ({{ totalMyQuestions() }})
+      </h4>
+
+      <!-- ? My Comment List -->
+      <div class="mt-3">
+        @if (myQuestions().length > 0) {
+          <ul>
+            @for (myQuestion of myQuestions(); track myQuestion.id) {
+              <li>
+                <button
+                  class="comment-item"
+                  (click)="onSelectQuestion(myQuestion.id)">
+                  <div class="comment-content">
+                    @if (myQuestion.commentCount > 0) {
+                      <img
+                        src="./images/icons/circle-check-green.svg"
+                        alt="Đã trả lời" />
+                    } @else {
+                      <img
+                        src="./images/icons/circle-question-mark.svg"
+                        alt="Chưa trả lời" />
+                    }
+                    <p
+                      class="line-clamp-1 max-w-[545px] items-center text-base leading-[1.6]">
+                      {{ myQuestion.title }}
+                    </p>
+                  </div>
+                </button>
+              </li>
+            }
+          </ul>
+        } @else {
+          <div class="flex w-full flex-col items-center justify-center">
+            <img
+              src="./images/icons/question-empty.svg"
+              alt="Không có câu hỏi" />
+            <p class="mt-3">
+              Bạn chưa đặt câu hỏi nào cho các bài học trong lớp này.
+            </p>
+          </div>
+        }
+      </div>
+
+      @if (myQuestions().length > 0) {
+        <!-- ? Pagination -->
+        <div class="mt-7 flex justify-end">
+          <div class="relative flex items-center justify-center">
+            <div class="flex items-center px-[10px]">
+              <span class="mr-2 select-none text-[#a2adbd]">Trang:</span>
+              <div
+                class="prev"
+                [ngClass]="{
+                  '!hidden': currentMyPage() === 1,
+                }"
+                (click)="changeMyPage.emit(currentMyPage() - 1)">
+                <span
+                  class="pi pi-angle-left text-[#0093fc]"
+                  style="font-size: 20px"></span>
+              </div>
+
+              @for (page of myQuestionPages(); track $index) {
+                @if (isNumber(page)) {
+                  <div
+                    class="page"
+                    [class.active]="page === currentMyPage()"
+                    (click)="changeMyPage.emit(page)">
+                    {{ page }}
+                  </div>
+                } @else {
+                  <div class="page">...</div>
+                }
+              }
+
+              <div
+                class="next"
+                [ngClass]="{
+                  '!hidden': currentMyPage() === totalMyQuestionPages(),
+                }"
+                (click)="changeMyPage.emit(currentMyPage() + 1)">
+                <span
+                  class="pi pi-angle-right text-[#0093fc]"
+                  style="font-size: 20px"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

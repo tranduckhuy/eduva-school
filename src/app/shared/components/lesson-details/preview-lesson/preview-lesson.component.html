@@ -7,11 +7,16 @@
         !lessonMaterial() ||
         lessonMaterial()?.contentType === 0 ||
         lessonMaterial()?.contentType === 3,
+      'sm:!aspect-auto sm:h-[70vh]': lessonMaterial()?.contentType === 3,
       'aspect-[2/0.25] sm:aspect-[2/0.5]': lessonMaterial()?.contentType === 1,
       'aspect-[2/1] sm:aspect-auto sm:h-[70vh]':
         lessonMaterial()?.contentType === 2,
     }">
-    @if (lessonMaterial()) {
+    @if (isLoading()) {
+      <div class="loading-spinner animate-spin"></div>
+    }
+
+    @if (lessonMaterial() && !isLoading()) {
       <!-- Viewer -->
       @switch (lessonMaterial()?.contentType) {
         @case (0) {
@@ -38,8 +43,10 @@
     <app-preview-lesson-skeleton />
   } @else {
     <div class="mt-5 flex items-center justify-between sm:flex-wrap">
-      <h1 class="font-nold text-2xl">{{ lessonMaterial()?.title }}</h1>
-      @if (isSchoolAdminOrMod() && isMaterialPending()) {
+      <h3 class="font-nold text-2xl sm:text-lg">
+        {{ lessonMaterial()?.title }}
+      </h3>
+      @if (isSchoolAdminOrMod() && isMaterialPending() && showActionButton()) {
         <div class="flex items-center gap-3 sm:mt-4">
           <p-button
             label="Duyệt"
@@ -68,3 +75,32 @@
     }
   }
 </div>
+
+@if (showCommentButton()) {
+  <div class="fixed bottom-16 right-5">
+    <p-button
+      icon="pi pi-comments"
+      size="large"
+      [raised]="true"
+      [rounded]="true"
+      (onClick)="visible = true" />
+  </div>
+}
+
+@if (showCommentButton() && lessonMaterial()) {
+  <p-drawer
+    header="Hỏi đáp"
+    position="right"
+    baseZIndex="900"
+    styleClass="!w-[50vw] md:!w-[70vw] sm:!w-full"
+    [closeOnEscape]="true"
+    [(visible)]="visible">
+    <ng-template #headless>
+      <comment-modal
+        [visible]="visible"
+        [materialId]="lessonMaterial()!.id"
+        [materialTitle]="lessonMaterial()!.title"
+        (closeCommentDrawer)="visible = false" />
+    </ng-template>
+  </p-drawer>
+}
