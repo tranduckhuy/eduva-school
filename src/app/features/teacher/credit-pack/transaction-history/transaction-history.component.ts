@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   input,
+  output,
   signal,
 } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
@@ -22,6 +23,11 @@ import { TableEmptyStateComponent } from '../../../../shared/components/table-em
 
 import { PaymentStatus } from '../../../../shared/models/entities/payment.model';
 import { CreditTransaction } from '../models/response/query/get-credit-transaction-response.model';
+
+type PageChangeValue = {
+  currentPage: number;
+  pageSize?: number;
+};
 
 @Component({
   selector: 'credit-transaction-history',
@@ -43,6 +49,8 @@ export class TransactionHistoryComponent {
 
   creditTransactions = input.required<CreditTransaction[]>();
   totalRecords = input.required<number>();
+
+  pageChange = output<PageChangeValue>();
 
   isLoading = this.loadingService.is('load-transactions');
 
@@ -66,6 +74,11 @@ export class TransactionHistoryComponent {
     this.currentPage.set(page);
     this.pageSize.set(rows);
     this.firstRecordIndex.set(first);
+
+    this.pageChange.emit({
+      currentPage: this.currentPage(),
+      pageSize: this.pageSize(),
+    } as PageChangeValue);
   }
 
   getPaymentStatusLabel(status: PaymentStatus): string {

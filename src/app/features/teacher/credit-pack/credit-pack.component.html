@@ -27,5 +27,6 @@
   </h3>
   <credit-transaction-history
     [creditTransactions]="creditTransactions()"
-    [totalRecords]="totalRecords()" />
+    [totalRecords]="totalRecords()"
+    (pageChange)="loadCreditTransactions($event)" />
 </div>

@@ -87,7 +87,6 @@ export class AuthService {
   ): Observable<AuthTokenResponse | null> {
     return this.requestService
       .post<AuthTokenResponse>(this.REFRESH_TOKEN_API_URL, request, {
-        bypassAuth: true,
         showLoading: false,
       })
       .pipe(

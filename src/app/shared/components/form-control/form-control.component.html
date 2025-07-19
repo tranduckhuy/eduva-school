@@ -7,12 +7,12 @@
           {{ label() }}
         </label>
       }
-      @if (redirectLink().value) {
+      @if (redirectLink()) {
         <a
           tabindex="-1"
-          routerLink="{{ redirectLink().href }}"
-          class="mb-2 block font-semibold text-[#f33a58]">
-          {{ redirectLink().value }}
+          class="mb-2 block font-semibold text-[#f33a58]"
+          [routerLink]="redirectLink()?.href">
+          {{ redirectLink()?.value }}
         </a>
       }
     </div>

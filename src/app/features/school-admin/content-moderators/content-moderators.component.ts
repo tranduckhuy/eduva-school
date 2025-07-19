@@ -71,6 +71,8 @@ export class ContentModeratorsComponent {
     { name: string; value: string | undefined } | undefined
   >(undefined);
   searchTerm = signal<string>('');
+  shouldStopRequest = signal<boolean>(true);
+
   tableHeadSkeleton = signal([
     'STT',
     'Kiểm duyệt nội dung',
@@ -211,6 +213,8 @@ export class ContentModeratorsComponent {
   }
 
   private loadData(): void {
+    if (!this.shouldStopRequest()) return;
+
     const params: UserListParams = {
       role: Role.ContentModerator,
       schoolId: this.currentUser()!.school!.id,
@@ -222,7 +226,9 @@ export class ContentModeratorsComponent {
       activeOnly: this.getActiveOnlyStatus(),
     };
 
-    this.userService.getUsers(params).subscribe();
+    this.userService.getUsers(params).subscribe({
+      error: () => this.shouldStopRequest.set(false),
+    });
   }
 
   private getActiveOnlyStatus(): boolean | undefined {

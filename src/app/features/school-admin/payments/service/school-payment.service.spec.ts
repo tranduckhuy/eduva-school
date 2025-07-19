@@ -86,7 +86,10 @@ describe('SchoolPaymentService', () => {
 
   const mockCreditTransactionDetail: CreditTransactionDetail = {
     id: 'credit123',
-    credits: 1000,
+    totalCredits: 1000,
+    paymentStatus: 0,
+    transactionCode: 'TXN001',
+    amount: 100000,
     createdAt: '2024-01-01T00:00:00Z',
     user: {
       id: 'user123',
@@ -198,9 +201,16 @@ describe('SchoolPaymentService', () => {
           next: result => {
             expect(mockToastService.errorGeneral).toHaveBeenCalled();
             expect(result).toBeNull();
+            expect(service.payments()).toEqual([]);
+            expect(service.totalPayments()).toBe(0);
             resolve();
           },
-          error: reject,
+          error: err => {
+            expect(mockToastService.errorGeneral).toHaveBeenCalled();
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toBe('Network error');
+            resolve();
+          },
         });
       });
     });
@@ -284,9 +294,15 @@ describe('SchoolPaymentService', () => {
           next: result => {
             expect(mockToastService.errorGeneral).toHaveBeenCalled();
             expect(result).toBeNull();
+            expect(service.schoolSubscriptionDetail()).toBeNull();
             resolve();
           },
-          error: reject,
+          error: err => {
+            expect(mockToastService.errorGeneral).toHaveBeenCalled();
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toBe('Network error');
+            resolve();
+          },
         });
       });
     });
@@ -369,9 +385,15 @@ describe('SchoolPaymentService', () => {
           next: result => {
             expect(mockToastService.errorGeneral).toHaveBeenCalled();
             expect(result).toBeNull();
+            expect(service.creditTransactionDetail()).toBeNull();
             resolve();
           },
-          error: reject,
+          error: err => {
+            expect(mockToastService.errorGeneral).toHaveBeenCalled();
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toBe('Network error');
+            resolve();
+          },
         });
       });
     });
@@ -503,7 +525,10 @@ describe('SchoolPaymentService', () => {
     it('should handle CreditTransactionDetail model with all properties', () => {
       const creditTransaction: CreditTransactionDetail = {
         id: 'credit123',
-        credits: 1000,
+        totalCredits: 1000,
+        paymentStatus: 0,
+        transactionCode: 'TXN001',
+        amount: 100000,
         createdAt: '2024-01-01T00:00:00Z',
         user: {
           id: 'user123',
@@ -522,7 +547,7 @@ describe('SchoolPaymentService', () => {
       };
 
       expect(creditTransaction.id).toBe('credit123');
-      expect(creditTransaction.credits).toBe(1000);
+      expect(creditTransaction.totalCredits).toBe(1000);
       expect(creditTransaction.user.id).toBe('user123');
       expect(creditTransaction.aiCreditPack.id).toBe(1);
       expect(creditTransaction.paymentTransactionId).toBe('payment123');
@@ -579,9 +604,15 @@ describe('SchoolPaymentService', () => {
         service.getPayments({ pageIndex: 1, pageSize: 10 }).subscribe({
           next: result => {
             expect(result).toBeNull();
+            expect(service.payments()).toEqual([]);
+            expect(service.totalPayments()).toBe(0);
             resolve();
           },
-          error: reject,
+          error: err => {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toBe('Network error');
+            resolve();
+          },
         });
       });
     });

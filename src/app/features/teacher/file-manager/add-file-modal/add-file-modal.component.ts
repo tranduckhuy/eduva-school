@@ -38,9 +38,11 @@ import {
   type CreateLessonMaterialsRequest,
 } from '../../../../shared/models/api/request/command/create-lesson-material-request.model';
 import { FileStorageService } from '../services/file-storage.service';
+import { ContentType } from '../../../../shared/models/enum/lesson-material.enum';
 
 type FileMetadata = {
   blobName: string;
+  duration: number;
   file: File;
 };
 
@@ -73,42 +75,54 @@ export class AddFileModalComponent {
     const newFiles = event.files;
 
     const validFiles: File[] = [];
-    const invalidFiles: File[] = [];
+    const invalidTypeFiles: File[] = [];
+    const oversizedFiles: File[] = [];
 
-    // ? Separate valid and invalid files based on allowed MIME types
+    // ? Separate files by validity (type and size)
     for (const file of newFiles) {
       const isValidType = ALLOWED_UPLOAD_MIME_TYPES.some(type =>
         file.type.startsWith(type)
       );
 
-      if (isValidType) {
-        const isDuplicate = currentFiles.some(
-          f => f.name === file.name && f.size === file.size
-        );
+      if (!isValidType) {
+        invalidTypeFiles.push(file);
+        continue;
+      }
 
-        if (!isDuplicate) {
-          validFiles.push(file);
-        }
-      } else {
-        invalidFiles.push(file);
+      if (file.size > MAX_UPLOAD_FILE_SIZE) {
+        oversizedFiles.push(file);
+        continue;
+      }
+
+      const isDuplicate = currentFiles.some(
+        f => f.name === file.name && f.size === file.size
+      );
+
+      if (!isDuplicate) {
+        validFiles.push(file);
       }
     }
 
-    // ? Warn user about invalid files but allow valid ones to proceed
-    if (invalidFiles.length > 0) {
-      const fileNames = invalidFiles.map(f => f.name).join(', ');
+    // ? Warn invalid type files
+    if (invalidTypeFiles.length > 0) {
+      const fileNames = invalidTypeFiles.map(f => f.name).join(', ');
       this.toastHandlingService.warn(
         'Cảnh báo',
-        `Các tệp sau không hợp lệ và đã bị bỏ qua: ${fileNames}.`
+        `Các tệp không hợp lệ về định dạng và đã bị bỏ qua: ${fileNames}.`
       );
     }
 
-    // ? If no valid files remain, do nothing
-    if (validFiles.length === 0) {
-      return;
+    // ? Warn oversized files
+    if (oversizedFiles.length > 0) {
+      const fileNames = oversizedFiles.map(f => f.name).join(', ');
+      this.toastHandlingService.warn(
+        'Cảnh báo',
+        `Các tệp vượt quá dung lượng tối đa ${(MAX_UPLOAD_FILE_SIZE / 1024 / 1024).toFixed(0)}MB và đã bị bỏ qua: ${fileNames}.`
+      );
     }
 
-    // ? Check if total size (existing + new valid files) exceeds limit
+    if (validFiles.length === 0) return;
+
     const totalSize = [...currentFiles, ...validFiles].reduce(
       (sum, file) => sum + file.size,
       0
@@ -137,8 +151,9 @@ export class AddFileModalComponent {
     this.selectedFiles.set([]);
   }
 
-  onSubmit() {
+  async onSubmit() {
     const files = this.selectedFiles();
+
     if (files.length === 0) {
       this.toastHandlingService.error(
         'Lỗi',
@@ -149,7 +164,12 @@ export class AddFileModalComponent {
 
     const timestamp = Date.now();
     const schoolId = this.user()?.school?.id ?? 0;
-    const fileMetadata = this.buildFileMetadata(files, timestamp, schoolId);
+    this.isLoading.set(true);
+    const fileMetadata = await this.buildFileMetadata(
+      files,
+      timestamp,
+      schoolId
+    );
 
     const fileStorageRequest: FileStorageRequest = {
       files: fileMetadata.map(m => ({
@@ -196,12 +216,12 @@ export class AddFileModalComponent {
           if (!res) return throwError(() => new Error());
 
           const materials: CreateLessonMaterialRequest[] = fileMetadata.map(
-            ({ file }, index) => ({
+            ({ file, duration }, index) => ({
               title: file.name,
               description: '',
               tag: '',
               contentType: getContentTypeFromMime(file.type),
-              duration: 0,
+              duration: Math.round(duration),
               fileSize: file.size,
               isAIContent: false,
               sourceUrl: res.uploadTokens[index],
@@ -234,17 +254,52 @@ export class AddFileModalComponent {
       });
   }
 
-  private buildFileMetadata(
+  private async buildFileMetadata(
     files: File[],
     timestamp: number,
     schoolId: number
-  ): FileMetadata[] {
-    return files.map(file => {
+  ): Promise<FileMetadata[]> {
+    const metadataPromises = files.map(async file => {
       const dotIndex = file.name.lastIndexOf('.');
       const base = file.name.substring(0, dotIndex);
       const ext = file.name.substring(dotIndex);
       const blobName = `${base}_${timestamp}_${schoolId}${ext}`;
-      return { blobName, file };
+
+      const contentType = getContentTypeFromMime(file.type);
+
+      let duration = 60;
+      if (
+        contentType === ContentType.Audio ||
+        contentType === ContentType.Video
+      ) {
+        duration = await this.getMediaDuration(file);
+      }
+
+      return { blobName, file, duration };
+    });
+
+    return Promise.all(metadataPromises);
+  }
+
+  private getMediaDuration(file: File): Promise<number> {
+    return new Promise(resolve => {
+      const url = URL.createObjectURL(file);
+      const media = document.createElement(
+        file.type.startsWith('audio/') ? 'audio' : 'video'
+      );
+
+      media.preload = 'metadata';
+      media.src = url;
+
+      media.onloadedmetadata = () => {
+        URL.revokeObjectURL(url);
+        resolve(media.duration);
+      };
+
+      media.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(0);
+      };
     });
   }
 }

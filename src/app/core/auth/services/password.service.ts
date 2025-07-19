@@ -38,11 +38,15 @@ export class PasswordService {
   }
 
   resetPassword(request: ResetPasswordRequest): Observable<void> {
-    return this.requestService.post(this.RESET_PASSWORD_API_URL, request).pipe(
-      tap(res => this.handleResetPasswordResponse(res)),
-      map(() => void 0),
-      catchError(err => this.handleResetPasswordError(err))
-    );
+    return this.requestService
+      .post(this.RESET_PASSWORD_API_URL, request, {
+        bypassAuth: true,
+      })
+      .pipe(
+        tap(res => this.handleResetPasswordResponse(res)),
+        map(() => void 0),
+        catchError(err => this.handleResetPasswordError(err))
+      );
   }
 
   changePassword(request: ChangePasswordRequest): Observable<void> {
