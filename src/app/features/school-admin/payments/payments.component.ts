@@ -3,7 +3,6 @@ import {
   Component,
   inject,
   signal,
-  OnInit,
 } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';

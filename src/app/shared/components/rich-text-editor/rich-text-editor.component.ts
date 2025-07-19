@@ -178,9 +178,9 @@ export class RichTextEditorComponent {
       const p = pImage.parentElement;
       if (!p || !(pImage instanceof HTMLElement)) return;
 
-      const src = pImage.getAttribute('src') || '';
-      const alt = pImage.getAttribute('alt') || '';
-      const width = pImage.getAttribute('width') || '';
+      const src = pImage.getAttribute('src') ?? '';
+      const alt = pImage.getAttribute('alt') ?? '';
+      const width = pImage.getAttribute('width') ?? '';
 
       const figure = document.createElement('figure');
       figure.classList.add('image');

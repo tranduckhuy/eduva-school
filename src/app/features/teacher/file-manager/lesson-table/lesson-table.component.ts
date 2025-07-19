@@ -4,13 +4,12 @@ import {
   OnInit,
   inject,
   signal,
-  viewChild,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { TooltipModule } from 'primeng/tooltip';
-import { TableModule, TableLazyLoadEvent, Table } from 'primeng/table';
+import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
 import { ConfirmationService } from 'primeng/api';
 

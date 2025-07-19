@@ -20,9 +20,9 @@ export class ContentParserService {
         if (el.tagName.toLowerCase() === 'p-image') {
           blocks.push({
             type: 'image',
-            src: el.getAttribute('src') || '',
-            alt: el.getAttribute('alt') || '',
-            width: el.getAttribute('width') || '',
+            src: el.getAttribute('src') ?? '',
+            alt: el.getAttribute('alt') ?? '',
+            width: el.getAttribute('width') ?? '',
           });
         }
 
@@ -34,9 +34,9 @@ export class ContentParserService {
           const pImage = el.querySelector('p-image') as HTMLElement;
           blocks.push({
             type: 'image',
-            src: pImage.getAttribute('src') || '',
-            alt: pImage.getAttribute('alt') || '',
-            width: pImage.getAttribute('width') || '',
+            src: pImage.getAttribute('src') ?? '',
+            alt: pImage.getAttribute('alt') ?? '',
+            width: pImage.getAttribute('width') ?? '',
           });
         }
 
