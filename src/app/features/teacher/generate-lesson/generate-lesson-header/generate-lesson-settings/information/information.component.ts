@@ -34,11 +34,10 @@ export class InformationComponent {
   clickOutside = output();
   toggleFullSCreen = output();
 
+  theme = this.themeService.theme;
   readonly user = this.userService.currentUser;
 
-  readonly isDarkMode = computed(() => {
-    return this.themeService.isDarkMode();
-  });
+  readonly isDarkMode = computed(() => this.theme() === 'dark');
 
   readonly isTeacher = computed(() => {
     return (
@@ -65,8 +64,10 @@ export class InformationComponent {
       : '/teacher/settings/account-settings';
   });
 
-  toggleDarkMode() {
-    this.themeService.toggleDarkMode();
+  toggleTheme() {
+    this.theme() === 'light'
+      ? this.themeService.setTheme('dark')
+      : this.themeService.setTheme('light');
   }
 
   logout() {

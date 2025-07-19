@@ -3,6 +3,11 @@ import { Routes } from '@angular/router';
 export const fileManagerRoutes: Routes = [
   {
     path: '',
+    redirectTo: 'my-drive',
+    pathMatch: 'full',
+  },
+  {
+    path: 'my-drive',
     data: {
       heading: 'Tất cả thư mục',
       breadcrumb: '',

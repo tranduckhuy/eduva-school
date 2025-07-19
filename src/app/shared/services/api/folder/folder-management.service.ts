@@ -102,7 +102,7 @@ export class FolderManagementService {
     return this.requestService
       .put(`${this.BASE_FOLDERS_API_URL}/${folderId}/archive`)
       .pipe(
-        tap(res => this.handleArchiveResponse(res)),
+        tap(res => this.handleSuccessResponse(res)),
         map(() => null),
         catchError(err => this.handleError(err))
       );
@@ -113,6 +113,16 @@ export class FolderManagementService {
       .delete(`${this.BASE_FOLDERS_API_URL}/${folderId}`)
       .pipe(
         tap(res => this.handleRemoveResponse(res)),
+        map(() => null),
+        catchError(err => this.handleError(err))
+      );
+  }
+
+  restoreFolder(folderId: string) {
+    return this.requestService
+      .put(`${this.BASE_FOLDERS_API_URL}/${folderId}/restore`)
+      .pipe(
+        tap(res => this.handleSuccessResponse(res)),
         map(() => null),
         catchError(err => this.handleError(err))
       );
@@ -160,7 +170,7 @@ export class FolderManagementService {
       : null;
   }
 
-  private handleArchiveResponse(res: any): void {
+  private handleSuccessResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS) {
       this.toastHandlingService.successGeneral();
     } else {

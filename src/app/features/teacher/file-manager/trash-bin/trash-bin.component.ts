@@ -1,113 +1,73 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+  OnInit,
+  signal,
+} from '@angular/core';
+import { DatePipe } from '@angular/common';
 
+import { TooltipModule } from 'primeng/tooltip';
+import { TableModule, type TableLazyLoadEvent } from 'primeng/table';
+import { ConfirmationService } from 'primeng/api';
+
+import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
+
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
-import { FileTypeFilterComponent } from '../file-type-filter/file-type-filter.component';
-import { MaterialTableComponent } from '../material-table/material-table.component';
-
-type Material = {
-  id: number;
-  name: string;
-  owner: string;
-  lastModified: string;
-  fileSize: string;
-  fileType: '.mp4' | '.mp3' | '.docx' | '.pdf';
-};
+import { TableSkeletonComponent } from '../../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
+import { TableEmptyStateComponent } from '../../../../shared/components/table-empty-state/table-empty-state.component';
 
 @Component({
   selector: 'app-trash-bin',
   standalone: true,
   imports: [
+    DatePipe,
+    TooltipModule,
+    TableModule,
     SearchInputComponent,
-    FileTypeFilterComponent,
-    MaterialTableComponent,
+    ButtonComponent,
+    TableSkeletonComponent,
+    TableEmptyStateComponent,
   ],
   templateUrl: './trash-bin.component.html',
   styleUrl: './trash-bin.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TrashBinComponent {
-  materials: Material[] = [
-    {
-      id: Date.now() + 1,
-      name: 'Bài giảng Toán 10',
-      owner: 'Nguyễn Văn A',
-      lastModified: '13 tháng 6 2025',
-      fileSize: '1.2MB',
-      fileType: '.mp4',
-    },
-    {
-      id: Date.now() + 2,
-      name: 'Tài liệu Văn học',
-      owner: 'Trần Thị B',
-      lastModified: '13 tháng 6 2025',
-      fileSize: '1.2MB',
-      fileType: '.mp3',
-    },
-    {
-      id: Date.now() + 3,
-      name: 'Video Lý thuyết Vật lý',
-      owner: 'Lê Văn C',
-      lastModified: '12 tháng 6 2025',
-      fileSize: '1.2MB',
-      fileType: '.docx',
-    },
-    {
-      id: Date.now() + 4,
-      name: 'Audio Sinh học 11',
-      owner: 'Phạm Thị D',
-      lastModified: '12 tháng 6 2025',
-      fileSize: '1.2MB',
-      fileType: '.pdf',
-    },
-    {
-      id: Date.now() + 5,
-      name: 'Giáo án Hóa học',
-      owner: 'Nguyễn Văn E',
-      lastModified: '11 tháng 6 2025',
-      fileSize: '1.2MB',
-      fileType: '.mp4',
-    },
-    {
-      id: Date.now() + 6,
-      name: 'Tổng hợp đề thi Văn',
-      owner: 'Trịnh Thị F',
-      lastModified: '11 tháng 6 2025',
-      fileSize: '1.2MB',
-      fileType: '.mp4',
-    },
-    {
-      id: Date.now() + 7,
-      name: 'Bài giảng Vật lý cơ bản',
-      owner: 'Hoàng Văn G',
-      lastModified: '10 tháng 6 2025',
-      fileSize: '1.2MB',
-      fileType: '.mp4',
-    },
-    {
-      id: Date.now() + 8,
-      name: 'Audio luyện nghe tiếng Anh',
-      owner: 'Nguyễn Thị H',
-      lastModified: '10 tháng 6 2025',
-      fileSize: '1.2MB',
-      fileType: '.mp4',
-    },
-    {
-      id: Date.now() + 9,
-      name: 'Tài liệu lịch sử lớp 12',
-      owner: 'Lê Văn I',
-      lastModified: '09 tháng 6 2025',
-      fileSize: '1.2MB',
-      fileType: '.mp4',
-    },
-    {
-      id: Date.now() + 10,
-      name: 'Bài giảng Tin học',
-      owner: 'Đỗ Thị J',
-      lastModified: '09 tháng 6 2025',
-      fileSize: '1.2MB',
-      fileType: '.mp4',
-    },
-  ];
+export class TrashBinComponent implements OnInit {
+  private readonly confirmationService = inject(ConfirmationService);
 
-  onSearchTriggered() {}
+  isLoading = input<boolean>(false);
+
+  currentPage = signal(1);
+  pageSize = signal(PAGE_SIZE);
+  firstRecordIndex = signal(0);
+  searchValue = signal('');
+  items = signal([]);
+  totalRecords = signal<number>(0);
+
+  tableHeadSkeleton = signal([
+    'Tên thư mục/tài liệu',
+    'Người sở hữu',
+    'Ngày chuyển vào thùng rác',
+    'Kích thước tệp',
+    'Hành động',
+  ]);
+
+  ngOnInit(): void {}
+
+  onSearch(searchTerm?: string) {}
+
+  onLazyLoad(event: TableLazyLoadEvent): void {
+    const rows = event.rows ?? this.pageSize();
+    const first = event.first ?? 0;
+    const page = Math.floor(first / rows) + 1;
+
+    this.currentPage.set(page);
+    this.pageSize.set(rows);
+    this.firstRecordIndex.set(first);
+  }
+
+  onDeleteItem(id: string) {}
 }

@@ -128,7 +128,30 @@ export class LessonMaterialsService {
         }
       )
       .pipe(
-        tap(res => this.handleApproveRejectMaterialResponse(res)),
+        tap(res => this.handleSuccessResponse(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  deleteMaterial(request: string[], folderId: string): Observable<null> {
+    return this.requestService
+      .deleteWithBody(
+        `${this.LESSON_MATERIALS_BY_FOLDER_API_URL}/${folderId}/lesson-materials`,
+        request
+      )
+      .pipe(
+        tap(res => this.handleSuccessResponse(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  restoreMaterial(request: string[], folderId: string): Observable<null> {
+    return this.requestService
+      .put(`${this.LESSON_MATERIALS_API_URL}/${folderId}/restore`, request)
+      .pipe(
+        tap(res => this.handleSuccessResponse(res)),
         map(() => null),
         catchError((err: HttpErrorResponse) => this.handleError(err))
       );
@@ -178,7 +201,7 @@ export class LessonMaterialsService {
     }
   }
 
-  private handleApproveRejectMaterialResponse(res: any): void {
+  private handleSuccessResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS) {
       this.toastHandlingService.successGeneral();
     } else {
