@@ -40,6 +40,9 @@ export class GlobalModalService {
       this.lastComponent = component;
       this.lastData = data;
     }
+
+    // ? Close all submenu after open modal
+    window.dispatchEvent(new Event('close-all-submenus'));
   }
 
   close() {

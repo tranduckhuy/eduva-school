@@ -64,7 +64,11 @@
         isSchoolAdmin()
           ? '/school-admin/subscription-plans'
           : '/teacher/credit-pack'
-      ">
+      "
+      [ngClass]="{
+        'pointer-events-none cursor-default':
+          !isSchoolAdmin() && (schoolMissing() || planExpired()),
+      }">
       <img
         src="./images/icons/view-subscription-plan.svg"
         alt=""
@@ -72,12 +76,16 @@
     </a>
     @if (!isSidebarCollapsed()) {
       <a
+        class="flex grow flex-col"
+        [ngClass]="{
+          'pointer-events-none cursor-default':
+            !isSchoolAdmin() && (schoolMissing() || planExpired()),
+        }"
         [routerLink]="
           isSchoolAdmin()
             ? '/school-admin/subscription-plans'
             : '/teacher/credit-pack'
-        "
-        class="flex grow flex-col">
+        ">
         <span class="text-base font-semibold dark:text-white">
           {{ isSchoolAdmin() ? 'Nâng cấp gói dịch vụ' : 'Mua gói Ecoin' }}
         </span>

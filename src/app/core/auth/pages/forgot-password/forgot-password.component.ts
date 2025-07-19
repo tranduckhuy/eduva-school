@@ -79,7 +79,15 @@ export class ForgotPasswordComponent {
       next: () => {
         this.submitted.set(false);
         this.form.markAsUntouched();
-        this.formControls().forEach(fc => fc.resetControl());
+
+        if (this.currentUser()) {
+          this.form.patchValue({
+            email: [this.currentUser()?.email],
+          });
+        } else {
+          this.form.reset();
+          this.formControls().forEach(fc => fc.resetControl());
+        }
       },
     });
   }
