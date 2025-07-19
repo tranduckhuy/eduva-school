@@ -40,7 +40,7 @@ export class PasswordService {
   resetPassword(request: ResetPasswordRequest): Observable<void> {
     return this.requestService
       .post(this.RESET_PASSWORD_API_URL, request, {
-        bypassAuth: true,
+        bypassAuthError: true,
       })
       .pipe(
         tap(res => this.handleResetPasswordResponse(res)),

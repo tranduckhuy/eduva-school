@@ -151,7 +151,7 @@ describe('PasswordService', () => {
             expect(requestService.post).toHaveBeenCalledWith(
               expect.stringContaining('/auth/reset-password'),
               mockResetPasswordRequest,
-              { bypassAuth: true }
+              { bypassAuthError: true }
             );
             expect(toastHandlingService.success).toHaveBeenCalledWith(
               'Thành công',
@@ -477,7 +477,7 @@ describe('PasswordService', () => {
                 expect.stringContaining('/auth/reset-password'),
                 request,
                 expect.objectContaining({
-                  bypassAuth: true,
+                  bypassAuthError: true,
                 })
               );
               resolve();
@@ -579,7 +579,7 @@ describe('PasswordService', () => {
                 confirmPassword: resetRequest.confirmPassword,
               }),
               expect.objectContaining({
-                bypassAuth: true,
+                bypassAuthError: true,
               })
             );
             resolve();
