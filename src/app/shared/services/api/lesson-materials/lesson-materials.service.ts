@@ -13,8 +13,9 @@ import { type LessonMaterial } from '../../../models/entities/lesson-material.mo
 import { type CreateLessonMaterialsRequest } from '../../../models/api/request/command/create-lesson-material-request.model';
 import { type UpdateLessonMaterialRequest } from '../../../models/api/request/command/update-lesson-material-request.model';
 import {
-  type GetPendingLessonMaterialsRequest,
   type GetLessonMaterialsRequest,
+  type GetPersonalLessonMaterialsRequest,
+  type GetPendingLessonMaterialsRequest,
 } from '../../../models/api/request/query/get-lesson-materials-request.model';
 import { type GetPagingLessonMaterialsResponse } from '../../../models/api/response/query/get-lesson-materials-response.model';
 import { type ApproveRejectMaterialRequest } from '../../../../features/moderation/moderate-lessons/models/approve-reject-material-request.model';
@@ -83,6 +84,24 @@ export class LessonMaterialsService {
       );
   }
 
+  getPersonalLessonMaterials(
+    request: GetPersonalLessonMaterialsRequest
+  ): Observable<LessonMaterial[] | null> {
+    return this.requestService
+      .get<GetPagingLessonMaterialsResponse>(
+        `${this.LESSON_MATERIALS_API_URL}/me`,
+        request,
+        {
+          loadingKey: 'get-materials',
+        }
+      )
+      .pipe(
+        tap(res => this.handlePagingListResponse(res)),
+        map(res => this.extractPagingListResponse(res)),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
   getPendingLessonMaterials(
     request: GetPendingLessonMaterialsRequest
   ): Observable<LessonMaterial[] | null> {
@@ -130,8 +149,8 @@ export class LessonMaterialsService {
   }
 
   approveRejectMaterial(
-    request: ApproveRejectMaterialRequest,
-    lessonMaterialId: string
+    lessonMaterialId: string,
+    request: ApproveRejectMaterialRequest
   ): Observable<null> {
     return this.requestService
       .put(
@@ -148,7 +167,7 @@ export class LessonMaterialsService {
       );
   }
 
-  deleteMaterial(request: string[], folderId: string): Observable<null> {
+  deleteMaterial(folderId: string, request: string[]): Observable<null> {
     return this.requestService
       .deleteWithBody(
         `${this.LESSON_MATERIALS_BY_FOLDER_API_URL}/${folderId}/lesson-materials`,
@@ -161,7 +180,7 @@ export class LessonMaterialsService {
       );
   }
 
-  restoreMaterial(request: string[], folderId: string): Observable<null> {
+  restoreMaterial(folderId: string, request: string[]): Observable<null> {
     return this.requestService
       .put(`${this.LESSON_MATERIALS_API_URL}/${folderId}/restore`, request)
       .pipe(

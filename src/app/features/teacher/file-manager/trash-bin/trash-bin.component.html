@@ -8,17 +8,13 @@
       </div>
 
       <div>
-        <app-button
+        <p-button
           pTooltip="Xóa vĩnh viễn tất cả các mục trong thùng rác"
           tooltipPosition="bottom"
-          variant="outline"
-          class="group !border-danger bg-transparent shadow-none hover:!bg-danger">
-          <div
-            class="flex items-center gap-2 !text-danger group-hover:!text-white">
-            <span class="pi pi-trash"></span>
-            <span>Dọn sạch thùng rác</span>
-          </div>
-        </app-button>
+          variant="outlined"
+          severity="danger"
+          icon="pi pi-trash"
+          label="Dọn sạch thùng rác" />
       </div>
     </div>
 
@@ -43,7 +39,7 @@
             [totalRecords]="totalRecords()"
             (onLazyLoad)="onLazyLoad($event)"
             currentPageReportTemplate="
-            Hiển thị {first} đến {last} trên {totalRecords} bài học
+            Hiển thị {first} đến {last} trên {totalRecords} mục
           ">
             <ng-template #header>
               <tr>
@@ -57,7 +53,7 @@
                 </th>
                 <th
                   scope="col"
-                  class="!min-w-[150px] !border-l !border-l-white !text-center dark:!border-l-dark-500"
+                  class="!min-w-[140px] !border-l !border-l-white !text-center dark:!border-l-dark-500"
                   alignFrozen="right"
                   pFrozenColumn>
                   Hành động
@@ -65,54 +61,95 @@
               </tr>
             </ng-template>
             <ng-template #body let-item let-i="rowIndex">
-              <tr>
-                <td>
-                  <div
-                    class="group flex cursor-pointer select-none items-center gap-2">
-                    <i class="material-symbols-outlined text-warning-500">
-                      folder
-                    </i>
-                    <span class="transition-colors group-hover:text-primary">
-                      {{ item.name }}
-                    </span>
-                  </div>
-                </td>
-                <td>{{ item.ownerName }}</td>
-                <td>{{ item.lastModifiedAt | date: 'fullDate' }}</td>
-                <td class="!text-center">--</td>
-                <td
-                  class="!border-l !border-l-gray-100 !text-center dark:!border-l-dark-500"
-                  alignFrozen="right"
-                  pFrozenColumn>
-                  <div class="flex items-center justify-center gap-2">
-                    <app-button
-                      pTooltip="Xem chi tiết"
-                      tooltipPosition="top"
-                      variant="rounded"
-                      size="xs"
-                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
-                      visibility
-                    </app-button>
-                    <app-button
-                      pTooltip="Chỉnh sửa"
-                      tooltipPosition="top"
-                      variant="rounded"
-                      size="xs"
-                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
-                      edit
-                    </app-button>
-                    <app-button
-                      pTooltip="Chuyển vào thùng rác"
-                      tooltipPosition="bottom"
-                      variant="rounded"
-                      size="xs"
-                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-danger shadow-none hover:bg-transparent"
-                      (clicked)="onDeleteItem(item.id)">
-                      delete
-                    </app-button>
-                  </div>
-                </td>
-              </tr>
+              <!-- Folder row -->
+              <ng-container *ngIf="item.type === 'folder'">
+                <tr>
+                  <td>
+                    <div
+                      class="group flex cursor-pointer select-none items-center gap-2">
+                      <i class="material-symbols-outlined text-warning-500">
+                        folder
+                      </i>
+                      <span class="transition-colors group-hover:text-primary">
+                        {{ item.data.name }}
+                      </span>
+                    </div>
+                  </td>
+                  <td>{{ item.data.ownerName }}</td>
+                  <td>{{ item.data.lastModifiedAt | date: 'fullDate' }}</td>
+                  <td class="!text-center">--</td>
+                  <td
+                    class="!border-l !border-l-gray-100 !text-center dark:!border-l-dark-500"
+                    alignFrozen="right"
+                    pFrozenColumn>
+                    <div class="flex items-center justify-center gap-2">
+                      <app-button
+                        pTooltip="Phục hồi"
+                        tooltipPosition="top"
+                        variant="rounded"
+                        size="xs"
+                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-xl !text-primary shadow-none hover:bg-transparent">
+                        settings_backup_restore
+                      </app-button>
+                      <app-button
+                        pTooltip="Xóa vĩnh viễn"
+                        tooltipPosition="bottom"
+                        variant="rounded"
+                        size="xs"
+                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-xl !text-danger shadow-none hover:bg-transparent">
+                        delete
+                      </app-button>
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
+
+              <!-- Material row -->
+              <ng-container *ngIf="item.type === 'material'">
+                <tr>
+                  <td>
+                    <div
+                      class="group flex cursor-pointer select-none items-center gap-2">
+                      <i
+                        class="material-symbols-outlined"
+                        [ngClass]="getMaterialIconColor(item.data)">
+                        {{ getMaterialIcon(item.data) }}
+                      </i>
+                      <span class="transition-colors group-hover:text-primary">
+                        {{ item.data.title }}
+                      </span>
+                    </div>
+                  </td>
+                  <td>{{ item.data.createdByName }}</td>
+                  <td>{{ item.data.lastModifiedAt | date: 'fullDate' }}</td>
+                  <td class="!text-center">
+                    {{ item.data.fileSize | bytesToReadable: 'MB' : 2 }}
+                  </td>
+                  <td
+                    class="!border-l !border-l-gray-100 !text-center dark:!border-l-dark-500"
+                    alignFrozen="right"
+                    pFrozenColumn>
+                    <div class="flex items-center justify-center gap-2">
+                      <app-button
+                        pTooltip="Phục hồi"
+                        tooltipPosition="top"
+                        variant="rounded"
+                        size="xs"
+                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-xl !text-primary shadow-none hover:bg-transparent">
+                        settings_backup_restore
+                      </app-button>
+                      <app-button
+                        pTooltip="Xóa vĩnh viễn"
+                        tooltipPosition="bottom"
+                        variant="rounded"
+                        size="xs"
+                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-xl !text-danger shadow-none hover:bg-transparent">
+                        delete
+                      </app-button>
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
             </ng-template>
             <ng-template #emptymessage>
               <tr>
@@ -126,9 +163,9 @@
             <div
               class="pointer-events-none absolute left-0 right-0 top-[60%] -translate-y-[50%]">
               <app-table-empty-state
-                icon="folder_off"
-                title="Không có thư mục nào"
-                subtitle="Hãy thêm mới thư mục để bắt đầu quản lý bài học." />
+                icon="delete_sweep"
+                title="Thùng rác trống"
+                subtitle="Không có thư mục hoặc tài liệu nào đã bị xóa. Khi bạn xoá dữ liệu, chúng sẽ hiển thị tại đây." />
             </div>
           }
         </div>

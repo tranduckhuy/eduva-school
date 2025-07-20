@@ -11,6 +11,7 @@ import { CreateLessonMaterialsRequest } from '../../../models/api/request/comman
 import { UpdateLessonMaterialRequest } from '../../../models/api/request/command/update-lesson-material-request.model';
 import {
   GetLessonMaterialsRequest,
+  GetPersonalLessonMaterialsRequest,
   GetPendingLessonMaterialsRequest,
 } from '../../../models/api/request/query/get-lesson-materials-request.model';
 import { GetPagingLessonMaterialsResponse } from '../../../models/api/response/query/get-lesson-materials-response.model';
@@ -285,7 +286,7 @@ describe('LessonMaterialsService', () => {
       );
       expect(result).toEqual([mockLessonMaterial]);
       expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
-      expect(service.totalRecords()).toBe(0); // count is not set for list response
+      expect(service.totalRecords()).toBe(0);
     });
 
     it('should get lesson materials by folder without request params', async () => {
@@ -469,6 +470,106 @@ describe('LessonMaterialsService', () => {
     });
   });
 
+  describe('getPersonalLessonMaterials', () => {
+    const mockRequest: GetPersonalLessonMaterialsRequest = {
+      pageIndex: 1,
+      pageSize: 10,
+    };
+
+    it('should get personal lesson materials successfully', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: mockPagingResponse,
+      };
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await lastValueFrom(
+        service.getPersonalLessonMaterials(mockRequest)
+      );
+
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining('/lesson-materials/me'),
+        mockRequest,
+        { loadingKey: 'get-materials' }
+      );
+      expect(result).toEqual([mockLessonMaterial]);
+      expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+      expect(service.totalRecords()).toBe(1);
+    });
+
+    it('should handle get personal lesson materials failure', async () => {
+      const failureResponse = { statusCode: StatusCode.MODEL_INVALID };
+      (requestService.get as any).mockReturnValue(of(failureResponse));
+
+      const result = await lastValueFrom(
+        service.getPersonalLessonMaterials(mockRequest)
+      );
+
+      expect(result).toBeNull();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle HTTP error for personal materials', async () => {
+      const error = new HttpErrorResponse({ status: 500 });
+      (requestService.get as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.getPersonalLessonMaterials(mockRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle response with null data', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: null,
+      };
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await lastValueFrom(
+        service.getPersonalLessonMaterials(mockRequest)
+      );
+
+      expect(result).toEqual([]);
+      expect(service.lessonMaterials()).toEqual([]);
+      expect(service.totalRecords()).toBe(0);
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle response with undefined data.data', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: { data: undefined, count: 0 },
+      };
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await lastValueFrom(
+        service.getPersonalLessonMaterials(mockRequest)
+      );
+
+      expect(result).toEqual([]);
+      expect(service.lessonMaterials()).toEqual([]);
+      expect(service.totalRecords()).toBe(0);
+    });
+
+    it('should handle response with null count', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: { data: [mockLessonMaterial], count: null },
+      };
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await lastValueFrom(
+        service.getPersonalLessonMaterials(mockRequest)
+      );
+
+      expect(result).toEqual([mockLessonMaterial]);
+      expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+      expect(service.totalRecords()).toBe(0);
+    });
+  });
+
   describe('getSharedLessonMaterials', () => {
     const mockRequest: GetPendingLessonMaterialsRequest = {
       pageIndex: 1,
@@ -610,7 +711,7 @@ describe('LessonMaterialsService', () => {
       (requestService.put as any).mockReturnValue(of(successResponse));
 
       const result = await lastValueFrom(
-        service.approveRejectMaterial(mockRequest, materialId)
+        service.approveRejectMaterial(materialId, mockRequest)
       );
 
       expect(requestService.put).toHaveBeenCalledWith(
@@ -629,7 +730,7 @@ describe('LessonMaterialsService', () => {
       (requestService.put as any).mockReturnValue(of(failureResponse));
 
       const result = await lastValueFrom(
-        service.approveRejectMaterial(mockRequest, materialId)
+        service.approveRejectMaterial(materialId, mockRequest)
       );
 
       expect(result).toBeNull();
@@ -641,7 +742,7 @@ describe('LessonMaterialsService', () => {
       (requestService.put as any).mockReturnValue(throwError(() => error));
 
       await expect(
-        lastValueFrom(service.approveRejectMaterial(mockRequest, materialId))
+        lastValueFrom(service.approveRejectMaterial(materialId, mockRequest))
       ).rejects.toThrow();
 
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
@@ -656,7 +757,7 @@ describe('LessonMaterialsService', () => {
       (requestService.put as any).mockReturnValue(of(successResponse));
 
       const result = await lastValueFrom(
-        service.approveRejectMaterial(rejectRequest, materialId)
+        service.approveRejectMaterial(materialId, rejectRequest)
       );
 
       expect(requestService.put).toHaveBeenCalledWith(
@@ -678,7 +779,7 @@ describe('LessonMaterialsService', () => {
       (requestService.put as any).mockReturnValue(throwError(() => error));
 
       await expect(
-        lastValueFrom(service.approveRejectMaterial(mockRequest, materialId))
+        lastValueFrom(service.approveRejectMaterial(materialId, mockRequest))
       ).rejects.toThrow();
 
       expect(toastHandlingService.warn).toHaveBeenCalledWith(
@@ -699,7 +800,7 @@ describe('LessonMaterialsService', () => {
       );
 
       const result = await lastValueFrom(
-        service.deleteMaterial(materialIds, folderId)
+        service.deleteMaterial(folderId, materialIds)
       );
 
       expect(requestService.deleteWithBody).toHaveBeenCalledWith(
@@ -717,7 +818,7 @@ describe('LessonMaterialsService', () => {
       );
 
       const result = await lastValueFrom(
-        service.deleteMaterial(materialIds, folderId)
+        service.deleteMaterial(folderId, materialIds)
       );
 
       expect(result).toBeNull();
@@ -731,7 +832,7 @@ describe('LessonMaterialsService', () => {
       );
 
       await expect(
-        lastValueFrom(service.deleteMaterial(materialIds, folderId))
+        lastValueFrom(service.deleteMaterial(folderId, materialIds))
       ).rejects.toThrow();
 
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
@@ -747,7 +848,7 @@ describe('LessonMaterialsService', () => {
       (requestService.put as any).mockReturnValue(of(successResponse));
 
       const result = await lastValueFrom(
-        service.restoreMaterial(materialIds, folderId)
+        service.restoreMaterial(folderId, materialIds)
       );
 
       expect(requestService.put).toHaveBeenCalledWith(
@@ -763,7 +864,7 @@ describe('LessonMaterialsService', () => {
       (requestService.put as any).mockReturnValue(of(failureResponse));
 
       const result = await lastValueFrom(
-        service.restoreMaterial(materialIds, folderId)
+        service.restoreMaterial(folderId, materialIds)
       );
 
       expect(result).toBeNull();
@@ -775,7 +876,7 @@ describe('LessonMaterialsService', () => {
       (requestService.put as any).mockReturnValue(throwError(() => error));
 
       await expect(
-        lastValueFrom(service.restoreMaterial(materialIds, folderId))
+        lastValueFrom(service.restoreMaterial(folderId, materialIds))
       ).rejects.toThrow();
 
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
@@ -832,6 +933,21 @@ describe('LessonMaterialsService', () => {
 
       await lastValueFrom(
         service.getSharedLessonMaterials({ pageIndex: 1, pageSize: 10 })
+      );
+
+      expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+      expect(service.totalRecords()).toBe(1);
+    });
+
+    it('should update signals when getting personal materials', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: mockPagingResponse,
+      };
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      await lastValueFrom(
+        service.getPersonalLessonMaterials({ pageIndex: 1, pageSize: 10 })
       );
 
       expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
@@ -955,6 +1071,39 @@ describe('LessonMaterialsService', () => {
       expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
       expect(service.totalRecords()).toBe(5);
     });
+
+    it('should handle personal materials response with null data', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: null,
+      };
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await lastValueFrom(
+        service.getPersonalLessonMaterials({ pageIndex: 1, pageSize: 10 })
+      );
+
+      expect(result).toEqual([]);
+      expect(service.lessonMaterials()).toEqual([]);
+      expect(service.totalRecords()).toBe(0);
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle personal materials response with undefined data.data', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: { data: undefined, count: 0 },
+      };
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await lastValueFrom(
+        service.getPersonalLessonMaterials({ pageIndex: 1, pageSize: 10 })
+      );
+
+      expect(result).toEqual([]);
+      expect(service.lessonMaterials()).toEqual([]);
+      expect(service.totalRecords()).toBe(0);
+    });
   });
 
   describe('API URL Construction', () => {
@@ -993,6 +1142,13 @@ describe('LessonMaterialsService', () => {
         { loadingKey: 'get-materials' }
       );
 
+      service.getPersonalLessonMaterials({ pageIndex: 1, pageSize: 10 });
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining('/lesson-materials/me'),
+        { pageIndex: 1, pageSize: 10 },
+        { loadingKey: 'get-materials' }
+      );
+
       service.getLessonMaterialById('test-id');
       expect(requestService.get).toHaveBeenCalledWith(
         expect.stringContaining('/lesson-materials/test-id')
@@ -1024,20 +1180,20 @@ describe('LessonMaterialsService', () => {
       const approveRequest: ApproveRejectMaterialRequest = {
         status: LessonMaterialStatus.Approved,
       };
-      service.approveRejectMaterial(approveRequest, 'test-id');
+      service.approveRejectMaterial('test-id', approveRequest);
       expect(requestService.put).toHaveBeenCalledWith(
         expect.stringContaining('/lesson-materials/test-id/pending-approval'),
         approveRequest,
         { loadingKey: 'approve-reject-material' }
       );
 
-      service.deleteMaterial(['test-id'], 'test-folder');
+      service.deleteMaterial('test-folder', ['test-id']);
       expect(requestService.deleteWithBody).toHaveBeenCalledWith(
         expect.stringContaining('/folders/test-folder/lesson-materials'),
         ['test-id']
       );
 
-      service.restoreMaterial(['test-id'], 'test-folder');
+      service.restoreMaterial('test-folder', ['test-id']);
       expect(requestService.put).toHaveBeenCalledWith(
         expect.stringContaining('/lesson-materials/test-folder/restore'),
         ['test-id']
@@ -1099,6 +1255,25 @@ describe('LessonMaterialsService', () => {
       ).rejects.toThrow();
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
+
+    it('should handle school subscription not found error for personal materials', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
+        status: 400,
+      });
+      (requestService.get as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(
+          service.getPersonalLessonMaterials({ pageIndex: 1, pageSize: 10 })
+        )
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Thiếu gói đăng ký',
+        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+      );
+    });
   });
 
   describe('Response Processing', () => {
@@ -1157,6 +1332,32 @@ describe('LessonMaterialsService', () => {
 
       const result = await lastValueFrom(
         service.getPendingLessonMaterials({ pageIndex: 1, pageSize: 10 })
+      );
+
+      expect(result).toEqual(multipleMaterials);
+      expect(service.lessonMaterials()).toEqual(multipleMaterials);
+      expect(service.totalRecords()).toBe(2);
+    });
+
+    it('should handle personal materials response with multiple items', async () => {
+      const multipleMaterials = [
+        mockLessonMaterial,
+        { ...mockLessonMaterial, id: '2' },
+      ];
+      const pagingResponse = {
+        data: multipleMaterials,
+        count: 2,
+        pageIndex: 1,
+        pageSize: 10,
+      };
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: pagingResponse,
+      };
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await lastValueFrom(
+        service.getPersonalLessonMaterials({ pageIndex: 1, pageSize: 10 })
       );
 
       expect(result).toEqual(multipleMaterials);

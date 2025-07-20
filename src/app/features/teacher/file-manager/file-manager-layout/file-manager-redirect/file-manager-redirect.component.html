@@ -1,6 +1,10 @@
 <ul class="file-manager-list">
   <li>
-    <a routerLink="/teacher/file-manager" class="file-manager-link active">
+    <a
+      routerLink="/teacher/file-manager/my-drive"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="file-manager-link active">
       <span class="flex items-center gap-2">
         <i class="material-symbols-outlined text-lg !text-[#3371ed]">
           school
@@ -13,23 +17,35 @@
     </a>
   </li>
   <li>
-    <a routerLink="recent" class="file-manager-link">
+    <a
+      routerLink="recent"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="file-manager-link">
       <span class="flex items-center gap-2">
         <i class="material-symbols-outlined text-lg !text-[#AD63F6]">
           schedule
         </i>
         <span>Gần đây</span>
       </span>
-      <span class="!text-[#3A4252] dark:!text-[#e6e6e6]">20</span>
+      <span class="!text-[#3A4252] dark:!text-[#e6e6e6]">
+        {{ totalFolders() }}
+      </span>
     </a>
   </li>
   <li>
-    <a routerLink="bin" class="file-manager-link">
+    <a
+      routerLink="bin"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="file-manager-link">
       <span class="flex items-center gap-2">
         <i class="material-symbols-outlined text-lg !text-[#FF4023]">delete</i>
         <span>Thùng rác</span>
       </span>
-      <span class="!text-[#3A4252] dark:!text-[#e6e6e6]">5</span>
+      <span class="!text-[#3A4252] dark:!text-[#e6e6e6]">
+        {{ trashTotalCount() }}
+      </span>
     </a>
   </li>
 </ul>
