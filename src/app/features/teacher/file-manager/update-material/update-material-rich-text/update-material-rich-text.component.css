@@ -121,10 +121,6 @@
     background-color 0.15s linear;
 }
 
-:host ::ng-deep .ck-placeholder::before {
-  color: var(--rich-text-placeholder-color) !important;
-}
-
 :host ::ng-deep .ck.ck-button.ck-off:active,
 :host ::ng-deep .ck.ck-button.ck-off:focus,
 :host ::ng-deep .ck.ck-button.ck-on,
