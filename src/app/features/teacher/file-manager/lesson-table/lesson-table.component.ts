@@ -13,20 +13,21 @@ import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
 import { ConfirmationService } from 'primeng/api';
 
-import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
+import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
+import { FolderManagementService } from '../../../../shared/services/api/folder/folder-management.service';
 
 import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
 import { FolderOwnerType } from '../../../../shared/models/enum/folder-owner-type.enum';
 import { EntityStatus } from '../../../../shared/models/enum/entity-status.enum';
 
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
-import { FolderManagementService } from '../../../../shared/services/api/folder/folder-management.service';
 import { GetFoldersRequest } from '../../../../shared/models/api/request/query/get-folders-request.model';
-import { AddLessonModalComponent } from '../../../../shared/components/add-lesson-modal/add-lesson-modal.component';
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
 import { TableSkeletonComponent } from '../../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 import { TableEmptyStateComponent } from '../../../../shared/components/table-empty-state/table-empty-state.component';
+import { AddLessonModalComponent } from '../../../../shared/components/add-lesson-modal/add-lesson-modal.component';
+import { RenameLessonModalComponent } from '../../../../shared/components/rename-lesson-modal/rename-lesson-modal.component';
 
 @Component({
   selector: 'lesson-table',
@@ -48,8 +49,8 @@ import { TableEmptyStateComponent } from '../../../../shared/components/table-em
 export class LessonTableComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly modalService = inject(GlobalModalService);
   private readonly loadingService = inject(LoadingService);
+  private readonly globalModalService = inject(GlobalModalService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly folderService = inject(FolderManagementService);
 
@@ -86,6 +87,18 @@ export class LessonTableComponent implements OnInit {
     });
   }
 
+  onLazyLoad(event: TableLazyLoadEvent): void {
+    const rows = event.rows ?? this.pageSize();
+    const first = event.first ?? 0;
+    const page = Math.floor(first / rows) + 1;
+
+    this.currentPage.set(page);
+    this.pageSize.set(rows);
+    this.firstRecordIndex.set(first);
+
+    this.fetchFolders();
+  }
+
   onSearch(searchTerm?: string): void {
     this.searchValue.set(searchTerm ?? '');
     this.currentPage.set(1);
@@ -117,20 +130,18 @@ export class LessonTableComponent implements OnInit {
     });
   }
 
-  onLazyLoad(event: TableLazyLoadEvent): void {
-    const rows = event.rows ?? this.pageSize();
-    const first = event.first ?? 0;
-    const page = Math.floor(first / rows) + 1;
-
-    this.currentPage.set(page);
-    this.pageSize.set(rows);
-    this.firstRecordIndex.set(first);
-
-    this.fetchFolders();
+  onRenameFolder(folderId: string, folderName: string) {
+    this.globalModalService.open(RenameLessonModalComponent, {
+      folderId,
+      folderName,
+      renameLessonSuccess: () => {
+        this.onSearch();
+      },
+    });
   }
 
   openAddFolderModal(): void {
-    this.modalService.open(AddLessonModalComponent, {
+    this.globalModalService.open(AddLessonModalComponent, {
       ownerType: FolderOwnerType.Personal,
       addLessonSuccess: () => {
         this.onSearch();

@@ -40,7 +40,7 @@ import { ScrollTopModule } from 'primeng/scrolltop';
     @if (showThemeButton()) {
       <button
         class="fixed right-5 top-5 z-10 transition-colors duration-100 ease-linear hover:text-primary md:right-[25px] md:top-[25px]"
-        (click)="toggleDarkMode()">
+        (click)="toggleTheme()">
         <i class="material-symbols-outlined !text-xl md:!text-[22px]">
           {{ isDarkMode() ? 'light_mode' : 'dark_mode' }}
         </i>
@@ -53,7 +53,7 @@ export class BlankLayoutComponent {
   private readonly themeService = inject(ThemeService);
   private readonly router = inject(Router);
 
-  private readonly hiddenPaths = ['/generate-lesson'];
+  theme = this.themeService.theme;
 
   private readonly currentUrl = signal(this.router.url);
 
@@ -61,7 +61,9 @@ export class BlankLayoutComponent {
     return !this.hiddenPaths.some(path => this.currentUrl().includes(path));
   });
 
-  readonly isDarkMode = computed(() => this.themeService.isDarkMode());
+  readonly isDarkMode = computed(() => this.theme() === 'dark');
+
+  private readonly hiddenPaths = ['/generate-lesson'];
 
   constructor() {
     effect(
@@ -72,7 +74,9 @@ export class BlankLayoutComponent {
     );
   }
 
-  toggleDarkMode() {
-    this.themeService.toggleDarkMode();
+  toggleTheme() {
+    this.theme() === 'light'
+      ? this.themeService.setTheme('dark')
+      : this.themeService.setTheme('light');
   }
 }

@@ -13,8 +13,9 @@ import { type LessonMaterial } from '../../../models/entities/lesson-material.mo
 import { type CreateLessonMaterialsRequest } from '../../../models/api/request/command/create-lesson-material-request.model';
 import { type UpdateLessonMaterialRequest } from '../../../models/api/request/command/update-lesson-material-request.model';
 import {
-  type GetPendingLessonMaterialsRequest,
   type GetLessonMaterialsRequest,
+  type GetPersonalLessonMaterialsRequest,
+  type GetPendingLessonMaterialsRequest,
 } from '../../../models/api/request/query/get-lesson-materials-request.model';
 import { type GetPagingLessonMaterialsResponse } from '../../../models/api/response/query/get-lesson-materials-response.model';
 import { type ApproveRejectMaterialRequest } from '../../../../features/moderation/moderate-lessons/models/approve-reject-material-request.model';
@@ -64,7 +65,7 @@ export class LessonMaterialsService {
       );
   }
 
-  getLessonMaterials(
+  getLessonMaterialsByFolder(
     folderId: string,
     request?: GetLessonMaterialsRequest
   ): Observable<LessonMaterial[] | null> {
@@ -79,6 +80,24 @@ export class LessonMaterialsService {
       .pipe(
         tap(res => this.handleListResponse(res)),
         map(res => this.extractListResponse(res)),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  getPersonalLessonMaterials(
+    request: GetPersonalLessonMaterialsRequest
+  ): Observable<LessonMaterial[] | null> {
+    return this.requestService
+      .get<GetPagingLessonMaterialsResponse>(
+        `${this.LESSON_MATERIALS_API_URL}/me`,
+        request,
+        {
+          loadingKey: 'get-materials',
+        }
+      )
+      .pipe(
+        tap(res => this.handlePagingListResponse(res)),
+        map(res => this.extractPagingListResponse(res)),
         catchError((err: HttpErrorResponse) => this.handleError(err))
       );
   }
@@ -130,8 +149,8 @@ export class LessonMaterialsService {
   }
 
   approveRejectMaterial(
-    request: ApproveRejectMaterialRequest,
-    lessonMaterialId: string
+    lessonMaterialId: string,
+    request: ApproveRejectMaterialRequest
   ): Observable<null> {
     return this.requestService
       .put(
@@ -142,7 +161,30 @@ export class LessonMaterialsService {
         }
       )
       .pipe(
-        tap(res => this.handleApproveRejectMaterialResponse(res)),
+        tap(res => this.handleSuccessResponse(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  deleteMaterial(folderId: string, request: string[]): Observable<null> {
+    return this.requestService
+      .deleteWithBody(
+        `${this.LESSON_MATERIALS_BY_FOLDER_API_URL}/${folderId}/lesson-materials`,
+        request
+      )
+      .pipe(
+        tap(res => this.handleSuccessResponse(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  restoreMaterial(folderId: string, request: string[]): Observable<null> {
+    return this.requestService
+      .put(`${this.LESSON_MATERIALS_API_URL}/${folderId}/restore`, request)
+      .pipe(
+        tap(res => this.handleSuccessResponse(res)),
         map(() => null),
         catchError((err: HttpErrorResponse) => this.handleError(err))
       );
@@ -206,7 +248,7 @@ export class LessonMaterialsService {
     }
   }
 
-  private handleApproveRejectMaterialResponse(res: any): void {
+  private handleSuccessResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS) {
       this.toastHandlingService.successGeneral();
     } else {

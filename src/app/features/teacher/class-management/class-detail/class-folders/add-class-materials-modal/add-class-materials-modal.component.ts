@@ -254,7 +254,7 @@ export class AddClassMaterialsModalComponent implements OnInit {
     };
 
     this.lessonMaterialService
-      .getLessonMaterials(folderId, request)
+      .getLessonMaterialsByFolder(folderId, request)
       .subscribe(res => {
         if (!res) return;
         const filtered = res.filter(m => !this.initialTargetIds().has(m.id));
@@ -270,7 +270,7 @@ export class AddClassMaterialsModalComponent implements OnInit {
     };
 
     this.lessonMaterialService
-      .getLessonMaterials(folderId, request)
+      .getLessonMaterialsByFolder(folderId, request)
       .subscribe(res => {
         if (!res) return;
         const ids = new Set(res.map(m => m.id));

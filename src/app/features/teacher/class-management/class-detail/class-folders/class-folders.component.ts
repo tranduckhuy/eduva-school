@@ -22,6 +22,7 @@ import { ContentType } from '../../../../../shared/models/enum/lesson-material.e
 import { type ClassModel } from '../../../../../shared/models/entities/class.model';
 import { type FolderWithMaterials } from '../class-detail.component';
 import { AddClassMaterialsModalComponent } from './add-class-materials-modal/add-class-materials-modal.component';
+import { RenameLessonModalComponent } from '../../../../../shared/components/rename-lesson-modal/rename-lesson-modal.component';
 
 @Component({
   selector: 'class-folders',
@@ -40,6 +41,7 @@ export class ClassFoldersComponent {
   folderWithMaterials = input<FolderWithMaterials[]>();
 
   addFolderMaterials = output<void>();
+  renameFolder = output<void>();
   removeFolderMaterials = output<void>();
 
   readonly openedMenuFolderId = signal<string | null>(null);
@@ -47,6 +49,16 @@ export class ClassFoldersComponent {
     folderId: string;
     materialId: string;
   } | null>(null);
+
+  onRenameFolder(folderId: string, folderName: string) {
+    this.globalModalService.open(RenameLessonModalComponent, {
+      folderId,
+      folderName,
+      renameLessonSuccess: () => {
+        this.renameFolder.emit();
+      },
+    });
+  }
 
   onRemoveFolder(folderId: string) {
     this.folderService

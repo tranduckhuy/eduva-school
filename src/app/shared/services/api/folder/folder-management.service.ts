@@ -11,9 +11,10 @@ import { ToastHandlingService } from '../../core/toast/toast-handling.service';
 import { StatusCode } from '../../../constants/status-code.constant';
 
 import { type Folder } from '../../../models/entities/folder.model';
-import { type CreateFolderRequest } from '../../../models/api/request/command/create-folder-request.model';
 import { type GetFoldersRequest } from '../../../models/api/request/query/get-folders-request.model';
 import { type GetFoldersResponse } from '../../../models/api/response/query/get-folders-response.model';
+import { type CreateFolderRequest } from '../../../models/api/request/command/create-folder-request.model';
+import { type RenameFolderRequest } from '../../../models/api/request/command/rename-material-request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +31,9 @@ export class FolderManagementService {
 
   private readonly totalRecordsSignal = signal<number>(0);
   totalRecords = this.totalRecordsSignal.asReadonly();
+
+  private readonly totalTrashRecordsSignal = signal<number>(0);
+  totalTrashRecords = this.totalTrashRecordsSignal.asReadonly();
 
   createFolder(request: CreateFolderRequest): Observable<Folder | null> {
     return this.requestService
@@ -98,11 +102,26 @@ export class FolderManagementService {
       );
   }
 
+  renameFolder(
+    folderId: string,
+    request: RenameFolderRequest
+  ): Observable<null> {
+    return this.requestService
+      .put(`${this.BASE_FOLDERS_API_URL}/${folderId}/rename`, request, {
+        loadingKey: 'rename-folder',
+      })
+      .pipe(
+        tap(res => this.handleSuccessResponse(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
   archiveFolder(folderId: string): Observable<null> {
     return this.requestService
       .put(`${this.BASE_FOLDERS_API_URL}/${folderId}/archive`)
       .pipe(
-        tap(res => this.handleArchiveResponse(res)),
+        tap(res => this.handleSuccessResponse(res)),
         map(() => null),
         catchError(err => this.handleError(err))
       );
@@ -113,6 +132,16 @@ export class FolderManagementService {
       .delete(`${this.BASE_FOLDERS_API_URL}/${folderId}`)
       .pipe(
         tap(res => this.handleRemoveResponse(res)),
+        map(() => null),
+        catchError(err => this.handleError(err))
+      );
+  }
+
+  restoreFolder(folderId: string) {
+    return this.requestService
+      .put(`${this.BASE_FOLDERS_API_URL}/${folderId}/restore`)
+      .pipe(
+        tap(res => this.handleSuccessResponse(res)),
         map(() => null),
         catchError(err => this.handleError(err))
       );
@@ -131,7 +160,10 @@ export class FolderManagementService {
       const folders = isPaging ? (res.data.data ?? []) : (res.data ?? []);
 
       this.folderListSignal.set([...folders]);
-      if (isPaging) this.totalRecordsSignal.set(res.data.count ?? 0);
+      if (isPaging) {
+        this.totalRecordsSignal.set(res.data.count ?? 0);
+        this.totalTrashRecordsSignal.set(res.data.count ?? 0);
+      }
     } else {
       this.toastHandlingService.error(
         'Lấy danh sách thư mục thất bại',
@@ -160,7 +192,7 @@ export class FolderManagementService {
       : null;
   }
 
-  private handleArchiveResponse(res: any): void {
+  private handleSuccessResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS) {
       this.toastHandlingService.successGeneral();
     } else {
