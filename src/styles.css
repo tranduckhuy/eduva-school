@@ -146,6 +146,9 @@
     --rich-text-focus-bg-color: #fff;
     --rich-text-focus-border-color: #444;
 
+    --description-rich-text-bg-color: var(--color-white);
+    --description-rich-text-border-color: var(--color-gray-200);
+
     --comment-item-text-color: #2e3441;
     --comment-item-hover-bg-color: #f2f9ff;
     --comment-item-category-bg-color: var(--color-gray-50);
@@ -198,6 +201,9 @@
     --rich-text-bg-color: var(--color-bg-third);
     --rich-text-focus-bg-color: var(--color-bg-third);
     --rich-text-focus-border-color: #2093e7;
+
+    --description-rich-text-bg-color: var(--rich-text-bg-color);
+    --description-rich-text-border-color: var(--color-gray-900);
 
     --comment-item-text-color: #a2adbd;
     --comment-item-hover-bg-color: #32353b;

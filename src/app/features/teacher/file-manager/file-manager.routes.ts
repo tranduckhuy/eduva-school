@@ -3,8 +3,8 @@ import { Routes } from '@angular/router';
 export const fileManagerRoutes: Routes = [
   {
     path: '',
-    redirectTo: 'my-drive',
     pathMatch: 'full',
+    redirectTo: 'my-drive',
   },
   {
     path: 'my-drive',
@@ -39,7 +39,19 @@ export const fileManagerRoutes: Routes = [
           ),
       },
       {
-        path: ':folderId/:materialId',
+        path: 'update-material/:folderId/:materialId',
+        data: {
+          title: 'Chỉnh sửa bài học',
+          heading: 'Chỉnh sửa bài học',
+          breadcrumb: 'Chỉnh sửa bài học',
+        },
+        loadComponent: () =>
+          import('./update-material/update-material.component').then(
+            mod => mod.UpdateMaterialComponent
+          ),
+      },
+      {
+        path: 'material-detail/:materialId',
         data: {
           title: 'Chi tiết bài học',
           heading: 'Chi tiết bài học',

@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
+import { Observable, catchError, map, tap, throwError } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 import { RequestService } from '../../core/request/request.service';
@@ -11,6 +11,7 @@ import { StatusCode } from '../../../constants/status-code.constant';
 
 import { type LessonMaterial } from '../../../models/entities/lesson-material.model';
 import { type CreateLessonMaterialsRequest } from '../../../models/api/request/command/create-lesson-material-request.model';
+import { type UpdateLessonMaterialRequest } from '../../../models/api/request/command/update-lesson-material-request.model';
 import {
   type GetPendingLessonMaterialsRequest,
   type GetLessonMaterialsRequest,
@@ -40,13 +41,26 @@ export class LessonMaterialsService {
 
   createLessonMaterials(
     request: CreateLessonMaterialsRequest
-  ): Observable<void> {
+  ): Observable<null> {
     return this.requestService
       .post(this.LESSON_MATERIALS_API_URL, request)
       .pipe(
         tap(res => this.handleCreateResponse(res)),
-        map(() => void 0),
-        catchError(err => this.handleCreateError(err))
+        map(() => null),
+        catchError(err => this.handleError(err))
+      );
+  }
+
+  updateLessonMaterial(
+    materialId: string,
+    request: UpdateLessonMaterialRequest
+  ): Observable<null> {
+    return this.requestService
+      .put(`${this.LESSON_MATERIALS_API_URL}/${materialId}`, request)
+      .pipe(
+        tap(res => this.handleUpdateResponse(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
       );
   }
 
@@ -175,6 +189,20 @@ export class LessonMaterialsService {
     }
   }
 
+  private handleUpdateResponse(res: any): void {
+    if (res.statusCode === StatusCode.SUCCESS) {
+      this.toastHandlingService.success(
+        'Cập nhật thành công',
+        'Thông tin của tài liệu đã được cập nhật thành công.'
+      );
+    } else {
+      this.toastHandlingService.error(
+        'Cập nhật thất bại',
+        'Không thể cập nhật thông tin tài liệu. Vui lòng thử lại sau.'
+      );
+    }
+  }
+
   private handleListResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS && res.data) {
       this.lessonMaterialsSignal.set(res.data ?? []);
@@ -223,7 +251,7 @@ export class LessonMaterialsService {
     return res.statusCode === StatusCode.SUCCESS ? res.data : null;
   }
 
-  private handleCreateError(err: HttpErrorResponse): Observable<void> {
+  private handleError(err: HttpErrorResponse): Observable<null> {
     if (err.error?.statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND) {
       this.toastHandlingService.warn(
         'Thiếu gói đăng ký',
@@ -232,11 +260,6 @@ export class LessonMaterialsService {
     } else {
       this.toastHandlingService.errorGeneral();
     }
-    return of(void 0);
-  }
-
-  private handleError(err: HttpErrorResponse): Observable<null> {
-    this.toastHandlingService.errorGeneral();
     return throwError(() => err);
   }
 }
