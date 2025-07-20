@@ -50,7 +50,7 @@ export class LessonMaterialsService {
       );
   }
 
-  getLessonMaterials(
+  getLessonMaterialsByFolder(
     folderId: string,
     request?: GetLessonMaterialsRequest
   ): Observable<LessonMaterial[] | null> {

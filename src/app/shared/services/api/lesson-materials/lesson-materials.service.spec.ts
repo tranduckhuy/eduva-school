@@ -114,7 +114,6 @@ describe('LessonMaterialsService', () => {
           title: 'Test Material',
           description: 'Test Description',
           contentType: 'pdf' as any,
-          tag: 'test',
           duration: 60,
           fileSize: 1024,
           isAIContent: false,
@@ -219,17 +218,19 @@ describe('LessonMaterialsService', () => {
       (requestService.get as any).mockReturnValue(of(successResponse));
 
       await new Promise<void>(resolve => {
-        service.getLessonMaterials(folderId, mockRequest).subscribe(result => {
-          expect(requestService.get).toHaveBeenCalledWith(
-            expect.stringContaining(`/folders/${folderId}/lesson-materials`),
-            mockRequest,
-            { loadingKey: 'get-materials' }
-          );
-          expect(result).toEqual([mockLessonMaterial]);
-          expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
-          expect(service.totalRecords()).toBe(0); // count is not set for list response
-          resolve();
-        });
+        service
+          .getLessonMaterialsByFolder(folderId, mockRequest)
+          .subscribe(result => {
+            expect(requestService.get).toHaveBeenCalledWith(
+              expect.stringContaining(`/folders/${folderId}/lesson-materials`),
+              mockRequest,
+              { loadingKey: 'get-materials' }
+            );
+            expect(result).toEqual([mockLessonMaterial]);
+            expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+            expect(service.totalRecords()).toBe(0); // count is not set for list response
+            resolve();
+          });
       });
     });
 
@@ -238,11 +239,13 @@ describe('LessonMaterialsService', () => {
       (requestService.get as any).mockReturnValue(of(failureResponse));
 
       await new Promise<void>(resolve => {
-        service.getLessonMaterials(folderId, mockRequest).subscribe(result => {
-          expect(result).toBeNull();
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
+        service
+          .getLessonMaterialsByFolder(folderId, mockRequest)
+          .subscribe(result => {
+            expect(result).toBeNull();
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            resolve();
+          });
       });
     });
 
@@ -251,7 +254,7 @@ describe('LessonMaterialsService', () => {
       (requestService.get as any).mockReturnValue(throwError(() => error));
 
       await new Promise<void>(resolve => {
-        service.getLessonMaterials(folderId, mockRequest).subscribe({
+        service.getLessonMaterialsByFolder(folderId, mockRequest).subscribe({
           next: () => {},
           error: err => {
             expect(err).toBe(error);
@@ -270,7 +273,7 @@ describe('LessonMaterialsService', () => {
       (requestService.get as any).mockReturnValue(of(successResponse));
 
       await new Promise<void>(resolve => {
-        service.getLessonMaterials(folderId).subscribe(result => {
+        service.getLessonMaterialsByFolder(folderId).subscribe(result => {
           expect(requestService.get).toHaveBeenCalledWith(
             expect.stringContaining(`/folders/${folderId}/lesson-materials`),
             undefined,
@@ -292,13 +295,15 @@ describe('LessonMaterialsService', () => {
       (requestService.get as any).mockReturnValue(of(successResponse));
 
       await new Promise<void>(resolve => {
-        service.getLessonMaterials(folderId, mockRequest).subscribe(result => {
-          expect(result).toBeNull();
-          expect(service.lessonMaterials()).toEqual([]);
-          expect(service.totalRecords()).toBe(0);
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
+        service
+          .getLessonMaterialsByFolder(folderId, mockRequest)
+          .subscribe(result => {
+            expect(result).toBeNull();
+            expect(service.lessonMaterials()).toEqual([]);
+            expect(service.totalRecords()).toBe(0);
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            resolve();
+          });
       });
     });
 
@@ -310,13 +315,15 @@ describe('LessonMaterialsService', () => {
       (requestService.get as any).mockReturnValue(of(successResponse));
 
       await new Promise<void>(resolve => {
-        service.getLessonMaterials(folderId, mockRequest).subscribe(result => {
-          expect(result).toBeNull();
-          expect(service.lessonMaterials()).toEqual([]);
-          expect(service.totalRecords()).toBe(0);
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
+        service
+          .getLessonMaterialsByFolder(folderId, mockRequest)
+          .subscribe(result => {
+            expect(result).toBeNull();
+            expect(service.lessonMaterials()).toEqual([]);
+            expect(service.totalRecords()).toBe(0);
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            resolve();
+          });
       });
     });
 
@@ -328,15 +335,17 @@ describe('LessonMaterialsService', () => {
       (requestService.get as any).mockReturnValue(of(successResponse));
 
       await new Promise<void>(resolve => {
-        service.getLessonMaterials(folderId, mockRequest).subscribe(result => {
-          expect(result).toEqual({ data: [mockLessonMaterial], count: 5 });
-          expect(service.lessonMaterials()).toEqual({
-            data: [mockLessonMaterial],
-            count: 5,
+        service
+          .getLessonMaterialsByFolder(folderId, mockRequest)
+          .subscribe(result => {
+            expect(result).toEqual({ data: [mockLessonMaterial], count: 5 });
+            expect(service.lessonMaterials()).toEqual({
+              data: [mockLessonMaterial],
+              count: 5,
+            });
+            expect(service.totalRecords()).toBe(5);
+            resolve();
           });
-          expect(service.totalRecords()).toBe(5);
-          resolve();
-        });
       });
     });
   });
@@ -745,7 +754,7 @@ describe('LessonMaterialsService', () => {
       (requestService.get as any).mockReturnValue(of(successResponse));
 
       await new Promise<void>(resolve => {
-        service.getLessonMaterials('folder1').subscribe(() => {
+        service.getLessonMaterialsByFolder('folder1').subscribe(() => {
           expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
           expect(service.totalRecords()).toBe(0);
           resolve();
@@ -814,7 +823,7 @@ describe('LessonMaterialsService', () => {
       (requestService.get as any).mockReturnValue(of(successResponse));
 
       await new Promise<void>(resolve => {
-        service.getLessonMaterials('folder1').subscribe(result => {
+        service.getLessonMaterialsByFolder('folder1').subscribe(result => {
           expect(result).toBeNull();
           expect(service.lessonMaterials()).toEqual([]);
           expect(service.totalRecords()).toBe(0);
@@ -865,7 +874,7 @@ describe('LessonMaterialsService', () => {
       (requestService.get as any).mockReturnValue(of(successResponse));
 
       await new Promise<void>(resolve => {
-        service.getLessonMaterials('folder1').subscribe(result => {
+        service.getLessonMaterialsByFolder('folder1').subscribe(result => {
           expect(result).toEqual({ data: [mockLessonMaterial], count: 5 });
           expect(service.lessonMaterials()).toEqual({
             data: [mockLessonMaterial],
@@ -885,7 +894,7 @@ describe('LessonMaterialsService', () => {
       (requestService.get as any).mockReturnValue(of(successResponse));
 
       await new Promise<void>(resolve => {
-        service.getLessonMaterials('folder1').subscribe(result => {
+        service.getLessonMaterialsByFolder('folder1').subscribe(result => {
           expect(result).toEqual([mockLessonMaterial]);
           expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
           expect(service.totalRecords()).toBe(0);
@@ -945,7 +954,7 @@ describe('LessonMaterialsService', () => {
       (requestService.post as any).mockReturnValue(of(successResponse));
       (requestService.put as any).mockReturnValue(of(successResponse));
 
-      service.getLessonMaterials('test-folder');
+      service.getLessonMaterialsByFolder('test-folder');
       expect(requestService.get).toHaveBeenCalledWith(
         expect.stringContaining('/folders/test-folder/lesson-materials'),
         undefined,

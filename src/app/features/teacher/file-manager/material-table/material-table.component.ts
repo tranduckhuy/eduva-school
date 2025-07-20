@@ -109,7 +109,7 @@ export class MaterialTableComponent implements OnInit {
       searchTerm: this.searchTerm(),
     };
     this.lessonMaterialsService
-      .getLessonMaterials(this.folderId(), request)
+      .getLessonMaterialsByFolder(this.folderId(), request)
       .subscribe();
   }
 
