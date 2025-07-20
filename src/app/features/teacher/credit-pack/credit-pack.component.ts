@@ -21,6 +21,11 @@ import { type GetCreditPacksRequest } from './models/request/query/get-credit-pa
 import { type GetCreditTransactionRequest } from './models/request/query/get-credit-transaction-request.model';
 import { type ConfirmPaymentReturnRequest } from '../../../shared/models/api/request/query/confirm-payment-return-request.model';
 
+type PageChangeValue = {
+  currentPage: number;
+  pageSize?: number;
+};
+
 @Component({
   selector: 'app-credit-pack',
   standalone: true,
@@ -42,9 +47,10 @@ export class CreditPackComponent implements OnInit {
   creditTransactions = this.creditTransactionService.creditTransactions;
   totalRecords = this.creditTransactionService.totalRecords;
 
-  currentPage = signal(1);
-  pageSize = signal(PAGE_SIZE);
-  firstRecordIndex = signal(0);
+  currentPage = signal<number>(1);
+  pageSize = signal<number>(PAGE_SIZE);
+  firstRecordIndex = signal<number>(0);
+  shouldStopRequest = signal<boolean>(true);
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(params => {
@@ -59,7 +65,7 @@ export class CreditPackComponent implements OnInit {
         this.paymentService.confirmPaymentReturn(confirmRequest).subscribe({
           complete: () => {
             this.userService.getCurrentProfile().subscribe();
-            this.loadCreditTransactions(1);
+            this.loadCreditTransactions({ currentPage: 1 });
           },
         });
       }
@@ -71,20 +77,22 @@ export class CreditPackComponent implements OnInit {
 
   loadCreditPacks() {
     const request: GetCreditPacksRequest = {
-      pageIndex: this.currentPage(),
-      pageSize: this.pageSize(),
       sortBy: 'price',
     };
     this.creditPackService.getCreditPacks(request).subscribe();
   }
 
-  loadCreditTransactions(page?: number) {
+  loadCreditTransactions(pageChangeValue?: PageChangeValue) {
+    if (!this.shouldStopRequest()) return;
+
     const request: GetCreditTransactionRequest = {
-      pageIndex: page ?? this.currentPage(),
-      pageSize: this.pageSize(),
+      pageIndex: pageChangeValue?.currentPage ?? this.currentPage(),
+      pageSize: pageChangeValue?.pageSize ?? this.pageSize(),
       sortBy: 'createdAt',
       sortDirection: 'desc',
     };
-    this.creditTransactionService.getCreditTransactions(request).subscribe();
+    this.creditTransactionService.getCreditTransactions(request).subscribe({
+      error: () => this.shouldStopRequest.set(false),
+    });
   }
 }

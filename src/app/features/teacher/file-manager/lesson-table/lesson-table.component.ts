@@ -4,13 +4,12 @@ import {
   OnInit,
   inject,
   signal,
-  viewChild,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { TooltipModule } from 'primeng/tooltip';
-import { TableModule, TableLazyLoadEvent, Table } from 'primeng/table';
+import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
 import { ConfirmationService } from 'primeng/api';
 
@@ -59,9 +58,10 @@ export class LessonTableComponent implements OnInit {
   isLoading = this.loadingService.is('get-folders');
 
   currentPage = signal(1);
-  pageSize = signal(PAGE_SIZE);
+  pageSize = signal(3);
   firstRecordIndex = signal(0);
   searchValue = signal('');
+  shouldStopRequest = signal<boolean>(true);
 
   tableHeadSkeleton = signal([
     'Thư mục bài học',
@@ -71,15 +71,15 @@ export class LessonTableComponent implements OnInit {
     'Hành động',
   ]);
 
-  private readonly table = viewChild.required<Table>('table');
-
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(params => {
       const page = Number(params.get('page'));
       const size = Number(params.get('pageSize'));
 
-      this.currentPage.set(!isNaN(page) && page > 0 ? page : 1);
-      this.pageSize.set(!isNaN(size) && size > 0 ? size : PAGE_SIZE);
+      if (page && size) {
+        this.currentPage.set(!isNaN(page) && page > 0 ? page : 1);
+        this.pageSize.set(!isNaN(size) && size > 0 ? size : PAGE_SIZE);
+      }
 
       const firstIndex = (this.currentPage() - 1) * this.pageSize();
       this.firstRecordIndex.set(firstIndex);
@@ -90,10 +90,8 @@ export class LessonTableComponent implements OnInit {
     this.searchValue.set(searchTerm ?? '');
     this.currentPage.set(1);
     this.firstRecordIndex.set(0);
-    // Force table to reload
-    if (this.table()?.reset) {
-      this.table().reset();
-    }
+
+    this.fetchFolders();
   }
 
   onArchiveFolder(folderId: string) {
@@ -128,13 +126,7 @@ export class LessonTableComponent implements OnInit {
     this.pageSize.set(rows);
     this.firstRecordIndex.set(first);
 
-    const request: GetFoldersRequest = {
-      name: this.searchValue(),
-      pageIndex: page,
-      pageSize: rows,
-      status: EntityStatus.Active,
-    };
-    this.folderService.getPersonalFolders(request).subscribe();
+    this.fetchFolders();
   }
 
   openAddFolderModal(): void {
@@ -153,6 +145,21 @@ export class LessonTableComponent implements OnInit {
         page: this.currentPage(),
         pageSize: this.pageSize(),
       },
+    });
+  }
+
+  private fetchFolders(): void {
+    if (!this.shouldStopRequest()) return;
+
+    const request: GetFoldersRequest = {
+      name: this.searchValue(),
+      pageIndex: this.currentPage(),
+      pageSize: this.pageSize(),
+      status: EntityStatus.Active,
+    };
+
+    this.folderService.getPersonalFolders(request).subscribe({
+      error: () => this.shouldStopRequest.set(false),
     });
   }
 }

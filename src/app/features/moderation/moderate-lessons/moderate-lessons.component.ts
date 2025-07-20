@@ -59,6 +59,7 @@ export class ModerateLessonsComponent {
   pageSize = signal(PAGE_SIZE);
   firstRecordIndex = signal(0);
   searchTerm = signal('');
+  shouldStopRequest = signal<boolean>(true);
 
   tableHeadSkeleton = signal([
     'Tài liệu bài học',
@@ -68,10 +69,6 @@ export class ModerateLessonsComponent {
     'Trạng thái',
     'Hành động',
   ]);
-
-  ngOnInit(): void {
-    this.onSearch();
-  }
 
   onLazyLoad(event: TableLazyLoadEvent): void {
     const rows = event.rows ?? this.pageSize();
@@ -122,12 +119,16 @@ export class ModerateLessonsComponent {
   }
 
   private loadMaterials(): void {
+    if (!this.shouldStopRequest()) return;
+
     const request: GetPendingLessonMaterialsRequest = {
       searchTerm: this.searchTerm(),
       pageIndex: this.currentPage(),
       pageSize: this.pageSize(),
     };
 
-    this.lessonMaterialsService.getPendingLessonMaterials(request).subscribe();
+    this.lessonMaterialsService.getPendingLessonMaterials(request).subscribe({
+      error: () => this.shouldStopRequest.set(false),
+    });
   }
 }

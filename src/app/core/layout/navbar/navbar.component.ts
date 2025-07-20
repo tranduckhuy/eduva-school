@@ -65,11 +65,20 @@ export class NavbarComponent implements OnInit {
     this.user()?.roles.includes(UserRoles.SCHOOL_ADMIN)
   );
 
-  schoolAndPlanMissing = computed(
-    () =>
-      !this.user()?.school ||
-      !this.user()?.userSubscriptionResponse.isSubscriptionActive
-  );
+  schoolMissing = computed(() => !this.user()?.school);
+  planExpired = computed(() => {
+    const isPlanActive =
+      this.user()?.userSubscriptionResponse.isSubscriptionActive;
+    const subscriptionEnd =
+      this.user()?.userSubscriptionResponse.subscriptionEndDate;
+
+    return (
+      isPlanActive &&
+      subscriptionEnd &&
+      !isPlanActive &&
+      new Date(subscriptionEnd) < new Date()
+    );
+  });
 
   navConfigs: NavbarConfig[] = [];
 
@@ -141,7 +150,7 @@ export class NavbarComponent implements OnInit {
     const isTeacher = role === UserRoles.TEACHER;
     const isModerator = role === UserRoles.CONTENT_MODERATOR;
     const isTeacherOrMod = isTeacher || isModerator;
-    const schoolMissing = this.schoolAndPlanMissing();
+    const schoolMissing = this.schoolMissing();
 
     const dashboardLink = isAdmin ? '/school-admin' : '/teacher';
     const profileLink = isAdmin

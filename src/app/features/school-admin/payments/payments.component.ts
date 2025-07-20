@@ -3,7 +3,6 @@ import {
   Component,
   inject,
   signal,
-  OnInit,
 } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -46,7 +45,7 @@ import { type PaymentListParams } from './model/payment-list-params';
   styleUrl: './payments.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PaymentsComponent implements OnInit {
+export class PaymentsComponent {
   private readonly paymentService = inject(SchoolPaymentService);
   private readonly loadingService = inject(LoadingService);
 
@@ -60,6 +59,8 @@ export class PaymentsComponent implements OnInit {
     { name: string; value: string | undefined } | undefined
   >(undefined);
   searchTerm = signal<string>('');
+  shouldStopRequest = signal<boolean>(true);
+
   tableHeadSkeleton = signal([
     'STT',
     'Khách hàng',
@@ -81,10 +82,6 @@ export class PaymentsComponent implements OnInit {
 
   payments = this.paymentService.payments;
   totalPayments = this.paymentService.totalPayments;
-
-  ngOnInit(): void {
-    this.loadData();
-  }
 
   onTimeFilterChange(
     selected: { name: string; value: string | undefined } | undefined
@@ -145,6 +142,8 @@ export class PaymentsComponent implements OnInit {
   }
 
   private loadData(): void {
+    if (!this.shouldStopRequest()) return;
+
     const params: PaymentListParams = {
       pageIndex: Math.floor(this.first() / this.rows()) + 1,
       pageSize: this.rows(),
@@ -156,6 +155,8 @@ export class PaymentsComponent implements OnInit {
       paymentMethod: 1,
     };
 
-    this.paymentService.getPayments(params).subscribe();
+    this.paymentService.getPayments(params).subscribe({
+      error: () => this.shouldStopRequest.set(false),
+    });
   }
 }

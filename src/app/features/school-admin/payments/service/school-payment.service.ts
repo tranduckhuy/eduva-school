@@ -1,6 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
 
 import { Payment } from '../../../../shared/models/entities/payment.model';
 import { PaymentListParams } from '../model/payment-list-params';
@@ -124,9 +125,9 @@ export class SchoolPaymentService {
         this.toastService.errorGeneral();
         return null;
       }),
-      catchError(() => {
+      catchError((err: HttpErrorResponse) => {
         this.toastService.errorGeneral();
-        return of(null);
+        return throwError(() => err);
       })
     );
   }

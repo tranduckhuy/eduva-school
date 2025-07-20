@@ -136,9 +136,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       const isNotFound = error.status === 404;
       const isServerError = error.status === 0 || error.status >= 500;
 
-      const statusCode = error.error?.statusCode;
+      const errorStatusCode = error.error?.statusCode;
 
-      if (!statusCode) return throwError(() => error);
+      if (!errorStatusCode) return throwError(() => error);
 
       if (isServerError) {
         handleServerError();
@@ -153,14 +153,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (
         isPaymentRequired &&
         !isByPassPayment &&
-        statusCode === statusCode.SUBSCRIPTION_EXPIRED_WITH_DATA_LOSS_RISK
+        errorStatusCode === StatusCode.SUBSCRIPTION_EXPIRED_WITH_DATA_LOSS_RISK
       ) {
         handleSubscriptionExpired();
         return throwError(() => error);
       }
 
       if (isForbidden && !isByPassAuth) {
-        if (statusCode === StatusCode.SCHOOL_AND_SUBSCRIPTION_REQUIRED) {
+        if (errorStatusCode === StatusCode.SCHOOL_AND_SUBSCRIPTION_REQUIRED) {
           handleMissingSchoolOrSubscription();
         } else {
           handleForbidden();
@@ -170,7 +170,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
       if (
         isNotFound &&
-        statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND
+        errorStatusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND
       ) {
         handleMissingSchoolOrSubscription();
         return throwError(() => error);

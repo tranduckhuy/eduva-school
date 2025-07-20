@@ -55,10 +55,7 @@ export class FormControlComponent
   readOnly = input<boolean>(false);
   isTextarea = input<boolean>(false);
   rows = input<number>(3);
-  redirectLink = input<{ value: string; href: string }>({
-    value: '',
-    href: '#!',
-  });
+  redirectLink = input<{ value: string; href: string } | null>(null);
   placeholder = input<string>('');
   options = input<Array<{ label: string; value: string }>>([]);
   maxLength = input<number>(0);
