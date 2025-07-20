@@ -11,8 +11,9 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 
-import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
+import { ImageModule } from 'primeng/image';
+import { SkeletonModule } from 'primeng/skeleton';
 import { DrawerModule } from 'primeng/drawer';
 
 import { SafeHtmlPipe } from '../../../pipes/safe-html.pipe';
@@ -33,14 +34,19 @@ import { PdfViewerComponent } from '../pdf-viewer/pdf-viewer.component';
 import { PreviewLessonSkeletonComponent } from '../../skeleton/preview-lesson-skeleton/preview-lesson-skeleton.component';
 import { ModerateReasonModalComponent } from '../../../../features/moderation/moderate-lessons/moderate-reason-modal/moderate-reason-modal.component';
 import { CommentModalComponent } from '../../comment-components/comment-modal/comment-modal.component';
+import {
+  ContentParserService,
+  RenderBlock,
+} from '../../../services/layout/content-parse/content-parse.service';
 
 @Component({
   selector: 'app-preview-lesson',
   standalone: true,
   imports: [
     CommonModule,
-    SkeletonModule,
     ButtonModule,
+    ImageModule,
+    SkeletonModule,
     DrawerModule,
     SafeHtmlPipe,
     PdfViewerComponent,
@@ -61,6 +67,7 @@ export class PreviewLessonComponent implements OnInit {
   private readonly lessonMaterialService = inject(LessonMaterialsService);
   private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
+  private readonly contentParseService = inject(ContentParserService);
 
   materialId = input.required<string>();
 
@@ -72,6 +79,8 @@ export class PreviewLessonComponent implements OnInit {
   currentPage = signal<number>(1);
   pageSize = signal<number>(PAGE_SIZE);
   isApprovedLesson = signal<boolean>(false);
+
+  contentBlocks = signal<RenderBlock[]>([]);
 
   showCommentButton = computed(() => {
     const lessonMaterial = this.lessonMaterial();
@@ -104,6 +113,7 @@ export class PreviewLessonComponent implements OnInit {
 
   private readonly showCommentButtonPaths = ['/teacher/file-manager'];
   private readonly showActionButtonPaths = ['/moderation/view-lesson'];
+
   visible = false;
 
   constructor() {
@@ -126,7 +136,16 @@ export class PreviewLessonComponent implements OnInit {
 
     this.lessonMaterialService
       .getLessonMaterialById(this.materialId())
-      .subscribe();
+      .subscribe({
+        next: () => {
+          const lessonMaterial = this.lessonMaterial();
+          const rawDescription = lessonMaterial
+            ? lessonMaterial.description
+            : '';
+
+          this.contentParse(rawDescription);
+        },
+      });
   }
 
   formatUpdateDate(input?: string | null): string {
@@ -152,5 +171,11 @@ export class PreviewLessonComponent implements OnInit {
 
   refuseLesson() {
     this.openModerateReasonModal(false);
+  }
+
+  private contentParse(content: string) {
+    this.contentBlocks.set(
+      this.contentParseService.convertHtmlToBlocks(content)
+    );
   }
 }

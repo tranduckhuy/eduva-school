@@ -72,7 +72,7 @@ export class UserCommentTextboxComponent implements OnInit {
       : this.mentionValue;
 
     this.commentValue.set(value);
-    this.form.get('content')?.patchValue(value);
+    this.content?.patchValue(value);
   }
 
   get content() {
@@ -138,7 +138,7 @@ export class UserCommentTextboxComponent implements OnInit {
   }
 
   getContent(content: string) {
-    this.form.get('content')?.patchValue(content);
+    this.content?.patchValue(content);
   }
 
   getErrorMessage(controlName: string): string {

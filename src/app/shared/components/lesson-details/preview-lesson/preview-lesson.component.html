@@ -69,9 +69,25 @@
       {{ formatUpdateDate(lessonMaterial()?.lastModifiedAt) }}
     </p>
     @if (lessonMaterial()?.description) {
-      <div
-        class="lesson-content"
-        [innerHTML]="lessonMaterial()!.description | safeHtml"></div>
+      <div class="lesson-content mt-5 pl-[7.5%] pr-[7.5%]">
+        @for (block of contentBlocks(); track $index) {
+          @if (block.type === 'html') {
+            <div [innerHTML]="block.html | safeHtml"></div>
+          }
+
+          @if (block.type === 'image') {
+            <p>
+              <p-image
+                [src]="block.src"
+                [alt]="block.alt"
+                [style]="{ width: block.width }"
+                preview="true"
+                loading="lazy"
+                appendTo="body"></p-image>
+            </p>
+          }
+        }
+      </div>
     }
   }
 </div>
