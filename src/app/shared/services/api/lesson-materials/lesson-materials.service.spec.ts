@@ -8,6 +8,7 @@ import { ToastHandlingService } from '../../core/toast/toast-handling.service';
 import { StatusCode } from '../../../constants/status-code.constant';
 import { LessonMaterial } from '../../../models/entities/lesson-material.model';
 import { CreateLessonMaterialsRequest } from '../../../models/api/request/command/create-lesson-material-request.model';
+import { UpdateLessonMaterialRequest } from '../../../models/api/request/command/update-lesson-material-request.model';
 import {
   GetLessonMaterialsRequest,
   GetPendingLessonMaterialsRequest,
@@ -45,14 +46,14 @@ describe('LessonMaterialsService', () => {
     schoolId: 1,
     title: 'Test Material',
     description: 'Test Description',
-    contentType: 'pdf' as any,
+    contentType: 3, // PDF
     tag: 'test',
-    lessonStatus: 'active' as any,
+    lessonStatus: 1, // Approved
     duration: 60,
     fileSize: 1024,
     isAIContent: false,
     sourceUrl: 'http://example.com/file.pdf',
-    visibility: 'public' as any,
+    visibility: 1, // School
     createdAt: '2024-01-01T00:00:00Z',
     lastModifiedAt: null,
     status: 0, // EntityStatus.Active
@@ -113,7 +114,7 @@ describe('LessonMaterialsService', () => {
         {
           title: 'Test Material',
           description: 'Test Description',
-          contentType: 'pdf' as any,
+          contentType: 3, // PDF
           tag: 'test',
           duration: 60,
           fileSize: 1024,
@@ -127,34 +128,34 @@ describe('LessonMaterialsService', () => {
       const successResponse = { statusCode: StatusCode.SUCCESS };
       (requestService.post as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.createLessonMaterials(mockRequest).subscribe(() => {
-          expect(requestService.post).toHaveBeenCalledWith(
-            expect.stringContaining('/lesson-materials'),
-            mockRequest
-          );
-          expect(toastHandlingService.success).toHaveBeenCalledWith(
-            'Tải lên thành công',
-            'Tất cả tài liệu đã được tải lên thành công.'
-          );
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.createLessonMaterials(mockRequest)
+      );
+
+      expect(requestService.post).toHaveBeenCalledWith(
+        expect.stringContaining('/lesson-materials'),
+        mockRequest
+      );
+      expect(result).toBeNull();
+      expect(toastHandlingService.success).toHaveBeenCalledWith(
+        'Tải lên thành công',
+        'Tất cả tài liệu đã được tải lên thành công.'
+      );
     });
 
     it('should handle create failure', async () => {
       const failureResponse = { statusCode: StatusCode.MODEL_INVALID };
       (requestService.post as any).mockReturnValue(of(failureResponse));
 
-      await new Promise<void>(resolve => {
-        service.createLessonMaterials(mockRequest).subscribe(() => {
-          expect(toastHandlingService.error).toHaveBeenCalledWith(
-            'Tải lên thất bại',
-            'Không thể tải lên tài liệu. Vui lòng thử lại sau.'
-          );
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.createLessonMaterials(mockRequest)
+      );
+
+      expect(result).toBeNull();
+      expect(toastHandlingService.error).toHaveBeenCalledWith(
+        'Tải lên thất bại',
+        'Không thể tải lên tài liệu. Vui lòng thử lại sau.'
+      );
     });
 
     it('should handle school subscription not found error', async () => {
@@ -164,27 +165,25 @@ describe('LessonMaterialsService', () => {
       });
       (requestService.post as any).mockReturnValue(throwError(() => error));
 
-      await new Promise<void>(resolve => {
-        service.createLessonMaterials(mockRequest).subscribe(() => {
-          expect(toastHandlingService.warn).toHaveBeenCalledWith(
-            'Thiếu gói đăng ký',
-            'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
-          );
-          resolve();
-        });
-      });
+      await expect(
+        lastValueFrom(service.createLessonMaterials(mockRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Thiếu gói đăng ký',
+        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+      );
     });
 
     it('should handle general error', async () => {
       const error = new HttpErrorResponse({ status: 500 });
       (requestService.post as any).mockReturnValue(throwError(() => error));
 
-      await new Promise<void>(resolve => {
-        service.createLessonMaterials(mockRequest).subscribe(() => {
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      await expect(
+        lastValueFrom(service.createLessonMaterials(mockRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle error without error.error property', async () => {
@@ -194,12 +193,83 @@ describe('LessonMaterialsService', () => {
       });
       (requestService.post as any).mockReturnValue(throwError(() => error));
 
-      await new Promise<void>(resolve => {
-        service.createLessonMaterials(mockRequest).subscribe(() => {
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
+      await expect(
+        lastValueFrom(service.createLessonMaterials(mockRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+  });
+
+  describe('updateLessonMaterial', () => {
+    const materialId = 'material1';
+    const mockRequest: UpdateLessonMaterialRequest = {
+      id: materialId,
+      title: 'Updated Material',
+      description: 'Updated Description',
+      visibility: 1, // School
+    };
+
+    it('should update lesson material successfully', async () => {
+      const successResponse = { statusCode: StatusCode.SUCCESS };
+      (requestService.put as any).mockReturnValue(of(successResponse));
+
+      const result = await lastValueFrom(
+        service.updateLessonMaterial(materialId, mockRequest)
+      );
+
+      expect(requestService.put).toHaveBeenCalledWith(
+        expect.stringContaining(`/lesson-materials/${materialId}`),
+        mockRequest
+      );
+      expect(result).toBeNull();
+      expect(toastHandlingService.success).toHaveBeenCalledWith(
+        'Cập nhật thành công',
+        'Thông tin của tài liệu đã được cập nhật thành công.'
+      );
+    });
+
+    it('should handle update failure', async () => {
+      const failureResponse = { statusCode: StatusCode.MODEL_INVALID };
+      (requestService.put as any).mockReturnValue(of(failureResponse));
+
+      const result = await lastValueFrom(
+        service.updateLessonMaterial(materialId, mockRequest)
+      );
+
+      expect(result).toBeNull();
+      expect(toastHandlingService.error).toHaveBeenCalledWith(
+        'Cập nhật thất bại',
+        'Không thể cập nhật thông tin tài liệu. Vui lòng thử lại sau.'
+      );
+    });
+
+    it('should handle HTTP error for update', async () => {
+      const error = new HttpErrorResponse({ status: 500 });
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.updateLessonMaterial(materialId, mockRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle school subscription not found error for update', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
+        status: 400,
       });
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.updateLessonMaterial(materialId, mockRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Thiếu gói đăng ký',
+        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+      );
     });
   });
 
@@ -218,48 +288,41 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterials(folderId, mockRequest).subscribe(result => {
-          expect(requestService.get).toHaveBeenCalledWith(
-            expect.stringContaining(`/folders/${folderId}/lesson-materials`),
-            mockRequest,
-            { loadingKey: 'get-materials' }
-          );
-          expect(result).toEqual([mockLessonMaterial]);
-          expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
-          expect(service.totalRecords()).toBe(0); // count is not set for list response
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getLessonMaterials(folderId, mockRequest)
+      );
+
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/folders/${folderId}/lesson-materials`),
+        mockRequest,
+        { loadingKey: 'get-materials' }
+      );
+      expect(result).toEqual([mockLessonMaterial]);
+      expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+      expect(service.totalRecords()).toBe(0); // count is not set for list response
     });
 
     it('should handle get lesson materials failure', async () => {
       const failureResponse = { statusCode: StatusCode.MODEL_INVALID };
       (requestService.get as any).mockReturnValue(of(failureResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterials(folderId, mockRequest).subscribe(result => {
-          expect(result).toBeNull();
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getLessonMaterials(folderId, mockRequest)
+      );
+
+      expect(result).toBeNull();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle HTTP error', async () => {
       const error = new HttpErrorResponse({ status: 500 });
       (requestService.get as any).mockReturnValue(throwError(() => error));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterials(folderId, mockRequest).subscribe({
-          next: () => {},
-          error: err => {
-            expect(err).toBe(error);
-            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-            resolve();
-          },
-        });
-      });
+      await expect(
+        lastValueFrom(service.getLessonMaterials(folderId, mockRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should get lesson materials without request params', async () => {
@@ -269,19 +332,16 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterials(folderId).subscribe(result => {
-          expect(requestService.get).toHaveBeenCalledWith(
-            expect.stringContaining(`/folders/${folderId}/lesson-materials`),
-            undefined,
-            { loadingKey: 'get-materials' }
-          );
-          expect(result).toEqual([mockLessonMaterial]);
-          expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
-          expect(service.totalRecords()).toBe(0);
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(service.getLessonMaterials(folderId));
+
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/folders/${folderId}/lesson-materials`),
+        undefined,
+        { loadingKey: 'get-materials' }
+      );
+      expect(result).toEqual([mockLessonMaterial]);
+      expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+      expect(service.totalRecords()).toBe(0);
     });
 
     it('should handle response with null data', async () => {
@@ -291,15 +351,14 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterials(folderId, mockRequest).subscribe(result => {
-          expect(result).toBeNull();
-          expect(service.lessonMaterials()).toEqual([]);
-          expect(service.totalRecords()).toBe(0);
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getLessonMaterials(folderId, mockRequest)
+      );
+
+      expect(result).toBeNull();
+      expect(service.lessonMaterials()).toEqual([]);
+      expect(service.totalRecords()).toBe(0);
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle response with undefined data', async () => {
@@ -309,15 +368,14 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterials(folderId, mockRequest).subscribe(result => {
-          expect(result).toBeNull();
-          expect(service.lessonMaterials()).toEqual([]);
-          expect(service.totalRecords()).toBe(0);
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getLessonMaterials(folderId, mockRequest)
+      );
+
+      expect(result).toBeNull();
+      expect(service.lessonMaterials()).toEqual([]);
+      expect(service.totalRecords()).toBe(0);
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle response with data containing count property', async () => {
@@ -327,17 +385,16 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterials(folderId, mockRequest).subscribe(result => {
-          expect(result).toEqual({ data: [mockLessonMaterial], count: 5 });
-          expect(service.lessonMaterials()).toEqual({
-            data: [mockLessonMaterial],
-            count: 5,
-          });
-          expect(service.totalRecords()).toBe(5);
-          resolve();
-        });
+      const result = await lastValueFrom(
+        service.getLessonMaterials(folderId, mockRequest)
+      );
+
+      expect(result).toEqual({ data: [mockLessonMaterial], count: 5 });
+      expect(service.lessonMaterials()).toEqual({
+        data: [mockLessonMaterial],
+        count: 5,
       });
+      expect(service.totalRecords()).toBe(5);
     });
   });
 
@@ -354,48 +411,41 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getPendingLessonMaterials(mockRequest).subscribe(result => {
-          expect(requestService.get).toHaveBeenCalledWith(
-            expect.stringContaining('/lesson-materials/pending-approval'),
-            mockRequest,
-            { loadingKey: 'get-materials' }
-          );
-          expect(result).toEqual([mockLessonMaterial]);
-          expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
-          expect(service.totalRecords()).toBe(1);
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getPendingLessonMaterials(mockRequest)
+      );
+
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining('/lesson-materials/pending-approval'),
+        mockRequest,
+        { loadingKey: 'get-materials' }
+      );
+      expect(result).toEqual([mockLessonMaterial]);
+      expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+      expect(service.totalRecords()).toBe(1);
     });
 
     it('should handle get pending lesson materials failure', async () => {
       const failureResponse = { statusCode: StatusCode.MODEL_INVALID };
       (requestService.get as any).mockReturnValue(of(failureResponse));
 
-      await new Promise<void>(resolve => {
-        service.getPendingLessonMaterials(mockRequest).subscribe(result => {
-          expect(result).toBeNull();
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getPendingLessonMaterials(mockRequest)
+      );
+
+      expect(result).toBeNull();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle HTTP error for pending materials', async () => {
       const error = new HttpErrorResponse({ status: 500 });
       (requestService.get as any).mockReturnValue(throwError(() => error));
 
-      await new Promise<void>(resolve => {
-        service.getPendingLessonMaterials(mockRequest).subscribe({
-          next: () => {},
-          error: err => {
-            expect(err).toBe(error);
-            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-            resolve();
-          },
-        });
-      });
+      await expect(
+        lastValueFrom(service.getPendingLessonMaterials(mockRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle response with null data', async () => {
@@ -405,15 +455,14 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getPendingLessonMaterials(mockRequest).subscribe(result => {
-          expect(result).toEqual([]);
-          expect(service.lessonMaterials()).toEqual([]);
-          expect(service.totalRecords()).toBe(0);
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getPendingLessonMaterials(mockRequest)
+      );
+
+      expect(result).toEqual([]);
+      expect(service.lessonMaterials()).toEqual([]);
+      expect(service.totalRecords()).toBe(0);
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle response with undefined data', async () => {
@@ -423,15 +472,14 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getPendingLessonMaterials(mockRequest).subscribe(result => {
-          expect(result).toEqual([]);
-          expect(service.lessonMaterials()).toEqual([]);
-          expect(service.totalRecords()).toBe(0);
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getPendingLessonMaterials(mockRequest)
+      );
+
+      expect(result).toEqual([]);
+      expect(service.lessonMaterials()).toEqual([]);
+      expect(service.totalRecords()).toBe(0);
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle response with undefined data.data', async () => {
@@ -441,14 +489,13 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getPendingLessonMaterials(mockRequest).subscribe(result => {
-          expect(result).toEqual([]);
-          expect(service.lessonMaterials()).toEqual([]);
-          expect(service.totalRecords()).toBe(0);
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getPendingLessonMaterials(mockRequest)
+      );
+
+      expect(result).toEqual([]);
+      expect(service.lessonMaterials()).toEqual([]);
+      expect(service.totalRecords()).toBe(0);
     });
 
     it('should handle response with null count', async () => {
@@ -458,14 +505,13 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getPendingLessonMaterials(mockRequest).subscribe(result => {
-          expect(result).toEqual([mockLessonMaterial]);
-          expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
-          expect(service.totalRecords()).toBe(0);
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getPendingLessonMaterials(mockRequest)
+      );
+
+      expect(result).toEqual([mockLessonMaterial]);
+      expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+      expect(service.totalRecords()).toBe(0);
     });
   });
 
@@ -482,48 +528,41 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getSharedLessonMaterials(mockRequest).subscribe(result => {
-          expect(requestService.get).toHaveBeenCalledWith(
-            expect.stringContaining('/lesson-materials/school-public'),
-            mockRequest,
-            { loadingKey: 'get-materials' }
-          );
-          expect(result).toEqual([mockLessonMaterial]);
-          expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
-          expect(service.totalRecords()).toBe(1);
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getSharedLessonMaterials(mockRequest)
+      );
+
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining('/lesson-materials/school-public'),
+        mockRequest,
+        { loadingKey: 'get-materials' }
+      );
+      expect(result).toEqual([mockLessonMaterial]);
+      expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+      expect(service.totalRecords()).toBe(1);
     });
 
     it('should handle get shared lesson materials failure', async () => {
       const failureResponse = { statusCode: StatusCode.MODEL_INVALID };
       (requestService.get as any).mockReturnValue(of(failureResponse));
 
-      await new Promise<void>(resolve => {
-        service.getSharedLessonMaterials(mockRequest).subscribe(result => {
-          expect(result).toBeNull();
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getSharedLessonMaterials(mockRequest)
+      );
+
+      expect(result).toBeNull();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle HTTP error for shared materials', async () => {
       const error = new HttpErrorResponse({ status: 500 });
       (requestService.get as any).mockReturnValue(throwError(() => error));
 
-      await new Promise<void>(resolve => {
-        service.getSharedLessonMaterials(mockRequest).subscribe({
-          next: () => {},
-          error: err => {
-            expect(err).toBe(error);
-            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-            resolve();
-          },
-        });
-      });
+      await expect(
+        lastValueFrom(service.getSharedLessonMaterials(mockRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle response with null data', async () => {
@@ -533,15 +572,14 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getSharedLessonMaterials(mockRequest).subscribe(result => {
-          expect(result).toEqual([]);
-          expect(service.lessonMaterials()).toEqual([]);
-          expect(service.totalRecords()).toBe(0);
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getSharedLessonMaterials(mockRequest)
+      );
+
+      expect(result).toEqual([]);
+      expect(service.lessonMaterials()).toEqual([]);
+      expect(service.totalRecords()).toBe(0);
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle response with undefined data', async () => {
@@ -551,15 +589,14 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getSharedLessonMaterials(mockRequest).subscribe(result => {
-          expect(result).toEqual([]);
-          expect(service.lessonMaterials()).toEqual([]);
-          expect(service.totalRecords()).toBe(0);
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getSharedLessonMaterials(mockRequest)
+      );
+
+      expect(result).toEqual([]);
+      expect(service.lessonMaterials()).toEqual([]);
+      expect(service.totalRecords()).toBe(0);
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
   });
 
@@ -573,45 +610,38 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterialById(materialId).subscribe(result => {
-          expect(requestService.get).toHaveBeenCalledWith(
-            expect.stringContaining(`/lesson-materials/${materialId}`)
-          );
-          expect(result).toEqual(mockLessonMaterial);
-          expect(service.lessonMaterial()).toEqual(mockLessonMaterial);
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getLessonMaterialById(materialId)
+      );
+
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/lesson-materials/${materialId}`)
+      );
+      expect(result).toEqual(mockLessonMaterial);
+      expect(service.lessonMaterial()).toEqual(mockLessonMaterial);
     });
 
     it('should handle get lesson material by id failure', async () => {
       const failureResponse = { statusCode: StatusCode.MODEL_INVALID };
       (requestService.get as any).mockReturnValue(of(failureResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterialById(materialId).subscribe(result => {
-          expect(result).toBeNull();
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getLessonMaterialById(materialId)
+      );
+
+      expect(result).toBeNull();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle HTTP error for get by id', async () => {
       const error = new HttpErrorResponse({ status: 500 });
       (requestService.get as any).mockReturnValue(throwError(() => error));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterialById(materialId).subscribe({
-          next: () => {},
-          error: err => {
-            expect(err).toBe(error);
-            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-            resolve();
-          },
-        });
-      });
+      await expect(
+        lastValueFrom(service.getLessonMaterialById(materialId))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle response with null data', async () => {
@@ -621,14 +651,13 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterialById(materialId).subscribe(result => {
-          expect(result).toBeNull();
-          expect(service.lessonMaterial()).toBeNull();
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getLessonMaterialById(materialId)
+      );
+
+      expect(result).toBeNull();
+      expect(service.lessonMaterial()).toBeNull();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle response with undefined data', async () => {
@@ -638,14 +667,13 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterialById(materialId).subscribe(result => {
-          expect(result).toBeUndefined();
-          expect(service.lessonMaterial()).toBeNull();
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getLessonMaterialById(materialId)
+      );
+
+      expect(result).toBeUndefined();
+      expect(service.lessonMaterial()).toBeNull();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
   });
 
@@ -660,53 +688,42 @@ describe('LessonMaterialsService', () => {
       const successResponse = { statusCode: StatusCode.SUCCESS };
       (requestService.put as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service
-          .approveRejectMaterial(mockRequest, materialId)
-          .subscribe(result => {
-            expect(requestService.put).toHaveBeenCalledWith(
-              expect.stringContaining(
-                `/lesson-materials/${materialId}/pending-approval`
-              ),
-              mockRequest,
-              { loadingKey: 'approve-reject-material' }
-            );
-            expect(result).toBeNull();
-            expect(toastHandlingService.successGeneral).toHaveBeenCalled();
-            resolve();
-          });
-      });
+      const result = await lastValueFrom(
+        service.approveRejectMaterial(mockRequest, materialId)
+      );
+
+      expect(requestService.put).toHaveBeenCalledWith(
+        expect.stringContaining(
+          `/lesson-materials/${materialId}/pending-approval`
+        ),
+        mockRequest,
+        { loadingKey: 'approve-reject-material' }
+      );
+      expect(result).toBeNull();
+      expect(toastHandlingService.successGeneral).toHaveBeenCalled();
     });
 
     it('should handle approve/reject material failure', async () => {
       const failureResponse = { statusCode: StatusCode.MODEL_INVALID };
       (requestService.put as any).mockReturnValue(of(failureResponse));
 
-      await new Promise<void>(resolve => {
-        service
-          .approveRejectMaterial(mockRequest, materialId)
-          .subscribe(result => {
-            expect(result).toBeNull();
-            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-            resolve();
-          });
-      });
+      const result = await lastValueFrom(
+        service.approveRejectMaterial(mockRequest, materialId)
+      );
+
+      expect(result).toBeNull();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle HTTP error for approve/reject', async () => {
       const error = new HttpErrorResponse({ status: 500 });
       (requestService.put as any).mockReturnValue(throwError(() => error));
 
-      await new Promise<void>(resolve => {
-        service.approveRejectMaterial(mockRequest, materialId).subscribe({
-          next: () => {},
-          error: err => {
-            expect(err).toBe(error);
-            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-            resolve();
-          },
-        });
-      });
+      await expect(
+        lastValueFrom(service.approveRejectMaterial(mockRequest, materialId))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle reject material with feedback', async () => {
@@ -717,22 +734,36 @@ describe('LessonMaterialsService', () => {
       const successResponse = { statusCode: StatusCode.SUCCESS };
       (requestService.put as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service
-          .approveRejectMaterial(rejectRequest, materialId)
-          .subscribe(result => {
-            expect(requestService.put).toHaveBeenCalledWith(
-              expect.stringContaining(
-                `/lesson-materials/${materialId}/pending-approval`
-              ),
-              rejectRequest,
-              { loadingKey: 'approve-reject-material' }
-            );
-            expect(result).toBeNull();
-            expect(toastHandlingService.successGeneral).toHaveBeenCalled();
-            resolve();
-          });
+      const result = await lastValueFrom(
+        service.approveRejectMaterial(rejectRequest, materialId)
+      );
+
+      expect(requestService.put).toHaveBeenCalledWith(
+        expect.stringContaining(
+          `/lesson-materials/${materialId}/pending-approval`
+        ),
+        rejectRequest,
+        { loadingKey: 'approve-reject-material' }
+      );
+      expect(result).toBeNull();
+      expect(toastHandlingService.successGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle school subscription not found error for approve/reject', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
+        status: 400,
       });
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.approveRejectMaterial(mockRequest, materialId))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Thiếu gói đăng ký',
+        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+      );
     });
   });
 
@@ -744,13 +775,10 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterials('folder1').subscribe(() => {
-          expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
-          expect(service.totalRecords()).toBe(0);
-          resolve();
-        });
-      });
+      await lastValueFrom(service.getLessonMaterials('folder1'));
+
+      expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+      expect(service.totalRecords()).toBe(0);
     });
 
     it('should update signals when getting pending materials', async () => {
@@ -760,15 +788,12 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service
-          .getPendingLessonMaterials({ pageIndex: 1, pageSize: 10 })
-          .subscribe(() => {
-            expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
-            expect(service.totalRecords()).toBe(1);
-            resolve();
-          });
-      });
+      await lastValueFrom(
+        service.getPendingLessonMaterials({ pageIndex: 1, pageSize: 10 })
+      );
+
+      expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+      expect(service.totalRecords()).toBe(1);
     });
 
     it('should update lesson material signal when getting by id', async () => {
@@ -778,12 +803,9 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterialById('material1').subscribe(() => {
-          expect(service.lessonMaterial()).toEqual(mockLessonMaterial);
-          resolve();
-        });
-      });
+      await lastValueFrom(service.getLessonMaterialById('material1'));
+
+      expect(service.lessonMaterial()).toEqual(mockLessonMaterial);
     });
 
     it('should update signals when getting shared materials', async () => {
@@ -793,15 +815,12 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service
-          .getSharedLessonMaterials({ pageIndex: 1, pageSize: 10 })
-          .subscribe(() => {
-            expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
-            expect(service.totalRecords()).toBe(1);
-            resolve();
-          });
-      });
+      await lastValueFrom(
+        service.getSharedLessonMaterials({ pageIndex: 1, pageSize: 10 })
+      );
+
+      expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+      expect(service.totalRecords()).toBe(1);
     });
   });
 
@@ -813,15 +832,12 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterials('folder1').subscribe(result => {
-          expect(result).toBeNull();
-          expect(service.lessonMaterials()).toEqual([]);
-          expect(service.totalRecords()).toBe(0);
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(service.getLessonMaterials('folder1'));
+
+      expect(result).toBeNull();
+      expect(service.lessonMaterials()).toEqual([]);
+      expect(service.totalRecords()).toBe(0);
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle undefined data in paging response', async () => {
@@ -847,14 +863,13 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterialById('material1').subscribe(result => {
-          expect(result).toBeNull();
-          expect(service.lessonMaterial()).toBeNull();
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(
+        service.getLessonMaterialById('material1')
+      );
+
+      expect(result).toBeNull();
+      expect(service.lessonMaterial()).toBeNull();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle response with count property in list response', async () => {
@@ -864,17 +879,14 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterials('folder1').subscribe(result => {
-          expect(result).toEqual({ data: [mockLessonMaterial], count: 5 });
-          expect(service.lessonMaterials()).toEqual({
-            data: [mockLessonMaterial],
-            count: 5,
-          });
-          expect(service.totalRecords()).toBe(5);
-          resolve();
-        });
+      const result = await lastValueFrom(service.getLessonMaterials('folder1'));
+
+      expect(result).toEqual({ data: [mockLessonMaterial], count: 5 });
+      expect(service.lessonMaterials()).toEqual({
+        data: [mockLessonMaterial],
+        count: 5,
       });
+      expect(service.totalRecords()).toBe(5);
     });
 
     it('should handle response with undefined count in list response', async () => {
@@ -884,14 +896,11 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service.getLessonMaterials('folder1').subscribe(result => {
-          expect(result).toEqual([mockLessonMaterial]);
-          expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
-          expect(service.totalRecords()).toBe(0);
-          resolve();
-        });
-      });
+      const result = await lastValueFrom(service.getLessonMaterials('folder1'));
+
+      expect(result).toEqual([mockLessonMaterial]);
+      expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+      expect(service.totalRecords()).toBe(0);
     });
 
     it('should handle response with null count in paging response', async () => {
@@ -901,16 +910,13 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service
-          .getPendingLessonMaterials({ pageIndex: 1, pageSize: 10 })
-          .subscribe(result => {
-            expect(result).toEqual([mockLessonMaterial]);
-            expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
-            expect(service.totalRecords()).toBe(0);
-            resolve();
-          });
-      });
+      const result = await lastValueFrom(
+        service.getPendingLessonMaterials({ pageIndex: 1, pageSize: 10 })
+      );
+
+      expect(result).toEqual([mockLessonMaterial]);
+      expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+      expect(service.totalRecords()).toBe(0);
     });
 
     it('should handle paging response with count property', async () => {
@@ -920,16 +926,13 @@ describe('LessonMaterialsService', () => {
       };
       (requestService.get as any).mockReturnValue(of(successResponse));
 
-      await new Promise<void>(resolve => {
-        service
-          .getPendingLessonMaterials({ pageIndex: 1, pageSize: 10 })
-          .subscribe(result => {
-            expect(result).toEqual([mockLessonMaterial]);
-            expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
-            expect(service.totalRecords()).toBe(5);
-            resolve();
-          });
-      });
+      const result = await lastValueFrom(
+        service.getPendingLessonMaterials({ pageIndex: 1, pageSize: 10 })
+      );
+
+      expect(result).toEqual([mockLessonMaterial]);
+      expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
+      expect(service.totalRecords()).toBe(5);
     });
   });
 
@@ -982,6 +985,18 @@ describe('LessonMaterialsService', () => {
         mockRequest
       );
 
+      const updateRequest: UpdateLessonMaterialRequest = {
+        id: 'test-id',
+        title: 'Updated Material',
+        description: 'Updated Description',
+        visibility: 1,
+      };
+      service.updateLessonMaterial('test-id', updateRequest);
+      expect(requestService.put).toHaveBeenCalledWith(
+        expect.stringContaining('/lesson-materials/test-id'),
+        updateRequest
+      );
+
       const approveRequest: ApproveRejectMaterialRequest = {
         status: LessonMaterialStatus.Approved,
       };
@@ -991,6 +1006,122 @@ describe('LessonMaterialsService', () => {
         approveRequest,
         { loadingKey: 'approve-reject-material' }
       );
+    });
+  });
+
+  describe('Error Handling Scenarios', () => {
+    it('should handle different error status codes', async () => {
+      const errorStatusCodes = [
+        StatusCode.UNAUTHORIZED,
+        StatusCode.FORBIDDEN,
+        StatusCode.SYSTEM_ERROR,
+        StatusCode.MODEL_INVALID,
+      ];
+
+      for (const statusCode of errorStatusCodes) {
+        const error = new HttpErrorResponse({
+          error: { statusCode },
+          status: 400,
+        });
+        (requestService.get as any).mockReturnValue(throwError(() => error));
+
+        await expect(
+          lastValueFrom(service.getLessonMaterials('folder1'))
+        ).rejects.toThrow();
+        expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+
+        vi.clearAllMocks();
+      }
+    });
+
+    it('should handle network errors', async () => {
+      const networkError = new HttpErrorResponse({
+        status: 0,
+        statusText: 'Network Error',
+      });
+      (requestService.get as any).mockReturnValue(
+        throwError(() => networkError)
+      );
+
+      await expect(
+        lastValueFrom(service.getLessonMaterials('folder1'))
+      ).rejects.toThrow();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle timeout errors', async () => {
+      const timeoutError = new HttpErrorResponse({
+        status: 408,
+        statusText: 'Request Timeout',
+      });
+      (requestService.get as any).mockReturnValue(
+        throwError(() => timeoutError)
+      );
+
+      await expect(
+        lastValueFrom(service.getLessonMaterials('folder1'))
+      ).rejects.toThrow();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+  });
+
+  describe('Response Processing', () => {
+    it('should handle successful response with empty array', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: [],
+      };
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await lastValueFrom(service.getLessonMaterials('folder1'));
+
+      expect(result).toEqual([]);
+      expect(service.lessonMaterials()).toEqual([]);
+      expect(service.totalRecords()).toBe(0);
+    });
+
+    it('should handle successful response with multiple items', async () => {
+      const multipleMaterials = [
+        mockLessonMaterial,
+        { ...mockLessonMaterial, id: '2' },
+      ];
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: multipleMaterials,
+      };
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await lastValueFrom(service.getLessonMaterials('folder1'));
+
+      expect(result).toEqual(multipleMaterials);
+      expect(service.lessonMaterials()).toEqual(multipleMaterials);
+      expect(service.totalRecords()).toBe(0);
+    });
+
+    it('should handle paging response with multiple items', async () => {
+      const multipleMaterials = [
+        mockLessonMaterial,
+        { ...mockLessonMaterial, id: '2' },
+      ];
+      const pagingResponse = {
+        data: multipleMaterials,
+        count: 2,
+        pageIndex: 1,
+        pageSize: 10,
+      };
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: pagingResponse,
+      };
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await lastValueFrom(
+        service.getPendingLessonMaterials({ pageIndex: 1, pageSize: 10 })
+      );
+
+      expect(result).toEqual(multipleMaterials);
+      expect(service.lessonMaterials()).toEqual(multipleMaterials);
+      expect(service.totalRecords()).toBe(2);
     });
   });
 });

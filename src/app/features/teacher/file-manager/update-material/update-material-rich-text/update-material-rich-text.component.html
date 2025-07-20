@@ -1,0 +1,10 @@
+<ckeditor
+  [editor]="editor"
+  [config]="config"
+  [data]="editorContent()"
+  [ngClass]="{
+    invalid: invalid(),
+  }"
+  (ready)="onEditorReady($event)"
+  tagName="textarea"
+  style="width: 100%"></ckeditor>

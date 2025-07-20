@@ -1,13 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  effect,
   input,
   output,
+  effect,
   signal,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import {
   ClassicEditor,
@@ -31,6 +31,12 @@ import {
   Paragraph,
   Code,
   Mention,
+  Undo,
+  List,
+  IndentBlock,
+  Indent,
+  Font,
+  Alignment,
 } from 'ckeditor5';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import type { Writer } from '@ckeditor/ckeditor5-engine';
@@ -38,24 +44,24 @@ import type { Writer } from '@ckeditor/ckeditor5-engine';
 import {
   convertImgToPImage,
   convertPImageToFigureImg,
-} from '../../utils/util-functions';
+} from '../../../../../shared/utils/util-functions';
 
 @Component({
-  selector: 'app-rich-text-editor',
+  selector: 'update-material-rich-text',
   standalone: true,
-  imports: [FormsModule, CommonModule, CKEditorModule],
-  templateUrl: './rich-text-editor.component.html',
-  styleUrl: './rich-text-editor.component.css',
+  imports: [CommonModule, FormsModule, CKEditorModule],
+  templateUrl: './update-material-rich-text.component.html',
+  styleUrl: './update-material-rich-text.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RichTextEditorComponent {
+export class UpdateMaterialRichTextComponent {
   editorValue = input.required<string>();
-  placeholder = input<string>('Nhập nội dung...');
-  invalid = input<boolean>(false);
-  isAutoFocus = input<boolean>(false);
-  isHeightTextBox = input<boolean>(false);
+  invalid = input<boolean>();
 
   valueChange = output<string>();
+  placeholder = input<string>('Nhập nội dung...');
+  isAutoFocus = input<boolean>(false);
+  isHeightTextBox = input<boolean>(false);
 
   editorContent = signal<string>('');
 
@@ -79,20 +85,36 @@ export class RichTextEditorComponent {
       licenseKey: 'GPL',
       placeholder: this.placeholder(),
       toolbar: [
+        'undo',
+        'redo',
+        '|',
         'bold',
         'italic',
         'underline',
+        'fontColor',
+        'fontBackgroundColor',
+        '|',
         'blockQuote',
         'code',
         'uploadImage',
         'link',
+        '|',
+        'alignment',
+        'fontSize',
+        'bulletedList',
+        'numberedList',
+        '|',
+        'outdent',
+        'indent',
       ],
       plugins: [
         Autoformat,
+        Alignment,
         BlockQuote,
         Bold,
         CloudServices,
         Essentials,
+        Font,
         Image,
         ImageCaption,
         ImageResize,
@@ -101,10 +123,14 @@ export class RichTextEditorComponent {
         ImageUpload,
         Base64UploadAdapter,
         Italic,
+        Indent,
+        IndentBlock,
         Link,
+        List,
         Paragraph,
         PictureEditing,
         Underline,
+        Undo,
         Code,
         Mention,
       ],
