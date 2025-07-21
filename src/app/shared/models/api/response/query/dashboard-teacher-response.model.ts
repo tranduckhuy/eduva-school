@@ -1,4 +1,7 @@
-import { ContentType } from '../../../enum/lesson-material.enum';
+import {
+  ContentType,
+  LessonMaterialStatus,
+} from '../../../enum/lesson-material.enum';
 
 interface LessonActivity {
   period: string;
@@ -17,25 +20,31 @@ interface ContentTypeStats {
 
 interface ReviewLesson {
   id: string;
-  name: string;
+  title: string;
+  lessonStatus: LessonMaterialStatus;
   ownerName: string;
+  createdAt: string;
   contentType: ContentType;
 }
 
 interface RecentLessons {
   id: string;
-  name: string;
+  title: string;
+  lessonStatus: LessonMaterialStatus;
   ownerName: string;
+  createdAt: string;
   contentType: ContentType;
 }
 
 interface QuestionVolumeTrend {
   period: string;
+  totalQuestions: number;
+  totalAnswers: number;
   total: number;
 }
 
 interface UnAnswerQuestion {
-  id: string;
+  lessonId: string;
   title: string;
   ownerName: string;
   lessonName: string;
@@ -52,7 +61,8 @@ export interface DashboardTeacherResponse {
     totalPendingLessons: number;
     remainCreditPoints: number;
     unansweredQuestions: number;
-    usedStorage: number;
+    usedStorageBytes: number;
+    usedStorageGB: number;
   };
   lessonActivity: LessonActivity[];
   questionVolumeTrend: QuestionVolumeTrend[];

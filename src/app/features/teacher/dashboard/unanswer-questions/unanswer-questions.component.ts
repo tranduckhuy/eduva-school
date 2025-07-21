@@ -5,11 +5,11 @@ import { RouterLink } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { type DashboardSchoolAdminResponse } from '../../../../shared/models/api/response/query/dashboard-sa-response.model';
 import { TableEmptyStateComponent } from '../../../../shared/components/table-empty-state/table-empty-state.component';
+import { DashboardTeacherResponse } from '../../../../shared/models/api/response/query/dashboard-teacher-response.model';
 
 @Component({
-  selector: 'app-top-teachers',
+  selector: 'app-unanswer-questions',
   standalone: true,
   imports: [
     CommonModule,
@@ -18,10 +18,11 @@ import { TableEmptyStateComponent } from '../../../../shared/components/table-em
     TooltipModule,
     TableEmptyStateComponent,
   ],
-  templateUrl: './top-teachers.component.html',
-  styleUrl: './top-teachers.component.css',
+  templateUrl: './unanswer-questions.component.html',
+  styleUrl: './unanswer-questions.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TopTeachersComponent {
-  teachers = input.required<DashboardSchoolAdminResponse['topTeachers']>();
+export class UnanswerQuestionsComponent {
+  readonly questions =
+    input.required<DashboardTeacherResponse['unAnswerQuestions']>();
 }

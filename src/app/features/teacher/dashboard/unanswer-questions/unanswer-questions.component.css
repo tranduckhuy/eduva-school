@@ -1,3 +1,7 @@
+::ng-deep .dark .apexcharts-legend-text {
+  color: #fff !important;
+}
+
 #chart {
   min-height: 300px;
 }

@@ -1,7 +1,7 @@
 <div
   class="col-5 my-6 min-h-[541px] rounded border border-gray-100 bg-white p-5 shadow-main dark:border-dark-500 dark:bg-dark-200">
   <div class="mb-4 flex items-center justify-between">
-    <h3 class="text-base font-semibold">Bài học chưa kiểm duyệt</h3>
+    <h3 class="text-base font-semibold">Bài học gần đây</h3>
   </div>
 
   <div class="relative">
@@ -15,7 +15,7 @@
       <ng-template #header>
         <tr>
           <th scope="col" class="!w-[30%]">Tài liệu</th>
-          <th scope="col" class="!w-[15%]">Người tạo</th>
+          <th scope="col" class="!w-[20%]">Người tạo</th>
           <th scope="col" class="!text-center">Ngày tạo</th>
           <th scope="col" class="!w-[15%] !text-center">Trạng thái</th>
           <th scope="col" class="!w-[10%] !text-center">Hành động</th>
@@ -25,7 +25,7 @@
         <tr>
           <td>
             <a
-              [routerLink]="['/moderation/view-lesson', material.id]"
+              [routerLink]="['/teacher/view-lesson', material.id]"
               [pTooltip]="material.title"
               tooltipPosition="top"
               class="group flex items-center gap-2">
@@ -49,20 +49,34 @@
             </p>
           </td>
           <td class="!text-center">
-            {{ material.createdAt | date: 'shortDate' }}
+            {{ material.createdAt | date: 'longDate' }}
           </td>
           <td class="!text-center">
             <div class="flex flex-col items-center gap-2">
-              <app-badge
-                variant="warning"
-                class="self-center whitespace-nowrap">
-                Chờ duyệt
-              </app-badge>
+              @if (material.lessonStatus === 0) {
+                <app-badge
+                  variant="warning"
+                  class="self-center whitespace-nowrap">
+                  Chờ duyệt
+                </app-badge>
+              } @else if (material.lessonStatus === 1) {
+                <app-badge
+                  variant="success"
+                  class="self-center whitespace-nowrap">
+                  duyệt
+                </app-badge>
+              } @else {
+                <app-badge
+                  variant="danger"
+                  class="self-center whitespace-nowrap">
+                  từ chối
+                </app-badge>
+              }
             </div>
           </td>
           <td class="!text-center">
             <div class="flex items-center justify-center gap-2">
-              <a [routerLink]="['/moderation/view-lesson', material.id]">
+              <a [routerLink]="['/teacher/view-lesson', material.id]">
                 <app-button
                   pTooltip="Xem chi tiết"
                   tooltipPosition="top"
@@ -89,8 +103,8 @@
         class="pointer-events-none absolute left-0 right-0 top-[60%] -translate-y-[50%]">
         <app-table-empty-state
           icon="task_alt"
-          title="Không có tài liệu cần kiểm duyệt"
-          subtitle="Hiện tại chưa có tài liệu nào được giáo viên đăng tải. Vui lòng quay lại sau để kiểm duyệt khi có nội dung mới." />
+          title="Không có tài liệu"
+          subtitle="Hiện tại chưa có tài liệu nào được giáo viên đăng tải." />
       </div>
     }
   </div>

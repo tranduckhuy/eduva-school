@@ -1,5 +1,7 @@
-import { EntityStatus } from '../../../enum/entity-status.enum';
-import { ContentType } from '../../../enum/lesson-material.enum';
+import {
+  ContentType,
+  LessonMaterialStatus,
+} from '../../../enum/lesson-material.enum';
 import { BillingCycle } from '../../request/command/create-plan-payment-link-request.model';
 
 interface LessonActivity {
@@ -35,7 +37,7 @@ interface ContentTypeStats {
 interface ReviewLesson {
   id: string;
   title: string;
-  lessonStatus: EntityStatus;
+  lessonStatus: LessonMaterialStatus;
   ownerName: string;
   createdAt: string;
   contentType: ContentType;

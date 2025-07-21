@@ -6,10 +6,7 @@
   background-color: var(--color-secondary-100) !important;
   color: var(--color-text-primary) !important;
   font-size: 15px;
-  padding-left: 24px !important;
-  padding-right: 0 !important;
-  padding-top: 11px !important;
-  padding-bottom: 11px !important;
+  padding: 16px !important;
 }
 
 ::ng-deep .dark .p-datatable-thead > tr > th {
@@ -20,10 +17,7 @@
   background-color: var(--color-bg-primary) !important;
   color: var(--color-gray-700) !important;
   font-size: 15px;
-  padding-left: 24px !important;
-  padding-right: 0 !important;
-  padding-top: 14px !important;
-  padding-bottom: 14px !important;
+  padding: 16px !important;
 }
 
 ::ng-deep .dark .p-datatable-tbody > tr > td {

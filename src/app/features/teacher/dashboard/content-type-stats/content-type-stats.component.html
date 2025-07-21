@@ -1,0 +1,32 @@
+<div
+  class="relative my-6 w-full rounded border border-gray-100 bg-white text-center shadow-main dark:border-gray-900 dark:bg-dark-200">
+  <div
+    class="flex items-center gap-1 border-b border-gray-100 p-5 dark:border-gray-700">
+    <h2 class="mb-4 text-base font-semibold">Tỉ lệ loại nội dung</h2>
+  </div>
+  <div>
+    <div class="chart-center-wrapper py-7">
+      <apx-chart
+        *ngIf="(pieChartOptions().series?.length ?? 0) > 0"
+        [series]="pieChartOptions().series"
+        [chart]="pieChartOptions().chart"
+        [labels]="pieChartOptions().labels"
+        [colors]="pieChartOptions().colors"
+        [responsive]="pieChartOptions().responsive"
+        [plotOptions]="pieChartOptions().plotOptions"
+        [fill]="pieChartOptions().fill"
+        [legend]="pieChartOptions().legend"></apx-chart>
+      <div
+        *ngIf="(pieChartOptions().series?.length ?? 0) > 0"
+        class="absolute left-[49%] top-[54%] z-10 -translate-x-1/2 -translate-y-1/2 text-center">
+        <div class="text-lg dark:text-gray-100">Tổng nội dung</div>
+        <div class="text-xl font-bold dark:text-gray-100">
+          {{ totalContentCount() }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="(pieChartOptions().series?.length ?? 0) === 0">
+    <p>Không có dữ liệu.</p>
+  </div>
+</div>
