@@ -7,15 +7,38 @@
   </div>
   <div class="e-col-3 e-col-xl-6 e-col-sm-12">
     <div class="flex flex-col gap-6">
-      <app-stat-card [statCard]="schoolsStatCard()" />
+      <app-stat-card [statCard]="classesStatCard()" />
       <app-stat-card [statCard]="storageStatCard()" />
     </div>
   </div>
   <div class="e-col-3 e-col-xl-6 e-col-sm-12">
-    <div class="flex flex-col gap-6">
-      <app-stat-card [statCard]="pricingPlanRevenueStatCard()" />
-      <app-stat-card [statCard]="pricingPlanRevenueStatCard()" />
-    </div>
+    <app-stat-card [statCard]="subscriptionStatCard()">
+      <p class="my-6 text-2xl font-semibold">
+        {{
+          dashboardSchoolAdminData()?.systemOverview?.currentSubscription?.price
+            | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN'
+        }}
+      </p>
+      <p class="text-base text-gray-500">
+        Ngày bắt đầu:
+        <span class="text-base font-semibold">
+          {{
+            dashboardSchoolAdminData()?.systemOverview?.currentSubscription
+              ?.startDate | date: 'dd/MM/yyyy'
+          }}
+        </span>
+      </p>
+
+      <p class="mt-5 text-base text-gray-500">
+        Ngày kết thúc:
+        <span class="text-base font-semibold">
+          {{
+            dashboardSchoolAdminData()?.systemOverview?.currentSubscription
+              ?.endDate | date: 'dd/MM/yyyy'
+          }}
+        </span>
+      </p>
+    </app-stat-card>
   </div>
 </div>
 
@@ -24,15 +47,23 @@
     <app-lesson-creation />
   </div>
   <div class="e-col-5 e-col-xl-12">
-    <app-top-active-schools />
+    <app-content-type-stats [dashboardData]="dashboardSchoolAdminData()!" />
   </div>
 </div>
 
 <div class="e-row e-g-4">
-  <div class="e-col-6 e-col-xl-12">
-    <app-user-registration-trend />
+  <div class="e-col-5 e-col-xl-12">
+    <app-top-teachers
+      [teachers]="dashboardSchoolAdminData()?.topTeachers ?? []" />
   </div>
-  <div class="e-col-6 e-col-xl-12">
-    <app-revenue-trend />
+  <div class="e-col-7 e-col-xl-12">
+    <app-lesson-status-stats [dashboardData]="dashboardSchoolAdminData()" />
+  </div>
+</div>
+
+<div class="e-row e-g-4">
+  <div class="e-col-12 e-col-xl-12">
+    <app-review-lessons
+      [lessons]="dashboardSchoolAdminData()?.reviewLessons ?? []" />
   </div>
 </div>
