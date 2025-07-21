@@ -1,9 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
-  FormGroup,
   FormBuilder,
+  FormGroup,
   Validators,
 } from '@angular/forms';
 
@@ -14,36 +19,46 @@ import { GlobalModalService } from '../../services/layout/global-modal/global-mo
 import { FolderManagementService } from '../../services/api/folder/folder-management.service';
 
 import { MODAL_DATA } from '../../tokens/injection/modal-data.token';
+import { RenameFolderRequest } from '../../models/api/request/command/rename-material-request.model';
 
-import { FolderOwnerType } from '../../models/enum/folder-owner-type.enum';
-
-import { type CreateFolderRequest } from '../../models/api/request/command/create-folder-request.model';
-
-interface AddLessonModalData {
-  ownerType: FolderOwnerType;
-  classId?: string;
-  addLessonSuccess: () => void;
+interface RenameLessonModalData {
+  folderId: string;
+  folderName: string;
+  renameLessonSuccess: () => void;
 }
 
 @Component({
-  selector: 'app-add-lesson-modal',
+  selector: 'app-rename-lesson-modal',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, ButtonModule],
-  templateUrl: './add-lesson-modal.component.html',
-  styleUrl: './add-lesson-modal.component.css',
+  templateUrl: './rename-lesson-modal.component.html',
+  styleUrl: './rename-lesson-modal.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddLessonModalComponent {
+export class RenameLessonModalComponent {
   private readonly fb = inject(FormBuilder);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
   private readonly folderService = inject(FolderManagementService);
-  private readonly modalData = inject(MODAL_DATA) as AddLessonModalData;
+  private readonly modalData = inject(MODAL_DATA) as RenameLessonModalData;
 
-  readonly isLoading = this.loadingService.is('create-folder');
-  readonly form: FormGroup = this.fb.group({
-    name: ['', Validators.required],
-  });
+  readonly isLoading = this.loadingService.is('rename-folder');
+
+  form: FormGroup;
+
+  constructor() {
+    this.form = this.fb.group({
+      name: [
+        this.modalData.folderName ? this.modalData.folderName : '',
+        [Validators.required],
+      ],
+    });
+
+    this.form.statusChanges.subscribe(() => {
+      this.cdr.markForCheck();
+    });
+  }
 
   get name() {
     return this.form.get('name')!;
@@ -54,21 +69,13 @@ export class AddLessonModalComponent {
 
     if (this.form.invalid) return;
 
-    const baseRequest: CreateFolderRequest = this.form.value;
-    const { ownerType, classId } = this.modalData;
-
-    if (ownerType === FolderOwnerType.Personal) {
-      this.folderService.createFolder(baseRequest).subscribe({
-        next: () => this.handleCreateSuccess(),
+    const request: RenameFolderRequest = this.form.value;
+    this.folderService
+      .renameFolder(this.modalData.folderId, request)
+      .subscribe({
+        next: () => this.handleRenameSuccess(),
         error: () => this.resetForm(),
       });
-    } else {
-      const request: CreateFolderRequest = { ...baseRequest, classId };
-      this.folderService.createFolder(request).subscribe({
-        next: () => this.handleCreateSuccess(),
-        error: () => this.resetForm(),
-      });
-    }
   }
 
   onBlur(controlName: string) {
@@ -86,8 +93,8 @@ export class AddLessonModalComponent {
     this.globalModalService.close();
   }
 
-  private handleCreateSuccess() {
-    this.modalData.addLessonSuccess();
+  private handleRenameSuccess() {
+    this.modalData.renameLessonSuccess();
     this.closeModal();
   }
 

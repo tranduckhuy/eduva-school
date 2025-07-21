@@ -49,7 +49,7 @@
                 <tr>
                   <th scope="col" class="!min-w-[300px]">Tài liệu bài học</th>
                   <th scope="col" class="!min-w-[250px]">Người tạo tài liệu</th>
-                  <th scope="col" class="!min-w-[180px]">
+                  <th scope="col" class="!min-w-[250px]">
                     Lần sửa đổi cuối cùng
                   </th>
                   <th scope="col" class="!min-w-[150px] !text-center">
@@ -75,8 +75,7 @@
                   <td>
                     <a
                       [routerLink]="[
-                        '/teacher/file-manager',
-                        folderId(),
+                        '/teacher/file-manager/my-drive/material-detail',
                         material.id,
                       ]"
                       class="group flex items-center gap-2">
@@ -134,8 +133,7 @@
                     <div class="flex items-center justify-center gap-2">
                       <a
                         [routerLink]="[
-                          '/teacher/file-manager',
-                          folderId(),
+                          '/teacher/file-manager/my-drive/material-detail',
                           material.id,
                         ]">
                         <app-button
@@ -147,20 +145,28 @@
                           visibility
                         </app-button>
                       </a>
-                      <app-button
-                        pTooltip="Chỉnh sửa"
-                        tooltipPosition="top"
-                        variant="rounded"
-                        size="xs"
-                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
-                        edit
-                      </app-button>
+                      <a
+                        [routerLink]="[
+                          '/teacher/file-manager/my-drive/update-material',
+                          folderId(),
+                          material.id,
+                        ]">
+                        <app-button
+                          pTooltip="Chỉnh sửa"
+                          tooltipPosition="top"
+                          variant="rounded"
+                          size="xs"
+                          class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
+                          edit
+                        </app-button>
+                      </a>
                       <app-button
                         pTooltip="Chuyển vào thùng rác"
                         tooltipPosition="bottom"
                         variant="rounded"
                         size="xs"
-                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-danger shadow-none hover:bg-transparent">
+                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-danger shadow-none hover:bg-transparent"
+                        (clicked)="onDeleteMaterial(material.id)">
                         delete
                       </app-button>
                     </div>

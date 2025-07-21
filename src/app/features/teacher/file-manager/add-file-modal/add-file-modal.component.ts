@@ -219,7 +219,6 @@ export class AddFileModalComponent {
             ({ file, duration }, index) => ({
               title: file.name,
               description: '',
-              tag: '',
               contentType: getContentTypeFromMime(file.type),
               duration: Math.round(duration),
               fileSize: file.size,
@@ -239,7 +238,7 @@ export class AddFileModalComponent {
           );
         }),
         switchMap(() =>
-          this.lessonMaterialsService.getLessonMaterials(folderId)
+          this.lessonMaterialsService.getLessonMaterialsByFolder(folderId)
         ),
         switchMap(() => this.fileStorageService.getFileStorageQuota()),
         finalize(() => this.isLoading.set(false))

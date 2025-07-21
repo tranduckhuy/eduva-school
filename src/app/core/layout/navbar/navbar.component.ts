@@ -97,6 +97,8 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.setActiveNavItems(this.router.url);
+
     // ? Listen to router events to update active states
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -262,7 +264,7 @@ export class NavbarComponent implements OnInit {
       this.buildNavItem(
         'Quản lý tài liệu',
         'folder_open',
-        '/teacher/file-manager',
+        '/teacher/file-manager/my-drive',
         schoolMissing
       ),
     ];

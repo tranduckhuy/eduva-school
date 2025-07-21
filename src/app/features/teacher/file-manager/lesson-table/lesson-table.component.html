@@ -98,7 +98,8 @@
                       tooltipPosition="top"
                       variant="rounded"
                       size="xs"
-                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
+                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent"
+                      (clicked)="onRenameFolder(folder.id, folder.name)">
                       edit
                     </app-button>
                     <app-button

@@ -12,6 +12,7 @@ import { FolderOwnerType } from '../../../models/enum/folder-owner-type.enum';
 import { type CreateFolderRequest } from '../../../models/api/request/command/create-folder-request.model';
 import { type GetFoldersRequest } from '../../../models/api/request/query/get-folders-request.model';
 import { type GetFoldersResponse } from '../../../models/api/response/query/get-folders-response.model';
+import { type RenameFolderRequest } from '../../../models/api/request/command/rename-material-request.model';
 
 describe('FolderManagementService', () => {
   let service: FolderManagementService;
@@ -42,6 +43,10 @@ describe('FolderManagementService', () => {
 
   const mockCreateRequest: CreateFolderRequest = {
     name: 'New Folder',
+  };
+
+  const mockRenameRequest: RenameFolderRequest = {
+    name: 'Renamed Folder',
   };
 
   const mockGetFoldersRequest: GetFoldersRequest = {
@@ -99,6 +104,10 @@ describe('FolderManagementService', () => {
 
     it('should have initial total records signal as 0', () => {
       expect(service.totalRecords()).toBe(0);
+    });
+
+    it('should have initial total trash records signal as 0', () => {
+      expect(service.totalTrashRecords()).toBe(0);
     });
   });
 
@@ -290,6 +299,72 @@ describe('FolderManagementService', () => {
       ).rejects.toBe(error);
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
+
+    it('should handle isPaging: false explicitly', async () => {
+      const requestWithIsPagingFalse = {
+        ...mockGetFoldersRequest,
+        isPaging: false,
+      };
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: [mockFolder, mockFolder2],
+      };
+
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await firstValueFrom(
+        service.getPersonalFolders(requestWithIsPagingFalse)
+      );
+
+      expect(result).toEqual([mockFolder, mockFolder2]);
+      expect(service.folderList()).toEqual([mockFolder, mockFolder2]);
+      // Should not update total records for non-paging requests
+      expect(service.totalRecords()).toBe(0);
+      expect(service.totalTrashRecords()).toBe(0);
+    });
+
+    it('should handle isPaging: true explicitly', async () => {
+      const requestWithIsPagingTrue = {
+        ...mockGetFoldersRequest,
+        isPaging: true,
+      };
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: mockGetFoldersResponse,
+      };
+
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await firstValueFrom(
+        service.getPersonalFolders(requestWithIsPagingTrue)
+      );
+
+      expect(result).toEqual([mockFolder, mockFolder2]);
+      expect(service.folderList()).toEqual([mockFolder, mockFolder2]);
+      expect(service.totalRecords()).toBe(2);
+      expect(service.totalTrashRecords()).toBe(2);
+    });
+
+    it('should handle isPaging: undefined (default to true)', async () => {
+      const requestWithIsPagingUndefined = { ...mockGetFoldersRequest };
+      delete requestWithIsPagingUndefined.isPaging;
+
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: mockGetFoldersResponse,
+      };
+
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await firstValueFrom(
+        service.getPersonalFolders(requestWithIsPagingUndefined)
+      );
+
+      expect(result).toEqual([mockFolder, mockFolder2]);
+      expect(service.folderList()).toEqual([mockFolder, mockFolder2]);
+      expect(service.totalRecords()).toBe(2);
+      expect(service.totalTrashRecords()).toBe(2);
+    });
   });
 
   describe('getClassFolders', () => {
@@ -450,6 +525,104 @@ describe('FolderManagementService', () => {
     });
   });
 
+  describe('renameFolder', () => {
+    const folderId = 'folder-123';
+
+    it('should rename folder successfully and show success toast', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+      };
+
+      (requestService.put as any).mockReturnValue(of(successResponse));
+
+      const result = await firstValueFrom(
+        service.renameFolder(folderId, mockRenameRequest)
+      );
+
+      expect(result).toBeNull();
+      expect(requestService.put).toHaveBeenCalledWith(
+        expect.stringContaining(`/folders/${folderId}/rename`),
+        mockRenameRequest,
+        { loadingKey: 'rename-folder' }
+      );
+      expect(toastHandlingService.successGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle rename failure and show error toast', async () => {
+      const failureResponse = {
+        statusCode: StatusCode.SYSTEM_ERROR,
+      };
+
+      (requestService.put as any).mockReturnValue(of(failureResponse));
+
+      const result = await firstValueFrom(
+        service.renameFolder(folderId, mockRenameRequest)
+      );
+
+      expect(result).toBeNull();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle error and call errorGeneral', async () => {
+      const error = new HttpErrorResponse({
+        error: new Error('Network error'),
+      });
+
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        firstValueFrom(service.renameFolder(folderId, mockRenameRequest))
+      ).rejects.toBe(error);
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+  });
+
+  describe('restoreFolder', () => {
+    const folderId = 'folder-123';
+
+    it('should restore folder successfully and show success toast', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+      };
+
+      (requestService.put as any).mockReturnValue(of(successResponse));
+
+      const result = await firstValueFrom(service.restoreFolder(folderId));
+
+      expect(result).toBeNull();
+      expect(requestService.put).toHaveBeenCalledWith(
+        expect.stringContaining(`/folders/${folderId}/restore`)
+      );
+      expect(toastHandlingService.successGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle restore failure and show error toast', async () => {
+      const failureResponse = {
+        statusCode: StatusCode.SYSTEM_ERROR,
+      };
+
+      (requestService.put as any).mockReturnValue(of(failureResponse));
+
+      const result = await firstValueFrom(service.restoreFolder(folderId));
+
+      expect(result).toBeNull();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle error and call errorGeneral', async () => {
+      const error = new HttpErrorResponse({
+        error: new Error('Network error'),
+      });
+
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        firstValueFrom(service.restoreFolder(folderId))
+      ).rejects.toBe(error);
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+  });
+
   describe('Signal Updates', () => {
     it('should update folderList signal when getting personal folders', async () => {
       const successResponse = {
@@ -462,11 +635,13 @@ describe('FolderManagementService', () => {
       // Verify initial state
       expect(service.folderList()).toEqual([]);
       expect(service.totalRecords()).toBe(0);
+      expect(service.totalTrashRecords()).toBe(0);
 
       await firstValueFrom(service.getPersonalFolders(mockGetFoldersRequest));
 
       expect(service.folderList()).toEqual([mockFolder, mockFolder2]);
       expect(service.totalRecords()).toBe(2);
+      expect(service.totalTrashRecords()).toBe(2);
     });
 
     it('should update folderList signal when getting class folders', async () => {
@@ -508,6 +683,27 @@ describe('FolderManagementService', () => {
       // Signals should remain unchanged
       expect(service.folderList()).toEqual([mockFolder]);
       expect(service.totalRecords()).toBe(1);
+      expect(service.totalTrashRecords()).toBe(1);
+    });
+
+    it('should handle non-paging response for personal folders', async () => {
+      const nonPagingRequest = { ...mockGetFoldersRequest, isPaging: false };
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: [mockFolder, mockFolder2],
+      };
+
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await firstValueFrom(
+        service.getPersonalFolders(nonPagingRequest)
+      );
+
+      expect(result).toEqual([mockFolder, mockFolder2]);
+      expect(service.folderList()).toEqual([mockFolder, mockFolder2]);
+      // Should not update total records for non-paging requests
+      expect(service.totalRecords()).toBe(0);
+      expect(service.totalTrashRecords()).toBe(0);
     });
   });
 
@@ -649,6 +845,82 @@ describe('FolderManagementService', () => {
       (requestService.get as any).mockReturnValue(of(responseWithNullData));
 
       const result = await firstValueFrom(service.getClassFolders('class-123'));
+
+      expect(result).toBeNull();
+      expect(service.folderList()).toEqual([]);
+    });
+
+    it('should handle undefined data in non-paging response', async () => {
+      const requestWithIsPagingFalse = {
+        ...mockGetFoldersRequest,
+        isPaging: false,
+      };
+      const responseWithUndefinedData = {
+        statusCode: StatusCode.SUCCESS,
+        data: undefined,
+      };
+
+      (requestService.get as any).mockReturnValue(
+        of(responseWithUndefinedData)
+      );
+
+      const result = await firstValueFrom(
+        service.getPersonalFolders(requestWithIsPagingFalse)
+      );
+
+      expect(result).toBeNull();
+      expect(service.folderList()).toEqual([]);
+    });
+
+    it('should handle null data in non-paging response', async () => {
+      const requestWithIsPagingFalse = {
+        ...mockGetFoldersRequest,
+        isPaging: false,
+      };
+      const responseWithNullData = {
+        statusCode: StatusCode.SUCCESS,
+        data: null,
+      };
+
+      (requestService.get as any).mockReturnValue(of(responseWithNullData));
+
+      const result = await firstValueFrom(
+        service.getPersonalFolders(requestWithIsPagingFalse)
+      );
+
+      expect(result).toBeNull();
+      expect(service.folderList()).toEqual([]);
+    });
+
+    it('should handle undefined data.data in paging response', async () => {
+      const responseWithUndefinedDataData = {
+        statusCode: StatusCode.SUCCESS,
+        data: { ...mockGetFoldersResponse, data: undefined },
+      };
+
+      (requestService.get as any).mockReturnValue(
+        of(responseWithUndefinedDataData)
+      );
+
+      const result = await firstValueFrom(
+        service.getPersonalFolders(mockGetFoldersRequest)
+      );
+
+      expect(result).toBeNull();
+      expect(service.folderList()).toEqual([]);
+    });
+
+    it('should handle null data.data in paging response', async () => {
+      const responseWithNullDataData = {
+        statusCode: StatusCode.SUCCESS,
+        data: { ...mockGetFoldersResponse, data: null },
+      };
+
+      (requestService.get as any).mockReturnValue(of(responseWithNullDataData));
+
+      const result = await firstValueFrom(
+        service.getPersonalFolders(mockGetFoldersRequest)
+      );
 
       expect(result).toBeNull();
       expect(service.folderList()).toEqual([]);

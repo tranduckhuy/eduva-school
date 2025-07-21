@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   effect,
   inject,
   input,
@@ -35,6 +36,7 @@ import { type GetQuestionsRequest } from './model/request/query/get-questions-re
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommentModalComponent {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly questionService = inject(QuestionService);
 
   materialId = input.required<string>();
@@ -63,7 +65,7 @@ export class CommentModalComponent {
   isLoading = signal<boolean>(false);
 
   // ? State management
-  fetchedIds = signal<Set<string>>(new Set());
+  hasFetchedOnce = signal(false);
   currentState = signal<'list' | 'content' | 'question'>('list');
 
   paginationLessonPages = computed(() =>
@@ -89,11 +91,16 @@ export class CommentModalComponent {
   );
 
   constructor() {
-    // effect(() => {
-    //   if (this.shouldFetch()) {
-    //     this.fetchAllQuestions();
-    //   }
-    // });
+    effect(
+      () => {
+        if (this.visible() && !this.hasFetchedOnce()) {
+          this.fetchAllQuestions();
+          this.hasFetchedOnce.set(true);
+        }
+      },
+      { allowSignalWrites: true }
+    );
+
     effect(
       () => {
         const totalPages = this.totalLessonQuestionPages();
@@ -105,10 +112,8 @@ export class CommentModalComponent {
       },
       { allowSignalWrites: true }
     );
-  }
 
-  ngOnInit(): void {
-    this.fetchAllQuestions();
+    this.destroyRef.onDestroy(() => this.hasFetchedOnce.set(false));
   }
 
   handleViewQuestion(questionId: string) {
@@ -125,14 +130,6 @@ export class CommentModalComponent {
 
   closeModal() {
     this.closeCommentDrawer.emit();
-  }
-
-  resetCommentCache(id: string) {
-    this.fetchedIds.update(set => {
-      const newSet = new Set(set);
-      newSet.delete(id);
-      return newSet;
-    });
   }
 
   onChangeLessonPage(page: number | string) {
@@ -203,7 +200,6 @@ export class CommentModalComponent {
       complete: () => {
         this.isLoading.set(false);
         this.currentState.set('list');
-        this.fetchedIds.update(set => new Set(set).add(this.materialId()));
       },
     });
   }
