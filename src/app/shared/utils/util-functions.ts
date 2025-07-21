@@ -136,7 +136,7 @@ export function debounceSignal<T>(
   };
 }
 
-/**
+/*
  * Converts all <figure class="image"><img /></figure> blocks in the given HTML string
  * into <p><p-image /></p> format, preserving relevant attributes like src, alt, and width.
  * This is typically used to convert image tags into a custom component format for rendering or editing.
@@ -199,4 +199,56 @@ export function convertPImageToFigureImg(html: string): string {
   });
 
   return doc.body.innerHTML;
+}
+
+/**
+<<<<<<< HEAD
+ * Gets the ISO week number for a given date.
+ *
+ * @param date - The date to get the ISO week number for.
+ * @returns The ISO week number (1-53).
+ */
+export function getISOWeekNumber(date: Date): number {
+  const d = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  );
+  const dayNum = d.getUTCDay() || 7; // ISO: Monday = 1, Sunday = 7
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil(
+    ((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7
+  );
+  return weekNo;
+}
+
+/**
+ * Gets the last N week numbers with their corresponding years.
+ *
+ * @param n - The number of weeks to get (default: 7).
+ * @returns An array of objects containing year and week number.
+ */
+export function getLastNWeekNumbers(
+  n: number = 7
+): Array<{ year: number; week: number }> {
+  const result: Array<{ year: number; week: number }> = [];
+  const today = new Date();
+
+  // Tìm thứ Hai của tuần hiện tại
+  const day = today.getDay();
+  const diffToMonday = (day + 6) % 7;
+  const currentMonday = new Date(today);
+  currentMonday.setDate(today.getDate() - diffToMonday);
+
+  for (let i = 0; i < n; i++) {
+    const monday = new Date(currentMonday);
+    monday.setDate(currentMonday.getDate() - i * 7);
+
+    const weekNumber = getISOWeekNumber(monday);
+    result.push({
+      year: monday.getFullYear(),
+      week: weekNumber,
+    });
+  }
+
+  return result;
 }

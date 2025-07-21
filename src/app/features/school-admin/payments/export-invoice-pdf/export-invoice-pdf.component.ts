@@ -302,7 +302,11 @@ export class ExportInvoicePdfComponent {
       10,
       nextSectionY + 22
     );
-    pdf.text('Ngày bắt đầu:', rightColX, nextSectionY);
+    pdf.text(
+      isCredit ? 'Thời gian giao dịch' : 'Ngày bắt đầu:',
+      rightColX,
+      nextSectionY
+    );
     pdf.text(
       this.datePipe.transform(
         isCredit ? creditDetail?.createdAt : subscriptionDetail?.startDate,
@@ -311,15 +315,17 @@ export class ExportInvoicePdfComponent {
       rightColX,
       nextSectionY + 7
     );
-    pdf.text('Ngày kết thúc:', rightColX, nextSectionY + 15);
-    pdf.text(
-      this.datePipe.transform(
-        isCredit ? creditDetail?.createdAt : subscriptionDetail?.endDate,
-        'medium'
-      ) ?? '',
-      rightColX,
-      nextSectionY + 22
-    );
+    if (!this.isCreditPack()) {
+      pdf.text('Ngày kết thúc:', rightColX, nextSectionY + 15);
+      pdf.text(
+        this.datePipe.transform(
+          isCredit ? creditDetail?.createdAt : subscriptionDetail?.endDate,
+          'medium'
+        ) ?? '',
+        rightColX,
+        nextSectionY + 22
+      );
+    }
   }
 
   private getCreditTableData(creditDetail: any) {

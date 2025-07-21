@@ -92,7 +92,11 @@
         </div>
 
         <div
-          class="e-row e-row-cols-4 e-row-cols-md-12 e-row-cols-lg-2 e-g-4 mb-6 dark:text-[#ffffff80]">
+          class="e-row e-row-cols-md-12 e-row-cols-lg-2 e-g-4 mb-6 dark:text-[#ffffff80]"
+          [ngClass]="{
+            'e-row-cols-3': isCreditPack(),
+            'e-row-cols-4': !isCreditPack(),
+          }">
           <div class="e-col">
             <p class="mb-2 text-[15px] font-semibold dark:text-[#ffffffB3]">
               Mã hóa đơn:
@@ -108,7 +112,7 @@
           </div>
           <div class="e-col">
             <p class="mb-2 text-[15px] font-semibold dark:text-[#ffffffB3]">
-              Ngày bắt đầu:
+              {{ isCreditPack() ? 'Thời gian giao dịch' : 'Ngày bắt đầu:' }}
             </p>
             <p class="mb-2 text-[15px]">
               {{
@@ -120,20 +124,22 @@
               }}
             </p>
           </div>
-          <div class="e-col">
-            <p class="mb-2 text-[15px] font-semibold dark:text-[#ffffffB3]">
-              Ngày kết thúc:
-            </p>
-            <p class="mb-2 text-[15px]">
-              {{
-                isCreditPack()
-                  ? (creditTransactionDetail()?.createdAt
-                    | date: 'HH:mm:ss, EEEE, dd MMMM, yyyy')
-                  : (schoolSubscriptionDetail()?.endDate
-                    | date: 'HH:mm:ss, EEEE, dd MMMM, yyyy')
-              }}
-            </p>
-          </div>
+          @if (!isCreditPack()) {
+            <div class="e-col">
+              <p class="mb-2 text-[15px] font-semibold dark:text-[#ffffffB3]">
+                Ngày kết thúc:
+              </p>
+              <p class="mb-2 text-[15px]">
+                {{
+                  isCreditPack()
+                    ? (creditTransactionDetail()?.createdAt
+                      | date: 'HH:mm:ss, EEEE, dd MMMM, yyyy')
+                    : (schoolSubscriptionDetail()?.endDate
+                      | date: 'HH:mm:ss, EEEE, dd MMMM, yyyy')
+                }}
+              </p>
+            </div>
+          }
           <div class="e-col">
             <p class="mb-2 text-[15px] font-semibold dark:text-[#ffffffB3]">
               Tổng tiền:
