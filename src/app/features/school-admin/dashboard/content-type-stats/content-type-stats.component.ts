@@ -1,19 +1,20 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Input,
   computed,
   input,
 } from '@angular/core';
-import { NgApexchartsModule } from 'ng-apexcharts';
+import { CommonModule } from '@angular/common';
+
 import {
   ApexNonAxisChartSeries,
   ApexChart,
   ApexResponsive,
   ApexLegend,
+  NgApexchartsModule,
 } from 'ng-apexcharts';
+
 import { DashboardSchoolAdminResponse } from '../../../../shared/models/api/response/query/dashboard-sa-response.model';
-import { CommonModule } from '@angular/common';
 
 export type PieChartOptions = {
   series: ApexNonAxisChartSeries;
