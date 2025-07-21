@@ -3,11 +3,12 @@
   <div class="flex justify-between">
     <div>
       <h3 class="font-semibold">{{ statCard().title }}</h3>
-      <p class="mb-4 text-xs font-medium text-[#8c9097] dark:text-dark-100">
+      <p
+        class="mb-4 whitespace-nowrap text-xs font-medium text-[#8c9097] dark:text-dark-100">
         {{ statCard().description }}
       </p>
       <p
-        class="text-[28px] font-semibold leading-none text-gray-700 dark:text-white">
+        class="line-clamp-1 text-[28px] font-semibold leading-none text-gray-700 dark:text-white">
         {{
           statCard().isRevenue
             ? (statCard().value
@@ -18,11 +19,18 @@
       </p>
     </div>
     <div class="self-end">
-      <span
-        class="material-symbols-outlined leading-non relative top-[2px] text-4xl"
-        [class]="statCard().iconColor">
-        {{ statCard().icon }}
-      </span>
+      @if (statCard().imageIcon) {
+        <img
+          src="./images/icons/ecoin.png"
+          alt="icon"
+          class="h-10 w-10 rounded-full object-contain" />
+      } @else {
+        <span
+          class="material-symbols-outlined leading-non relative top-[2px] text-4xl"
+          [class]="statCard().iconColor">
+          {{ statCard().icon }}
+        </span>
+      }
     </div>
   </div>
   <ng-content />

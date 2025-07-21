@@ -7,7 +7,7 @@ import { TooltipModule } from 'primeng/tooltip';
 interface StatCard {
   title: string;
   description: string;
-  value: number;
+  value: number | string;
   compareValue?: number;
   unit?: string;
   isRevenue?: boolean;
@@ -33,6 +33,6 @@ export class StatCardComponent {
   statCard = input.required<StatCard>();
 
   getPercent(value: number) {
-    return Math.round((value / this.statCard().value) * 100);
+    return Math.round((value / Number(this.statCard().value)) * 100);
   }
 }

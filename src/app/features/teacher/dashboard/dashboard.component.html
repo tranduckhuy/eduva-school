@@ -1,20 +1,23 @@
 <div class="e-row e-g-4">
   <div class="e-col-3 e-col-xl-6 e-col-sm-12">
-    <app-stat-card [statCard]="usersStatCard()" />
+    <div class="flex flex-col gap-6">
+      <app-stat-card [statCard]="studentsStatCard()" />
+      <app-stat-card [statCard]="classesStatCard()" />
+    </div>
   </div>
   <div class="e-col-3 e-col-xl-6 e-col-sm-12">
     <app-stat-card [statCard]="lessonsStatCard()" />
   </div>
   <div class="e-col-3 e-col-xl-6 e-col-sm-12">
     <div class="flex flex-col gap-6">
-      <app-stat-card [statCard]="schoolsStatCard()" />
-      <app-stat-card [statCard]="storageStatCard()" />
+      <app-stat-card [statCard]="pendingLessonStatCard()" />
+      <app-stat-card [statCard]="unAnswerQuestionStatCard()" />
     </div>
   </div>
   <div class="e-col-3 e-col-xl-6 e-col-sm-12">
     <div class="flex flex-col gap-6">
-      <app-stat-card [statCard]="pricingPlanRevenueStatCard()" />
-      <app-stat-card [statCard]="pricingPlanRevenueStatCard()" />
+      <app-stat-card [statCard]="remainCreditPointsStatCard()" />
+      <app-stat-card [statCard]="storageStatCard()" />
     </div>
   </div>
 </div>
@@ -24,15 +27,26 @@
     <app-lesson-creation />
   </div>
   <div class="e-col-5 e-col-xl-12">
-    <app-top-active-schools />
+    <app-content-type-stats [dashboardData]="dashboardData()!" />
   </div>
 </div>
 
 <div class="e-row e-g-4">
   <div class="e-col-6 e-col-xl-12">
-    <app-user-registration-trend />
+    <app-unanswer-questions
+      [questions]="dashboardData()?.unAnswerQuestions ?? []" />
   </div>
   <div class="e-col-6 e-col-xl-12">
-    <app-revenue-trend />
+    <app-question-volume-trend />
+  </div>
+</div>
+
+<div class="e-row e-g-4">
+  <div class="e-col-12 e-col-xl-12">
+    @if (isTeacher) {
+      <app-recent-lessons [lessons]="dashboardData()?.recentLessons ?? []" />
+    } @else {
+      <app-review-lessons [lessons]="dashboardData()?.reviewLessons ?? []" />
+    }
   </div>
 </div>

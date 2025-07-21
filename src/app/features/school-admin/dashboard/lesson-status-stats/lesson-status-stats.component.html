@@ -1,30 +1,20 @@
 <div
-  class="relative my-6 w-full rounded border border-gray-100 bg-white shadow-main dark:border-gray-900 dark:bg-dark-200">
+  class="relative w-full rounded border border-gray-100 bg-white shadow-main dark:border-gray-900 dark:bg-dark-200">
   <div
     class="flex items-center gap-1 border-b border-gray-100 p-5 dark:border-gray-700">
-    <div>
-      <h2 class="text-base font-semibold">Hoạt Động Tạo Bài Học</h2>
-    </div>
+    <h2 class="text-base font-semibold">Thống kê trạng thái bài giảng</h2>
     <div class="ml-auto flex gap-2">
       <p-select
-        [options]="timeSelectOptions()"
+        [options]="timeSelectOptions"
         [ngModel]="timeSelect()"
         (ngModelChange)="onTimeSelectChange($event)"
         optionLabel="name"
         placeholder="Chọn khoảng thời gian"
-        [disabled]="isChangingPeriod()"
         class="!dark:bg-dark-200 flex h-11 w-full items-center sm:w-40" />
-      @if (isChangingPeriod()) {
-        <div class="flex items-center">
-          <div
-            class="h-4 w-4 animate-spin rounded-full border-b-2 border-primary"></div>
-        </div>
-      }
     </div>
   </div>
-
   <div id="chart" class="p-5">
-    @if (isChangingPeriod()) {
+    <ng-container *ngIf="isLoading(); else chartBlock">
       <div class="flex h-64 items-center justify-center">
         <div class="text-center">
           <div
@@ -32,7 +22,8 @@
           <p class="text-gray-600 dark:text-gray-400">Đang tải dữ liệu...</p>
         </div>
       </div>
-    } @else {
+    </ng-container>
+    <ng-template #chartBlock>
       <apx-chart
         [series]="chartOptions().series"
         [chart]="chartOptions().chart"
@@ -46,6 +37,6 @@
         [fill]="chartOptions().fill"
         [legend]="chartOptions().legend">
       </apx-chart>
-    }
+    </ng-template>
   </div>
 </div>
