@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  input,
+} from '@angular/core';
+
+import { AiJobsService } from './services/api/ai-jobs.service';
+import { AiSocketService } from './services/api/ai-socket.service';
 
 import { GenerateLessonUploadComponent } from './generate-lesson-upload/generate-lesson-upload.component';
 import { GenerateLessonChatComponent } from './generate-lesson-chat/generate-lesson-chat.component';
@@ -18,4 +28,24 @@ import { GenerateLessonMobileComponent } from '../generate-lesson-mobile/generat
   styleUrl: './generate-lesson-main.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GenerateLessonMainComponent {}
+export class GenerateLessonMainComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly aiJobService = inject(AiJobsService);
+  private readonly aiSocketService = inject(AiSocketService);
+
+  jobId = input<string>();
+
+  job = this.aiJobService.job;
+
+  constructor() {
+    this.destroyRef.onDestroy(() => this.aiSocketService.disconnect());
+  }
+
+  ngOnInit(): void {
+    const jobId = this.jobId();
+
+    if (!jobId) return;
+
+    this.aiJobService.getJobById(jobId).subscribe();
+  }
+}

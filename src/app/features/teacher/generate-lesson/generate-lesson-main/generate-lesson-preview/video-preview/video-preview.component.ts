@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   computed,
   effect,
   inject,
@@ -34,7 +35,7 @@ import { JobStatus } from '../../../../../../shared/models/enum/job-status.enum'
   styleUrl: './video-preview.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VideoPreviewComponent {
+export class VideoPreviewComponent implements OnInit {
   private readonly resourcesStateService = inject(ResourcesStateService);
   private readonly generateSettingsService = inject(
     GenerateSettingsSelectionService
@@ -42,9 +43,11 @@ export class VideoPreviewComponent {
   private readonly aiJobService = inject(AiJobsService);
   private readonly aiSocketService = inject(AiSocketService);
 
-  jobUpdateProgress = this.aiSocketService.jobUpdateProgress;
+  job = this.aiJobService.job;
   jobId = this.aiJobService.jobId;
   generationType = this.aiJobService.generationType;
+
+  jobUpdateProgress = this.aiSocketService.jobUpdateProgress;
 
   isLoading = this.resourcesStateService.isLoading;
   hasInteracted = this.resourcesStateService.hasInteracted;
@@ -88,12 +91,21 @@ export class VideoPreviewComponent {
           !failureReason &&
           generationType === LessonGenerationType.Video
         ) {
-          this.videoUrl.set(payload?.productBlobNameUrl);
+          this.videoUrl.set(payload?.videoOutputBlobName);
           this.videoState.set('generated');
         }
       },
       { allowSignalWrites: true }
     );
+  }
+
+  ngOnInit(): void {
+    const job = this.job();
+
+    if (!job) return;
+
+    this.videoState.set('generated');
+    this.videoUrl.set(job.videoOutputBlobName);
   }
 
   // ? Confirm Generate

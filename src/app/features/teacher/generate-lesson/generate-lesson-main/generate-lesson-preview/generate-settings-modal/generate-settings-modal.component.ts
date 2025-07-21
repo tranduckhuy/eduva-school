@@ -17,6 +17,7 @@ import { FolderManagementService } from '../../../../../../shared/services/api/f
 import {
   GenerateSettingsSelectionService,
   type VoiceOption,
+  type LanguageOption,
 } from '../services/generate-settings-selection.service';
 import { type GetFoldersRequest } from '../../../../../../shared/models/api/request/query/get-folders-request.model';
 import { EntityStatus } from '../../../../../../shared/models/enum/entity-status.enum';
@@ -41,7 +42,17 @@ export class GenerateSettingsModalComponent implements OnInit {
   folderList = this.folderService.folderList;
   isFolderLoading = this.loadingService.is('get-folders');
 
-  languageOptions = signal<string[]>(['vi-VN']);
+  speed = this.settingsSelectionService.selectedRate;
+  voice = this.settingsSelectionService.selectedVoice;
+  language = this.settingsSelectionService.selectedLanguage;
+  folderId = this.settingsSelectionService.selectedFolderId;
+
+  languageOptions = signal<LanguageOption[]>([
+    {
+      name: 'Tiếng Việt',
+      value: 'vi-VN',
+    },
+  ]);
   voiceOptions = signal<VoiceOption[]>([
     {
       name: 'Nữ trầm',
@@ -77,10 +88,10 @@ export class GenerateSettingsModalComponent implements OnInit {
 
   constructor() {
     this.form = this.fb.group({
-      speed: '1',
-      voice: null,
-      language: 'vi-VN',
-      folder: null,
+      speed: this.speed() ?? '1',
+      voice: this.voice(),
+      language: this.language() ?? 'vi-VN',
+      folderId: this.folderId(),
     });
   }
 
@@ -95,12 +106,12 @@ export class GenerateSettingsModalComponent implements OnInit {
   }
 
   save(): void {
-    const { speed, voice, language, folder } = this.form.value;
+    const { speed, voice, language, folderId } = this.form.value;
 
     this.settingsSelectionService.setSpeedRate(speed);
     this.settingsSelectionService.setVoice(voice);
     this.settingsSelectionService.setLanguage(language);
-    this.settingsSelectionService.setFolder(folder);
+    this.settingsSelectionService.setFolderId(folderId);
 
     this.closeModal();
   }
@@ -108,4 +119,8 @@ export class GenerateSettingsModalComponent implements OnInit {
   closeModal() {
     this.globalModalService.close();
   }
+
+  compareFolders = (folder1: any, folder2: any) => {
+    return folder1 && folder2 && folder1.id === folder2.id;
+  };
 }

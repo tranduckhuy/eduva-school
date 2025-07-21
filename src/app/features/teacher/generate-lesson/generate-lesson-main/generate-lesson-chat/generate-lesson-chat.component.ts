@@ -1,11 +1,11 @@
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
-  Component,
-  computed,
-  DestroyRef,
-  effect,
   ElementRef,
+  Component,
+  OnInit,
+  computed,
+  effect,
   inject,
   signal,
   viewChild,
@@ -58,16 +58,18 @@ interface AiResponseMessage {
   styleUrl: './generate-lesson-chat.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GenerateLessonChatComponent implements AfterViewInit {
+export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   private readonly scrollContainer = viewChild<ElementRef>('scrollContainer');
 
   private readonly fb = inject(FormBuilder);
-  private readonly destroyRef = inject(DestroyRef);
   private readonly resourcesStateService = inject(ResourcesStateService);
   private readonly aiJobService = inject(AiJobsService);
   private readonly aiSocketService = inject(AiSocketService);
 
+  readonly job = this.aiJobService.job;
+
   readonly jobUpdateProgress = this.aiSocketService.jobUpdateProgress;
+
   readonly checkedFiles = this.resourcesStateService.checkedFiles;
   readonly hasGeneratedSuccessfully =
     this.resourcesStateService.hasGeneratedSuccessfully;
@@ -118,8 +120,15 @@ export class GenerateLessonChatComponent implements AfterViewInit {
       },
       { allowSignalWrites: true }
     );
+  }
 
-    this.destroyRef.onDestroy(() => this.aiSocketService.disconnect());
+  ngOnInit(): void {
+    const job = this.job();
+
+    if (!job) return;
+
+    this.resourcesStateService.updateHasInteracted(true);
+    this.restoreMessagesFromJob(job);
   }
 
   ngAfterViewInit(): void {
@@ -230,49 +239,13 @@ export class GenerateLessonChatComponent implements AfterViewInit {
     failureReason,
   }: AiResponseMessage): void {
     const content = failureReason
-      ? `
-        <div class="text-red-500 font-medium">
-          <p>😢 <strong>Rất tiếc!</strong> Quá trình tạo nội dung không thành công.</p>
-          <p>Lý do: <em>${failureReason}</em></p>
-          <p>Vui lòng kiểm tra lại dữ liệu và thử lại sau.</p>
-        </div>
-      `
-      : `
-        <div class="mb-3">
-          <h4 class="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
-            🎓 Nội dung bài giảng đã sẵn sàng!
-          </h4>
-
-          <p class="mb-2 text-gray-700 dark:text-gray-300">
-            Đây là bản nháp gợi ý. Bạn có thể chỉnh sửa, bổ sung hoặc phát triển thêm để tạo nên một bài giảng hấp dẫn và truyền cảm hứng cho người học.
-          </p>
-
-          <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-700 text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-3">
-            ${previewContent}...
-          </div>
-
-          <div class="mb-2 text-sm text-gray-600 dark:text-gray-400 italic">
-            <p>🎧 Tạo bản ghi âm (audio): <strong>${audioCost}</strong> Ecoin</p>
-            <p>🎞️ Tạo video minh hoạ (có giọng đọc + hình ảnh): <strong>${videoCost}</strong> Ecoin</p>
-          </div>
-
-          <p class="mb-2 text-gray-700 dark:text-gray-300">
-            Nếu bạn đồng ý với chi phí hiển thị ở trên, hãy tiếp tục bằng cách nhấn nút <strong>"Tạo nội dung"</strong> ở phần bên phải để bắt đầu tạo sản phẩm chính thức.
-          </p>
-
-          <p class="mb-2 text-gray-700 dark:text-gray-300">
-            <strong>EDUVA</strong> xin chân thành cảm ơn bạn đã tin tưởng sử dụng hệ thống!
-          </p>
-
-          <p class="mt-3 text-xs text-primary">
-            * Lưu ý: Chi phí chỉ được tính khi bạn thực hiện tạo sản phẩm chính thức.
-          </p>
-        </div>
-      `;
+      ? this.renderFailureMessage(failureReason)
+      : this.renderSuccessMessage(previewContent, audioCost, videoCost);
 
     this.messages.update(prev => {
       const updated = [...prev];
       const idx = updated.findIndex(m => m.sender === 'system' && m.isLoading);
+
       const newMessage: ChatMessage = {
         sender: 'system',
         content,
@@ -290,38 +263,88 @@ export class GenerateLessonChatComponent implements AfterViewInit {
     }
   }
 
-  private fakeSystemResponse() {
-    this.resourcesStateService.updateIsLoading(true);
+  private renderFailureMessage(reason: string): string {
+    return `
+      <div class="text-red-500 font-medium">
+        <p>😢 <strong>Rất tiếc!</strong> Quá trình tạo nội dung không thành công.</p>
+        <p>Lý do: <em>${reason}</em></p>
+        <p>Vui lòng kiểm tra lại dữ liệu và thử lại sau.</p>
+      </div>
+    `;
+  }
 
-    this.messages.update(prev => [
-      ...prev,
-      { sender: 'system', content: '', isLoading: true },
-    ]);
+  private renderSuccessMessage(
+    previewContent?: string,
+    audioCost?: number,
+    videoCost?: number
+  ): string {
+    const previewBlock = previewContent
+      ? `
+        <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-700 text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-3">
+          ${previewContent}...
+        </div>
+      `
+      : '';
 
-    this.scrollToBottom();
+    return `
+      <div class="mb-3">
+        <h4 class="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
+          🎓 Nội dung bài giảng đã sẵn sàng!
+        </h4>
 
-    const delay = 2000 + Math.floor(Math.random() * 1000);
+        <p class="mb-2 text-gray-700 dark:text-gray-300">
+          Đây là <strong>bản nháp gợi ý</strong> dựa trên chủ đề bạn đã cung cấp. Bạn có thể chỉnh sửa, bổ sung hoặc phát triển thêm để tạo nên một bài giảng hấp dẫn và truyền cảm hứng cho người học.
+        </p>
+        <p class="mb-2 text-gray-700 dark:text-gray-300">
+          Sau khi bạn tạo nội dung chính thức, phần bản nháp này sẽ <strong>không được lưu trữ</strong>. Nội dung hoàn tất sẽ được lưu trữ trong hệ thống để bạn có thể thao tác với nội dung đã tạo ra.
+        </p>
 
-    setTimeout(() => {
-      this.messages.update(prev => {
-        const updated = [...prev];
-        const idx = updated.findIndex(
-          m => m.sender === 'system' && m.isLoading
-        );
-        if (idx !== -1) {
-          updated[idx] = {
-            sender: 'system',
-            content: `Slide bài giảng sẽ được hiển thị tại đây trong các phiên bản sắp tới.
-              Hiện tại, tính năng này vẫn đang trong quá trình hoàn thiện để mang đến
-              trải nghiệm tốt nhất cho bạn. Cảm ơn bạn đã kiên nhẫn và đồng hành 
-              cùng <strong>EDUVA</strong> trong quá trình phát triển hệ thống!`,
-          };
-        }
-        return updated;
-      });
+        ${previewBlock}
 
-      this.resourcesStateService.updateIsLoading(false);
-      this.scrollToBottom();
-    }, delay);
+        <div class="mb-2 text-sm text-gray-600 dark:text-gray-400 italic">
+          <p>🎧 Tạo bản ghi âm (audio): <strong>${audioCost}</strong> Ecoin</p>
+          <p>🎞️ Tạo video minh hoạ (có giọng đọc + hình ảnh): <strong>${videoCost}</strong> Ecoin</p>
+        </div>
+
+        <p class="mb-2 text-gray-700 dark:text-gray-300">
+          Nếu bạn đồng ý với chi phí hiển thị ở trên, hãy tiếp tục bằng cách nhấn nút <strong>"Tạo nội dung"</strong> ở phần bên phải để bắt đầu tạo nội dung chính thức.
+        </p>
+
+        <p class="mb-2 text-gray-700 dark:text-gray-300">
+          <strong>EDUVA</strong> xin chân thành cảm ơn bạn đã tin tưởng sử dụng hệ thống!
+        </p>
+
+        <p class="mt-3 text-xs text-primary">
+          * Lưu ý: Chi phí chỉ được tính khi bạn thực hiện tạo sản phẩm chính thức.
+        </p>
+      </div>
+    `;
+  }
+
+  private restoreMessagesFromJob(job: {
+    topic: string;
+    previewContent?: string;
+    audioCost?: number;
+    videoCost?: number;
+    failureReason?: string | null;
+  }): void {
+    const userMessage: ChatMessage = {
+      sender: 'user',
+      content: job.topic,
+    };
+
+    const systemMessage: ChatMessage = {
+      sender: 'system',
+      content: job.failureReason
+        ? this.renderFailureMessage(job.failureReason)
+        : this.renderSuccessMessage(
+            job.previewContent,
+            job.audioCost,
+            job.videoCost
+          ),
+      isLoading: false,
+    };
+
+    this.messages.set([userMessage, systemMessage]);
   }
 }

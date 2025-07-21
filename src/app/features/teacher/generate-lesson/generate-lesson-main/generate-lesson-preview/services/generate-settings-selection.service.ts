@@ -1,11 +1,18 @@
 import { Injectable, signal } from '@angular/core';
 
+import { type Folder } from '../../../../../../shared/models/entities/folder.model';
+
 export type VoiceOption = {
   name: string;
   value: string;
   language_code: string;
   gender: string;
   natural_sample_rate: number;
+};
+
+export type LanguageOption = {
+  name: string;
+  value: string;
 };
 
 @Injectable({
@@ -18,11 +25,11 @@ export class GenerateSettingsSelectionService {
   private readonly selectedVoiceSignal = signal<string | null>(null);
   selectedVoice = this.selectedVoiceSignal.asReadonly();
 
-  private readonly selectedLanguageSignal = signal<string>('vi-VN');
+  private readonly selectedLanguageSignal = signal<string | null>(null);
   selectedLanguage = this.selectedLanguageSignal.asReadonly();
 
-  private readonly selectedFolderSignal = signal<string | null>(null);
-  selectedFolder = this.selectedVoiceSignal.asReadonly();
+  private readonly selectedFolderIdSignal = signal<string | null>(null);
+  selectedFolderId = this.selectedFolderIdSignal.asReadonly();
 
   setSpeedRate(rate: number) {
     this.selectedRateSignal.set(rate);
@@ -36,14 +43,14 @@ export class GenerateSettingsSelectionService {
     this.selectedLanguageSignal.set(code);
   }
 
-  setFolder(folderId: string) {
-    this.selectedFolderSignal.set(folderId);
+  setFolderId(folderId: string) {
+    this.selectedFolderIdSignal.set(folderId);
   }
 
   reset() {
     this.selectedRateSignal.set(null);
     this.selectedVoiceSignal.set(null);
-    this.selectedLanguageSignal.set('vi-VN');
-    this.selectedFolderSignal.set(null);
+    this.selectedLanguageSignal.set(null);
+    this.selectedFolderIdSignal.set(null);
   }
 }

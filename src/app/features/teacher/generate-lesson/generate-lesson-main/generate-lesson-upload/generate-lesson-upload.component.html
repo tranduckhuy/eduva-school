@@ -12,7 +12,7 @@
       pTooltip="Tài liệu cho AI tạo bài giảng"
       tooltipPosition="bottom"
       class="flex h-10 w-full items-center justify-center rounded-full border border-[#dde1eb] text-[#5f6368] shadow-transparent transition-colors ease-in hover:bg-[#ecf2fc] dark:text-[#e6e6e6] dark:hover:bg-dark-400"
-      [ngClass]="{ 'pointer-events-none opacity-80': currentCount() >= 5 }"
+      [ngClass]="{ 'pointer-events-none opacity-80': disableUploadButton }"
       (click)="openUploadModal()">
       <div class="flex items-center gap-2">
         <span
@@ -37,11 +37,12 @@
           Chọn toàn bộ tài liệu
         </label>
         <p-checkbox
-          [binary]="true"
           inputId="all"
           size="small"
           styleClass="relative bottom-[3px]"
+          [binary]="true"
           [ngModel]="selectAll()"
+          [disabled]="disableCheckboxAll"
           (onChange)="toggleAll($event.checked)" />
       </div>
     }

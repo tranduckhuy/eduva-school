@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   ElementRef,
   HostListener,
   viewChild,
@@ -44,7 +45,7 @@ import { type ConfirmCreateContent } from '../../models/request/command/confirm-
   styleUrl: './audio-preview.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AudioPreviewComponent {
+export class AudioPreviewComponent implements OnInit {
   private readonly audio = viewChild<ElementRef<HTMLAudioElement>>('audio');
 
   private readonly mediaFocusService = inject(MediaFocusService);
@@ -55,9 +56,11 @@ export class AudioPreviewComponent {
   private readonly aiJobService = inject(AiJobsService);
   private readonly aiSocketService = inject(AiSocketService);
 
-  jobUpdateProgress = this.aiSocketService.jobUpdateProgress;
+  job = this.aiJobService.job;
   jobId = this.aiJobService.jobId;
   generationType = this.aiJobService.generationType;
+
+  jobUpdateProgress = this.aiSocketService.jobUpdateProgress;
 
   isLoading = this.resourcesStateService.isLoading;
   totalCheckedSources = this.resourcesStateService.totalCheckedSources;
@@ -133,12 +136,21 @@ export class AudioPreviewComponent {
           !failureReason &&
           generationType === LessonGenerationType.Audio
         ) {
-          this.audioUrl.set(payload?.productBlobNameUrl);
+          this.audioUrl.set(payload?.audioOutputBlobName);
           this.audioState.set('generated');
         }
       },
       { allowSignalWrites: true }
     );
+  }
+
+  ngOnInit(): void {
+    const job = this.job();
+
+    if (!job) return;
+
+    this.audioState.set('generated');
+    this.audioUrl.set(job.audioOutputBlobName);
   }
 
   get volumeIcon() {
