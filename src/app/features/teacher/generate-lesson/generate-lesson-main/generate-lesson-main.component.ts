@@ -7,8 +7,11 @@ import {
   input,
 } from '@angular/core';
 
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { AiJobsService } from './services/api/ai-jobs.service';
 import { AiSocketService } from './services/api/ai-socket.service';
+import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 
 import { GenerateLessonUploadComponent } from './generate-lesson-upload/generate-lesson-upload.component';
 import { GenerateLessonChatComponent } from './generate-lesson-chat/generate-lesson-chat.component';
@@ -19,6 +22,7 @@ import { GenerateLessonMobileComponent } from '../generate-lesson-mobile/generat
   selector: 'generate-lesson-main',
   standalone: true,
   imports: [
+    ProgressSpinnerModule,
     GenerateLessonUploadComponent,
     GenerateLessonChatComponent,
     GenerateLessonPreviewComponent,
@@ -32,9 +36,11 @@ export class GenerateLessonMainComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly aiJobService = inject(AiJobsService);
   private readonly aiSocketService = inject(AiSocketService);
+  private readonly loadingService = inject(LoadingService);
 
   jobId = input<string>();
 
+  isLoading = this.loadingService.is('get-job-detail');
   job = this.aiJobService.job;
 
   constructor() {

@@ -77,7 +77,9 @@ export class AiJobsService {
 
   getJobById(jobId: string): Observable<AiJob | null> {
     return this.requestService
-      .get<AiJob>(`${this.BASE_AI_JOBS_API_URL}/${jobId}`)
+      .get<AiJob>(`${this.BASE_AI_JOBS_API_URL}/${jobId}`, undefined, {
+        loadingKey: 'get-job-detail',
+      })
       .pipe(
         tap(res => {
           if (res.statusCode === StatusCode.SUCCESS) {

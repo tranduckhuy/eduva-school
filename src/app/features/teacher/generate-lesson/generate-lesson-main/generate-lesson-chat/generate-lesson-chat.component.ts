@@ -128,6 +128,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     if (!job) return;
 
     this.resourcesStateService.updateHasInteracted(true);
+    this.scrollToBottom();
     this.restoreMessagesFromJob(job);
   }
 
@@ -321,6 +322,28 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     `;
   }
 
+  private renderReadOnlySuccessMessage(): string {
+    return `
+      <div class="mb-3">
+        <h4 class="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
+          ✅ Nội dung bài giảng đã được tạo thành công!
+        </h4>
+
+        <p class="mb-2 text-gray-700 dark:text-gray-300">
+          Bạn có thể <strong>xem trước hoặc tải xuống</strong> nội dung này ở phần bên phải.
+        </p>
+
+        <p class="mb-2 text-gray-700 dark:text-gray-300">
+          Nếu bạn muốn tạo nội dung mới, vui lòng quay lại trang quản lý và bắt đầu lại với một yêu cầu khác.
+        </p>
+
+        <p class="mt-3 text-xs text-primary">
+          * Lưu ý: Bạn không thể chỉnh sửa hoặc tạo lại nội dung này tại bước này.
+        </p>
+      </div>
+    `;
+  }
+
   private restoreMessagesFromJob(job: {
     topic: string;
     previewContent?: string;
@@ -337,11 +360,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       sender: 'system',
       content: job.failureReason
         ? this.renderFailureMessage(job.failureReason)
-        : this.renderSuccessMessage(
-            job.previewContent,
-            job.audioCost,
-            job.videoCost
-          ),
+        : this.renderReadOnlySuccessMessage(),
       isLoading: false,
     };
 
