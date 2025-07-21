@@ -1,0 +1,15 @@
+<a
+  routerLink="/teacher/generate-lesson/generate"
+  class="flex min-h-[230px] flex-col rounded-xl border border-[#dde1eb] bg-transparent p-6">
+  <img
+    [src]="user()?.avatarUrl"
+    [alt]="user()?.fullName"
+    class="size-16 rounded-full object-cover" />
+  <h3 class="mt-8 line-clamp-2 text-xl font-medium dark:text-white">
+    {{ job().topic }}
+  </h3>
+  <span class="mt-auto text-xs text-gray-400 dark:text-gray-300">
+    {{ job().createdAt | date: 'longDate' }} ·
+    {{ job().sourcesBlobNames.length }} tài liệu
+  </span>
+</a>

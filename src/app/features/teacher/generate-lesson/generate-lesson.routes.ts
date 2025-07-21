@@ -10,17 +10,29 @@ export const generateLessonRoutes: Routes = [
     children: [
       {
         path: '',
+        pathMatch: 'full',
+        redirectTo: 'generated',
+      },
+      {
+        path: 'generated',
+        loadComponent: () =>
+          import(
+            './generate-lesson-completed/generate-lesson-completed.component'
+          ).then(mod => mod.GenerateLessonCompletedComponent),
+      },
+      {
+        path: 'generate',
         loadComponent: () =>
           import('./generate-lesson-main/generate-lesson-main.component').then(
             mod => mod.GenerateLessonMainComponent
           ),
       },
       {
-        path: 'generate-lesson-saved',
+        path: 'generate/:jobId',
         loadComponent: () =>
-          import(
-            './generate-lesson-saved/generate-lesson-saved.component'
-          ).then(mod => mod.GenerateLessonSavedComponent),
+          import('./generate-lesson-main/generate-lesson-main.component').then(
+            mod => mod.GenerateLessonMainComponent
+          ),
       },
     ],
   },

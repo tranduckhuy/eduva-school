@@ -1,0 +1,60 @@
+<div class="mt-14 w-full">
+  <div class="mx-auto w-[80vw] lg:w-[90vw] sm:w-full">
+    <!-- ? Create New Button -->
+    <div class="flex w-full justify-end">
+      <a routerLink="/teacher/generate-lesson/generate">
+        <p-button
+          label="Tạo mới"
+          icon="pi pi-plus"
+          styleClass="min-w-[140px]"
+          [rounded]="true" />
+      </a>
+    </div>
+
+    <!-- ? Job List -->
+    <section class="sm:mt-8">
+      <h2 class="text-2xl font-medium">Các nội dung bạn đã tạo</h2>
+      <div class="e-container-fluid mt-4 px-0">
+        <div
+          class="e-row e-row-cols-4 e-row-cols-lg-3 e-row-cols-md-2 e-row-cols-xs-1">
+          <!-- ? Create New Card -->
+          <div class="e-col">
+            <a
+              routerLink="/teacher/generate-lesson/generate"
+              class="flex min-h-[230px] flex-col items-center justify-center gap-4 rounded-xl border border-[#dde1eb] bg-transparent">
+              <app-button
+                theme="light"
+                variant="light-rounded"
+                size="xl"
+                class="flex items-center justify-center bg-primary-100">
+                <span
+                  class="material-symbols-outlined relative top-1 text-primary">
+                  add_2
+                </span>
+              </app-button>
+              <span class="text-xl dark:text-white">Tạo mới</span>
+            </a>
+          </div>
+
+          <!-- ? Job Cards -->
+          @for (job of jobList(); track job.id) {
+            <div class="e-col">
+              <generate-lesson-card [job]="job" />
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ? -->
+    @if (jobList().length > 0) {
+      <div class="mt-8 flex w-full justify-center">
+        <p-paginator
+          [first]="first()"
+          [rows]="rows()"
+          [totalRecords]="totalJobs()"
+          (onPageChange)="onPageChange($event)" />
+      </div>
+    }
+  </div>
+</div>
