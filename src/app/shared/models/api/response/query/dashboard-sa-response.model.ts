@@ -1,4 +1,6 @@
+import { EntityStatus } from '../../../enum/entity-status.enum';
 import { ContentType } from '../../../enum/lesson-material.enum';
+import { BillingCycle } from '../../request/command/create-plan-payment-link-request.model';
 
 interface LessonActivity {
   period: string;
@@ -13,6 +15,9 @@ interface LessonStatusStats {
   pending: number;
   approved: number;
   rejected: number;
+  pendingPercentage: number;
+  approvedPercentage: number;
+  rejectedPercentage: number;
 }
 
 interface ContentTypeStats {
@@ -21,18 +26,24 @@ interface ContentTypeStats {
   video: number;
   audio: number;
   total: number;
+  pdfPercentage: number;
+  docPercentage: number;
+  videoPercentage: number;
+  audioPercentage: number;
 }
 
 interface ReviewLesson {
   id: string;
-  name: string;
+  title: string;
+  lessonStatus: EntityStatus;
   ownerName: string;
+  createdAt: string;
   contentType: ContentType;
 }
 
 interface TopTeachers {
   id: string;
-  name: string;
+  fullName: string;
   lessonCount: number;
   classesCount: number;
 }
@@ -40,6 +51,7 @@ interface TopTeachers {
 export interface DashboardSchoolAdminResponse {
   systemOverview: {
     totalUsers: number;
+    schoolAdmin: number;
     contentModerators: number;
     teachers: number;
     students: number;
@@ -47,12 +59,15 @@ export interface DashboardSchoolAdminResponse {
     totalLessons: number;
     uploadedLessons: number;
     aiGeneratedLessons: number;
-    usedStorage: number;
+    usedStorageBytes: number;
+    usedStorageGB: number;
     currentSubscription: {
+      id: string;
       name: string;
       price: number;
-      maxStorage: number;
-      billingCycle: string;
+      maxStorageBytes: number;
+      maxStorageGB: number;
+      billingCycle: BillingCycle;
       startDate: string;
       endDate: string;
     };
