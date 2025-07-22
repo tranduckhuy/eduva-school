@@ -138,10 +138,7 @@ describe('LessonMaterialsService', () => {
         mockRequest
       );
       expect(result).toBeNull();
-      expect(toastHandlingService.success).toHaveBeenCalledWith(
-        'Tải lên thành công',
-        'Tất cả tài liệu đã được tải lên thành công.'
-      );
+      expect(toastHandlingService.successGeneral).toHaveBeenCalled();
     });
 
     it('should handle create failure', async () => {
@@ -153,10 +150,7 @@ describe('LessonMaterialsService', () => {
       );
 
       expect(result).toBeNull();
-      expect(toastHandlingService.error).toHaveBeenCalledWith(
-        'Tải lên thất bại',
-        'Không thể tải lên tài liệu. Vui lòng thử lại sau.'
-      );
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalledWith();
     });
 
     it('should handle school subscription not found error', async () => {

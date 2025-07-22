@@ -17,6 +17,13 @@
 
     <div class="overlay" (click)="togglePlayPause(); onMobileTap()"></div>
 
+    <div
+      class="background-bar"
+      [class.opacity-100]="showMobileControls()"
+      [class.visible]="showMobileControls()"
+      [class.opacity-0]="!showMobileControls()"
+      [class.invisible]="!showMobileControls()"></div>
+
     @if (showUiControls()) {
       <!-- ? Progress Bar -->
       <div

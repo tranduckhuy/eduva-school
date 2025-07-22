@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  HostListener,
   inject,
   input,
   signal,
@@ -18,9 +17,16 @@ import { VgBufferingModule } from '@videogular/ngx-videogular/buffering';
 
 import { ButtonModule } from 'primeng/button';
 
-import { MediaFocusService } from '../../services/media-focus.service';
+import { ResourcesStateService } from '../../../services/utils/resources-state.service';
+import { GenerateSettingsSelectionService } from '../../services/generate-settings-selection.service';
+import { LessonMaterialsService } from '../../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
 
 import { VideoSettingsMenuComponent } from '../video-settings-menu/video-settings-menu.component';
+
+import {
+  type CreateLessonMaterialRequest,
+  type CreateLessonMaterialsRequest,
+} from '../../../../../../../shared/models/api/request/command/create-lesson-material-request.model';
 
 @Component({
   selector: 'video-preview-player',
@@ -45,11 +51,16 @@ export class VideoPreviewPlayerComponent {
   volumeBarRef = viewChild<ElementRef>('volumeBar');
 
   private vgApi = inject(VgApiService);
-  private readonly mediaFocusService = inject(MediaFocusService);
+  private readonly resourceStateService = inject(ResourcesStateService);
+  private readonly generateSettingsService = inject(
+    GenerateSettingsSelectionService
+  );
+  private readonly lessonMaterialService = inject(LessonMaterialsService);
 
   videoUrl = input<string>('');
 
-  isActive = this.mediaFocusService.isActive('video');
+  hasGeneratedSuccessfully = this.resourceStateService.hasGeneratedSuccessfully;
+  folderId = this.generateSettingsService.selectedFolderId;
 
   private hideControlsTimeout!: ReturnType<typeof setTimeout>;
 
@@ -166,16 +177,6 @@ export class VideoPreviewPlayerComponent {
     this.volumeLevel.set(level);
   }
 
-  toggleMute() {
-    const current = this.volumeLevel();
-    if (current > 0) {
-      this.lastVolumeLevel.set(current);
-      this.updateVolume(0);
-    } else {
-      this.updateVolume(this.lastVolumeLevel() ?? 1);
-    }
-  }
-
   startVolumeDrag(event: MouseEvent) {
     const volumeBar = this.volumeBarRef();
 
@@ -184,6 +185,16 @@ export class VideoPreviewPlayerComponent {
     this.startDrag(event, volumeBar, ratio => {
       this.updateVolume(ratio);
     });
+  }
+
+  toggleMute() {
+    const current = this.volumeLevel();
+    if (current > 0) {
+      this.lastVolumeLevel.set(current);
+      this.updateVolume(0);
+    } else {
+      this.updateVolume(this.lastVolumeLevel() ?? 1);
+    }
   }
 
   toggleFullscreen() {
@@ -248,10 +259,6 @@ export class VideoPreviewPlayerComponent {
     }
   }
 
-  setAsActive() {
-    this.mediaFocusService.setActive('video');
-  }
-
   formatTime(seconds: number): string {
     if (isNaN(seconds)) return '00:00';
     const min = Math.floor(seconds / 60)
@@ -263,25 +270,31 @@ export class VideoPreviewPlayerComponent {
     return `${min}:${sec}`;
   }
 
-  @HostListener('window:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent): void {
-    if (!this.isActive()) return;
+  onSaveGeneratedContent() {
+    const folderId = this.folderId();
+    const metadata = this.resourceStateService.aiGeneratedMetadata();
 
-    if (this.shouldIgnoreKeyboardEvent(event)) return;
+    if (!folderId || !metadata) return;
 
-    const actions: Record<string, () => void> = {
-      Space: () => {
-        event.preventDefault();
-        this.togglePlayPause();
-      },
-      ArrowRight: () => this.forward(10),
-      ArrowLeft: () => this.rewind(10),
-      KeyF: () => this.toggleFullscreen(),
-      KeyM: () => this.toggleMute(),
+    const cleanBlobName = metadata.blobName.split('?')[0];
+    const material: CreateLessonMaterialRequest = {
+      title: metadata.title,
+      contentType: metadata.contentType,
+      duration: metadata.duration,
+      fileSize: metadata.fileSize,
+      isAIContent: true,
+      sourceUrl: cleanBlobName,
     };
 
-    const action = actions[event.code];
-    if (action) action();
+    const createRequest: CreateLessonMaterialsRequest = {
+      folderId,
+      blobNames: [cleanBlobName],
+      lessonMaterials: [material],
+    };
+
+    this.lessonMaterialService.createLessonMaterials(createRequest).subscribe({
+      next: () => this.resourceStateService.clearAiGeneratedMetadata(),
+    });
   }
 
   private getVideoElement(): HTMLVideoElement {
@@ -308,12 +321,5 @@ export class VideoPreviewPlayerComponent {
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
     onMouseMove(event);
-  }
-
-  private shouldIgnoreKeyboardEvent(event: KeyboardEvent): boolean {
-    const target = event.target as HTMLElement;
-    return (
-      ['INPUT', 'TEXTAREA'].includes(target.tagName) || target.isContentEditable
-    );
   }
 }

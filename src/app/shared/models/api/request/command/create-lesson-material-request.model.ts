@@ -4,7 +4,7 @@ export interface CreateLessonMaterialRequest {
   title: string;
   description?: string;
   contentType: ContentType;
-  duration: number;
+  duration?: number;
   fileSize: number;
   isAIContent: boolean;
   sourceUrl: string;

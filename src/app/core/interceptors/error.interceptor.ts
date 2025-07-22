@@ -42,8 +42,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
     globalModalService.close();
     confirmationService.confirm({
-      message: 'Vui lòng đăng nhập lại.',
       header: 'Phiên đã hết hạn',
+      message: 'Vui lòng đăng nhập lại.',
       closable: false,
       rejectVisible: false,
       acceptButtonProps: { label: 'Đồng ý' },
