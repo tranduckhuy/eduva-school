@@ -37,7 +37,7 @@
           <div class="relative">
             <p-table
               [tableStyle]="{ 'min-width': '50rem' }"
-              [scrollHeight]="'600px'"
+              [scrollHeight]="'460px'"
               [scrollable]="true"
               [paginator]="false"
               [showCurrentPageReport]="true"
@@ -63,7 +63,7 @@
                   </th>
                   <th
                     scope="col"
-                    class="!min-w-[150px] !border-l !border-l-white !text-center dark:!border-l-dark-500"
+                    class="!min-w-[180px] !border-l !border-l-white !text-center dark:!border-l-dark-500"
                     alignFrozen="right"
                     pFrozenColumn>
                     Hành động
@@ -84,7 +84,10 @@
                         [ngClass]="getMaterialIconColor(material)">
                         {{ getMaterialIcon(material) }}
                       </i>
-                      <span class="transition-colors group-hover:text-primary">
+                      <span
+                        [pTooltip]="material.title"
+                        tooltipPosition="bottom"
+                        class="line line-clamp-2 transition-colors group-hover:text-primary">
                         {{ material.title }}
                       </span>
                     </a>
@@ -166,7 +169,8 @@
                         tooltipPosition="bottom"
                         variant="rounded"
                         size="xs"
-                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
+                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent"
+                        (clicked)="onUpdateVisibility(material)">
                         share
                       </app-button>
                       <app-button

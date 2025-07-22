@@ -166,6 +166,7 @@ export class NavbarComponent implements OnInit {
           this.buildNavItem('Bảng thống kê', 'dashboard', dashboardLink),
         ],
       },
+      ...this.buildGenerateLessonNav(isTeacher, isModerator, schoolMissing),
       {
         section: 'Quản lý',
         navItems: [
@@ -299,7 +300,6 @@ export class NavbarComponent implements OnInit {
     if (isTeacher || isModerator) {
       push('Tài liệu chia sẻ', '/teacher/shared-lessons', schoolMissing);
       push('Danh sách lớp học', '/teacher/class-management', schoolMissing);
-      push('Tạo bài giảng tự động', '/teacher/generate-lesson', schoolMissing);
     }
 
     if (isModerator && !isAdmin) {
@@ -313,5 +313,27 @@ export class NavbarComponent implements OnInit {
       isActive: false,
       submenuItems: submenu,
     };
+  }
+
+  private buildGenerateLessonNav(
+    isTeacher: boolean,
+    isModerator: boolean,
+    schoolMissing: boolean
+  ): NavbarConfig[] {
+    if (!isTeacher && !isModerator) return [];
+
+    return [
+      {
+        section: 'Tạo bài giảng',
+        navItems: [
+          this.buildNavItem(
+            'Tạo bài giảng tự động',
+            'smart_display',
+            '/teacher/generate-lesson',
+            schoolMissing
+          ),
+        ],
+      },
+    ];
   }
 }
