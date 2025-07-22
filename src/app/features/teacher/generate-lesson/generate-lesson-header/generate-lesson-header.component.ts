@@ -32,8 +32,7 @@ export class GenerateLessonHeaderComponent {
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(e => {
-        const nav = e as NavigationEnd;
-        this.currentUrl.set(nav.urlAfterRedirects);
+        this.currentUrl.set(e.urlAfterRedirects);
       });
   }
 }

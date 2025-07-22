@@ -135,12 +135,12 @@ export class VideoPreviewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const job = this.job();
+    const videoBlob = this.job()?.videoOutputBlobName;
 
-    if (!job || !job.videoOutputBlobName) return;
+    if (!videoBlob) return;
 
     this.videoState.set('generated');
-    this.videoUrl.set(job.videoOutputBlobName);
+    this.videoUrl.set(videoBlob);
 
     this.resourcesStateService.markGeneratedSuccess();
   }

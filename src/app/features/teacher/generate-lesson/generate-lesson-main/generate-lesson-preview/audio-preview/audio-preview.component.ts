@@ -135,12 +135,12 @@ export class AudioPreviewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const job = this.job();
+    const audioBlob = this.job()?.audioOutputBlobName;
 
-    if (!job || !job.audioOutputBlobName) return;
+    if (!audioBlob) return;
 
     this.audioState.set('generated');
-    this.audioUrl.set(job.audioOutputBlobName);
+    this.audioUrl.set(audioBlob);
 
     this.resourcesStateService.markGeneratedSuccess();
   }

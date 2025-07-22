@@ -1,7 +1,5 @@
 import { Injectable, signal } from '@angular/core';
 
-import { type Folder } from '../../../../../../shared/models/entities/folder.model';
-
 export type VoiceOption = {
   name: string;
   value: string;
