@@ -14,6 +14,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AiJobsService } from './services/api/ai-jobs.service';
 import { AiSocketService } from './services/api/ai-socket.service';
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
+import { ResourcesStateService } from './services/utils/resources-state.service';
 
 import { GenerateLessonUploadComponent } from './generate-lesson-upload/generate-lesson-upload.component';
 import { GenerateLessonChatComponent } from './generate-lesson-chat/generate-lesson-chat.component';
@@ -39,6 +40,7 @@ export class GenerateLessonMainComponent implements OnInit, OnChanges {
   private readonly aiJobService = inject(AiJobsService);
   private readonly aiSocketService = inject(AiSocketService);
   private readonly loadingService = inject(LoadingService);
+  private readonly resourceStateService = inject(ResourcesStateService);
 
   jobId = input<string>();
 
@@ -46,7 +48,10 @@ export class GenerateLessonMainComponent implements OnInit, OnChanges {
   job = this.aiJobService.job;
 
   constructor() {
-    this.destroyRef.onDestroy(() => this.aiSocketService.disconnect());
+    this.destroyRef.onDestroy(() => {
+      this.aiSocketService.disconnect();
+      this.resourceStateService.resetAll();
+    });
   }
 
   ngOnInit(): void {
@@ -61,6 +66,7 @@ export class GenerateLessonMainComponent implements OnInit, OnChanges {
     if (changes['jobId']) {
       const newJobId = this.jobId();
       if (newJobId) {
+        this.resourceStateService.resetAll();
         this.aiJobService.getJobById(newJobId).subscribe();
       } else {
         this.aiJobService.clearJob();

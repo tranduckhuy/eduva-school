@@ -122,8 +122,11 @@
       label="Lưu nội dung"
       size="small"
       icon="pi pi-save"
+      tooltipPosition="bottom"
       [rounded]="true"
       [fluid]="true"
+      [pTooltip]="!this.folderId() ? 'Vui lòng chọn thư mục trước khi lưu' : ''"
+      [disabled]="!this.folderId()"
       (onClick)="onSaveGeneratedContent()" />
   }
   <p-button
