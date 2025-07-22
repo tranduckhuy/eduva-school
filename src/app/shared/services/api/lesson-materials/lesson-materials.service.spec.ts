@@ -785,7 +785,7 @@ describe('LessonMaterialsService', () => {
 
   describe('deleteMaterial', () => {
     const materialIds = ['material1', 'material2'];
-    const folderId = 'folder1';
+    const request = { ids: materialIds, permanent: true };
 
     it('should delete materials successfully', async () => {
       const successResponse = { statusCode: StatusCode.SUCCESS };
@@ -793,13 +793,11 @@ describe('LessonMaterialsService', () => {
         of(successResponse)
       );
 
-      const result = await lastValueFrom(
-        service.deleteMaterial(folderId, materialIds)
-      );
+      const result = await lastValueFrom(service.deleteMaterial(request));
 
       expect(requestService.deleteWithBody).toHaveBeenCalledWith(
-        expect.stringContaining(`/folders/${folderId}/lesson-materials`),
-        materialIds
+        expect.stringContaining('/lesson-materials'),
+        request
       );
       expect(result).toBeNull();
       expect(toastHandlingService.successGeneral).toHaveBeenCalled();
@@ -811,9 +809,7 @@ describe('LessonMaterialsService', () => {
         of(failureResponse)
       );
 
-      const result = await lastValueFrom(
-        service.deleteMaterial(folderId, materialIds)
-      );
+      const result = await lastValueFrom(service.deleteMaterial(request));
 
       expect(result).toBeNull();
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
@@ -826,7 +822,7 @@ describe('LessonMaterialsService', () => {
       );
 
       await expect(
-        lastValueFrom(service.deleteMaterial(folderId, materialIds))
+        lastValueFrom(service.deleteMaterial(request))
       ).rejects.toThrow();
 
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
@@ -847,7 +843,8 @@ describe('LessonMaterialsService', () => {
 
       expect(requestService.put).toHaveBeenCalledWith(
         expect.stringContaining(`/lesson-materials/${folderId}/restore`),
-        materialIds
+        materialIds,
+        { loadingKey: 'restore-material' }
       );
       expect(result).toBeNull();
       expect(toastHandlingService.successGeneral).toHaveBeenCalled();
@@ -1181,16 +1178,17 @@ describe('LessonMaterialsService', () => {
         { loadingKey: 'approve-reject-material' }
       );
 
-      service.deleteMaterial('test-folder', ['test-id']);
+      service.deleteMaterial({ ids: ['test-id'], permanent: true });
       expect(requestService.deleteWithBody).toHaveBeenCalledWith(
-        expect.stringContaining('/folders/test-folder/lesson-materials'),
-        ['test-id']
+        expect.stringContaining('/lesson-materials'),
+        { ids: ['test-id'], permanent: true }
       );
 
       service.restoreMaterial('test-folder', ['test-id']);
       expect(requestService.put).toHaveBeenCalledWith(
         expect.stringContaining('/lesson-materials/test-folder/restore'),
-        ['test-id']
+        ['test-id'],
+        { loadingKey: 'restore-material' }
       );
     });
   });
