@@ -11,6 +11,7 @@ import { ToastHandlingService } from '../../../../../../shared/services/core/toa
 import { StatusCode } from '../../../../../../shared/constants/status-code.constant';
 import { LessonGenerationType } from '../../../../../../shared/models/enum/lesson-generation-type.enum';
 
+import { type AiJob } from '../../../../../../shared/models/entities/ai-job.model';
 import { type CreateAiJobsRequest } from '../../models/request/command/create-ai-jobs-request.model';
 import { type CreateAiJobsResponse } from '../../models/response/command/create-ai-jobs-response.model';
 import { type ConfirmCreateContent } from '../../models/request/command/confirm-create-content-request.model';
@@ -24,6 +25,9 @@ export class AiJobsService {
 
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly BASE_AI_JOBS_API_URL = `${this.BASE_API_URL}/ai-jobs`;
+
+  private readonly jobSignal = signal<AiJob | null>(null);
+  job = this.jobSignal.asReadonly();
 
   private readonly jobIdSignal = signal<string>('');
   jobId = this.jobIdSignal.asReadonly();
@@ -69,6 +73,26 @@ export class AiJobsService {
         map(() => null),
         catchError((err: HttpErrorResponse) => this.handleError(err))
       );
+  }
+
+  getJobById(jobId: string): Observable<AiJob | null> {
+    return this.requestService
+      .get<AiJob>(`${this.BASE_AI_JOBS_API_URL}/${jobId}`, undefined, {
+        loadingKey: 'get-job-detail',
+      })
+      .pipe(
+        tap(res => {
+          if (res.statusCode === StatusCode.SUCCESS) {
+            this.jobSignal.set(res.data as AiJob);
+          }
+        }),
+        map(res => this.extractData<AiJob>(res)),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  clearJob() {
+    this.jobSignal.set(null);
   }
 
   // ---------------------------

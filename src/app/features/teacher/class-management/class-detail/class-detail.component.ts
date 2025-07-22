@@ -121,12 +121,14 @@ export class ClassDetailComponent implements OnInit {
       switchMap(folders => {
         if (!folders || folders.length === 0) return of([]);
         const requests = folders.map(folder =>
-          this.lessonMaterialsService.getLessonMaterials(folder.id).pipe(
-            map(materials => ({
-              folder,
-              materials: materials ?? [],
-            }))
-          )
+          this.lessonMaterialsService
+            .getLessonMaterialsByFolder(folder.id)
+            .pipe(
+              map(materials => ({
+                folder,
+                materials: materials ?? [],
+              }))
+            )
         );
         return forkJoin(requests);
       })

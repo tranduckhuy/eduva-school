@@ -8,28 +8,43 @@
     <div class="ml-auto flex gap-2">
       <p-select
         [options]="timeSelectOptions()"
-        [ngModel]="timeSelect"
+        [ngModel]="timeSelect()"
         (ngModelChange)="onTimeSelectChange($event)"
         optionLabel="name"
         placeholder="Chọn khoảng thời gian"
+        [disabled]="isChangingPeriod()"
         class="!dark:bg-dark-200 flex h-11 w-full items-center sm:w-40" />
+      @if (isChangingPeriod()) {
+        <div class="flex items-center">
+          <div
+            class="h-4 w-4 animate-spin rounded-full border-b-2 border-primary"></div>
+        </div>
+      }
     </div>
   </div>
 
   <div id="chart" class="p-5">
-    @if (chartOptions()) {
+    @if (isChangingPeriod()) {
+      <div class="flex h-64 items-center justify-center">
+        <div class="text-center">
+          <div
+            class="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
+          <p class="text-gray-600 dark:text-gray-400">Đang tải dữ liệu...</p>
+        </div>
+      </div>
+    } @else {
       <apx-chart
-        [series]="chartOptions()!.series"
-        [chart]="chartOptions()!.chart"
-        [xaxis]="chartOptions()!.xaxis"
-        [yaxis]="chartOptions()!.yaxis"
-        [title]="chartOptions()!.title"
-        [tooltip]="chartOptions()!.tooltip"
-        [dataLabels]="chartOptions()!.dataLabels"
-        [plotOptions]="chartOptions()!.plotOptions"
-        [colors]="chartOptions()!.colors"
-        [fill]="chartOptions()!.fill"
-        [legend]="chartOptions()!.legend">
+        [series]="chartOptions().series"
+        [chart]="chartOptions().chart"
+        [xaxis]="chartOptions().xaxis"
+        [yaxis]="chartOptions().yaxis"
+        [title]="chartOptions().title"
+        [tooltip]="chartOptions().tooltip"
+        [dataLabels]="chartOptions().dataLabels"
+        [plotOptions]="chartOptions().plotOptions"
+        [colors]="chartOptions().colors"
+        [fill]="chartOptions().fill"
+        [legend]="chartOptions().legend">
       </apx-chart>
     }
   </div>

@@ -49,11 +49,6 @@ export class AddLessonModalComponent {
     return this.form.get('name')!;
   }
 
-  onBlur(controlName: string) {
-    const control = this.form.get(controlName);
-    control?.markAsTouched();
-  }
-
   onSubmit() {
     this.form.markAllAsTouched();
 
@@ -74,6 +69,11 @@ export class AddLessonModalComponent {
         error: () => this.resetForm(),
       });
     }
+  }
+
+  onBlur(controlName: string) {
+    const control = this.form.get(controlName);
+    control?.markAsTouched();
   }
 
   getErrorMessage(controlName: string): string {

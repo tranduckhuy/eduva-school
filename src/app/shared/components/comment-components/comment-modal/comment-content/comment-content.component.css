@@ -1,0 +1,9 @@
+.comment-category {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #808b9a;
+  background-color: #f6f7f9;
+  white-space: nowrap;
+}

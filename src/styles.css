@@ -1,5 +1,6 @@
 @import '@angular/cdk/overlay-prebuilt.css';
 @import 'primeicons/primeicons.css';
+@import 'ckeditor5/ckeditor5.css';
 @import '~plyr/dist/plyr.css';
 
 @import './assets/css/grid.css';
@@ -61,6 +62,7 @@
     --color-primary-600: #157cd9;
     --color-primary-700: #115fb8;
     --color-primary-800: #0e4b92;
+    --color-primary: var(--color-primary-500);
 
     --color-secondary-50: #f3f7ff;
     --color-secondary-100: #e2ebfd;
@@ -129,6 +131,36 @@
     --color-scrollbar: #b5c3d7;
 
     --color-button-active: #edeffa;
+
+    --color-text-btn-gradient: var(--color-primary);
+    --color-bg-btn-gradient-icon:
+      linear-gradient(#fbfdff, #fbfdff) padding-box,
+      linear-gradient(#5ebbff 0%, #a174ff 40%) border-box;
+    --color-bg-icon-btn-gradient-icon: #fbfdff;
+    --color-bg-hover-btn-gradient-icon: #e1effe;
+
+    --rich-text-text-color: var(--color-black);
+    --rich-text-placeholder-color: #24242466;
+    --rich-text-mention-bg-color: var(--color-gray-50);
+    --rich-text-bg-color: #eef4fc;
+    --rich-text-focus-bg-color: #fff;
+    --rich-text-focus-border-color: #444;
+
+    --description-rich-text-bg-color: var(--color-white);
+    --description-rich-text-border-color: var(--color-gray-200);
+
+    --comment-item-text-color: #2e3441;
+    --comment-item-hover-bg-color: #f2f9ff;
+    --comment-item-category-bg-color: var(--color-gray-50);
+    --comment-pagination-disabled: var(--comment-item-text-color);
+
+    --color-text-blockquote: #4e586b;
+    --color-text-code-block: #2e3441;
+    --color-bg-code-block: #c9fffc;
+    --color-shadow-image: #0000000d;
+
+    --color-text-footer-options-comment: #2e3441;
+    --color-bg-footer-options-comment: #eef4fc;
   }
 
   html {
@@ -157,6 +189,34 @@
     --color-scrollbar: #ffffff26;
 
     --color-button-active: #8695aa;
+
+    --color-text-btn-gradient: var(--color-white);
+    --color-bg-btn-gradient-icon: #292d35;
+    --color-bg-icon-btn-gradient-icon: var(--color-bg-btn-gradient-icon);
+    --color-bg-hover-btn-gradient-icon: #2e4a8d;
+
+    --rich-text-text-color: #dae4f0;
+    --rich-text-placeholder-color: #dae4f066;
+    --rich-text-mention-bg-color: #191d1e;
+    --rich-text-bg-color: var(--color-bg-third);
+    --rich-text-focus-bg-color: var(--color-bg-third);
+    --rich-text-focus-border-color: #2093e7;
+
+    --description-rich-text-bg-color: var(--rich-text-bg-color);
+    --description-rich-text-border-color: var(--color-gray-900);
+
+    --comment-item-text-color: #a2adbd;
+    --comment-item-hover-bg-color: #32353b;
+    --comment-item-category-bg-color: var(--color-bg-primary);
+    --comment-pagination-disabled: var(--color-text-lesson-active);
+
+    --color-text-blockquote: var(--rich-text-text-color);
+    --color-text-code-block: var(--rich-text-text-color);
+    --color-bg-code-block: #34474c;
+    --color-shadow-image: #ffffff1a;
+
+    --color-text-footer-options-comment: var(--color-text-code-block);
+    --color-bg-footer-options-comment: #3b4554;
   }
 
   html *::-webkit-scrollbar {

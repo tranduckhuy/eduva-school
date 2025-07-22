@@ -19,14 +19,18 @@
         </div>
       </div>
       <p-button
-        pTooltip="Hãy tải tài liệu lên, nhập yêu cầu và chọn cài đặt giọng đọc trước khi tạo"
         tooltipPosition="bottom"
         label="Tạo nội dung"
         styleClass="mt-4"
         [rounded]="true"
         [fluid]="true"
+        [pTooltip]="
+          hasGeneratedSuccessfully()
+            ? 'Bạn đã tạo nội dung cho bài giảng này. Nếu muốn tạo lại, vui lòng tạo 1 phiên tạo nội dung mới.'
+            : 'Hãy tải tài liệu lên, nhập yêu cầu và chọn cài đặt giọng đọc trước khi tạo'
+        "
         [disabled]="disableGenerate()"
-        (onClick)="confirmGenerateAudio()" />
+        (onClick)="confirmGenerateVideo()" />
     </div>
   }
 

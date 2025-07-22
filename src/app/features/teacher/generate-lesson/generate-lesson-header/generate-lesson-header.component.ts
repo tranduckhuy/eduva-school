@@ -1,13 +1,38 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { Router, RouterLink, NavigationEnd } from '@angular/router';
+
+import { filter } from 'rxjs';
 
 import { GenerateLessonSettingsComponent } from './generate-lesson-settings/generate-lesson-settings.component';
 
 @Component({
   selector: 'generate-lesson-header',
   standalone: true,
-  imports: [GenerateLessonSettingsComponent],
+  imports: [RouterLink, GenerateLessonSettingsComponent],
   templateUrl: './generate-lesson-header.component.html',
   styleUrl: './generate-lesson-header.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GenerateLessonHeaderComponent {}
+export class GenerateLessonHeaderComponent {
+  private readonly router = inject(Router);
+
+  private readonly currentUrl = signal(this.router.url);
+
+  readonly isInGeneratedRoute = computed(() =>
+    this.currentUrl().includes('/generate-lesson/generated')
+  );
+
+  constructor() {
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(e => {
+        this.currentUrl.set(e.urlAfterRedirects);
+      });
+  }
+}

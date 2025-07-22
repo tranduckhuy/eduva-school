@@ -1,0 +1,66 @@
+:host ::ng-deep .p-button-label {
+  font-weight: 600 !important;
+}
+
+ul li + li {
+  margin-top: 10px;
+}
+
+.comment-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 6px 8px 6px 12px;
+  color: var(--comment-item-text-color);
+  cursor: pointer;
+}
+
+.comment-item:hover {
+  border-radius: 4px;
+  background-color: var(--comment-item-hover-bg-color);
+}
+
+.comment-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prev,
+.next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 24px;
+  border-radius: 4px;
+  margin-top: 2px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 24px;
+  border-radius: 4px;
+  margin-right: 4px;
+  font-weight: 600;
+  color: #0093fc;
+  user-select: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.prev:hover,
+.next:hover,
+.page:hover {
+  background-color: var(--comment-item-hover-bg-color);
+}
+
+.page.active {
+  color: #fff;
+  background-color: rgb(0, 147, 252);
+}

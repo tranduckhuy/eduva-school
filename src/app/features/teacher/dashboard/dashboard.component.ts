@@ -1,10 +1,23 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 
 import { StatCardComponent } from './stat-card/stat-card.component';
-import { UserRegistrationTrendComponent } from './user-registration-trend/user-registration-trend.component';
 import { LessonCreationComponent } from './lesson-creation/lesson-creation.component';
-import { RevenueTrendComponent } from './revenue-trend/revenue-trend.component';
-import { TopActiveSchoolsComponent } from './top-active-schools/top-active-schools.component';
+import { UserService } from '../../../shared/services/api/user/user.service';
+import { DashboardService } from '../../../shared/services/api/dashboard/dashboard.service';
+import { LoadingService } from '../../../shared/services/core/loading/loading.service';
+import { UserRoles } from '../../../shared/constants/user-roles.constant';
+import { ContentTypeStatsComponent } from './content-type-stats/content-type-stats.component';
+import { ReviewLessonsComponent } from './review-lessons/review-lessons.component';
+import { RecentLessonsComponent } from './recent-lessons/recent-lessons.component';
+import { UnanswerQuestionsComponent } from './unanswer-questions/unanswer-questions.component';
+import { QuestionVolumeTrendComponent } from './question-volume-trend/question-volume-trend.component';
 
 interface StatCard {
   title: string;
@@ -28,54 +41,89 @@ interface SubItem {
   standalone: true,
   imports: [
     StatCardComponent,
-    UserRegistrationTrendComponent,
     LessonCreationComponent,
-    RevenueTrendComponent,
-    TopActiveSchoolsComponent,
+    ContentTypeStatsComponent,
+    ReviewLessonsComponent,
+    RecentLessonsComponent,
+    UnanswerQuestionsComponent,
+    QuestionVolumeTrendComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardComponent {
-  usersStatCard = signal<StatCard>({
-    title: 'Người dùng',
-    description: 'Số lượng người dùng',
-    value: 5301,
-    icon: 'group',
-    iconColor: 'text-primary',
-    subItems: [
-      { title: 'School Admins', value: 50 },
-      { title: 'Giáo viên', value: 1000 },
-      { title: 'Học sinh', value: 4251 },
-    ],
+export class DashboardComponent implements OnInit {
+  private readonly userService = inject(UserService);
+  private readonly dashboardService = inject(DashboardService);
+  private readonly loadingService = inject(LoadingService);
+
+  readonly dashboardData = this.dashboardService.dashboardTeacherData;
+  readonly currentUser = this.userService.currentUser;
+  readonly isLoadingDashboard = this.loadingService.is('dashboard');
+
+  isTeacher = this.currentUser()?.roles?.includes(UserRoles.TEACHER);
+
+  studentsStatCard = computed<StatCard>(() => {
+    const data = this.dashboardData();
+    return {
+      title: 'Học sinh',
+      description: 'Số lượng học sinh',
+      value: data?.systemOverview.totalStudents ?? 0,
+      icon: 'group',
+      iconColor: 'text-primary',
+    };
   });
-  lessonsStatCard = signal<StatCard>({
-    title: 'Bài học',
-    description: 'Số lượng bài học',
-    value: 5000,
-    icon: 'book_ribbon',
-    iconColor: 'text-success',
-    subItems: [
-      { title: 'Bài học được tải lên', value: 3000 },
-      { title: 'Bài học tạo bằng AI', value: 2000 },
-    ],
+  classesStatCard = computed<StatCard>(() => {
+    const data = this.dashboardData();
+    return {
+      title: 'Lớp học',
+      description: 'Số lượng lớp học',
+      value: data?.systemOverview.totalClasses ?? 0,
+      icon: 'class',
+      iconColor: 'text-primary',
+    };
   });
-  storageStatCard = signal<StatCard>({
-    title: 'Dung lượng',
-    description: 'Dung lượng đã sử dụng',
-    value: 5000,
-    icon: 'database',
-    compareValue: 8000,
-    unit: 'GB',
-    iconColor: 'text-danger',
+  lessonsStatCard = computed<StatCard>(() => {
+    const data = this.dashboardData();
+    return {
+      title: 'Bài học',
+      description: 'Số lượng bài học',
+      value: data?.systemOverview.totalLessons ?? 0,
+      icon: 'book_ribbon',
+      iconColor: 'text-success',
+      subItems: [
+        {
+          title: 'Bài học được tải lên',
+          value: data?.systemOverview.uploadedLessons ?? 0,
+        },
+        {
+          title: 'Bài học tạo bằng AI',
+          value: data?.systemOverview.aiGeneratedLessons ?? 0,
+        },
+      ],
+    };
   });
-  schoolsStatCard = signal<StatCard>({
-    title: 'Trường học',
-    description: 'Số lượng trường học',
-    value: 50,
-    icon: 'school',
-    iconColor: 'text-danger',
+  storageStatCard = computed<StatCard>(() => {
+    const data = this.dashboardData();
+    return {
+      title: 'Dung lượng (GB)',
+      description: 'Dung lượng đã sử dụng',
+      value: data?.systemOverview.usedStorageGB ?? 0,
+      icon: 'database',
+      unit: 'GB',
+      iconColor: 'text-danger',
+    };
+  });
+  remainCreditPointsStatCard = computed<StatCard>(() => {
+    const data = this.dashboardData();
+    return {
+      title: 'Credit còn lại',
+      description: 'Số lượng credit còn lại',
+      value: data?.systemOverview.remainCreditPoints ?? 0,
+      imageIcon: true,
+      icon: 'credit_score',
+      iconColor: 'text-warning',
+    };
   });
   pricingPlanRevenueStatCard = signal<StatCard>({
     title: 'Credit',
@@ -85,4 +133,32 @@ export class DashboardComponent {
     isRevenue: true,
     iconColor: 'text-warning',
   });
+  pendingLessonStatCard = computed<StatCard>(() => {
+    const data = this.dashboardData();
+    return {
+      title: this.isTeacher
+        ? 'Bài học chờ kiểm duyệt'
+        : 'Bài học chưa kiểm duyệt',
+      description: this.isTeacher
+        ? 'Số lượng bài học chờ kiểm duyệt'
+        : 'Số lượng bài học chưa kiểm duyệt',
+      value: data?.systemOverview.totalPendingLessons ?? 0,
+      icon: 'timer',
+      iconColor: 'text-warning',
+    };
+  });
+  unAnswerQuestionStatCard = computed<StatCard>(() => {
+    const data = this.dashboardData();
+    return {
+      title: 'Câu hỏi chưa trả lời',
+      description: 'Số lượng câu hỏi chưa trả lời',
+      value: data?.systemOverview.unansweredQuestions ?? 0,
+      icon: 'question_answer',
+      iconColor: 'text-warning',
+    };
+  });
+
+  ngOnInit(): void {
+    this.dashboardService.getTeacherDashboardData({}).subscribe();
+  }
 }

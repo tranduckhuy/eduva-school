@@ -1,0 +1,40 @@
+@if (question()) {
+  <div class="mb-[70px] mt-7">
+    @if (question()?.canComment) {
+      <app-user-comment-textbox
+        [questionId]="question()!.id"
+        (createCommentSuccess)="createCommentSuccess.emit()" />
+    }
+
+    <!-- ? Comment List -->
+    <div class="mt-6">
+      <h2 class="text-lg font-semibold text-[#4e586b] dark:text-[#dae4f0]">
+        {{ question()?.commentCount }} bình luận
+      </h2>
+
+      @for (comment of question()?.comments; track comment.id) {
+        <!-- ? Comments -->
+        <comment-context
+          [comment]="comment"
+          [questionId]="question()?.id"
+          [isBestComment]="comment.id === commentWithMostReplies()?.id"
+          (createCommentSuccess)="createCommentSuccess.emit()"
+          (updateCommentSuccess)="updateCommentSuccess.emit()"
+          (deleteCommentSuccess)="deleteCommentSuccess.emit()" />
+
+        <!-- ? Replies -->
+        <div class="border-l-[#dae4f0 ] ml-2 mt-[30px] border-l">
+          @for (reply of comment.replies; track reply.id) {
+            <comment-context
+              [reply]="reply"
+              [questionId]="question()?.id"
+              [isReplyMode]="true"
+              (createCommentSuccess)="createCommentSuccess.emit()"
+              (updateCommentSuccess)="updateCommentSuccess.emit()"
+              (deleteCommentSuccess)="deleteCommentSuccess.emit()" />
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

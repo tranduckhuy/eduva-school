@@ -101,20 +101,17 @@
 
       <!-- ? Voice Type -->
       <div class="mt-5 flex w-full gap-4">
-        <div class="flex grow flex-col">
+        <div
+          class="flex min-w-[calc(50%-10px)] max-w-[calc(50%-10px)] grow flex-col">
           <span class="text-base font-semibold dark:text-white">Giọng đọc</span>
           <div class="mt-2 flex w-full gap-3">
             <p-select
               formControlName="voice"
               name="voice"
               placeholder="Chọn giọng đọc phù hợp yêu cầu"
-              filterPlaceholder="Tìm kiếm..."
-              emptyFilterMessage="Không có kết quả tìm thấy"
               emptyMessage="Chưa có giọng đọc nào."
               class="w-full"
               [checkmark]="true"
-              [filter]="true"
-              [resetFilterOnHide]="true"
               [showClear]="true"
               [options]="voiceOptions()">
               <ng-template let-selectedVoice #selectedItem>
@@ -126,24 +123,28 @@
             </p-select>
           </div>
         </div>
-        <div class="flex grow flex-col">
+        <div
+          class="flex min-w-[calc(50%-5px)] max-w-[calc(50%-5px)] grow flex-col">
           <span class="text-base font-semibold dark:text-white">
             Ngôn ngữ đọc
           </span>
           <div class="mt-2 flex w-full gap-3">
             <p-select
               formControlName="language"
-              name="voice"
+              name="language"
               placeholder="Chọn ngôn ngữ phù hợp yêu cầu"
-              filterPlaceholder="Tìm kiếm..."
-              emptyFilterMessage="Không có kết quả tìm thấy"
               emptyMessage="Chưa có ngôn ngữ nào."
               class="w-full"
               [checkmark]="true"
-              [filter]="true"
-              [resetFilterOnHide]="true"
               [showClear]="true"
-              [options]="languageOptions()" />
+              [options]="languageOptions()">
+              <ng-template let-selectedLanguage #selectedItem>
+                {{ selectedLanguage.name }}
+              </ng-template>
+              <ng-template let-language #item>
+                {{ language.name }}
+              </ng-template>
+            </p-select>
           </div>
         </div>
       </div>
@@ -155,26 +156,21 @@
         </span>
         <div class="mt-2 flex gap-3">
           <p-select
-            formControlName="folder"
-            name="folder"
+            formControlName="folderId"
+            name="folderId"
             placeholder="Chọn thư mục bạn muốn lưu trữ"
             filterPlaceholder="Tìm kiếm..."
             emptyFilterMessage="Không có kết quả tìm thấy"
             emptyMessage="Chưa có thư mục nào. Vui lòng tạo thư mục mới để bắt đầu."
             class="w-full"
+            optionLabel="name"
+            optionValue="id"
             [checkmark]="true"
             [filter]="true"
             [resetFilterOnHide]="true"
             [showClear]="true"
             [options]="folderList()"
-            [loading]="isFolderLoading()">
-            <ng-template let-selectedFolder #selectedItem>
-              {{ selectedFolder.name }}
-            </ng-template>
-            <ng-template let-folder #item>
-              {{ folder.name }}
-            </ng-template>
-          </p-select>
+            [loading]="isFolderLoading()" />
         </div>
       </div>
     </form>

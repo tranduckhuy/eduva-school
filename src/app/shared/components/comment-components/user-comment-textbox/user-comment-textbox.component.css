@@ -1,0 +1,47 @@
+:host ::ng-deep .p-button-label {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+.btn-cancel {
+  min-width: 160px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background-color: #5ebbff;
+  background: linear-gradient(#5ebbff80 40%, #a174ff80);
+  overflow: hidden;
+  user-select: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-cancel:hover {
+  opacity: 0.8;
+}
+
+.btn-cancel-inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 4px 16px;
+  border: 1px solid transparent;
+  border-radius: inherit;
+  background-color: #fff;
+  background-clip: padding-box;
+}
+
+.btn-cancel-inner span {
+  white-space: nowrap;
+  font-weight: 700;
+  line-height: 1.8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: transparent;
+  background: linear-gradient(to bottom right, #5ebbff, #a174ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+}

@@ -1,0 +1,88 @@
+.content {
+  --font-size: 14px;
+  --line-height: 1.6;
+  --color: #2e3441;
+  --marginParagraph: 6px 0;
+
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  color: var(--color);
+  word-break: break-word;
+}
+
+.content ::ng-deep p,
+.content ::ng-deep ul,
+.content ::ng-deep ol {
+  margin: var(--marginParagraph, 14px 0);
+}
+
+.content ::ng-deep code {
+  padding: 1px 3px;
+  border-radius: 3px;
+  color: var(--color-text-code-block);
+  background-color: var(--color-bg-code-block) !important;
+  white-space: pre-wrap;
+  word-break: keep-all;
+}
+
+.content ::ng-deep blockquote {
+  padding-left: 21px;
+  border-left: 2px solid #0093fc !important;
+  margin: 12px 0;
+}
+
+.content ::ng-deep blockquote p {
+  color: var(--color-text-blockquote);
+  font-weight: 600;
+  font-style: normal;
+}
+
+.content ::ng-deep p a {
+  color: #0093fc;
+  text-decoration: underline;
+}
+
+.content ::ng-deep .p-image-preview {
+  margin: 24px auto;
+}
+
+.content ::ng-deep p-image {
+  display: flex;
+}
+
+.content ::ng-deep img,
+.content ::ng-deep .p-image-preview-mask {
+  display: block;
+  max-width: 100% !important;
+  max-height: 420px;
+  padding: 4px;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--color-shadow-image);
+}
+
+.content-footer-options {
+  display: flex;
+  flex-direction: column;
+  width: 254px;
+  border-radius: 8px;
+  background-color: var(--color-bg-footer-options-comment);
+  box-shadow: 0px 8px 16px 0px rgba(35, 115, 159, 0.16);
+  overflow: hidden;
+}
+
+.content-footer-option-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--color-text-footer-options-comment);
+  background-color: var(--color-bg-footer-options-comment);
+  outline: none;
+  user-select: none;
+  cursor: pointer;
+}
+
+.content-footer-option-item:hover {
+  filter: brightness(0.95);
+}

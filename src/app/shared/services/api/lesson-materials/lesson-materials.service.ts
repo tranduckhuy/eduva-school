@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
+import { Observable, catchError, map, tap, throwError } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 import { RequestService } from '../../core/request/request.service';
@@ -11,9 +11,11 @@ import { StatusCode } from '../../../constants/status-code.constant';
 
 import { type LessonMaterial } from '../../../models/entities/lesson-material.model';
 import { type CreateLessonMaterialsRequest } from '../../../models/api/request/command/create-lesson-material-request.model';
+import { type UpdateLessonMaterialRequest } from '../../../models/api/request/command/update-lesson-material-request.model';
 import {
-  type GetPendingLessonMaterialsRequest,
   type GetLessonMaterialsRequest,
+  type GetPersonalLessonMaterialsRequest,
+  type GetPendingLessonMaterialsRequest,
 } from '../../../models/api/request/query/get-lesson-materials-request.model';
 import { type GetPagingLessonMaterialsResponse } from '../../../models/api/response/query/get-lesson-materials-response.model';
 import { type ApproveRejectMaterialRequest } from '../../../../features/moderation/moderate-lessons/models/approve-reject-material-request.model';
@@ -40,17 +42,30 @@ export class LessonMaterialsService {
 
   createLessonMaterials(
     request: CreateLessonMaterialsRequest
-  ): Observable<void> {
+  ): Observable<null> {
     return this.requestService
       .post(this.LESSON_MATERIALS_API_URL, request)
       .pipe(
-        tap(res => this.handleCreateResponse(res)),
-        map(() => void 0),
-        catchError(err => this.handleCreateError(err))
+        tap(res => this.handleSuccessResponse(res)),
+        map(() => null),
+        catchError(err => this.handleError(err))
       );
   }
 
-  getLessonMaterials(
+  updateLessonMaterial(
+    materialId: string,
+    request: UpdateLessonMaterialRequest
+  ): Observable<null> {
+    return this.requestService
+      .put(`${this.LESSON_MATERIALS_API_URL}/${materialId}`, request)
+      .pipe(
+        tap(res => this.handleUpdateResponse(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  getLessonMaterialsByFolder(
     folderId: string,
     request?: GetLessonMaterialsRequest
   ): Observable<LessonMaterial[] | null> {
@@ -65,6 +80,24 @@ export class LessonMaterialsService {
       .pipe(
         tap(res => this.handleListResponse(res)),
         map(res => this.extractListResponse(res)),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  getPersonalLessonMaterials(
+    request: GetPersonalLessonMaterialsRequest
+  ): Observable<LessonMaterial[] | null> {
+    return this.requestService
+      .get<GetPagingLessonMaterialsResponse>(
+        `${this.LESSON_MATERIALS_API_URL}/me`,
+        request,
+        {
+          loadingKey: 'get-materials',
+        }
+      )
+      .pipe(
+        tap(res => this.handlePagingListResponse(res)),
+        map(res => this.extractPagingListResponse(res)),
         catchError((err: HttpErrorResponse) => this.handleError(err))
       );
   }
@@ -116,8 +149,8 @@ export class LessonMaterialsService {
   }
 
   approveRejectMaterial(
-    request: ApproveRejectMaterialRequest,
-    lessonMaterialId: string
+    lessonMaterialId: string,
+    request: ApproveRejectMaterialRequest
   ): Observable<null> {
     return this.requestService
       .put(
@@ -128,7 +161,30 @@ export class LessonMaterialsService {
         }
       )
       .pipe(
-        tap(res => this.handleApproveRejectMaterialResponse(res)),
+        tap(res => this.handleSuccessResponse(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  deleteMaterial(folderId: string, request: string[]): Observable<null> {
+    return this.requestService
+      .deleteWithBody(
+        `${this.LESSON_MATERIALS_BY_FOLDER_API_URL}/${folderId}/lesson-materials`,
+        request
+      )
+      .pipe(
+        tap(res => this.handleSuccessResponse(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  restoreMaterial(folderId: string, request: string[]): Observable<null> {
+    return this.requestService
+      .put(`${this.LESSON_MATERIALS_API_URL}/${folderId}/restore`, request)
+      .pipe(
+        tap(res => this.handleSuccessResponse(res)),
         map(() => null),
         catchError((err: HttpErrorResponse) => this.handleError(err))
       );
@@ -138,16 +194,16 @@ export class LessonMaterialsService {
   //  Private Helper Functions
   // ---------------------------
 
-  private handleCreateResponse(res: any): void {
+  private handleUpdateResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS) {
       this.toastHandlingService.success(
-        'Tải lên thành công',
-        'Tất cả tài liệu đã được tải lên thành công.'
+        'Cập nhật thành công',
+        'Thông tin của tài liệu đã được cập nhật thành công.'
       );
     } else {
       this.toastHandlingService.error(
-        'Tải lên thất bại',
-        'Không thể tải lên tài liệu. Vui lòng thử lại sau.'
+        'Cập nhật thất bại',
+        'Không thể cập nhật thông tin tài liệu. Vui lòng thử lại sau.'
       );
     }
   }
@@ -178,7 +234,7 @@ export class LessonMaterialsService {
     }
   }
 
-  private handleApproveRejectMaterialResponse(res: any): void {
+  private handleSuccessResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS) {
       this.toastHandlingService.successGeneral();
     } else {
@@ -200,7 +256,7 @@ export class LessonMaterialsService {
     return res.statusCode === StatusCode.SUCCESS ? res.data : null;
   }
 
-  private handleCreateError(err: HttpErrorResponse): Observable<void> {
+  private handleError(err: HttpErrorResponse): Observable<null> {
     if (err.error?.statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND) {
       this.toastHandlingService.warn(
         'Thiếu gói đăng ký',
@@ -209,11 +265,6 @@ export class LessonMaterialsService {
     } else {
       this.toastHandlingService.errorGeneral();
     }
-    return of(void 0);
-  }
-
-  private handleError(err: HttpErrorResponse): Observable<null> {
-    this.toastHandlingService.errorGeneral();
     return throwError(() => err);
   }
 }

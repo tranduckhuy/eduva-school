@@ -1,0 +1,74 @@
+<div
+  class="comment-modal-content h-full max-h-full cursor-default overflow-y-auto bg-white p-8 dark:bg-dark-400">
+  <span
+    class="pi pi-times absolute right-0 top-0 z-[999] cursor-pointer p-6 text-[#1d9ffb]"
+    style="font-size: 20px"
+    (click)="closeModal()"></span>
+  <div>
+    <!-- ? Title -->
+    <div
+      class="absolute left-0 top-0 z-10 w-full bg-white px-8 pb-5 pt-[25px] text-center dark:bg-dark-400">
+      <div class="relative flex items-center justify-between">
+        @if (currentState() !== 'list') {
+          <button
+            class="flex cursor-pointer items-center gap-2 font-semibold text-[#0093fc]"
+            (click)="handleGoBack()">
+            <span class="pi pi-arrow-left" style="font-weight: 600"></span>
+            <span>Quay lại</span>
+          </button>
+        }
+        <h2
+          class="absolute left-[50%] -translate-x-[50%] text-2xl font-bold tracking-[0.5px] text-[#4e586b] dark:text-[#dae4f0]">
+          Hỏi đáp
+        </h2>
+      </div>
+    </div>
+
+    <!-- ? Comment List -->
+    <div class="mt-20">
+      @if (isLoading()) {
+        <div class="flex h-full w-full items-center justify-center pt-20">
+          <span class="loader"></span>
+        </div>
+      }
+
+      @if (currentState() === 'list' && !isLoading()) {
+        <comment-list
+          [materialTitle]="materialTitle()"
+          [lessonQuestions]="lessonQuestions()"
+          [totalLessonQuestions]="totalLessonQuestions()"
+          [currentLessonPage]="currentLessonQuestionPage()"
+          [totalLessonQuestionPages]="totalLessonQuestionPages()"
+          [lessonQuestionPages]="paginationLessonPages()"
+          [myQuestions]="myQuestions()"
+          [totalMyQuestions]="totalMyQuestions()"
+          [currentMyPage]="currentMyQuestionPage()"
+          [totalMyQuestionPages]="totalMyQuestionPages()"
+          [myQuestionPages]="paginationMyPages()"
+          (newQuestion)="handleAddNewQuestion()"
+          (viewComment)="handleViewQuestion($event)"
+          (changeLessonPage)="onChangeLessonPage($event)"
+          (changeMyPage)="onChangeMyPage($event)" />
+      }
+
+      @if (currentState() === 'content' && !isLoading()) {
+        <comment-content
+          [question]="question()"
+          (deleteQuestion)="onDeleteQuestion()"
+          (editQuestion)="onUpdateQuestionPrefill($event)"
+          (createCommentSuccess)="onUpdateQuestion($event)"
+          (updateCommentSuccess)="onUpdateQuestion($event)"
+          (deleteCommentSuccess)="onUpdateQuestion($event)" />
+      }
+
+      @if (currentState() === 'question' && !isLoading()) {
+        <new-question
+          [materialId]="materialId()"
+          [questionToEdit]="editQuestion()"
+          (createQuestionSuccess)="onCreateQuestion()"
+          (updateQuestionSuccess)="onUpdateQuestion($event)"
+          (cancelUpdateQuestion)="handleViewQuestion($event)" />
+      }
+    </div>
+  </div>
+</div>

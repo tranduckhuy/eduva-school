@@ -22,13 +22,15 @@
 
     <div class="mt-5">
       @if (isLoading()) {
-        <app-table-skeleton [tableHead]="tableHeadSkeleton()" />
+        <app-table-skeleton [tableHead]="tableHeadSkeleton()" [limit]="2" />
       } @else {
         <div class="relative">
           <p-table
+            #table
             [tableStyle]="{ 'min-width': '50rem' }"
             [paginator]="true"
             [lazy]="true"
+            [lazyLoadOnInit]="true"
             [scrollable]="true"
             [showCurrentPageReport]="true"
             [scrollHeight]="'600px'"
@@ -39,8 +41,8 @@
             [totalRecords]="totalRecords()"
             (onLazyLoad)="onLazyLoad($event)"
             currentPageReportTemplate="
-            Hiển thị {first} đến {last} trên {totalRecords} bài học
-          ">
+              Hiển thị {first} đến {last} trên {totalRecords} thư mục
+            ">
             <ng-template #header>
               <tr>
                 <th scope="col" class="!min-w-[300px]">Thư mục bài học</th>
@@ -96,7 +98,8 @@
                       tooltipPosition="top"
                       variant="rounded"
                       size="xs"
-                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
+                      class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent"
+                      (clicked)="onRenameFolder(folder.id, folder.name)">
                       edit
                     </app-button>
                     <app-button

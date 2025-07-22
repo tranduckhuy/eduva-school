@@ -1,0 +1,40 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+  <!-- ? Comment Textbox -->
+  <div class="flex items-start gap-2">
+    <img
+      [src]="user()?.avatarUrl"
+      [alt]="user()?.fullName"
+      class="h-10 w-10 rounded-[50%]" />
+
+    <div class="flex w-full flex-col">
+      <app-rich-text-editor
+        placeholder="Nhập bình luận mới của bạn"
+        [isAutoFocus]="isReply()"
+        [invalid]="invalid()"
+        [editorValue]="commentValue()"
+        (valueChange)="getContent($event)" />
+      @if (invalid()) {
+        <div class="mt-3 font-medium leading-normal text-[#f33a58]">
+          {{ getErrorMessage('content') }}
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- ? Comment Button -->
+  <div class="ml-auto flex">
+    @if (isReply() || isEdit()) {
+      <button type="button" class="btn-cancel mr-2" (click)="cancel.emit()">
+        <div class="btn-cancel-inner">
+          <span>Hủy</span>
+        </div>
+      </button>
+    }
+    <p-button
+      type="submit"
+      styleClass="font-bold uppercase tracking-[1px] h-8 min-w-40"
+      [label]="!isEdit() ? 'Bình luận' : 'Lưu lại'"
+      [loading]="isLoadingCreate() || isLoadingUpdate()"
+      [disabled]="form.invalid || isLoadingCreate() || isLoadingUpdate()" />
+  </div>
+</form>

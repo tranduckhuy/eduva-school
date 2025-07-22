@@ -17,6 +17,12 @@
       <p class="text-[#5f6368] dark:text-white">
         (Ví dụ: giáo trình, bài đọc, ghi chú, đề cương bài học, v.v.)
       </p>
+      <p class="mt-3 text-primary">
+        <strong>Lưu ý:</strong>
+        Các tài liệu bạn cung cấp chỉ được sử dụng tạm thời cho quá trình tạo
+        nội dung. Hệ thống <u>không lưu trữ</u> bất kỳ thông tin nào, đảm bảo
+        <u>tuyệt đối an toàn</u> và <u>bảo mật kiến thức giảng dạy</u> của bạn.
+      </p>
     </div>
 
     <div class="mt-6 w-full">
@@ -58,7 +64,7 @@
       <p class="dark:text-white">Giới hạn tài liệu</p>
       <div class="relative top-[1px] grow">
         <p-progressbar
-          [pTooltip]="(current / max).toString()"
+          [pTooltip]="(current / max).toString() + ' tài liệu'"
           [value]="(current / max) * 100"
           tooltipPosition="bottom"
           showValue="false"

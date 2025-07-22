@@ -12,6 +12,16 @@ export interface GetLessonMaterialsRequest {
   status?: EntityStatus;
 }
 
+export interface GetPersonalLessonMaterialsRequest {
+  entityStatus?: EntityStatus;
+  pageIndex?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDirection?: string;
+  searchTerm?: string;
+  isPagingEnabled?: boolean;
+}
+
 export interface GetPendingLessonMaterialsRequest {
   tag?: string;
   contentType?: ContentType;

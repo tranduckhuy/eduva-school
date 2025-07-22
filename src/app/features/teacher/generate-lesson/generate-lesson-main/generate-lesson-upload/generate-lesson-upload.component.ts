@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
+  OnInit,
   inject,
   signal,
 } from '@angular/core';
@@ -16,9 +16,9 @@ import { SubmenuDirective } from '../../../../../shared/directives/submenu/subme
 
 import { GlobalModalService } from '../../../../../shared/services/layout/global-modal/global-modal.service';
 import { ResourcesStateService } from '../services/utils/resources-state.service';
+import { AiJobsService } from '../services/api/ai-jobs.service';
 
 import { UploadResourcesModalComponent } from './upload-resources-modal/upload-resources-modal.component';
-import { AiSocketService } from '../services/api/ai-socket.service';
 
 interface SourceItem {
   id: string;
@@ -44,24 +44,49 @@ interface SourceItem {
   styleUrl: './generate-lesson-upload.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GenerateLessonUploadComponent {
-  private readonly destroyRef = inject(DestroyRef);
+export class GenerateLessonUploadComponent implements OnInit {
   private readonly modalService = inject(GlobalModalService);
   private readonly resourcesStateService = inject(ResourcesStateService);
-  private readonly aiSocketService = inject(AiSocketService);
+  private readonly aiJobService = inject(AiJobsService);
 
   readonly selectAll = signal(false);
   readonly openedMenuId = signal<string | null>(null);
 
+  readonly job = this.aiJobService.job;
+
+  readonly isLoading = this.resourcesStateService.isLoading;
+  readonly hasGeneratedSuccessfully =
+    this.resourcesStateService.hasGeneratedSuccessfully;
   readonly sourceList = this.resourcesStateService.sourceList;
   readonly currentCount = this.resourcesStateService.totalSources;
   readonly maxCount = 5;
 
-  constructor() {
-    this.destroyRef.onDestroy(() => {
-      this.aiSocketService.resetSignal();
-      this.aiSocketService.disconnect();
-    });
+  ngOnInit(): void {
+    const job = this.job();
+
+    if (!job) return;
+
+    this.resourcesStateService.markGeneratedSuccess();
+  }
+
+  get disableUploadButton() {
+    return (
+      this.currentCount() >= 5 ||
+      this.isLoading() ||
+      this.hasGeneratedSuccessfully()
+    );
+  }
+
+  get disableCheckboxAll() {
+    const sourceList = this.sourceList();
+    const hasUploading = sourceList.some(item => item.isUploading);
+
+    return (
+      hasUploading ||
+      this.isLoading() ||
+      this.hasGeneratedSuccessfully() ||
+      this.sourceList().length <= 0
+    );
   }
 
   toggleAll(checked: boolean) {

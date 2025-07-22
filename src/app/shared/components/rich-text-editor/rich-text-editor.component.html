@@ -1,0 +1,11 @@
+<ckeditor
+  [editor]="editor"
+  [config]="config"
+  [data]="editorContent()"
+  [ngClass]="{
+    invalid: invalid(),
+    'height-textbox': isHeightTextBox(),
+  }"
+  (ready)="onEditorReady($event)"
+  tagName="textarea"
+  style="width: 100%"></ckeditor>

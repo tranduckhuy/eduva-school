@@ -11,12 +11,20 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { TooltipModule } from 'primeng/tooltip';
 import { TableModule } from 'primeng/table';
+import { ConfirmationService } from 'primeng/api';
 
 import { BytesToReadablePipe } from '../../../../shared/pipes/byte-to-readable.pipe';
 
-import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
+import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 import { LessonMaterialsService } from '../../../../shared/services/api/lesson-materials/lesson-materials.service';
+
+import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
+import { EntityStatus } from '../../../../shared/models/enum/entity-status.enum';
+import {
+  ContentType,
+  LessonMaterialStatus,
+} from '../../../../shared/models/enum/lesson-material.enum';
 
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
@@ -27,12 +35,6 @@ import {
   BadgeComponent,
   BadgeVariant,
 } from '../../../../shared/components/badge/badge.component';
-
-import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
-import {
-  ContentType,
-  LessonMaterialStatus,
-} from '../../../../shared/models/enum/lesson-material.enum';
 
 import { type LessonMaterial } from '../../../../shared/models/entities/lesson-material.model';
 import { type GetLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
@@ -60,15 +62,16 @@ import { type GetLessonMaterialsRequest } from '../../../../shared/models/api/re
 export class MaterialTableComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly globalModalService = inject(GlobalModalService);
   private readonly loadingService = inject(LoadingService);
+  private readonly globalModalService = inject(GlobalModalService);
+  private readonly confirmationService = inject(ConfirmationService);
   private readonly lessonMaterialsService = inject(LessonMaterialsService);
 
   folderId = input.required<string>();
 
+  isLoading = this.loadingService.is('get-materials');
   materials = this.lessonMaterialsService.lessonMaterials;
   totalRecords = this.lessonMaterialsService.totalRecords;
-  isLoading = this.loadingService.is('get-materials');
 
   searchTerm = signal('');
 
@@ -107,10 +110,35 @@ export class MaterialTableComponent implements OnInit {
 
     const request: GetLessonMaterialsRequest = {
       searchTerm: this.searchTerm(),
+      status: EntityStatus.Active,
     };
     this.lessonMaterialsService
-      .getLessonMaterials(this.folderId(), request)
+      .getLessonMaterialsByFolder(this.folderId(), request)
       .subscribe();
+  }
+
+  onDeleteMaterial(materialId: string) {
+    this.confirmationService.confirm({
+      header: 'Chuyển vào thùng rác?',
+      message:
+        'Tài liệu này sẽ được chuyển vào thùng rác. Bạn có chắc chắn muốn tiếp tục?',
+      icon: 'pi pi-info-circle',
+      rejectButtonProps: {
+        label: 'Không, giữ lại',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Có, chuyển vào thùng rác',
+        severity: 'danger',
+      },
+      accept: () => {
+        const request = [materialId];
+        this.lessonMaterialsService
+          .deleteMaterial(this.folderId(), request)
+          .subscribe();
+      },
+    });
   }
 
   openAddMaterialModal(): void {
@@ -171,10 +199,10 @@ export class MaterialTableComponent implements OnInit {
 
   getMaterialStatusBadge(status: LessonMaterialStatus): BadgeVariant {
     switch (status) {
+      case LessonMaterialStatus.Pending:
+        return 'info';
       case LessonMaterialStatus.Approved:
         return 'success';
-      case LessonMaterialStatus.Pending:
-        return 'warning';
       case LessonMaterialStatus.Rejected:
         return 'danger';
       default:

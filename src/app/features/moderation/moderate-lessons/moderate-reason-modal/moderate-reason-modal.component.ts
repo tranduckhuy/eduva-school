@@ -86,7 +86,7 @@ export class ModerateReasonModalComponent implements OnInit {
       feedback: this.form.get('reason')?.value,
     };
     this.lessonMaterialService
-      .approveRejectMaterial(request, this.modalData.materialId)
+      .approveRejectMaterial(this.modalData.materialId, request)
       .subscribe({
         next: () => {
           this.closeModal();

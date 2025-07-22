@@ -3,6 +3,11 @@ import { Routes } from '@angular/router';
 export const fileManagerRoutes: Routes = [
   {
     path: '',
+    pathMatch: 'full',
+    redirectTo: 'my-drive',
+  },
+  {
+    path: 'my-drive',
     data: {
       heading: 'Tất cả thư mục',
       breadcrumb: '',
@@ -34,7 +39,19 @@ export const fileManagerRoutes: Routes = [
           ),
       },
       {
-        path: ':folderId/:materialId',
+        path: 'update-material/:folderId/:materialId',
+        data: {
+          title: 'Chỉnh sửa bài học',
+          heading: 'Chỉnh sửa bài học',
+          breadcrumb: 'Chỉnh sửa bài học',
+        },
+        loadComponent: () =>
+          import('./update-material/update-material.component').then(
+            mod => mod.UpdateMaterialComponent
+          ),
+      },
+      {
+        path: 'material-detail/:materialId',
         data: {
           title: 'Chi tiết bài học',
           heading: 'Chi tiết bài học',

@@ -59,6 +59,8 @@ export class PaymentsComponent {
     { name: string; value: string | undefined } | undefined
   >(undefined);
   searchTerm = signal<string>('');
+  shouldStopRequest = signal<boolean>(true);
+
   tableHeadSkeleton = signal([
     'STT',
     'Khách hàng',
@@ -140,6 +142,8 @@ export class PaymentsComponent {
   }
 
   private loadData(): void {
+    if (!this.shouldStopRequest()) return;
+
     const params: PaymentListParams = {
       pageIndex: Math.floor(this.first() / this.rows()) + 1,
       pageSize: this.rows(),
@@ -151,6 +155,8 @@ export class PaymentsComponent {
       paymentMethod: 1,
     };
 
-    this.paymentService.getPayments(params).subscribe();
+    this.paymentService.getPayments(params).subscribe({
+      error: () => this.shouldStopRequest.set(false),
+    });
   }
 }

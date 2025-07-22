@@ -1,0 +1,47 @@
+<div class="flex flex-col gap-6">
+  <div
+    class="rounded bg-white px-0 shadow-main dark:border-dark-500 dark:bg-dark-200">
+    <div class="p-[25px]">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="w-full">
+          <app-form-control
+            formControlName="title"
+            name="title"
+            label="Tên tài liệu"
+            type="text"
+            placeholder="Nhập tên tài liệu"
+            [required]="true">
+          </app-form-control>
+        </div>
+
+        <div class="mt-4 w-full">
+          <span
+            class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+            Mô tả nội dung tài liệu
+          </span>
+          <update-material-rich-text
+            placeholder="Tóm tắt kiến thức trọng tâm, mục tiêu bài học hoặc lưu ý dành cho học sinh..."
+            [editorValue]="descriptionValue()"
+            (valueChange)="getDescriptionValue($event)" />
+        </div>
+
+        <div class="mt-5 flex w-full items-center justify-end gap-2">
+          <p-button
+            size="small"
+            variant="outlined"
+            icon="pi pi-angle-left"
+            label="Quay lại"
+            (onClick)="goBackToMaterialList()" />
+          <p-button
+            type="submit"
+            size="small"
+            variant="outlined"
+            icon="pi pi-save"
+            label="Lưu thông tin"
+            [loading]="isLoading()"
+            [disabled]="form.invalid || isLoading()" />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

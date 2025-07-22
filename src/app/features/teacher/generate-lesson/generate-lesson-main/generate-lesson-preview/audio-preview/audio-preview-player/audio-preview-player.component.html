@@ -1,0 +1,104 @@
+<!-- ? Generated State -->
+<div class="relative flex items-center justify-between">
+  <h3
+    [pTooltip]="audioName()"
+    tooltipPosition="top"
+    class="line-clamp-1 grow pl-3 text-base font-semibold">
+    {{ audioName() }}
+  </h3>
+  <p-button
+    icon="pi pi-ellipsis-v"
+    [rounded]="true"
+    [text]="true"
+    (onClick)="toggleMenu()" />
+  @if (openedMenu()) {
+    <div
+      class="absolute right-0 top-10 z-[1] flex min-w-[112px] max-w-[280px] origin-top-right animate-scaleIn flex-col rounded bg-[#f0f4f9] dark:bg-dark-400"
+      clickOutsideSubmenu
+      (clickOutside)="toggleMenu()">
+      <div
+        class="group relative flex h-10 cursor-pointer select-none items-center gap-2 rounded-tl rounded-tr px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300">
+        <span class="pi pi-sliders-v"></span>
+        <span>Điều chỉnh tốc độ đọc</span>
+        <span class="material-symbols-outlined">arrow_right</span>
+        <div
+          class="invisible absolute -left-20 top-0 z-[1] flex min-w-[80px] max-w-[280px] origin-top-right flex-col rounded bg-[#f0f4f9] opacity-0 group-hover:visible group-hover:animate-scaleIn group-hover:opacity-100 dark:bg-dark-400">
+          @for (rate of availableRates; track rate) {
+            <button
+              (click)="onPlaybackRateChange(rate)"
+              class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
+              [class.rounded-tl]="rate === availableRates[0]"
+              [class.rounded-tr]="rate === availableRates[0]"
+              [class.rounded-bl]="
+                rate === availableRates[availableRates.length - 1]
+              "
+              [class.rounded-br]="
+                rate === availableRates[availableRates.length - 1]
+              ">
+              <span
+                class="pi pi-check"
+                [class.opacity-0]="playbackRate() !== rate"></span>
+              <span>{{ rate }}x</span>
+            </button>
+          }
+        </div>
+      </div>
+      <button
+        class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300">
+        <span class="pi pi-download"></span>
+        <span>Tải xuống bản xem trước</span>
+      </button>
+      @if (!hasGeneratedSuccessfully()) {
+        <button
+          class="flex h-10 items-center gap-2 rounded-bl rounded-br px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
+          (click)="onSaveGeneratedContent()">
+          <span class="pi pi-save"></span>
+          <span>Lưu nội dung</span>
+        </button>
+      }
+    </div>
+  }
+</div>
+<div class="mt-2 flex grow items-center gap-5 pb-5">
+  <audio
+    #audio
+    id="audio-player"
+    class="hidden"
+    [src]="audioUrl()"
+    (loadedmetadata)="onMetadataLoaded()"></audio>
+  <p-button
+    [rounded]="true"
+    styleClass="!text-white"
+    (onClick)="togglePlayPause()">
+    <ng-template #icon>
+      <span class="material-symbols-rounded text-3xl">
+        {{ isPlaying() ? 'pause' : 'play_arrow' }}
+      </span>
+    </ng-template>
+  </p-button>
+  <div class="relative flex h-10 grow flex-col justify-center gap-2">
+    <p-slider
+      [animate]="true"
+      [max]="duration()"
+      [ngModel]="currentTime()"
+      (onSlideEnd)="onTimeChange($event.value)"
+      styleClass="w-full cursor-pointer" />
+    <div
+      class="absolute -bottom-5 left-0 flex w-full items-center justify-between">
+      <div class="volume-control flex items-center gap-4">
+        <span
+          class="material-symbols-rounded cursor-pointer select-none text-xl text-gray-500 dark:text-gray-300"
+          (click)="toggleMute()">
+          {{ volumeIcon }}
+        </span>
+        <p-slider
+          [ngModel]="volume()"
+          (onSlideEnd)="onVolumeChange($event.value)"
+          styleClass="w-20 cursor-pointer" />
+      </div>
+      <span class="select-none text-xs text-gray-500 dark:text-gray-300">
+        {{ formatTime(currentTime()) }} / {{ formatTime(duration()) }}
+      </span>
+    </div>
+  </div>
+</div>

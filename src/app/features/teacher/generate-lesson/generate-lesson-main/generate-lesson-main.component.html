@@ -1,17 +1,23 @@
-<div class="e-container-fluid !px-0 lg:hidden">
-  <div class="e-row">
-    <div class="e-col-3">
-      <generate-lesson-upload />
-    </div>
-    <div class="e-col-6">
-      <generate-lesson-chat />
-    </div>
-    <div class="e-col-3">
-      <generate-lesson-preview />
+@if (isLoading()) {
+  <div class="flex h-[calc(100vh-70px)] w-full items-center justify-center">
+    <p-progressspinner />
+  </div>
+} @else {
+  <div class="e-container-fluid !px-0 lg:hidden">
+    <div class="e-row">
+      <div class="e-col-3">
+        <generate-lesson-upload />
+      </div>
+      <div class="e-col-6">
+        <generate-lesson-chat />
+      </div>
+      <div class="e-col-3">
+        <generate-lesson-preview />
+      </div>
     </div>
   </div>
-</div>
 
-<div class="hidden lg:block">
-  <generate-lesson-mobile />
-</div>
+  <div class="hidden lg:block">
+    <generate-lesson-mobile />
+  </div>
+}

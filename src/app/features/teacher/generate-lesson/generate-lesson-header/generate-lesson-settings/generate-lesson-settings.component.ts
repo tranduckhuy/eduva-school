@@ -27,13 +27,12 @@ export class GenerateLessonSettingsComponent implements OnInit {
   private readonly themeService = inject(ThemeService);
   readonly headerSubmenuService = inject(HeaderSubmenuService);
 
+  theme = this.themeService.theme;
   readonly user = this.userService.currentUser;
 
   isFullscreen = signal(false);
 
-  readonly isDarkMode = computed(() => {
-    return this.themeService.isDarkMode();
-  });
+  readonly isDarkMode = computed(() => this.theme() === 'dark');
 
   ngOnInit(): void {
     document.addEventListener('fullscreenchange', () => {
@@ -65,7 +64,9 @@ export class GenerateLessonSettingsComponent implements OnInit {
     }
   }
 
-  toggleDarkMode() {
-    this.themeService.toggleDarkMode();
+  toggleTheme() {
+    this.theme() === 'light'
+      ? this.themeService.setTheme('dark')
+      : this.themeService.setTheme('light');
   }
 }

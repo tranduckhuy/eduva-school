@@ -1,7 +1,4 @@
-<div
-  class="relative box-border w-full bg-black pt-[56.25%]"
-  (mousedown)="setAsActive()"
-  (mouseenter)="setAsActive()">
+<div class="relative box-border w-full bg-black pt-[56.25%]">
   <div
     id="video-player"
     class="video-player absolute inset-0 box-border text-white"
@@ -15,6 +12,13 @@
 
     <!-- ? Overlay -->
     <div class="overlay" (click)="togglePlayPause(); onMobileTap()"></div>
+
+    <div
+      class="background-bar"
+      [class.opacity-100]="showMobileControls()"
+      [class.visible]="showMobileControls()"
+      [class.opacity-0]="!showMobileControls()"
+      [class.invisible]="!showMobileControls()"></div>
 
     <!-- ? Progress Bar -->
     <div
@@ -113,12 +117,15 @@
 </div>
 
 <div class="mt-4">
-  <p-button
-    label="Tạo nội dung mới"
-    size="small"
-    icon="pi pi-refresh"
-    [rounded]="true"
-    [fluid]="true" />
+  @if (!hasGeneratedSuccessfully()) {
+    <p-button
+      label="Lưu nội dung"
+      size="small"
+      icon="pi pi-save"
+      [rounded]="true"
+      [fluid]="true"
+      (onClick)="onSaveGeneratedContent()" />
+  }
   <p-button
     label="Tải xuống Video"
     variant="outlined"
