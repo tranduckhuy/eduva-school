@@ -38,6 +38,7 @@ import {
 
 import { type LessonMaterial } from '../../../../shared/models/entities/lesson-material.model';
 import { type GetLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
+import { DeleteMaterialRequest } from '../../../../shared/models/api/request/command/delete-material-request.model';
 
 @Component({
   selector: 'material-table',
@@ -111,6 +112,8 @@ export class MaterialTableComponent implements OnInit {
     const request: GetLessonMaterialsRequest = {
       searchTerm: this.searchTerm(),
       status: EntityStatus.Active,
+      sortBy: 'createdAt',
+      sortDirection: 'desc',
     };
     this.lessonMaterialsService
       .getLessonMaterialsByFolder(this.folderId(), request)
@@ -133,10 +136,13 @@ export class MaterialTableComponent implements OnInit {
         severity: 'danger',
       },
       accept: () => {
-        const request = [materialId];
-        this.lessonMaterialsService
-          .deleteMaterial(this.folderId(), request)
-          .subscribe();
+        const request: DeleteMaterialRequest = {
+          ids: [materialId],
+          permanent: false,
+        };
+        this.lessonMaterialsService.deleteMaterial(request).subscribe({
+          next: () => this.onSearch(),
+        });
       },
     });
   }

@@ -59,7 +59,7 @@ export class LessonTableComponent implements OnInit {
   isLoading = this.loadingService.is('get-folders');
 
   currentPage = signal(1);
-  pageSize = signal(3);
+  pageSize = signal(PAGE_SIZE);
   firstRecordIndex = signal(0);
   searchValue = signal('');
   shouldStopRequest = signal<boolean>(true);

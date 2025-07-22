@@ -89,7 +89,7 @@ export class ClassDetailComponent implements OnInit {
 
   loadData(): void {
     this.classManagementService
-      .getTeacherClassById(this.classId())
+      .getClassById(this.classId())
       .pipe(
         switchMap(classModel => {
           if (!classModel?.id) return this.handleEmptyClass();

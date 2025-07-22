@@ -148,23 +148,26 @@ export class AddClassMaterialsModalComponent implements OnInit {
   handleMoveToSource() {
     this.refreshMaterialSignals();
   }
+
   handleMoveAllToSource() {
     this.refreshMaterialSignals();
   }
+
   handleMoveToTarget() {
     this.refreshMaterialSignals();
   }
+
   handleMoveAllToTarget() {
     this.refreshMaterialSignals();
   }
 
   loadSourceFolderMaterials(event?: SelectChangeEvent) {
-    const folder = event?.value as Folder;
-    if (!folder) {
+    const folderId = event?.value as string;
+    if (!folderId) {
       this.sourceMaterials.set([]);
       return;
     }
-    this.loadSourceMaterials(folder.id, this.sourceFilterText());
+    this.loadSourceMaterials(folderId, this.sourceFilterText());
   }
 
   getMaterialIconConfig(type: ContentType) {

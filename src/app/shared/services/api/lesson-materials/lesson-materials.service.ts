@@ -19,6 +19,7 @@ import {
 } from '../../../models/api/request/query/get-lesson-materials-request.model';
 import { type GetPagingLessonMaterialsResponse } from '../../../models/api/response/query/get-lesson-materials-response.model';
 import { type ApproveRejectMaterialRequest } from '../../../../features/moderation/moderate-lessons/models/approve-reject-material-request.model';
+import { DeleteMaterialRequest } from '../../../models/api/request/command/delete-material-request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +29,7 @@ export class LessonMaterialsService {
   private readonly toastHandlingService = inject(ToastHandlingService);
 
   private readonly BASE_API_URL = environment.baseApiUrl;
-  private readonly LESSON_MATERIALS_API_URL = `${this.BASE_API_URL}/lesson-materials`;
+  private readonly BASE_LESSON_MATERIALS_API_URL = `${this.BASE_API_URL}/lesson-materials`;
   private readonly LESSON_MATERIALS_BY_FOLDER_API_URL = `${this.BASE_API_URL}/folders`;
 
   private readonly lessonMaterialsSignal = signal<LessonMaterial[]>([]);
@@ -44,7 +45,7 @@ export class LessonMaterialsService {
     request: CreateLessonMaterialsRequest
   ): Observable<null> {
     return this.requestService
-      .post(this.LESSON_MATERIALS_API_URL, request)
+      .post(this.BASE_LESSON_MATERIALS_API_URL, request)
       .pipe(
         tap(res => this.handleSuccessResponse(res)),
         map(() => null),
@@ -57,7 +58,7 @@ export class LessonMaterialsService {
     request: UpdateLessonMaterialRequest
   ): Observable<null> {
     return this.requestService
-      .put(`${this.LESSON_MATERIALS_API_URL}/${materialId}`, request)
+      .put(`${this.BASE_LESSON_MATERIALS_API_URL}/${materialId}`, request)
       .pipe(
         tap(res => this.handleUpdateResponse(res)),
         map(() => null),
@@ -89,7 +90,7 @@ export class LessonMaterialsService {
   ): Observable<LessonMaterial[] | null> {
     return this.requestService
       .get<GetPagingLessonMaterialsResponse>(
-        `${this.LESSON_MATERIALS_API_URL}/me`,
+        `${this.BASE_LESSON_MATERIALS_API_URL}/me`,
         request,
         {
           loadingKey: 'get-materials',
@@ -107,7 +108,7 @@ export class LessonMaterialsService {
   ): Observable<LessonMaterial[] | null> {
     return this.requestService
       .get<GetPagingLessonMaterialsResponse>(
-        `${this.LESSON_MATERIALS_API_URL}/pending-approval`,
+        `${this.BASE_LESSON_MATERIALS_API_URL}/pending-approval`,
         request,
         {
           loadingKey: 'get-materials',
@@ -125,7 +126,7 @@ export class LessonMaterialsService {
   ): Observable<LessonMaterial[] | null> {
     return this.requestService
       .get<GetPagingLessonMaterialsResponse>(
-        `${this.LESSON_MATERIALS_API_URL}/school-public`,
+        `${this.BASE_LESSON_MATERIALS_API_URL}/school-public`,
         request,
         {
           loadingKey: 'get-materials',
@@ -140,7 +141,7 @@ export class LessonMaterialsService {
 
   getLessonMaterialById(id: string): Observable<LessonMaterial | null> {
     return this.requestService
-      .get<LessonMaterial>(`${this.LESSON_MATERIALS_API_URL}/${id}`)
+      .get<LessonMaterial>(`${this.BASE_LESSON_MATERIALS_API_URL}/${id}`)
       .pipe(
         tap(res => this.handleDetailResponse(res)),
         map(res => this.extractDetailResponse(res)),
@@ -154,7 +155,7 @@ export class LessonMaterialsService {
   ): Observable<null> {
     return this.requestService
       .put(
-        `${this.LESSON_MATERIALS_API_URL}/${lessonMaterialId}/pending-approval`,
+        `${this.BASE_LESSON_MATERIALS_API_URL}/${lessonMaterialId}/pending-approval`,
         request,
         {
           loadingKey: 'approve-reject-material',
@@ -167,12 +168,9 @@ export class LessonMaterialsService {
       );
   }
 
-  deleteMaterial(folderId: string, request: string[]): Observable<null> {
+  deleteMaterial(request: DeleteMaterialRequest): Observable<null> {
     return this.requestService
-      .deleteWithBody(
-        `${this.LESSON_MATERIALS_BY_FOLDER_API_URL}/${folderId}/lesson-materials`,
-        request
-      )
+      .deleteWithBody(this.BASE_LESSON_MATERIALS_API_URL, request)
       .pipe(
         tap(res => this.handleSuccessResponse(res)),
         map(() => null),
@@ -182,7 +180,13 @@ export class LessonMaterialsService {
 
   restoreMaterial(folderId: string, request: string[]): Observable<null> {
     return this.requestService
-      .put(`${this.LESSON_MATERIALS_API_URL}/${folderId}/restore`, request)
+      .put(
+        `${this.BASE_LESSON_MATERIALS_API_URL}/${folderId}/restore`,
+        request,
+        {
+          loadingKey: 'restore-material',
+        }
+      )
       .pipe(
         tap(res => this.handleSuccessResponse(res)),
         map(() => null),
