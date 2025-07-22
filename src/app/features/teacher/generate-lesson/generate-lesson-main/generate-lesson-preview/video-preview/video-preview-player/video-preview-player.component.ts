@@ -16,6 +16,7 @@ import { VgOverlayPlayModule } from '@videogular/ngx-videogular/overlay-play';
 import { VgBufferingModule } from '@videogular/ngx-videogular/buffering';
 
 import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { ResourcesStateService } from '../../../services/utils/resources-state.service';
 import { GenerateSettingsSelectionService } from '../../services/generate-settings-selection.service';
@@ -39,6 +40,7 @@ import {
     VgOverlayPlayModule,
     VgBufferingModule,
     ButtonModule,
+    TooltipModule,
     VideoSettingsMenuComponent,
   ],
   templateUrl: './video-preview-player.component.html',

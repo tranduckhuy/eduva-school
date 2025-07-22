@@ -51,6 +51,13 @@
       @if (!hasGeneratedSuccessfully()) {
         <button
           class="flex h-10 items-center gap-2 rounded-bl rounded-br px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
+          tooltipPosition="bottom"
+          [pTooltip]="
+            !this.folderId() ? 'Vui lòng chọn thư mục trước khi lưu' : ''
+          "
+          [ngClass]="{
+            'pointer-events-none cursor-default opacity-80': !this.folderId(),
+          }"
           (click)="onSaveGeneratedContent()">
           <span class="pi pi-save"></span>
           <span>Lưu nội dung</span>

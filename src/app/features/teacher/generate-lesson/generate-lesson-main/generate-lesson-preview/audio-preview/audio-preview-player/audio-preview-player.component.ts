@@ -8,6 +8,7 @@ import {
   input,
   signal,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -29,6 +30,7 @@ import {
   selector: 'audio-preview-player',
   standalone: true,
   imports: [
+    CommonModule,
     FormsModule,
     SubmenuDirective,
     ButtonModule,

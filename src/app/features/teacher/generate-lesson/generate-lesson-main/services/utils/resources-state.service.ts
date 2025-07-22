@@ -105,4 +105,14 @@ export class ResourcesStateService {
   clearAiGeneratedMetadata() {
     this.aiGeneratedMetadataSignal.set(null);
   }
+
+  resetAll(): void {
+    this.sourceListSignal.set([]);
+    this.isLoadingSignal.set(false);
+    this.hasInteractedSignal.set(false);
+    this.hasPreviewContentSignal.set(false);
+    this.hasGeneratedSuccessfullySignal.set(false);
+    this.generatedTypeSignal.set(null);
+    this.aiGeneratedMetadataSignal.set(null);
+  }
 }

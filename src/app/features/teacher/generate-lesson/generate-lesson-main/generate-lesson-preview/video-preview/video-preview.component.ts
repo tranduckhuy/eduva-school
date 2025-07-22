@@ -262,8 +262,14 @@ export class VideoPreviewComponent implements OnInit {
         Nếu tiếp tục tạo mới dưới định dạng <strong>Video</strong>, nội dung hiện tại sẽ <span class="text-[#f87171] font-medium">bị thay thế</span>.
         <br/><br/>
         Vui lòng lưu lại nếu bạn muốn giữ nội dung đã tạo.
+        ${
+          !this.folderId()
+            ? '<br/><br/><span class="text-xs text-[#f87171]">* Bạn cần chọn thư mục trước khi có thể lưu nội dung</span>'
+            : ''
+        }
       `,
-      closable: false,
+      closable: true,
+      closeOnEscape: true,
       rejectButtonProps: {
         label: 'Tiếp tục không lưu',
         severity: 'secondary',
@@ -273,6 +279,7 @@ export class VideoPreviewComponent implements OnInit {
       acceptButtonProps: {
         label: 'Lưu và tiếp tục',
         size: 'small',
+        disabled: !this.folderId(),
       },
       accept: onAccept,
       reject: onReject,
