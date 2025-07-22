@@ -24,6 +24,7 @@ import { EntityStatus } from '../../../../shared/models/enum/entity-status.enum'
 import {
   ContentType,
   LessonMaterialStatus,
+  LessonMaterialVisibility,
 } from '../../../../shared/models/enum/lesson-material.enum';
 
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
@@ -38,7 +39,8 @@ import {
 
 import { type LessonMaterial } from '../../../../shared/models/entities/lesson-material.model';
 import { type GetLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
-import { DeleteMaterialRequest } from '../../../../shared/models/api/request/command/delete-material-request.model';
+import { type DeleteMaterialRequest } from '../../../../shared/models/api/request/command/delete-material-request.model';
+import { type UpdateLessonMaterialRequest } from '../../../../shared/models/api/request/command/update-lesson-material-request.model';
 
 @Component({
   selector: 'material-table',
@@ -118,6 +120,21 @@ export class MaterialTableComponent implements OnInit {
     this.lessonMaterialsService
       .getLessonMaterialsByFolder(this.folderId(), request)
       .subscribe();
+  }
+
+  onUpdateVisibility(material: LessonMaterial) {
+    const request: UpdateLessonMaterialRequest = {
+      id: material.id,
+      title: material.title,
+      description: material.description,
+      duration: material.duration,
+      visibility: LessonMaterialVisibility.School,
+    };
+    this.lessonMaterialsService
+      .updateLessonMaterial(material.id, request)
+      .subscribe({
+        next: () => this.onSearch(),
+      });
   }
 
   onDeleteMaterial(materialId: string) {

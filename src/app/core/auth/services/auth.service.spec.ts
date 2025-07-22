@@ -322,17 +322,21 @@ describe('AuthService', () => {
       });
     });
 
-    it('should handle refresh token HTTP error', async () => {
+    it('should propagate error on refresh token HTTP error', async () => {
       (requestService.post as any).mockReturnValue(
         throwError(() => new Error('Network error'))
       );
       await new Promise<void>(resolve => {
-        service.refreshToken(mockRefreshTokenRequest).subscribe(result => {
-          expect(result).toBeNull();
-          expect(jwtService.clearAll).toHaveBeenCalled();
-          expect(userService.clearCurrentUser).toHaveBeenCalled();
-          expect(router.navigateByUrl).toHaveBeenCalledWith('/auth/login');
-          resolve();
+        service.refreshToken(mockRefreshTokenRequest).subscribe({
+          next: () => {
+            expect(false).toBe(true);
+            resolve();
+          },
+          error: err => {
+            expect(err).toBeInstanceOf(Error);
+            expect(err.message).toBe('Network error');
+            resolve();
+          },
         });
       });
     });
