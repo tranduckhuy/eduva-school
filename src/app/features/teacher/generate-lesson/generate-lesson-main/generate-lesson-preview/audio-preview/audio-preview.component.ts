@@ -17,6 +17,7 @@ import { ConfirmationService } from 'primeng/api';
 
 import { ResourcesStateService } from '../../services/utils/resources-state.service';
 import { GenerateSettingsSelectionService } from '../services/generate-settings-selection.service';
+import { ToastHandlingService } from '../../../../../../shared/services/core/toast/toast-handling.service';
 import { AiJobsService } from '../../services/api/ai-jobs.service';
 import { AiSocketService } from '../../services/api/ai-socket.service';
 import { LessonMaterialsService } from '../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
@@ -51,6 +52,7 @@ export class AudioPreviewComponent implements OnInit {
   private readonly generateSettingsService = inject(
     GenerateSettingsSelectionService
   );
+  private readonly toastHandlingService = inject(ToastHandlingService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly aiJobService = inject(AiJobsService);
   private readonly aiSocketService = inject(AiSocketService);
@@ -76,19 +78,21 @@ export class AudioPreviewComponent implements OnInit {
   audioUrl = signal<string>('');
   audioState = signal<'empty' | 'loading' | 'generated'>('empty');
 
+  currentGeneratedType = signal<LessonGenerationType | null>(null);
+
   readonly disableGenerate = computed(() => {
     const uploading = this.resourcesStateService
       .sourceList()
       .some(x => x.isUploading);
 
     return (
-      (this.totalCheckedSources() === 0 && !this.hasInteracted()) ||
-      this.isLoading() ||
       uploading ||
-      !this.hasGeneratedSuccessfully() ||
+      this.isLoading() ||
+      this.hasGeneratedSuccessfully() ||
       !this.speedRate() ||
       !this.voice() ||
-      !this.language()
+      !this.language() ||
+      (this.totalCheckedSources() === 0 && !this.hasInteracted())
     );
   });
 
@@ -106,17 +110,25 @@ export class AudioPreviewComponent implements OnInit {
           !failureReason &&
           generationType === LessonGenerationType.Audio
         ) {
-          this.audioUrl.set(payload?.audioOutputBlobName);
+          this.audioUrl.set(payload?.audioOutputBlobNameUrl);
           this.audioState.set('generated');
 
           this.resourcesStateService.setAiGeneratedMetadata({
             title: this.generateAutoTitle(),
             contentType: ContentType.Audio,
-            duration: Math.round(payload.actualDuration),
-            fileSize: 0,
-            blobName: payload.audioOutputBlobName,
+            duration: Math.round(payload.actualDurationSeconds) ?? 0,
+            fileSize: 1,
+            blobName: payload.audioOutputBlobNameUrl,
           });
         }
+      },
+      { allowSignalWrites: true }
+    );
+
+    effect(
+      () => {
+        const current = this.resourcesStateService.generatedType();
+        this.currentGeneratedType.set(current);
       },
       { allowSignalWrites: true }
     );
@@ -129,45 +141,53 @@ export class AudioPreviewComponent implements OnInit {
 
     this.audioState.set('generated');
     this.audioUrl.set(job.audioOutputBlobName);
+
+    this.resourcesStateService.markGeneratedSuccess();
   }
 
   // ? Confirm Generate
   confirmGenerateAudio() {
     this.handleConfirmGenerate(LessonGenerationType.Audio, () => {
-      this.handleSaveAudio();
-      this.confirmGenerationRequest(LessonGenerationType.Audio);
+      this.handleSaveAudio(() =>
+        this.confirmGenerationRequest(LessonGenerationType.Audio)
+      );
     });
   }
 
-  private handleSaveAudio() {
+  private handleSaveAudio(onSuccess: () => void) {
     const folderId = this.folderId();
     const metadata = this.resourcesStateService.aiGeneratedMetadata();
 
     if (!folderId || !metadata) return;
 
+    const cleanBlobName = metadata.blobName.split('?')[0];
     const material: CreateLessonMaterialRequest = {
       title: metadata.title,
       contentType: metadata.contentType,
       duration: metadata.duration,
       fileSize: metadata.fileSize,
       isAIContent: true,
-      sourceUrl: metadata.blobName,
+      sourceUrl: cleanBlobName,
     };
 
     const createRequest: CreateLessonMaterialsRequest = {
       folderId,
-      blobNames: [metadata.blobName],
+      blobNames: [cleanBlobName],
       lessonMaterials: [material],
     };
 
     this.resourcesStateService.updateIsLoading(true);
-
+    this.toastHandlingService.info(
+      'Đang xử lý',
+      'Hệ thống đang lưu nội dung đã tạo trước khi bắt đầu tạo mới. Vui lòng chờ trong giây lát...'
+    );
     this.lessonMaterialService
       .createLessonMaterials(createRequest)
       .pipe(finalize(() => this.resourcesStateService.updateIsLoading(false)))
       .subscribe({
         next: () => {
           this.resourcesStateService.clearAiGeneratedMetadata();
+          onSuccess();
         },
       });
   }
@@ -187,7 +207,7 @@ export class AudioPreviewComponent implements OnInit {
     type: LessonGenerationType,
     saveBeforeContinue: () => void
   ) {
-    const currentGenerated = this.resourcesStateService.generatedType();
+    const currentGenerated = this.currentGeneratedType();
 
     if (currentGenerated === type) return;
 
@@ -220,12 +240,16 @@ export class AudioPreviewComponent implements OnInit {
       },
     };
 
-    this.aiJobService.confirmCreateContent(jobId, request).subscribe({
-      next: () => {
-        this.audioState.set('loading');
-        this.resourcesStateService.setGeneratedType(type);
-      },
-    });
+    this.resourcesStateService.updateIsLoading(true);
+    this.aiJobService
+      .confirmCreateContent(jobId, request)
+      .pipe(finalize(() => this.resourcesStateService.updateIsLoading(false)))
+      .subscribe({
+        next: () => {
+          this.audioState.set('loading');
+          this.resourcesStateService.setGeneratedType(type);
+        },
+      });
   }
 
   private confirmOverwrite(onAccept: () => void, onReject: () => void) {

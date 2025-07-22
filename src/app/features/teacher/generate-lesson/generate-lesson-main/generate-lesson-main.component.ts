@@ -3,6 +3,8 @@ import {
   Component,
   DestroyRef,
   OnInit,
+  OnChanges,
+  SimpleChanges,
   inject,
   input,
 } from '@angular/core';
@@ -32,7 +34,7 @@ import { GenerateLessonMobileComponent } from '../generate-lesson-mobile/generat
   styleUrl: './generate-lesson-main.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GenerateLessonMainComponent implements OnInit {
+export class GenerateLessonMainComponent implements OnInit, OnChanges {
   private readonly destroyRef = inject(DestroyRef);
   private readonly aiJobService = inject(AiJobsService);
   private readonly aiSocketService = inject(AiSocketService);
@@ -53,5 +55,16 @@ export class GenerateLessonMainComponent implements OnInit {
     if (!jobId) return;
 
     this.aiJobService.getJobById(jobId).subscribe();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['jobId']) {
+      const newJobId = this.jobId();
+      if (newJobId) {
+        this.aiJobService.getJobById(newJobId).subscribe();
+      } else {
+        this.aiJobService.clearJob();
+      }
+    }
   }
 }

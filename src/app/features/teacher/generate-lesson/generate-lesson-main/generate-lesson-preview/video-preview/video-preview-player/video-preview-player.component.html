@@ -119,11 +119,12 @@
 <div class="mt-4">
   @if (!hasGeneratedSuccessfully()) {
     <p-button
-      label="Tạo nội dung mới"
+      label="Lưu nội dung"
       size="small"
-      icon="pi pi-refresh"
+      icon="pi pi-save"
       [rounded]="true"
-      [fluid]="true" />
+      [fluid]="true"
+      (onClick)="onSaveGeneratedContent()" />
   }
   <p-button
     label="Tải xuống Video"

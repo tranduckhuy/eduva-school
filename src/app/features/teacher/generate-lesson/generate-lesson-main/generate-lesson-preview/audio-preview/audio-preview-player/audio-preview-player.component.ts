@@ -17,6 +17,13 @@ import { SliderModule } from 'primeng/slider';
 import { SubmenuDirective } from '../../../../../../../shared/directives/submenu/submenu.directive';
 
 import { ResourcesStateService } from '../../../services/utils/resources-state.service';
+import { GenerateSettingsSelectionService } from '../../services/generate-settings-selection.service';
+import { LessonMaterialsService } from '../../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
+
+import {
+  type CreateLessonMaterialRequest,
+  type CreateLessonMaterialsRequest,
+} from '../../../../../../../shared/models/api/request/command/create-lesson-material-request.model';
 
 @Component({
   selector: 'audio-preview-player',
@@ -36,10 +43,15 @@ export class AudioPreviewPlayerComponent {
   private readonly audio = viewChild<ElementRef<HTMLAudioElement>>('audio');
 
   private readonly resourceStateService = inject(ResourcesStateService);
+  private readonly generateSettingsService = inject(
+    GenerateSettingsSelectionService
+  );
+  private readonly lessonMaterialService = inject(LessonMaterialsService);
 
   audioUrl = input<string>('');
 
   hasGeneratedSuccessfully = this.resourceStateService.hasGeneratedSuccessfully;
+  folderId = this.generateSettingsService.selectedFolderId;
 
   currentTime = signal<number>(0);
   duration = signal<number>(0);
@@ -177,5 +189,32 @@ export class AudioPreviewPlayerComponent {
 
   toggleMenu() {
     this.openedMenu.set(!this.openedMenu());
+  }
+
+  onSaveGeneratedContent() {
+    const folderId = this.folderId();
+    const metadata = this.resourceStateService.aiGeneratedMetadata();
+
+    if (!folderId || !metadata) return;
+
+    const cleanBlobName = metadata.blobName.split('?')[0];
+    const material: CreateLessonMaterialRequest = {
+      title: metadata.title,
+      contentType: metadata.contentType,
+      duration: metadata.duration,
+      fileSize: metadata.fileSize,
+      isAIContent: true,
+      sourceUrl: cleanBlobName,
+    };
+
+    const createRequest: CreateLessonMaterialsRequest = {
+      folderId,
+      blobNames: [cleanBlobName],
+      lessonMaterials: [material],
+    };
+
+    this.lessonMaterialService.createLessonMaterials(createRequest).subscribe({
+      next: () => this.resourceStateService.clearAiGeneratedMetadata(),
+    });
   }
 }

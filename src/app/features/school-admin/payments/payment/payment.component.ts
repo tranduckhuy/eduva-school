@@ -29,9 +29,9 @@ import { ExportInvoicePdfComponent } from '../export-invoice-pdf/export-invoice-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentComponent {
+  private readonly router = inject(Router);
   private readonly paymentService = inject(SchoolPaymentService);
   private readonly loadingService = inject(LoadingService);
-  private readonly router = inject(Router);
 
   isLoading = this.loadingService;
   schoolSubscriptionDetail = this.paymentService.schoolSubscriptionDetail;

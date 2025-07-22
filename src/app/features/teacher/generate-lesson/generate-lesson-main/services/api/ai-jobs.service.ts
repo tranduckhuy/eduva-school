@@ -91,6 +91,10 @@ export class AiJobsService {
       );
   }
 
+  clearJob() {
+    this.jobSignal.set(null);
+  }
+
   // ---------------------------
   //  Private Helper Functions
   // ---------------------------

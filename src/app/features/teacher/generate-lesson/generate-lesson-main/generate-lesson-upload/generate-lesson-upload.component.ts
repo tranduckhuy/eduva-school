@@ -70,11 +70,19 @@ export class GenerateLessonUploadComponent implements OnInit {
   }
 
   get disableUploadButton() {
-    return this.currentCount() >= 5 || this.hasGeneratedSuccessfully();
+    return (
+      this.currentCount() >= 5 ||
+      this.isLoading() ||
+      this.hasGeneratedSuccessfully()
+    );
   }
 
   get disableCheckboxAll() {
+    const sourceList = this.sourceList();
+    const hasUploading = sourceList.some(item => item.isUploading);
+
     return (
+      hasUploading ||
       this.isLoading() ||
       this.hasGeneratedSuccessfully() ||
       this.sourceList().length <= 0

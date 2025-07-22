@@ -1,15 +1,29 @@
-<header
-  class="header sticky left-0 top-0 z-10 flex h-16 items-center justify-between">
+<header class="header flex h-16 items-center justify-between">
   <h1 class="flex items-center gap-3">
-    <a href="/">
+    <a routerLink="/">
       <img
         src="./images/logo.png"
         alt="EDUVA"
         class="size-9 shrink-0 rounded-md object-contain" />
     </a>
-    <a href="/" class="text-[#252526] dark:text-[#e6e6e6]">
-      Học, Học Nữa, Học Mãi
-    </a>
+    @if (isInGeneratedRoute()) {
+      <a routerLink="/" class="text-[#252526] dark:text-[#e6e6e6]">
+        Học, Học Nữa, Học Mãi
+      </a>
+    } @else {
+      <a
+        routerLink="/teacher/generate-lesson/generated"
+        class="group flex items-center gap-1">
+        <span
+          class="pi pi-angle-left opacity-70 transition-all duration-200 ease-in-out group-hover:-translate-x-1 group-hover:opacity-100"
+          style="font-size: 18px"></span>
+        <span
+          class="!font-semibold text-[#252526] opacity-80 transition-opacity duration-200 ease-in-out group-hover:opacity-100 dark:text-[#e6e6e6]">
+          Quay lại
+        </span>
+      </a>
+    }
   </h1>
+
   <generate-lesson-settings />
 </header>

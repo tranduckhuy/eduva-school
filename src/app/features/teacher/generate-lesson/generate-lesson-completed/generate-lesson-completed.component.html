@@ -16,7 +16,7 @@
       <h2 class="text-2xl font-medium">Các nội dung bạn đã tạo</h2>
       <div class="e-container-fluid mt-4 px-0">
         <div
-          class="e-row e-row-cols-4 e-row-cols-lg-3 e-row-cols-md-2 e-row-cols-xs-1">
+          class="e-row e-row-cols-4 e-row-cols-lg-3 e-row-cols-md-2 e-row-cols-xs-1 e-gy-3">
           <!-- ? Create New Card -->
           <div class="e-col">
             <a
@@ -48,7 +48,7 @@
 
     <!-- ? -->
     @if (jobList().length > 0) {
-      <div class="mt-8 flex w-full justify-center">
+      <div class="mt-8 flex w-full justify-center pb-8">
         <p-paginator
           [first]="first()"
           [rows]="rows()"

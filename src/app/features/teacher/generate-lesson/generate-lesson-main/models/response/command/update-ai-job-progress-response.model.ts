@@ -4,11 +4,12 @@ export interface UpdateAiJobProgressResponse {
   jobId: string;
   status: JobStatus;
   wordCount: number;
-  actualDuration: number;
+  estimatedDurationMinutes: number;
+  actualDurationSeconds: number;
   previewContent: string;
   contentBlobName: string;
-  videoOutputBlobName: string;
-  audioOutputBlobName: string;
+  videoOutputBlobNameUrl: string;
+  audioOutputBlobNameUrl: string;
   audioCost: number;
   videoCost: number;
   failureReason: string;

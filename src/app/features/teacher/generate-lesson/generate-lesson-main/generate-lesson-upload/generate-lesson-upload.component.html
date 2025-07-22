@@ -88,7 +88,7 @@
               [binary]="true"
               [inputId]="item.id"
               [ngModel]="item.checked"
-              [disabled]="item.isUploading!"
+              [disabled]="item.isUploading! || isLoading()"
               (onChange)="toggleItem(item.id, $event.checked)" />
           } @else {
             <p-progress-spinner

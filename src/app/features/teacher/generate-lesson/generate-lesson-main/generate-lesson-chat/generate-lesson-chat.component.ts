@@ -71,8 +71,8 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   readonly jobUpdateProgress = this.aiSocketService.jobUpdateProgress;
 
   readonly checkedFiles = this.resourcesStateService.checkedFiles;
-  readonly hasGeneratedSuccessfully =
-    this.resourcesStateService.hasGeneratedSuccessfully;
+  readonly hasPreviewContentSuccessfully =
+    this.resourcesStateService.hasPreviewContentSuccessfully;
   readonly totalUploaded = this.resourcesStateService.totalSources;
   readonly totalChecked = this.resourcesStateService.totalCheckedSources;
   readonly isLoading = this.resourcesStateService.isLoading;
@@ -84,7 +84,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     return (
       this.totalChecked() === 0 ||
       this.isLoading() ||
-      this.hasGeneratedSuccessfully()
+      this.hasPreviewContentSuccessfully()
     );
   });
 
@@ -116,6 +116,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
           this.scrollToBottom();
           this.displaySystemAiMessage(payload);
           this.resourcesStateService.updateIsLoading(false);
+          this.resourcesStateService.markGeneratedPreviewContentSuccess();
         }
       },
       { allowSignalWrites: true }
@@ -127,9 +128,11 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
 
     if (!job) return;
 
-    this.resourcesStateService.updateHasInteracted(true);
     this.scrollToBottom();
     this.restoreMessagesFromJob(job);
+
+    this.resourcesStateService.markGeneratedSuccess();
+    this.resourcesStateService.updateHasInteracted(true);
   }
 
   ngAfterViewInit(): void {
@@ -199,6 +202,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     this.scrollToBottom();
     this.resourcesStateService.updateIsLoading(true);
     this.resourcesStateService.resetGeneratedStatus();
+    this.resourcesStateService.resetGeneratedPreviewContentStatus();
 
     this.messages.update(prev => [
       ...prev,
@@ -260,7 +264,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     });
 
     if (!failureReason) {
-      this.resourcesStateService.markGeneratedSuccess();
+      this.resourcesStateService.markGeneratedPreviewContentSuccess();
     }
   }
 

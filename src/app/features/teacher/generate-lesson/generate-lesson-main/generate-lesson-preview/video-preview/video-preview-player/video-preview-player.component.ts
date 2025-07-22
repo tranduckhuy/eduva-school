@@ -18,8 +18,15 @@ import { VgBufferingModule } from '@videogular/ngx-videogular/buffering';
 import { ButtonModule } from 'primeng/button';
 
 import { ResourcesStateService } from '../../../services/utils/resources-state.service';
+import { GenerateSettingsSelectionService } from '../../services/generate-settings-selection.service';
+import { LessonMaterialsService } from '../../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
 
 import { VideoSettingsMenuComponent } from '../video-settings-menu/video-settings-menu.component';
+
+import {
+  type CreateLessonMaterialRequest,
+  type CreateLessonMaterialsRequest,
+} from '../../../../../../../shared/models/api/request/command/create-lesson-material-request.model';
 
 @Component({
   selector: 'video-preview-player',
@@ -45,10 +52,15 @@ export class VideoPreviewPlayerComponent {
 
   private vgApi = inject(VgApiService);
   private readonly resourceStateService = inject(ResourcesStateService);
+  private readonly generateSettingsService = inject(
+    GenerateSettingsSelectionService
+  );
+  private readonly lessonMaterialService = inject(LessonMaterialsService);
 
   videoUrl = input<string>('');
 
   hasGeneratedSuccessfully = this.resourceStateService.hasGeneratedSuccessfully;
+  folderId = this.generateSettingsService.selectedFolderId;
 
   private hideControlsTimeout!: ReturnType<typeof setTimeout>;
 
@@ -256,6 +268,33 @@ export class VideoPreviewPlayerComponent {
       .toString()
       .padStart(2, '0');
     return `${min}:${sec}`;
+  }
+
+  onSaveGeneratedContent() {
+    const folderId = this.folderId();
+    const metadata = this.resourceStateService.aiGeneratedMetadata();
+
+    if (!folderId || !metadata) return;
+
+    const cleanBlobName = metadata.blobName.split('?')[0];
+    const material: CreateLessonMaterialRequest = {
+      title: metadata.title,
+      contentType: metadata.contentType,
+      duration: metadata.duration,
+      fileSize: metadata.fileSize,
+      isAIContent: true,
+      sourceUrl: cleanBlobName,
+    };
+
+    const createRequest: CreateLessonMaterialsRequest = {
+      folderId,
+      blobNames: [cleanBlobName],
+      lessonMaterials: [material],
+    };
+
+    this.lessonMaterialService.createLessonMaterials(createRequest).subscribe({
+      next: () => this.resourceStateService.clearAiGeneratedMetadata(),
+    });
   }
 
   private getVideoElement(): HTMLVideoElement {

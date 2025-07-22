@@ -25,6 +25,7 @@ export interface AiGeneratedMetadata {
   providedIn: 'root',
 })
 export class ResourcesStateService {
+  // ? Signal State Management
   private readonly sourceListSignal = signal<SourceItem[]>([]);
   sourceList = this.sourceListSignal.asReadonly();
 
@@ -33,6 +34,10 @@ export class ResourcesStateService {
 
   private readonly hasInteractedSignal = signal(false);
   hasInteracted = this.hasInteractedSignal.asReadonly();
+
+  private readonly hasPreviewContentSignal = signal(false);
+  readonly hasPreviewContentSuccessfully =
+    this.hasPreviewContentSignal.asReadonly();
 
   private readonly hasGeneratedSuccessfullySignal = signal(false);
   readonly hasGeneratedSuccessfully =
@@ -47,6 +52,7 @@ export class ResourcesStateService {
     signal<AiGeneratedMetadata | null>(null);
   readonly aiGeneratedMetadata = this.aiGeneratedMetadataSignal.asReadonly();
 
+  // ? Computed
   readonly checkedFiles = computed(() =>
     this.sourceListSignal()
       .filter(i => i.checked && !i.isUploading && i.file)
@@ -72,6 +78,14 @@ export class ResourcesStateService {
     this.isLoadingSignal.set(value);
   }
 
+  markGeneratedPreviewContentSuccess() {
+    this.hasPreviewContentSignal.set(true);
+  }
+
+  resetGeneratedPreviewContentStatus() {
+    this.hasPreviewContentSignal.set(false);
+  }
+
   markGeneratedSuccess() {
     this.hasGeneratedSuccessfullySignal.set(true);
   }
@@ -82,14 +96,6 @@ export class ResourcesStateService {
 
   setGeneratedType(type: LessonGenerationType) {
     this.generatedTypeSignal.set(type);
-  }
-
-  hasGeneratedType(type: LessonGenerationType): boolean {
-    return this.generatedTypeSignal() === type;
-  }
-
-  resetGeneratedType() {
-    this.generatedTypeSignal.set(null);
   }
 
   setAiGeneratedMetadata(data: AiGeneratedMetadata) {

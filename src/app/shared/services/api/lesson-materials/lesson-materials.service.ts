@@ -46,7 +46,7 @@ export class LessonMaterialsService {
     return this.requestService
       .post(this.LESSON_MATERIALS_API_URL, request)
       .pipe(
-        tap(res => this.handleCreateResponse(res)),
+        tap(res => this.handleSuccessResponse(res)),
         map(() => null),
         catchError(err => this.handleError(err))
       );
@@ -193,20 +193,6 @@ export class LessonMaterialsService {
   // ---------------------------
   //  Private Helper Functions
   // ---------------------------
-
-  private handleCreateResponse(res: any): void {
-    if (res.statusCode === StatusCode.SUCCESS) {
-      this.toastHandlingService.success(
-        'Tải lên thành công',
-        'Tất cả tài liệu đã được tải lên thành công.'
-      );
-    } else {
-      this.toastHandlingService.error(
-        'Tải lên thất bại',
-        'Không thể tải lên tài liệu. Vui lòng thử lại sau.'
-      );
-    }
-  }
 
   private handleUpdateResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS) {
