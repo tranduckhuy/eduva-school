@@ -1,13 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  effect,
   inject,
   input,
-  OnInit,
   signal,
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
+
+import { catchError, forkJoin, of } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -16,6 +16,7 @@ import { ConfirmationService } from 'primeng/api';
 
 import { BytesToReadablePipe } from '../../../../shared/pipes/byte-to-readable.pipe';
 
+import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 import { FolderManagementService } from '../../../../shared/services/api/folder/folder-management.service';
 import { LessonMaterialsService } from '../../../../shared/services/api/lesson-materials/lesson-materials.service';
 
@@ -33,6 +34,8 @@ import { type Folder } from '../../../../shared/models/entities/folder.model';
 import { type LessonMaterial } from '../../../../shared/models/entities/lesson-material.model';
 import { type GetFoldersRequest } from '../../../../shared/models/api/request/query/get-folders-request.model';
 import { type GetPersonalLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
+import { type DeleteMaterialRequest } from '../../../../shared/models/api/request/command/delete-material-request.model';
+import { ChoosePersonalFolderModalComponent } from './choose-personal-folder-modal/choose-personal-folder-modal.component';
 
 type TrashItem =
   | { type: 'folder'; data: Folder }
@@ -57,15 +60,16 @@ type TrashItem =
   styleUrl: './trash-bin.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TrashBinComponent implements OnInit {
+export class TrashBinComponent {
   private readonly confirmationService = inject(ConfirmationService);
+  private readonly globalModalService = inject(GlobalModalService);
   private readonly folderService = inject(FolderManagementService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
 
   isLoading = input<boolean>(false);
   shouldStopRequest = signal<boolean>(false);
 
-  items = signal<TrashItem[]>([]);
+  trashItems = signal<TrashItem[]>([]);
   totalRecords = signal<number>(0);
 
   currentPage = signal(1);
@@ -81,42 +85,6 @@ export class TrashBinComponent implements OnInit {
     'Hành động',
   ]);
 
-  constructor() {
-    effect(
-      () => {
-        if (this.shouldStopRequest()) return;
-
-        const folders = this.folderService.folderList();
-        const materials = this.lessonMaterialService.lessonMaterials();
-
-        const merged: TrashItem[] = [
-          ...folders.map(f => ({ type: 'folder', data: f }) as const),
-          ...materials.map(m => ({ type: 'material', data: m }) as const),
-        ];
-
-        this.items.set(merged);
-      },
-      { allowSignalWrites: true }
-    );
-
-    effect(
-      () => {
-        if (this.shouldStopRequest()) return;
-
-        const folderCount = this.folderService.totalRecords();
-        const materialCount = this.lessonMaterialService.totalRecords();
-        this.totalRecords.set(folderCount + materialCount);
-      },
-      { allowSignalWrites: true }
-    );
-  }
-
-  ngOnInit(): void {
-    this.shouldStopRequest.set(false);
-
-    this.loadAllData();
-  }
-
   onLazyLoad(event: TableLazyLoadEvent): void {
     const rows = event.rows ?? this.pageSize();
     const first = event.first ?? 0;
@@ -127,7 +95,7 @@ export class TrashBinComponent implements OnInit {
     this.firstRecordIndex.set(first);
     this.shouldStopRequest.set(false);
 
-    this.loadAllData();
+    this.loadTrashItems();
   }
 
   onSearch(searchTerm?: string): void {
@@ -136,10 +104,78 @@ export class TrashBinComponent implements OnInit {
     this.firstRecordIndex.set(0);
     this.shouldStopRequest.set(false);
 
-    this.loadAllData();
+    this.loadTrashItems();
   }
 
-  onDeleteItem(type: string, id: string) {}
+  onRestoreItem(type: 'folder' | 'material', id: string) {
+    if (type === 'folder') {
+      this.folderService.restoreFolder(id).subscribe({
+        next: () => this.loadTrashItems(),
+      });
+    } else {
+      this.globalModalService.open(ChoosePersonalFolderModalComponent, {
+        materialId: id,
+        onRestoreSuccess: () => {
+          this.loadTrashItems();
+        },
+      });
+    }
+  }
+
+  onDeleteItem(type: 'folder' | 'material', id: string): void {
+    const isFolder = type === 'folder';
+
+    this.confirmDelete({
+      header: isFolder ? 'Xóa thư mục?' : 'Xóa tài liệu?',
+      message: isFolder
+        ? 'Thư mục này sẽ bị xóa vĩnh viễn. Bạn có chắc chắn muốn tiếp tục?'
+        : 'Tài liệu này sẽ bị xóa vĩnh viễn. Bạn có chắc chắn muốn tiếp tục?',
+      accept: () => {
+        if (isFolder) {
+          this.handleDeleteFolder([id]);
+        } else {
+          this.handleDeleteMaterial([id]);
+        }
+      },
+    });
+  }
+
+  onDeleteAllItem(): void {
+    const currentTrashItems = this.trashItems();
+
+    const folderIds = currentTrashItems
+      .filter(item => item.type === 'folder')
+      .map(item => item.data.id);
+
+    const materialIds = currentTrashItems
+      .filter(item => item.type === 'material')
+      .map(item => item.data.id);
+
+    if (folderIds.length === 0 && materialIds.length === 0) return;
+
+    this.confirmDelete({
+      header: 'Xóa toàn bộ mục trong thùng rác?',
+      message:
+        'Toàn bộ mục trong thùng rác sẽ bị xóa vĩnh viễn. Bạn có chắc chắn muốn tiếp tục?',
+      accept: () => {
+        const deleteFolder$ = folderIds.length
+          ? this.folderService
+              .removeFolder(folderIds)
+              .pipe(catchError(() => of(null)))
+          : of(null);
+
+        const deleteMaterial$ = materialIds.length
+          ? this.lessonMaterialService
+              .deleteMaterial({ ids: materialIds, permanent: true })
+              .pipe(catchError(() => of(null)))
+          : of(null);
+
+        forkJoin([deleteFolder$, deleteMaterial$]).subscribe({
+          next: () => this.loadTrashItems(),
+        });
+      },
+    });
+  }
 
   getMaterialIcon(material: LessonMaterial): string {
     switch (material.contentType) {
@@ -169,37 +205,103 @@ export class TrashBinComponent implements OnInit {
     }
   }
 
-  private loadFolder() {
-    const request: GetFoldersRequest = {
+  private loadTrashItems(): void {
+    if (this.shouldStopRequest()) return;
+
+    const pageSize = this.pageSize() * 2;
+
+    const folderRequest: GetFoldersRequest = {
       status: EntityStatus.Archived,
       ownerType: FolderOwnerType.Personal,
-      pageIndex: this.currentPage(),
-      pageSize: this.pageSize(),
+      pageIndex: 1,
+      pageSize,
       sortBy: 'lastModifiedAt',
       searchTerm: this.searchValue(),
       isPaging: true,
     };
-    this.folderService.getPersonalFolders(request).subscribe({
-      error: () => this.shouldStopRequest.set(true),
-    });
-  }
 
-  private loadMaterial() {
-    const request: GetPersonalLessonMaterialsRequest = {
+    const materialRequest: GetPersonalLessonMaterialsRequest = {
       entityStatus: EntityStatus.Deleted,
-      pageIndex: this.currentPage(),
-      pageSize: this.pageSize(),
+      pageIndex: 1,
+      pageSize,
       sortBy: 'lastModifiedAt',
       searchTerm: this.searchValue(),
       isPagingEnabled: true,
     };
-    this.lessonMaterialService.getPersonalLessonMaterials(request).subscribe({
+
+    forkJoin([
+      this.folderService.getPersonalFolders(folderRequest),
+      this.lessonMaterialService.getPersonalLessonMaterials(materialRequest),
+    ]).subscribe({
+      next: ([folders, materials]) => {
+        const sortedFolders = (folders ?? []).sort((a, b) => {
+          const dateA = a.lastModifiedAt ?? '';
+          const dateB = b.lastModifiedAt ?? '';
+          return new Date(dateB).getTime() - new Date(dateA).getTime();
+        });
+
+        const sortedMaterials = (materials ?? []).sort((a, b) => {
+          const dateA = a.lastModifiedAt ?? '';
+          const dateB = b.lastModifiedAt ?? '';
+          return new Date(dateB).getTime() - new Date(dateA).getTime();
+        });
+
+        const merged: TrashItem[] = [
+          ...sortedFolders.map(f => ({ type: 'folder', data: f }) as const),
+          ...sortedMaterials.map(m => ({ type: 'material', data: m }) as const),
+        ];
+
+        const total = sortedFolders.length + sortedMaterials.length;
+        const start = this.firstRecordIndex();
+        const end = start + this.pageSize();
+
+        this.totalRecords.set(total);
+        this.trashItems.set(merged.slice(start, end));
+      },
       error: () => this.shouldStopRequest.set(true),
     });
   }
 
-  private loadAllData(): void {
-    this.loadFolder();
-    this.loadMaterial();
+  private handleDeleteFolder(ids: string[]): void {
+    this.folderService.removeFolder(ids).subscribe({
+      next: () => this.loadTrashItems(),
+    });
+  }
+
+  private handleDeleteMaterial(ids: string[]): void {
+    const request: DeleteMaterialRequest = {
+      ids,
+      permanent: true,
+    };
+
+    this.lessonMaterialService.deleteMaterial(request).subscribe({
+      next: () => this.loadTrashItems(),
+    });
+  }
+
+  private confirmDelete({
+    header,
+    message,
+    accept,
+  }: {
+    header: string;
+    message: string;
+    accept: () => void;
+  }): void {
+    this.confirmationService.confirm({
+      header,
+      message,
+      icon: 'pi pi-info-circle',
+      rejectButtonProps: {
+        label: 'Không, giữ lại',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Có, xóa vĩnh viễn',
+        severity: 'danger',
+      },
+      accept,
+    });
   }
 }

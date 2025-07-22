@@ -131,13 +131,13 @@ describe('ClassManagementService', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('createClassAsTeacher', () => {
+  describe('createClass', () => {
     it('should create class and update signals on CREATED', async () => {
       (requestService.post as any).mockReturnValue(
         of({ statusCode: StatusCode.CREATED, data: mockClass })
       );
       await new Promise<void>(resolve => {
-        service.createClassAsTeacher(mockCreateRequest).subscribe(result => {
+        service.createClass(mockCreateRequest).subscribe(result => {
           expect(result).toEqual(mockClass);
           expect(toastHandlingService.success).toHaveBeenCalled();
           expect(service.classes()).toContainEqual(mockClass);
@@ -150,7 +150,7 @@ describe('ClassManagementService', () => {
         of({ statusCode: StatusCode.SYSTEM_ERROR, data: mockClass })
       );
       await new Promise<void>(resolve => {
-        service.createClassAsTeacher(mockCreateRequest).subscribe(result => {
+        service.createClass(mockCreateRequest).subscribe(result => {
           expect(result).toBeNull();
           expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
           resolve();
@@ -163,7 +163,7 @@ describe('ClassManagementService', () => {
       });
       (requestService.post as any).mockReturnValue(throwError(() => error));
       await new Promise<void>(resolve => {
-        service.createClassAsTeacher(mockCreateRequest).subscribe(result => {
+        service.createClass(mockCreateRequest).subscribe(result => {
           expect(result).toBeNull();
           expect(toastHandlingService.warn).toHaveBeenCalled();
           resolve();
@@ -176,7 +176,7 @@ describe('ClassManagementService', () => {
       });
       (requestService.post as any).mockReturnValue(throwError(() => error));
       await new Promise<void>(resolve => {
-        service.createClassAsTeacher(mockCreateRequest).subscribe(result => {
+        service.createClass(mockCreateRequest).subscribe(result => {
           expect(result).toBeNull();
           expect(toastHandlingService.error).toHaveBeenCalled();
           resolve();
@@ -187,7 +187,7 @@ describe('ClassManagementService', () => {
       const error = new HttpErrorResponse({ error: { statusCode: 9999 } });
       (requestService.post as any).mockReturnValue(throwError(() => error));
       await new Promise<void>(resolve => {
-        service.createClassAsTeacher(mockCreateRequest).subscribe(result => {
+        service.createClass(mockCreateRequest).subscribe(result => {
           expect(result).toBeNull();
           expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
           resolve();
@@ -196,13 +196,13 @@ describe('ClassManagementService', () => {
     });
   });
 
-  describe('getTeacherClasses', () => {
+  describe('getClasses', () => {
     it('should get teacher classes and update signals on SUCCESS', async () => {
       (requestService.get as any).mockReturnValue(
         of({ statusCode: StatusCode.SUCCESS, data: mockTeacherClassResponse })
       );
       await new Promise<void>(resolve => {
-        service.getTeacherClasses(mockTeacherClassRequest).subscribe(result => {
+        service.getClasses(mockTeacherClassRequest).subscribe(result => {
           expect(result).toEqual(mockTeacherClassResponse);
           expect(service.classes()).toEqual([mockClass, mockClass2]);
           expect(service.totalClass()).toBe(2);
@@ -218,7 +218,7 @@ describe('ClassManagementService', () => {
         })
       );
       await new Promise<void>(resolve => {
-        service.getTeacherClasses(mockTeacherClassRequest).subscribe(result => {
+        service.getClasses(mockTeacherClassRequest).subscribe(result => {
           expect(result).toBeNull();
           expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
           resolve();
@@ -230,7 +230,7 @@ describe('ClassManagementService', () => {
         of({ statusCode: StatusCode.SUCCESS })
       );
       await new Promise<void>(resolve => {
-        service.getTeacherClasses(mockTeacherClassRequest).subscribe(result => {
+        service.getClasses(mockTeacherClassRequest).subscribe(result => {
           expect(result).toBeNull();
           expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
           resolve();
@@ -242,7 +242,7 @@ describe('ClassManagementService', () => {
         throwError(() => new Error('Network error'))
       );
       await new Promise<void>(resolve => {
-        service.getTeacherClasses(mockTeacherClassRequest).subscribe(result => {
+        service.getClasses(mockTeacherClassRequest).subscribe(result => {
           expect(result).toBeNull();
           expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
           resolve();
@@ -251,13 +251,13 @@ describe('ClassManagementService', () => {
     });
   });
 
-  describe('getTeacherClassById', () => {
+  describe('getClassById', () => {
     it('should get class by id and update signal on SUCCESS', async () => {
       (requestService.get as any).mockReturnValue(
         of({ statusCode: StatusCode.SUCCESS, data: mockClass })
       );
       await new Promise<void>(resolve => {
-        service.getTeacherClassById('1').subscribe(result => {
+        service.getClassById('1').subscribe(result => {
           expect(result).toEqual(mockClass);
           expect(service.classModel()).toEqual(mockClass);
           resolve();
@@ -270,7 +270,7 @@ describe('ClassManagementService', () => {
         of({ statusCode: StatusCode.SYSTEM_ERROR, data: mockClass })
       );
       await new Promise<void>(resolve => {
-        service.getTeacherClassById('1').subscribe(result => {
+        service.getClassById('1').subscribe(result => {
           expect(result).toBeNull();
           expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
           resolve();
@@ -283,7 +283,7 @@ describe('ClassManagementService', () => {
         of({ statusCode: StatusCode.SUCCESS })
       );
       await new Promise<void>(resolve => {
-        service.getTeacherClassById('1').subscribe(result => {
+        service.getClassById('1').subscribe(result => {
           expect(result).toBeNull();
           expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
           resolve();
@@ -295,7 +295,7 @@ describe('ClassManagementService', () => {
         throwError(() => new Error('Network error'))
       );
       await new Promise<void>(resolve => {
-        service.getTeacherClassById('1').subscribe(result => {
+        service.getClassById('1').subscribe(result => {
           expect(result).toBeNull();
           expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
           resolve();
@@ -310,12 +310,12 @@ describe('ClassManagementService', () => {
       (requestService.post as any).mockReturnValue(
         of({ statusCode: StatusCode.SUCCESS, data: updatedClass })
       );
-      // Set initial class model through getTeacherClassById first
+      // Set initial class model through getClassById first
       (requestService.get as any).mockReturnValue(
         of({ statusCode: StatusCode.SUCCESS, data: mockClass })
       );
       await new Promise<void>(resolve => {
-        service.getTeacherClassById('1').subscribe(() => {
+        service.getClassById('1').subscribe(() => {
           // Now test refreshClassCode
           (requestService.post as any).mockReturnValue(
             of({ statusCode: StatusCode.SUCCESS, data: updatedClass })
@@ -413,11 +413,11 @@ describe('ClassManagementService', () => {
 
   describe('updateClassModelPartial', () => {
     it('should merge partial update into classModel', () => {
-      // Set initial class model through getTeacherClassById first
+      // Set initial class model through getClassById first
       (requestService.get as any).mockReturnValue(
         of({ statusCode: StatusCode.SUCCESS, data: mockClass })
       );
-      service.getTeacherClassById('1').subscribe(() => {
+      service.getClassById('1').subscribe(() => {
         service.updateClassModelPartial({ name: 'New Name' });
         expect(service.classModel()?.name).toBe('New Name');
       });
@@ -448,7 +448,7 @@ describe('ClassManagementService', () => {
       of({ statusCode: StatusCode.SUCCESS, data: emptyClass })
     );
     await new Promise<void>(resolve => {
-      service.getTeacherClassById('').subscribe(result => {
+      service.getClassById('').subscribe(result => {
         expect(result).toEqual(emptyClass);
         resolve();
       });

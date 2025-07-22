@@ -127,7 +127,17 @@ export class FolderManagementService {
       );
   }
 
-  removeFolder(folderId: string): Observable<null> {
+  removeFolder(request: string[]): Observable<null> {
+    return this.requestService
+      .deleteWithBody(`${this.BASE_FOLDERS_API_URL}/user`, request)
+      .pipe(
+        tap(res => this.handleRemoveResponse(res)),
+        map(() => null),
+        catchError(err => this.handleError(err))
+      );
+  }
+
+  removeClassFolder(folderId: string): Observable<null> {
     return this.requestService
       .delete(`${this.BASE_FOLDERS_API_URL}/${folderId}`)
       .pipe(

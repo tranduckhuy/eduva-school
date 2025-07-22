@@ -108,6 +108,6 @@ export class ClassManagementComponent implements OnInit {
       pageSize: this.pageSize(),
       searchTerm: this.searchTerm(),
     };
-    this.classManagementService.getTeacherClasses(request).subscribe();
+    this.classManagementService.getClasses(request).subscribe();
   }
 }

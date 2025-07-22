@@ -62,7 +62,7 @@ export class ClassFoldersComponent {
 
   onRemoveFolder(folderId: string) {
     this.folderService
-      .removeFolder(folderId)
+      .removeClassFolder(folderId)
       .subscribe(() => this.removeFolderMaterials.emit());
   }
 

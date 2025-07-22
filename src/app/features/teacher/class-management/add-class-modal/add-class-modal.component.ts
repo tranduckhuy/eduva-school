@@ -77,14 +77,14 @@ export class AddClassModalComponent {
 
     const request: CreateClassRequest = this.form.value;
     this.classManagementService
-      .createClassAsTeacher(request)
+      .createClass(request)
       .pipe(
         switchMap(() => {
           const request: GetTeacherClassRequest = {
             pageIndex: this.modalData.pageIndex,
             pageSize: this.modalData.pageSize,
           };
-          return this.classManagementService.getTeacherClasses(request);
+          return this.classManagementService.getClasses(request);
         })
       )
       .subscribe({

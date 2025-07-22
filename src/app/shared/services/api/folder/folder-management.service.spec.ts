@@ -479,7 +479,7 @@ describe('FolderManagementService', () => {
     });
   });
 
-  describe('removeFolder', () => {
+  describe('removeClassFolder', () => {
     const folderId = 'folder-123';
 
     it('should remove folder successfully and show success toast', async () => {
@@ -489,7 +489,7 @@ describe('FolderManagementService', () => {
 
       (requestService.delete as any).mockReturnValue(of(successResponse));
 
-      const result = await firstValueFrom(service.removeFolder(folderId));
+      const result = await firstValueFrom(service.removeClassFolder(folderId));
 
       expect(result).toBeNull();
       expect(requestService.delete).toHaveBeenCalledWith(
@@ -505,7 +505,7 @@ describe('FolderManagementService', () => {
 
       (requestService.delete as any).mockReturnValue(of(failureResponse));
 
-      const result = await firstValueFrom(service.removeFolder(folderId));
+      const result = await firstValueFrom(service.removeClassFolder(folderId));
 
       expect(result).toBeNull();
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
@@ -518,9 +518,9 @@ describe('FolderManagementService', () => {
 
       (requestService.delete as any).mockReturnValue(throwError(() => error));
 
-      await expect(firstValueFrom(service.removeFolder(folderId))).rejects.toBe(
-        error
-      );
+      await expect(
+        firstValueFrom(service.removeClassFolder(folderId))
+      ).rejects.toBe(error);
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
   });

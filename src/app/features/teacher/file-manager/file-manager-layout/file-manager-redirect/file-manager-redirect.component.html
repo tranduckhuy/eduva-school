@@ -11,26 +11,6 @@
         </i>
         <span>Tất cả thư mục</span>
       </span>
-      <span class="!text-[#3A4252] dark:!text-[#e6e6e6]">
-        {{ totalFolders() }}
-      </span>
-    </a>
-  </li>
-  <li>
-    <a
-      routerLink="recent"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
-      class="file-manager-link">
-      <span class="flex items-center gap-2">
-        <i class="material-symbols-outlined text-lg !text-[#AD63F6]">
-          schedule
-        </i>
-        <span>Gần đây</span>
-      </span>
-      <span class="!text-[#3A4252] dark:!text-[#e6e6e6]">
-        {{ totalFolders() }}
-      </span>
     </a>
   </li>
   <li>
@@ -42,9 +22,6 @@
       <span class="flex items-center gap-2">
         <i class="material-symbols-outlined text-lg !text-[#FF4023]">delete</i>
         <span>Thùng rác</span>
-      </span>
-      <span class="!text-[#3A4252] dark:!text-[#e6e6e6]">
-        {{ trashTotalCount() }}
       </span>
     </a>
   </li>

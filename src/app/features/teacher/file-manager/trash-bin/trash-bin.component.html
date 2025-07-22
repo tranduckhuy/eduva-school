@@ -14,7 +14,8 @@
           variant="outlined"
           severity="danger"
           icon="pi pi-trash"
-          label="Dọn sạch thùng rác" />
+          label="Dọn sạch thùng rác"
+          (onClick)="onDeleteAllItem()" />
       </div>
     </div>
 
@@ -32,10 +33,10 @@
             [scrollable]="true"
             [showCurrentPageReport]="true"
             [scrollHeight]="'600px'"
+            [value]="trashItems()"
             [rows]="pageSize()"
             [first]="firstRecordIndex()"
-            [value]="items()"
-            [paginator]="items().length > 0"
+            [paginator]="trashItems().length > 0"
             [totalRecords]="totalRecords()"
             (onLazyLoad)="onLazyLoad($event)"
             currentPageReportTemplate="
@@ -61,16 +62,15 @@
               </tr>
             </ng-template>
             <ng-template #body let-item let-i="rowIndex">
-              <!-- Folder row -->
+              <!-- ? Folder row -->
               <ng-container *ngIf="item.type === 'folder'">
                 <tr>
                   <td>
-                    <div
-                      class="group flex cursor-pointer select-none items-center gap-2">
+                    <div class="flex select-none items-center gap-2">
                       <i class="material-symbols-outlined text-warning-500">
                         folder
                       </i>
-                      <span class="transition-colors group-hover:text-primary">
+                      <span>
                         {{ item.data.name }}
                       </span>
                     </div>
@@ -88,7 +88,8 @@
                         tooltipPosition="top"
                         variant="rounded"
                         size="xs"
-                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-xl !text-primary shadow-none hover:bg-transparent">
+                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-xl !text-primary shadow-none hover:bg-transparent"
+                        (clicked)="onRestoreItem('folder', item.data.id)">
                         settings_backup_restore
                       </app-button>
                       <app-button
@@ -96,7 +97,8 @@
                         tooltipPosition="bottom"
                         variant="rounded"
                         size="xs"
-                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-xl !text-danger shadow-none hover:bg-transparent">
+                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-xl !text-danger shadow-none hover:bg-transparent"
+                        (clicked)="onDeleteItem('folder', item.data.id)">
                         delete
                       </app-button>
                     </div>
@@ -104,18 +106,17 @@
                 </tr>
               </ng-container>
 
-              <!-- Material row -->
+              <!-- ? Material row -->
               <ng-container *ngIf="item.type === 'material'">
                 <tr>
                   <td>
-                    <div
-                      class="group flex cursor-pointer select-none items-center gap-2">
+                    <div class="flex items-center gap-2">
                       <i
                         class="material-symbols-outlined"
                         [ngClass]="getMaterialIconColor(item.data)">
                         {{ getMaterialIcon(item.data) }}
                       </i>
-                      <span class="transition-colors group-hover:text-primary">
+                      <span>
                         {{ item.data.title }}
                       </span>
                     </div>
@@ -135,7 +136,8 @@
                         tooltipPosition="top"
                         variant="rounded"
                         size="xs"
-                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-xl !text-primary shadow-none hover:bg-transparent">
+                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-xl !text-primary shadow-none hover:bg-transparent"
+                        (clicked)="onRestoreItem('material', item.data.id)">
                         settings_backup_restore
                       </app-button>
                       <app-button
@@ -143,7 +145,8 @@
                         tooltipPosition="bottom"
                         variant="rounded"
                         size="xs"
-                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-xl !text-danger shadow-none hover:bg-transparent">
+                        class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-xl !text-danger shadow-none hover:bg-transparent"
+                        (clicked)="onDeleteItem('material', item.data.id)">
                         delete
                       </app-button>
                     </div>
@@ -159,7 +162,7 @@
               </tr>
             </ng-template>
           </p-table>
-          @if (items().length === 0) {
+          @if (trashItems().length === 0) {
             <div
               class="pointer-events-none absolute left-0 right-0 top-[60%] -translate-y-[50%]">
               <app-table-empty-state

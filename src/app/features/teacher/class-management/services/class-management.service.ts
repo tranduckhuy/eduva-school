@@ -40,9 +40,7 @@ export class ClassManagementService {
   private readonly totalClassSignal = signal<number>(0);
   totalClass = this.totalClassSignal.asReadonly();
 
-  createClassAsTeacher(
-    request: CreateClassRequest
-  ): Observable<ClassModel | null> {
+  createClass(request: CreateClassRequest): Observable<ClassModel | null> {
     return this.requestService
       .post<ClassModel>(this.BASE_CLASS_API_URL, request)
       .pipe(
@@ -54,7 +52,7 @@ export class ClassManagementService {
       );
   }
 
-  getTeacherClasses(
+  getClasses(
     request: GetTeacherClassRequest
   ): Observable<GetTeacherClassResponse | null> {
     return this.requestService
@@ -69,7 +67,7 @@ export class ClassManagementService {
       );
   }
 
-  getTeacherClassById(classId: string): Observable<ClassModel | null> {
+  getClassById(classId: string): Observable<ClassModel | null> {
     return this.requestService
       .get<ClassModel>(`${this.BASE_CLASS_API_URL}/${classId}`)
       .pipe(
