@@ -2,7 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 
-import { Observable, catchError, map, of, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 
@@ -99,10 +99,8 @@ export class AuthService {
           this.clearSession();
           return null;
         }),
-        catchError(() => {
-          this.clearSession();
-          this.router.navigateByUrl('/auth/login');
-          return of(null);
+        catchError((err: HttpErrorResponse) => {
+          return throwError(() => err);
         })
       );
   }

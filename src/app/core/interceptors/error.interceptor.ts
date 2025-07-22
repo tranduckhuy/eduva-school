@@ -7,6 +7,7 @@ import { catchError, throwError } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 
 import { JwtService } from '../auth/services/jwt.service';
+import { AuthService } from '../auth/services/auth.service';
 import { UserService } from '../../shared/services/api/user/user.service';
 import { GlobalModalService } from '../../shared/services/layout/global-modal/global-modal.service';
 
@@ -17,11 +18,10 @@ import {
   BYPASS_PAYMENT_ERROR,
 } from '../../shared/tokens/context/http-context.token';
 
-let hasShownUnauthorizedDialog = false;
-
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const jwtService = inject(JwtService);
+  const authService = inject(AuthService);
   const userService = inject(UserService);
   const globalModalService = inject(GlobalModalService);
   const confirmationService = inject(ConfirmationService);
@@ -36,10 +36,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   };
 
   const handleUnauthorized = () => {
-    if (hasShownUnauthorizedDialog) return;
-
-    hasShownUnauthorizedDialog = true;
-
     globalModalService.close();
     confirmationService.confirm({
       header: 'Phiên đã hết hạn',
@@ -48,11 +44,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       rejectVisible: false,
       acceptButtonProps: { label: 'Đồng ý' },
       accept: () => {
-        jwtService.clearAll();
-        userService.clearCurrentUser();
-        router.navigateByUrl('/auth/login', {
-          replaceUrl: true,
-        });
+        authService.logout();
       },
     });
   };

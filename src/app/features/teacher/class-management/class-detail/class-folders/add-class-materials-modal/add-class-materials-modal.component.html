@@ -10,7 +10,7 @@
     </header>
 
     <div class="mt-[25px] w-[1000px] px-[25px] pb-0">
-      <p class="mt-2 max-w-full text-xs italic text-[#f33a58]">
+      <p class="mt-2 max-w-full text-xs italic text-primary">
         * Vui lòng chọn thư mục cá nhân và di chuyển bài học mới từ danh sách
         bên trái sang danh sách tài liệu lớp bên phải. Bạn chỉ có thể thêm các
         bài học mới, không thể di chuyển các bài học đã có sẵn trong lớp về thư
@@ -27,18 +27,15 @@
           inputId="folder"
           styleClass="mt-3 w-full"
           placeholder="Chọn một thư mục cá nhân của bạn"
-          [showClear]="true"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
           [checkmark]="true"
+          [showClear]="true"
+          [resetFilterOnHide]="true"
           [options]="folderList()"
           [loading]="isLoadingFolder()"
-          (onChange)="loadSourceFolderMaterials($event)">
-          <ng-template let-selectedOption #selectedItem>
-            {{ selectedOption.name }}
-          </ng-template>
-          <ng-template let-folder #item>
-            {{ folder.name }}
-          </ng-template>
-        </p-select>
+          (onChange)="loadSourceFolderMaterials($event)" />
         @if (folder?.invalid && (folder?.touched || submitted())) {
           <div class="mt-2 font-medium leading-normal text-[#f33a58]">
             {{ getErrorMessage('folder') }}

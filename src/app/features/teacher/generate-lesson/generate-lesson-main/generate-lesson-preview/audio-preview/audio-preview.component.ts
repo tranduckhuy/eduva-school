@@ -271,6 +271,7 @@ export class AudioPreviewComponent implements OnInit {
       acceptButtonProps: {
         label: 'Lưu và tiếp tục',
         size: 'small',
+        disabled: !this.folderId(),
       },
       accept: onAccept,
       reject: onReject,

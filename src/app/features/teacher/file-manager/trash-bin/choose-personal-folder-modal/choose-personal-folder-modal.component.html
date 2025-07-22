@@ -1,0 +1,66 @@
+<div class="max-h-[calc(100vh-40px)] w-full rounded bg-white dark:bg-dark-300">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <header
+      class="sticky left-0 top-0 z-[1] block w-full rounded-t-lg bg-gray-50 p-[25px] dark:bg-dark-400">
+      <h2 class="text-lg">Chọn thư mục cá nhân</h2>
+      <span
+        class="pi pi-times absolute right-[5px] top-[50%] -translate-y-[50%] cursor-pointer px-5 py-3 text-xl"
+        (click)="closeModal()"></span>
+    </header>
+
+    <div class="mt-[25px] px-[25px] pb-0">
+      <div class="w-[500px] xs:w-[300px]">
+        <p class="mt-2 max-w-full text-xs italic text-primary">
+          * Vui lòng chọn một thư mục cá nhân để phục hồi các tài liệu đã xóa.
+          Các tài liệu sẽ được khôi phục và lưu vào thư mục mà bạn chọn. <br />
+          <strong>Lưu ý:</strong> Những bài giảng trong thư mục cá nhân đã tồn
+          tại trong thư mục lớp sẽ không hiển thị trong danh sách phục hồi.
+        </p>
+        <div class="mt-4">
+          <label for="name" class="font-bold dark:text-white">
+            Thư mục của cá nhân bạn
+          </label>
+          <p-select
+            formControlName="folderId"
+            name="folderId"
+            inputId="folderId"
+            styleClass="mt-3 w-full"
+            placeholder="Chọn một thư mục cá nhân của bạn"
+            filterPlaceholder="Tìm kiếm..."
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            [checkmark]="true"
+            [showClear]="true"
+            [resetFilterOnHide]="true"
+            [options]="folderList()"
+            [loading]="isLoadingFolder()" />
+          @if (folderId?.invalid && (folderId?.touched || submitted())) {
+            <div class="mt-2 font-medium leading-normal text-[#f33a58]">
+              {{ getErrorMessage('folderId') }}
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <footer
+      class="sticky bottom-0 left-0 z-[1] flex justify-end gap-2 bg-white p-[25px] dark:bg-dark-300">
+      <p-button
+        label="Hủy"
+        variant="outlined"
+        severity="danger"
+        icon="pi pi-times"
+        size="small"
+        (onClick)="closeModal()" />
+      <p-button
+        label="Phục hồi"
+        variant="outlined"
+        type="submit"
+        size="small"
+        icon="pi pi-save"
+        [loading]="isLoading()"
+        [disabled]="form.invalid || isLoading()" />
+    </footer>
+  </form>
+</div>
