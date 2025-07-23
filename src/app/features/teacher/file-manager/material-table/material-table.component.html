@@ -170,7 +170,9 @@
                         variant="rounded"
                         size="xs"
                         class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent"
-                        (clicked)="onUpdateVisibility(material)">
+                        (clicked)="
+                          onUpdateVisibility(material.id, material.lessonStatus)
+                        ">
                         share
                       </app-button>
                       <app-button
