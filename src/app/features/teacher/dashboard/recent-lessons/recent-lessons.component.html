@@ -54,22 +54,20 @@
           <td class="!text-center">
             <div class="flex flex-col items-center gap-2">
               @if (material.lessonStatus === 0) {
-                <app-badge
-                  variant="warning"
-                  class="self-center whitespace-nowrap">
+                <app-badge variant="info" class="self-center whitespace-nowrap">
                   Chờ duyệt
                 </app-badge>
               } @else if (material.lessonStatus === 1) {
                 <app-badge
                   variant="success"
                   class="self-center whitespace-nowrap">
-                  duyệt
+                  Đã duyệt
                 </app-badge>
               } @else {
                 <app-badge
                   variant="danger"
                   class="self-center whitespace-nowrap">
-                  từ chối
+                  Từ chối
                 </app-badge>
               }
             </div>

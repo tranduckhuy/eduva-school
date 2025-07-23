@@ -20,6 +20,7 @@ import {
   ApexFill,
   ApexLegend,
   NgApexchartsModule,
+  ApexStroke,
 } from 'ng-apexcharts';
 
 import { Select } from 'primeng/select';
@@ -43,6 +44,7 @@ export type ChartOptions = {
   chart: ApexChart;
   xaxis: ApexXAxis;
   yaxis: ApexYAxis;
+  stroke: ApexStroke;
   title: ApexTitleSubtitle;
   tooltip: ApexTooltip;
   dataLabels: ApexDataLabels;
@@ -125,7 +127,7 @@ export class LessonCreationComponent {
     }
 
     if (timeSelectValue.code === 'weekly') {
-      return this.generateWeeklyData(7, data);
+      return this.generateWeeklyData(12, data);
     } else {
       return this.generateMonthlyData(data, 12);
     }
@@ -162,6 +164,23 @@ export class LessonCreationComponent {
             reset: true,
           },
         },
+        animations: {
+          enabled: true,
+          easing: 'easeinout',
+          speed: 800,
+          animateGradually: {
+            enabled: true,
+            delay: 150,
+          },
+          dynamicAnimation: {
+            enabled: true,
+            speed: 350,
+          },
+        },
+        zoom: {
+          enabled: true,
+          type: 'x',
+        },
         events: {
           click: (event, chartContext, config) => {
             // Handle bar click for daily breakdown
@@ -176,10 +195,18 @@ export class LessonCreationComponent {
       plotOptions: {},
       stroke: {
         curve: 'smooth',
-        width: 3,
       },
       markers: {
-        size: 5,
+        size: 4,
+        hover: {
+          size: 6,
+        },
+      },
+      grid: {
+        padding: {
+          right: 30,
+          left: 20,
+        },
       },
       fill: {
         opacity: 1,
@@ -301,55 +328,49 @@ export class LessonCreationComponent {
     uploaded: DataPoint[];
   } {
     const lessonActivities = data?.lessonActivity;
-
     if (!lessonActivities || lessonActivities.length === 0) {
       return { ai: [], uploaded: [] };
     }
 
-    const aiData = lessonActivities.map(item => {
-      // Handle both "YYYY-MM" and "YYYY-WXX" formats
-      const periodParts = item.period.split('-');
-      let monthNumber: number;
+    const currentYear = new Date().getFullYear();
+    // Only keep months from the current year
+    const yearMonthRegex = /(\d{4})-(\d{2})/;
+    const filtered = lessonActivities
+      .map(item => {
+        const match = yearMonthRegex.exec(item.period);
+        if (match) {
+          return {
+            ...item,
+            year: parseInt(match[1], 10),
+            month: parseInt(match[2], 10),
+          };
+        }
+        return null;
+      })
+      .filter(
+        (
+          item
+        ): item is DashboardSchoolAdminResponse['lessonActivity'][0] & {
+          year: number;
+          month: number;
+        } => !!item && item.year === currentYear
+      );
 
-      if (periodParts.length === 2) {
-        // For monthly data, period is "YYYY-MM"
-        monthNumber = parseInt(periodParts[1], 10); // 1-based index
-      } else {
-        // Fallback for other formats
-        monthNumber = 1;
-      }
+    // Sort by month ascending
+    filtered.sort((a, b) => a.month - b.month);
+    // Take up to 12 months
+    const recent = filtered.slice(-12);
 
-      return {
-        x: monthNumber, // month number as number
-        y: item.aiGeneratedCount,
-        fill: {
-          type: 'solid',
-        },
-      };
-    });
-
-    const uploadedData = lessonActivities.map(item => {
-      // Handle both "YYYY-MM" and "YYYY-WXX" formats
-      const periodParts = item.period.split('-');
-      let monthNumber: number;
-
-      if (periodParts.length === 2) {
-        // For monthly data, period is "YYYY-MM"
-        monthNumber = parseInt(periodParts[1], 10); // 1-based index
-      } else {
-        // Fallback for other formats
-        monthNumber = 1;
-      }
-
-      return {
-        x: monthNumber, // month number as number
-        y: item.uploadedCount,
-        fill: {
-          type: 'solid',
-        },
-      };
-    });
-
+    const aiData = recent.map(item => ({
+      x: item.month, // month number as number
+      y: item.aiGeneratedCount,
+      fill: { type: 'solid' },
+    }));
+    const uploadedData = recent.map(item => ({
+      x: item.month, // month number as number
+      y: item.uploadedCount,
+      fill: { type: 'solid' },
+    }));
     return { ai: aiData, uploaded: uploadedData };
   }
 }

@@ -158,7 +158,10 @@ export class AuthService {
         return;
       }
 
-      if (user.roles.includes(UserRoles.STUDENT)) {
+      if (
+        user.roles.includes(UserRoles.STUDENT) ||
+        user.roles.includes(UserRoles.SYSTEM_ADMIN)
+      ) {
         this.router.navigateByUrl('/errors/403');
         setTimeout(() => {
           this.clearSession();
