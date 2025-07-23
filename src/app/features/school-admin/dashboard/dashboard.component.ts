@@ -6,6 +6,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 
 import { UserService } from '../../../shared/services/api/user/user.service';
 import { PaymentService } from '../../../shared/services/api/payment/payment.service';
@@ -16,7 +17,6 @@ import { TopTeachersComponent } from './top-teachers/top-teachers.component';
 import { type ConfirmPaymentReturnRequest } from '../../../shared/models/api/request/query/confirm-payment-return-request.model';
 import { DashboardService } from '../../../shared/services/api/dashboard/dashboard.service';
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
-import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ReviewLessonsComponent } from './review-lessons/review-lessons.component';
 import { ContentTypeStatsComponent } from './content-type-stats/content-type-stats.component';
 import { LessonStatusStatsComponent } from './lesson-status-stats/lesson-status-stats.component';
@@ -51,6 +51,7 @@ interface SubItem {
     ReviewLessonsComponent,
     ContentTypeStatsComponent,
     LessonStatusStatsComponent,
+    CommonModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',

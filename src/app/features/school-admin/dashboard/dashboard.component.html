@@ -15,9 +15,25 @@
     <app-stat-card [statCard]="subscriptionStatCard()">
       <p class="my-6 text-2xl font-semibold">
         {{
-          dashboardSchoolAdminData()?.systemOverview?.currentSubscription?.price
-            | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN'
+          dashboardSchoolAdminData()?.systemOverview?.currentSubscription
+            ?.amountPaid | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN'
         }}
+        <span
+          class="text-base"
+          *ngIf="
+            (dashboardSchoolAdminData()?.systemOverview?.currentSubscription
+              ?.amountPaid ?? 0) <
+            (dashboardSchoolAdminData()?.systemOverview?.currentSubscription
+              ?.price ?? 0)
+          ">
+          /
+          <span class="text-base line-through">
+            {{
+              dashboardSchoolAdminData()?.systemOverview?.currentSubscription
+                ?.price | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN'
+            }}
+          </span>
+        </span>
       </p>
       <p class="text-base text-gray-500">
         Ngày bắt đầu:

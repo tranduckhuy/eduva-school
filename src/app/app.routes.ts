@@ -31,7 +31,7 @@ export const routes: Routes = [
     path: 'school-admin',
     canMatch: [authGuard, roleGuard],
     data: {
-      roles: [UserRoles.SCHOOL_ADMIN, UserRoles.SYSTEM_ADMIN],
+      roles: [UserRoles.SCHOOL_ADMIN],
     },
     loadChildren: () =>
       import('./features/school-admin/school-admin.routes').then(
