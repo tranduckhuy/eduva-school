@@ -20,7 +20,9 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { ResourcesStateService } from '../../../services/utils/resources-state.service';
 import { GenerateSettingsSelectionService } from '../../services/generate-settings-selection.service';
+import { LoadingService } from '../../../../../../../shared/services/core/loading/loading.service';
 import { LessonMaterialsService } from '../../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
+import { AiJobsService } from '../../../services/api/ai-jobs.service';
 
 import { VideoSettingsMenuComponent } from '../video-settings-menu/video-settings-menu.component';
 
@@ -28,6 +30,7 @@ import {
   type CreateLessonMaterialRequest,
   type CreateLessonMaterialsRequest,
 } from '../../../../../../../shared/models/api/request/command/create-lesson-material-request.model';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'video-preview-player',
@@ -57,10 +60,13 @@ export class VideoPreviewPlayerComponent {
   private readonly generateSettingsService = inject(
     GenerateSettingsSelectionService
   );
+  private readonly loadingService = inject(LoadingService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
+  private readonly aiJobService = inject(AiJobsService);
 
   videoUrl = input<string>('');
 
+  isLoadingCreateMaterial = this.loadingService.isLoading;
   hasGeneratedSuccessfully = this.resourceStateService.hasGeneratedSuccessfully;
   folderId = this.generateSettingsService.selectedFolderId;
 
@@ -278,25 +284,36 @@ export class VideoPreviewPlayerComponent {
 
     if (!folderId || !metadata) return;
 
-    const cleanBlobName = metadata.blobName.split('?')[0];
-    const material: CreateLessonMaterialRequest = {
-      title: metadata.title,
-      contentType: metadata.contentType,
-      duration: metadata.duration,
-      fileSize: metadata.fileSize,
-      isAIContent: true,
-      sourceUrl: cleanBlobName,
-    };
+    this.aiJobService
+      .getFileSizeByBlobNameUrl(metadata.blobName)
+      .pipe(
+        switchMap(fileSize => {
+          const cleanBlobName = metadata.blobName.split('?')[0];
+          const material: CreateLessonMaterialRequest = {
+            title: metadata.title,
+            contentType: metadata.contentType,
+            duration: metadata.duration,
+            fileSize: fileSize,
+            isAIContent: true,
+            sourceUrl: cleanBlobName,
+          };
 
-    const createRequest: CreateLessonMaterialsRequest = {
-      folderId,
-      blobNames: [cleanBlobName],
-      lessonMaterials: [material],
-    };
+          const createRequest: CreateLessonMaterialsRequest = {
+            folderId,
+            blobNames: [cleanBlobName],
+            lessonMaterials: [material],
+          };
 
-    this.lessonMaterialService.createLessonMaterials(createRequest).subscribe({
-      next: () => this.resourceStateService.clearAiGeneratedMetadata(),
-    });
+          return this.lessonMaterialService.createLessonMaterials(
+            createRequest
+          );
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.resourceStateService.clearAiGeneratedMetadata();
+        },
+      });
   }
 
   private getVideoElement(): HTMLVideoElement {

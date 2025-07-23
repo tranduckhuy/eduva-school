@@ -126,7 +126,8 @@
       [rounded]="true"
       [fluid]="true"
       [pTooltip]="!this.folderId() ? 'Vui lòng chọn thư mục trước khi lưu' : ''"
-      [disabled]="!this.folderId()"
+      [disabled]="!this.folderId() || isLoadingCreateMaterial()"
+      [loading]="isLoadingCreateMaterial()"
       (onClick)="onSaveGeneratedContent()" />
   }
   <p-button

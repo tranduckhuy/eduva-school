@@ -11,6 +11,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { switchMap } from 'rxjs';
+
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { SliderModule } from 'primeng/slider';
@@ -20,6 +22,7 @@ import { SubmenuDirective } from '../../../../../../../shared/directives/submenu
 import { ResourcesStateService } from '../../../services/utils/resources-state.service';
 import { GenerateSettingsSelectionService } from '../../services/generate-settings-selection.service';
 import { LessonMaterialsService } from '../../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
+import { AiJobsService } from '../../../services/api/ai-jobs.service';
 
 import {
   type CreateLessonMaterialRequest,
@@ -49,9 +52,9 @@ export class AudioPreviewPlayerComponent {
     GenerateSettingsSelectionService
   );
   private readonly lessonMaterialService = inject(LessonMaterialsService);
+  private readonly aiJobService = inject(AiJobsService);
 
   audioUrl = input<string>('');
-
   hasGeneratedSuccessfully = this.resourceStateService.hasGeneratedSuccessfully;
   folderId = this.generateSettingsService.selectedFolderId;
 
@@ -199,24 +202,35 @@ export class AudioPreviewPlayerComponent {
 
     if (!folderId || !metadata) return;
 
-    const cleanBlobName = metadata.blobName.split('?')[0];
-    const material: CreateLessonMaterialRequest = {
-      title: metadata.title,
-      contentType: metadata.contentType,
-      duration: metadata.duration,
-      fileSize: metadata.fileSize,
-      isAIContent: true,
-      sourceUrl: cleanBlobName,
-    };
+    this.aiJobService
+      .getFileSizeByBlobNameUrl(metadata.blobName)
+      .pipe(
+        switchMap(fileSize => {
+          const cleanBlobName = metadata.blobName.split('?')[0];
+          const material: CreateLessonMaterialRequest = {
+            title: metadata.title,
+            contentType: metadata.contentType,
+            duration: metadata.duration,
+            fileSize: fileSize,
+            isAIContent: true,
+            sourceUrl: cleanBlobName,
+          };
 
-    const createRequest: CreateLessonMaterialsRequest = {
-      folderId,
-      blobNames: [cleanBlobName],
-      lessonMaterials: [material],
-    };
+          const createRequest: CreateLessonMaterialsRequest = {
+            folderId,
+            blobNames: [cleanBlobName],
+            lessonMaterials: [material],
+          };
 
-    this.lessonMaterialService.createLessonMaterials(createRequest).subscribe({
-      next: () => this.resourceStateService.clearAiGeneratedMetadata(),
-    });
+          return this.lessonMaterialService.createLessonMaterials(
+            createRequest
+          );
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.resourceStateService.clearAiGeneratedMetadata();
+        },
+      });
   }
 }

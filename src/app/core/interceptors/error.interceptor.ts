@@ -44,7 +44,23 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       rejectVisible: false,
       acceptButtonProps: { label: 'Đồng ý' },
       accept: () => {
-        authService.logout();
+        // ? Clear cookie and user profile cache
+        authService.clearSession();
+
+        // ? Clear state cache
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('accordion-open:')) {
+            localStorage.removeItem(key);
+          }
+        });
+
+        // ? Close modal
+        globalModalService.close();
+
+        // ? Close Submenus
+        window.dispatchEvent(new Event('close-all-submenus'));
+
+        router.navigateByUrl('/auth/login', { replaceUrl: true });
       },
     });
   };

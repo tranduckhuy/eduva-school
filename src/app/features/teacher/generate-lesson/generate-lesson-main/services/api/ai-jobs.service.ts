@@ -1,5 +1,9 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpContext,
+  HttpErrorResponse,
+} from '@angular/common/http';
 
 import { Observable, map, catchError, throwError, tap } from 'rxjs';
 
@@ -10,6 +14,7 @@ import { ToastHandlingService } from '../../../../../../shared/services/core/toa
 
 import { StatusCode } from '../../../../../../shared/constants/status-code.constant';
 import { LessonGenerationType } from '../../../../../../shared/models/enum/lesson-generation-type.enum';
+import { BYPASS_AUTH } from '../../../../../../shared/tokens/context/http-context.token';
 
 import { type AiJob } from '../../../../../../shared/models/entities/ai-job.model';
 import { type CreateAiJobsRequest } from '../../models/request/command/create-ai-jobs-request.model';
@@ -20,6 +25,7 @@ import { type ConfirmCreateContent } from '../../models/request/command/confirm-
   providedIn: 'root',
 })
 export class AiJobsService {
+  private readonly httpClient = inject(HttpClient);
   private readonly requestService = inject(RequestService);
   private readonly toastHandlingService = inject(ToastHandlingService);
 
@@ -88,6 +94,21 @@ export class AiJobsService {
         }),
         map(res => this.extractData<AiJob>(res)),
         catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  getFileSizeByBlobNameUrl(blobNameUrl: string): Observable<number> {
+    return this.httpClient
+      .head(blobNameUrl, {
+        observe: 'response',
+        context: new HttpContext().set(BYPASS_AUTH, true),
+      })
+      .pipe(
+        map(response => {
+          const contentLength = response.headers.get('Content-Length');
+          return contentLength ? +contentLength : 1;
+        }),
+        catchError((err: HttpErrorResponse) => throwError(() => err))
       );
   }
 

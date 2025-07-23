@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 
-import { finalize } from 'rxjs';
+import { finalize, switchMap } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -160,30 +160,38 @@ export class VideoPreviewComponent implements OnInit {
 
     if (!folderId || !metadata) return;
 
-    const cleanBlobName = metadata.blobName.split('?')[0];
-    const material: CreateLessonMaterialRequest = {
-      title: metadata.title,
-      contentType: metadata.contentType,
-      duration: metadata.duration,
-      fileSize: metadata.fileSize,
-      isAIContent: true,
-      sourceUrl: cleanBlobName,
-    };
-
-    const createRequest: CreateLessonMaterialsRequest = {
-      folderId,
-      blobNames: [cleanBlobName],
-      lessonMaterials: [material],
-    };
-
     this.resourcesStateService.updateIsLoading(true);
     this.toastHandlingService.info(
       'Đang xử lý',
       'Hệ thống đang lưu nội dung đã tạo trước khi bắt đầu tạo mới. Vui lòng chờ trong giây lát...'
     );
-    this.lessonMaterialService
-      .createLessonMaterials(createRequest)
-      .pipe(finalize(() => this.resourcesStateService.updateIsLoading(false)))
+
+    this.aiJobService
+      .getFileSizeByBlobNameUrl(metadata.blobName)
+      .pipe(
+        switchMap(fileSize => {
+          const cleanBlobName = metadata.blobName.split('?')[0];
+          const material: CreateLessonMaterialRequest = {
+            title: metadata.title,
+            contentType: metadata.contentType,
+            duration: metadata.duration,
+            fileSize: fileSize,
+            isAIContent: true,
+            sourceUrl: cleanBlobName,
+          };
+
+          const createRequest: CreateLessonMaterialsRequest = {
+            folderId,
+            blobNames: [cleanBlobName],
+            lessonMaterials: [material],
+          };
+
+          return this.lessonMaterialService.createLessonMaterials(
+            createRequest
+          );
+        }),
+        finalize(() => this.resourcesStateService.updateIsLoading(false))
+      )
       .subscribe({
         next: () => {
           this.resourcesStateService.clearAiGeneratedMetadata();
@@ -212,7 +220,7 @@ export class VideoPreviewComponent implements OnInit {
     if (currentGenerated === type) return;
 
     // ? If have any type generated then popup confirmation for user decide to save content or not
-    if (currentGenerated !== type) {
+    if (currentGenerated && currentGenerated !== type) {
       this.confirmOverwrite(
         () => {
           saveBeforeContinue();
