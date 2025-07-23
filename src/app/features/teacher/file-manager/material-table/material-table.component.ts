@@ -104,8 +104,6 @@ export class MaterialTableComponent implements OnInit {
         this.previousPageSize.set(size);
       }
     });
-
-    this.onSearch();
   }
 
   onSearch(term?: string): void {

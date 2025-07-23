@@ -5,7 +5,6 @@ import * as signalR from '@microsoft/signalr';
 import { environment } from '../../../../../../../environments/environment';
 
 import { JwtService } from '../../../../../../core/auth/services/jwt.service';
-import { ToastHandlingService } from '../../../../../../shared/services/core/toast/toast-handling.service';
 
 import { type UpdateAiJobProgressResponse } from '../../models/response/command/update-ai-job-progress-response.model';
 
@@ -16,7 +15,6 @@ export class AiSocketService {
   private connection: signalR.HubConnection | null = null;
 
   private readonly jwtService = inject(JwtService);
-  private readonly toastHandlingService = inject(ToastHandlingService);
 
   private readonly BASE_HUB_API = environment.baseHubUrl;
 
@@ -51,10 +49,9 @@ export class AiSocketService {
         );
       })
       .catch(() => {
-        this.toastHandlingService.errorGeneral();
         this.jobUpdateProgressSignal.set({
           failureReason:
-            'Đã xảy ra lỗi trong quá trình kết nối. Vui lòng thử lại sau.',
+            'Đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau.',
         } as UpdateAiJobProgressResponse);
       });
   }

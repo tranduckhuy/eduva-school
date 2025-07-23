@@ -1,8 +1,11 @@
-import { effect, EffectRef, Signal } from '@angular/core';
+import { Signal, EffectRef, effect } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { FormGroup } from '@angular/forms';
 
 import { ContentType } from '../models/enum/lesson-material.enum';
+
+import { type NotificationModel } from '../models/entities/notification.model';
+import { type NotificationPayloadMap } from '../../core/layout/header/user-actions/notifications/models/notification-payload-mapping.model';
 
 /**
  * Triggers the download of a file from a Blob object.
@@ -251,4 +254,15 @@ export function getLastNWeekNumbers(
   }
 
   return result;
+}
+
+export function mapNotificationPayload<T extends keyof NotificationPayloadMap>(
+  raw: NotificationModel<any>
+): NotificationModel<NotificationPayloadMap[T]> {
+  const typedPayload = raw.payload as NotificationPayloadMap[T];
+
+  return {
+    ...raw,
+    payload: typedPayload,
+  };
 }

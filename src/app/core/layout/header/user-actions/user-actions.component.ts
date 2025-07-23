@@ -1,15 +1,17 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
   signal,
 } from '@angular/core';
 
-import { UserService } from '../../../../shared/services/api/user/user.service';
 import { ThemeService } from '../../../../shared/services/core/theme/theme.service';
 import { HeaderSubmenuService } from '../services/header-submenu.service';
+import { UserService } from '../../../../shared/services/api/user/user.service';
+import { NotificationSocketService } from '../../../../shared/services/api/notification/notification-socket.service';
 
 import { NotificationsComponent } from './notifications/notifications.component';
 import { InformationComponent } from './information/information.component';
@@ -23,9 +25,13 @@ import { InformationComponent } from './information/information.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserActionsComponent implements OnInit {
-  private readonly userService = inject(UserService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly themeService = inject(ThemeService);
-  readonly headerSubmenuService = inject(HeaderSubmenuService);
+  private readonly headerSubmenuService = inject(HeaderSubmenuService);
+  private readonly userService = inject(UserService);
+  private readonly notificationSocketService = inject(
+    NotificationSocketService
+  );
 
   theme = this.themeService.theme;
   readonly user = this.userService.currentUser;
@@ -34,10 +40,18 @@ export class UserActionsComponent implements OnInit {
 
   readonly isDarkMode = computed(() => this.theme() === 'dark');
 
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.notificationSocketService.disconnect();
+    });
+  }
+
   ngOnInit(): void {
     document.addEventListener('fullscreenchange', () => {
       this.isFullscreen.set(!!document.fullscreenElement);
     });
+
+    this.notificationSocketService.connect();
   }
 
   toggleMenu(submenuKey: string): void {
@@ -68,5 +82,13 @@ export class UserActionsComponent implements OnInit {
     this.theme() === 'light'
       ? this.themeService.setTheme('dark')
       : this.themeService.setTheme('light');
+  }
+
+  getActiveSubmenuMenu(menuName: string) {
+    return this.headerSubmenuService.getActiveSubmenuMenu() === menuName;
+  }
+
+  closeSubmenu() {
+    this.headerSubmenuService.close();
   }
 }
