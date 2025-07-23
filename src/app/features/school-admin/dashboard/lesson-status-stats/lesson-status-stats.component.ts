@@ -181,9 +181,10 @@ export class LessonStatusStatsComponent {
     const now = new Date();
     const currentYear = now.getFullYear();
     // Only keep months from the current year
+    const yearMonthRegex = /(\d{4})-(\d{2})/;
     const filtered = stats
       .map(item => {
-        const match = item.period.match(/(\d{4})-(\d{2})/);
+        const match = yearMonthRegex.exec(item.period);
         if (match) {
           return {
             ...item,

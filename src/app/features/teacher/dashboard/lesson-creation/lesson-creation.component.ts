@@ -308,9 +308,10 @@ export class LessonCreationComponent {
 
     const currentYear = new Date().getFullYear();
     // Only keep months from the current year
+    const yearMonthRegex = /(\d{4})-(\d{2})/;
     const filtered = lessonActivities
       .map(item => {
-        const match = item.period.match(/(\d{4})-(\d{2})/);
+        const match = yearMonthRegex.exec(item.period);
         if (match) {
           return {
             ...item,
