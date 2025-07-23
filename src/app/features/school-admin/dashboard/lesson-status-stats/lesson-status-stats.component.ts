@@ -180,25 +180,34 @@ export class LessonStatusStatsComponent {
   ) {
     const now = new Date();
     const currentYear = now.getFullYear();
-    const monthList = Array.from({ length: months }, (_, i) => {
-      const month = i + 1;
-      return `${currentYear}-${month.toString().padStart(2, '0')}`;
-    });
-    const filtered = stats.filter(item => monthList.includes(item.period));
-    filtered.sort((a, b) => {
-      const [yearA, monthA] = a.period.split('-').map(Number);
-      const [yearB, monthB] = b.period.split('-').map(Number);
-      if (yearA !== yearB) return yearA - yearB;
-      return monthA - monthB;
-    });
+    // Only keep months from the current year
+    const filtered = stats
+      .map(item => {
+        const match = item.period.match(/(\d{4})-(\d{2})/);
+        if (match) {
+          return {
+            ...item,
+            year: parseInt(match[1], 10),
+            month: parseInt(match[2], 10),
+          };
+        }
+        return null;
+      })
+      .filter(
+        (item): item is (typeof stats)[0] & { year: number; month: number } =>
+          !!item && item.year === currentYear
+      );
+
+    // Sort by month ascending
+    filtered.sort((a, b) => a.month - b.month);
+    // Take up to 12 months
+    const recent = filtered.slice(-12);
+
     return {
-      pending: filtered.map(item => item.pending),
-      approved: filtered.map(item => item.approved),
-      rejected: filtered.map(item => item.rejected),
-      categories: filtered.map(item => {
-        const m = item.period.split('-')[1];
-        return `Th${Number(m)}`;
-      }),
+      pending: recent.map(item => item.pending),
+      approved: recent.map(item => item.approved),
+      rejected: recent.map(item => item.rejected),
+      categories: recent.map(item => `Th${item.month}`),
     };
   }
 

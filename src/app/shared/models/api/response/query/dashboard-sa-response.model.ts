@@ -72,6 +72,7 @@ export interface DashboardSchoolAdminResponse {
       billingCycle: BillingCycle;
       startDate: string;
       endDate: string;
+      amountPaid: number;
     };
   };
   lessonActivity: LessonActivity[];
