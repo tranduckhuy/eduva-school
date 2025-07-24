@@ -44,14 +44,14 @@
                 }"
                 (click)="markAsRead(notification)">
                 <img
-                  [src]="notification.payload.createdByAvatar"
-                  [alt]="notification.payload.createdByName"
+                  [src]="notification.formatted.avatar"
+                  [alt]="notification.formatted.alt"
                   class="dark:bg-da size-12 rounded-full bg-white" />
                 <div class="flex flex-col text-left">
                   <p
                     class="line-clamp-2 max-w-[255px] dark:text-white"
                     tooltipPosition="bottom"
-                    [pTooltip]="notification.formatted.rawMessage"
+                    [pTooltip]="notification.formatted.tooltip"
                     [innerHTML]="notification.formatted.message | safeHtml"></p>
                   <p class="max-w-[255px] text-gray-500 dark:text-dark-100">
                     {{ notification.formatted.date }}
