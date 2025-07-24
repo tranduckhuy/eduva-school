@@ -206,7 +206,6 @@ export function convertPImageToFigureImg(html: string): string {
 }
 
 /**
-<<<<<<< HEAD
  * Gets the ISO week number for a given date.
  *
  * @param date - The date to get the ISO week number for.
@@ -297,4 +296,36 @@ export function clearQueryParams(
     queryParamsHandling: 'merge',
     replaceUrl: true,
   });
+}
+
+/**
+ * Format a date string to a human-readable relative time in Vietnamese.
+ *
+ * @param dateString - The ISO date string to format.
+ * @returns {string} A string representing the relative time, e.g.:
+ *   - "Vừa xong" (just now)
+ *   - "5 phút trước" (5 minutes ago)
+ *   - "2 giờ trước" (2 hours ago)
+ *   - "3 ngày trước" (3 days ago)
+ *   - "1 tháng trước" (1 month ago)
+ *   - "2 năm trước" (2 years ago)
+ *   - Returns an empty string if input is falsy.
+ */
+export function formatRelativeDate(dateString: string): string {
+  const now = new Date();
+  const target = new Date(dateString);
+  const diffMs = now.getTime() - target.getTime();
+
+  const minutes = Math.floor(diffMs / (1000 * 60));
+  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const months = Math.floor(days / 30);
+  const years = Math.floor(days / 365);
+
+  if (minutes < 1) return 'Vừa xong';
+  if (minutes < 60) return `${minutes} phút trước`;
+  if (hours < 24) return `${hours} giờ trước`;
+  if (days < 30) return `${days} ngày trước`;
+  if (months < 12) return `${months} tháng trước`;
+  return `${years} năm trước`;
 }

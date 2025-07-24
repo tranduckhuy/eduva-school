@@ -65,9 +65,52 @@
       }
     </div>
 
-    <p class="my-3 dark:text-white">
+    <p class="mt-2 dark:text-white">
       {{ formatUpdateDate(lessonMaterial()?.lastModifiedAt) }}
     </p>
+
+    @if (lessonMaterialApproval() && isShowingFeedback() && isTeacherOrMod()) {
+      <p-panel styleClass="mt-4" [toggleable]="true">
+        <ng-template pTemplate="header">
+          <div class="flex items-center gap-2">
+            <p-avatar
+              [image]="lessonMaterialApproval()?.approverAvatarUrl"
+              shape="circle" />
+            <span class="font-bold">
+              {{ lessonMaterialApproval()?.approverName }} -
+              {{
+                lessonMaterialApproval()?.statusChangeTo === 1
+                  ? 'Phê duyệt'
+                  : 'Từ chối'
+              }}
+            </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <div class="flex items-center justify-end">
+            <span class="text-surface-500 dark:text-surface-400">
+              {{ approvalRelativeDate }}
+            </span>
+          </div>
+        </ng-template>
+        <p class="mt-2">
+          Kiểm duyệt viên
+          <strong>{{ lessonMaterialApproval()?.approverName }}</strong> đã
+          <strong>
+            {{
+              lessonMaterialApproval()?.statusChangeTo === 1
+                ? 'phê duyệt'
+                : 'từ chối'
+            }}
+          </strong>
+          tài liệu của bạn với lí do:
+        </p>
+        <p
+          class="mt-1"
+          [innerHTML]="lessonMaterialApproval()!.feedback | safeHtml"></p>
+      </p-panel>
+    }
+
     @if (lessonMaterial()?.description) {
       <div class="lesson-content mt-5 pl-[7.5%] pr-[7.5%]">
         @for (block of contentBlocks(); track $index) {

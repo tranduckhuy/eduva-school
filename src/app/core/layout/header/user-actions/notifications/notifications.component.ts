@@ -22,9 +22,16 @@ import {
 } from '../../../../../shared/services/api/notification/notification.service';
 import { LoadingService } from '../../../../../shared/services/core/loading/loading.service';
 
+import { formatRelativeDate } from '../../../../../shared/utils/util-functions';
+
 import { NotificationSkeletonComponent } from '../../../../../shared/components/skeleton/notification-skeleton/notification-skeleton.component';
 
 import { type GetNotificationsRequest } from '../../../../../shared/models/api/request/query/get-notifications-request.model';
+import { type QuestionNotification } from './models/question-notification.model';
+import { type QuestionDeleteNotification } from './models/question-delete-notification.model';
+import { type QuestionCommentNotification } from './models/question-comment-notification.model';
+import { type QuestionCommentDeleteNotification } from './models/question-comment-delete-notification.model';
+import { type LessonMaterialApprovalNotification } from './models/material-approval-notification.model';
 
 interface FormattedNotification {
   tooltip?: string;
@@ -162,25 +169,6 @@ export class NotificationsComponent implements OnInit {
     };
   }
 
-  private formatRelativeDate(dateString: string): string {
-    const now = new Date();
-    const target = new Date(dateString);
-    const diffMs = now.getTime() - target.getTime();
-
-    const minutes = Math.floor(diffMs / (1000 * 60));
-    const hours = Math.floor(diffMs / (1000 * 60 * 60));
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const months = Math.floor(days / 30);
-    const years = Math.floor(days / 365);
-
-    if (minutes < 1) return 'Vừa xong';
-    if (minutes < 60) return `${minutes} phút trước`;
-    if (hours < 24) return `${hours} giờ trước`;
-    if (days < 30) return `${days} ngày trước`;
-    if (months < 12) return `${months} tháng trước`;
-    return `${years} năm trước`;
-  }
-
   private formatNotification(
     notification: NotificationWithTypedPayload
   ): FormattedNotification {
@@ -188,7 +176,7 @@ export class NotificationsComponent implements OnInit {
     const { title, lessonMaterialTitle, createdByName, createdAt, deletedAt } =
       payload;
 
-    const date = this.formatRelativeDate(createdAt ?? deletedAt);
+    const date = formatRelativeDate(createdAt ?? deletedAt);
 
     switch (notification.type) {
       case 'QuestionCreated':
@@ -257,6 +245,22 @@ export class NotificationsComponent implements OnInit {
           };
         }
       }
+      case 'LessonMaterialApproved': {
+        const { performedByName, lessonMaterialTitle } = payload;
+        return {
+          tooltip: `${performedByName} đã duyệt tài liệu: ${lessonMaterialTitle} của bạn`,
+          message: `Tài liệu <strong>${lessonMaterialTitle}</strong> của bạn đã được <strong>${performedByName}</strong> duyệt thành công!`,
+          date,
+        };
+      }
+      case 'LessonMaterialRejected': {
+        const { performedByName, lessonMaterialTitle } = payload;
+        return {
+          tooltip: `${performedByName} đã từ chối tài liệu: ${lessonMaterialTitle} của bạn`,
+          message: `Tài liệu <strong>${lessonMaterialTitle}</strong> của bạn đã bị <strong>${performedByName}</strong> từ chối!`,
+          date,
+        };
+      }
       default:
         return {
           message: 'Thông báo không xác định',
@@ -269,7 +273,6 @@ export class NotificationsComponent implements OnInit {
   private redirectBasedOnNotification(
     notification: NotificationWithTypedPayload
   ) {
-    const payload = notification.payload;
     const queryParams = {
       isLinkedFromNotification: true,
     };
@@ -277,7 +280,10 @@ export class NotificationsComponent implements OnInit {
     switch (notification.type) {
       case 'QuestionCreated':
       case 'QuestionUpdated':
-      case 'QuestionDeleted':
+      case 'QuestionDeleted': {
+        const payload = notification.payload as
+          | QuestionNotification
+          | QuestionDeleteNotification;
         this.router.navigate(
           ['/teacher/view-lesson', payload.lessonMaterialId],
           {
@@ -285,9 +291,13 @@ export class NotificationsComponent implements OnInit {
           }
         );
         break;
+      }
       case 'QuestionCommented':
       case 'QuestionCommentUpdated':
-      case 'QuestionCommentDeleted':
+      case 'QuestionCommentDeleted': {
+        const payload = notification.payload as
+          | QuestionCommentNotification
+          | QuestionCommentDeleteNotification;
         this.router.navigate(
           ['/teacher/view-lesson', payload.lessonMaterialId],
           {
@@ -298,13 +308,20 @@ export class NotificationsComponent implements OnInit {
           }
         );
         break;
-
-      default:
+      }
+      case 'LessonMaterialApproved':
+      case 'LessonMaterialRejected': {
+        const payload =
+          notification.payload as LessonMaterialApprovalNotification;
         this.router.navigate([
           '/teacher/view-lesson',
           payload.lessonMaterialId,
         ]);
         break;
+      }
+      default: {
+        break;
+      }
     }
   }
 }

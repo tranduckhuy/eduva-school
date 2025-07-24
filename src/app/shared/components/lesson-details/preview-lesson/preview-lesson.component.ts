@@ -15,6 +15,8 @@ import { ButtonModule } from 'primeng/button';
 import { ImageModule } from 'primeng/image';
 import { SkeletonModule } from 'primeng/skeleton';
 import { DrawerModule } from 'primeng/drawer';
+import { PanelModule } from 'primeng/panel';
+import { AvatarModule } from 'primeng/avatar';
 
 import { SafeHtmlPipe } from '../../../pipes/safe-html.pipe';
 
@@ -27,7 +29,10 @@ import {
   type RenderBlock,
 } from '../../../services/layout/content-parse/content-parse.service';
 
-import { clearQueryParams } from '../../../utils/util-functions';
+import {
+  clearQueryParams,
+  formatRelativeDate,
+} from '../../../utils/util-functions';
 
 import { PAGE_SIZE } from '../../../constants/common.constant';
 import { UserRoles } from '../../../constants/user-roles.constant';
@@ -41,6 +46,12 @@ import { PreviewLessonSkeletonComponent } from '../../skeleton/preview-lesson-sk
 import { ModerateReasonModalComponent } from '../../../../features/moderation/moderate-lessons/moderate-reason-modal/moderate-reason-modal.component';
 import { CommentModalComponent } from '../../comment-components/comment-modal/comment-modal.component';
 
+const SHOW_ACTION_BUTTON_PATHS = ['/moderation/view-lesson'];
+const SHOW_COMMENT_BUTTON_PATHS = [
+  '/teacher/file-manager',
+  '/teacher/view-lesson',
+];
+
 @Component({
   selector: 'app-preview-lesson',
   standalone: true,
@@ -50,6 +61,8 @@ import { CommentModalComponent } from '../../comment-components/comment-modal/co
     ImageModule,
     SkeletonModule,
     DrawerModule,
+    PanelModule,
+    AvatarModule,
     SafeHtmlPipe,
     PdfViewerComponent,
     DocViewerComponent,
@@ -63,6 +76,7 @@ import { CommentModalComponent } from '../../comment-components/comment-modal/co
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreviewLessonComponent implements OnInit {
+  // ? Injected Services
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly userService = inject(UserService);
@@ -71,11 +85,13 @@ export class PreviewLessonComponent implements OnInit {
   private readonly globalModalService = inject(GlobalModalService);
   private readonly contentParseService = inject(ContentParserService);
 
+  // ? Inputs & Signals
   materialId = input.required<string>();
 
   user = this.userService.currentUser;
-  lessonMaterial = this.lessonMaterialService.lessonMaterial;
   isLoading = this.loadingService.isLoading;
+  lessonMaterial = this.lessonMaterialService.lessonMaterial;
+  lessonMaterialApproval = this.lessonMaterialService.lessonMaterialApproval;
 
   questionIdFromNotification = signal<string>('');
 
@@ -83,16 +99,20 @@ export class PreviewLessonComponent implements OnInit {
 
   currentPage = signal<number>(1);
   pageSize = signal<number>(PAGE_SIZE);
+
+  isShowingFeedback = signal<boolean>(false);
   isApprovedLesson = signal<boolean>(false);
 
   contentBlocks = signal<RenderBlock[]>([]);
 
+  visible = false;
+
+  // ? Computed Properties
   showCommentButton = computed(() => {
     const lessonMaterial = this.lessonMaterial();
-    const hasShowPath = this.showCommentButtonPaths.some(path =>
+    const hasShowPath = SHOW_COMMENT_BUTTON_PATHS.some(path =>
       this.currentUrl().includes(path)
     );
-
     return (
       hasShowPath &&
       lessonMaterial &&
@@ -100,29 +120,29 @@ export class PreviewLessonComponent implements OnInit {
     );
   });
 
-  showActionButton = computed(() => {
-    return this.showActionButtonPaths.some(path =>
-      this.currentUrl().includes(path)
+  showActionButton = computed(() =>
+    SHOW_ACTION_BUTTON_PATHS.some(path => this.currentUrl().includes(path))
+  );
+
+  isSchoolAdminOrMod = computed(() => {
+    const roles = this.user()?.roles || [];
+    return (
+      roles.includes(UserRoles.SCHOOL_ADMIN) ||
+      roles.includes(UserRoles.CONTENT_MODERATOR)
     );
   });
 
-  isSchoolAdminOrMod = computed(
-    () =>
-      this.user()?.roles.includes(UserRoles.SCHOOL_ADMIN) ||
-      this.user()?.roles.includes(UserRoles.CONTENT_MODERATOR)
-  );
+  isTeacherOrMod = computed(() => {
+    const roles = this.user()?.roles || [];
+    return (
+      roles.includes(UserRoles.TEACHER) ||
+      roles.includes(UserRoles.CONTENT_MODERATOR)
+    );
+  });
 
   isMaterialPending = computed(
     () => this.lessonMaterial()?.lessonStatus === LessonMaterialStatus.Pending
   );
-
-  private readonly showCommentButtonPaths = [
-    '/teacher/file-manager',
-    '/teacher/view-lesson',
-  ];
-  private readonly showActionButtonPaths = ['/moderation/view-lesson'];
-
-  visible = false;
 
   constructor() {
     effect(
@@ -134,6 +154,58 @@ export class PreviewLessonComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.handleRouteQueryParams();
+    this.loadDetailData();
+    this.loadApprovalData();
+  }
+
+  get approvalRelativeDate(): string {
+    const lessonMaterialApproval = this.lessonMaterialApproval();
+    if (!lessonMaterialApproval) return '';
+    const approvalStatus =
+      lessonMaterialApproval.statusChangeTo === LessonMaterialStatus.Approved
+        ? 'Đã phê duyệt'
+        : 'Đã từ chối';
+    return `${approvalStatus} ${formatRelativeDate(lessonMaterialApproval.createdAt)}`;
+  }
+
+  formatUpdateDate(input?: string | null): string {
+    if (!input) return 'Bài học chưa từng được cập nhật';
+    const date = new Date(input);
+    if (isNaN(date.getTime())) return 'Định dạng ngày không hợp lệ';
+    return `Cập nhật ${formatRelativeDate(input)}`;
+  }
+
+  approveLesson() {
+    this.openModerateReasonModal(true);
+  }
+
+  refuseLesson() {
+    this.openModerateReasonModal(false);
+  }
+
+  private loadDetailData() {
+    this.lessonMaterialService
+      .getLessonMaterialById(this.materialId())
+      .subscribe({
+        next: () => {
+          const lessonMaterial = this.lessonMaterial();
+          this.contentParse(lessonMaterial ? lessonMaterial.description : '');
+        },
+      });
+  }
+
+  private loadApprovalData() {
+    this.lessonMaterialService
+      .getLessonMaterialApprovalById(this.materialId())
+      .subscribe({
+        next: res => {
+          this.isShowingFeedback.set(!!res?.[0]?.feedback);
+        },
+      });
+  }
+
+  private handleRouteQueryParams() {
     this.activatedRoute.queryParamMap.subscribe(params => {
       const page = Number(params.get('page'));
       const size = Number(params.get('pageSize'));
@@ -145,55 +217,23 @@ export class PreviewLessonComponent implements OnInit {
 
       if (isLinkedFromNotification) {
         this.visible = true;
-
         if (questionId) {
           this.questionIdFromNotification.set(questionId);
         }
-
         clearQueryParams(this.router, this.activatedRoute, [
           'isLinkedFromNotification',
           'questionId',
         ]);
       }
     });
-
-    this.lessonMaterialService
-      .getLessonMaterialById(this.materialId())
-      .subscribe({
-        next: () => {
-          const lessonMaterial = this.lessonMaterial();
-          const rawDescription = lessonMaterial
-            ? lessonMaterial.description
-            : '';
-
-          this.contentParse(rawDescription);
-        },
-      });
   }
 
-  formatUpdateDate(input?: string | null): string {
-    if (!input) return 'Bài học chưa từng được cập nhật';
-
-    const date = new Date(input);
-    if (isNaN(date.getTime())) return 'Định dạng ngày không hợp lệ';
-
-    return `Cập nhật tháng ${date.getUTCMonth() + 1} năm ${date.getUTCFullYear()}`;
-  }
-
-  openModerateReasonModal(isApproved: boolean) {
+  private openModerateReasonModal(isApproved: boolean) {
     this.isApprovedLesson.set(isApproved);
     this.globalModalService.open(ModerateReasonModalComponent, {
       materialId: this.materialId(),
       isApproved,
     });
-  }
-
-  approveLesson() {
-    this.openModerateReasonModal(true);
-  }
-
-  refuseLesson() {
-    this.openModerateReasonModal(false);
   }
 
   private contentParse(content: string) {
