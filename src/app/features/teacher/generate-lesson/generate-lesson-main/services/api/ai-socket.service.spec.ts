@@ -4,7 +4,6 @@ import { AiSocketService } from './ai-socket.service';
 import { JobStatus } from '../../../../../../shared/models/enum/job-status.enum';
 import { type UpdateAiJobProgressResponse } from '../../models/response/command/update-ai-job-progress-response.model';
 import { JwtService } from '../../../../../../core/auth/services/jwt.service';
-import { ToastHandlingService } from '../../../../../../shared/services/core/toast/toast-handling.service';
 import { MessageService } from 'primeng/api';
 
 // Mock environment
@@ -75,7 +74,6 @@ describe('AiSocketService', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: JwtService, useValue: jwtServiceMock },
-        { provide: ToastHandlingService, useValue: toastHandlingServiceMock },
         { provide: MessageService, useValue: messageServiceMock },
       ],
     });
@@ -96,7 +94,10 @@ describe('AiSocketService', () => {
       previewContent: 'preview',
       audioCost: 1,
       videoCost: 2,
-      productBlobNameUrl: 'url',
+      videoOutputBlobNameUrl: 'url',
+      audioOutputBlobNameUrl: 'url',
+      estimatedDurationMinutes: 1,
+      actualDurationSeconds: 1,
       failureReason: '',
       lastModifiedAt: 'now',
     };
@@ -109,7 +110,10 @@ describe('AiSocketService', () => {
     service.connect(jobId);
     await Promise.resolve();
     expect(withUrlMock).toHaveBeenCalledWith(
-      'http://mock-hub-url/job-status?access_token=mock-access-token'
+      'http://mock-hub-url/job-status',
+      expect.objectContaining({
+        accessTokenFactory: expect.any(Function),
+      })
     );
     expect(configureLoggingMock).toHaveBeenCalledWith(LogLevelMock.Information);
     expect(withAutomaticReconnectMock).toHaveBeenCalled();
@@ -141,7 +145,6 @@ describe('AiSocketService', () => {
     service.connect(jobId);
     await Promise.resolve();
     await Promise.resolve();
-    expect(toastHandlingServiceMock.errorGeneral).toHaveBeenCalled();
     expect(service.jobUpdateProgress()).toEqual(
       expect.objectContaining({
         failureReason: expect.stringContaining('Đã xảy ra lỗi'),
@@ -159,7 +162,10 @@ describe('AiSocketService', () => {
       previewContent: '',
       audioCost: 0,
       videoCost: 0,
-      productBlobNameUrl: '',
+      audioOutputBlobNameUrl: '',
+      videoOutputBlobNameUrl: '',
+      estimatedDurationMinutes: 0,
+      actualDurationSeconds: 0,
       failureReason: '',
       lastModifiedAt: '',
     };

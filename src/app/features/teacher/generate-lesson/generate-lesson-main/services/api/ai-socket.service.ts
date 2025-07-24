@@ -27,11 +27,12 @@ export class AiSocketService {
       this.disconnect();
     }
 
-    const accessToken = this.jwtService.getAccessToken();
-    const hubUrl = `${this.BASE_HUB_API}/job-status?access_token=${accessToken}`;
+    const hubUrl = `${this.BASE_HUB_API}/job-status`;
 
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl(hubUrl)
+      .withUrl(hubUrl, {
+        accessTokenFactory: () => this.jwtService.getAccessToken() ?? '',
+      })
       .configureLogging(signalR.LogLevel.Information)
       .withAutomaticReconnect()
       .build();

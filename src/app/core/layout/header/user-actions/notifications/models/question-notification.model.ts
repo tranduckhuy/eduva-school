@@ -2,14 +2,16 @@ import { type QuestionActionType } from '../../../../../../shared/models/enum/qu
 
 export interface QuestionNotification {
   questionId: string;
-  lessonMaterialId: string;
   title: string;
+  lessonMaterialId: string;
   lessonMaterialTitle: string;
   content: string;
   createdAt: string;
   lastModifiedAt: string;
   createdByUserId: string;
+  performedByUserId: string;
   createdByName: string;
+  performedByName: string;
   createdByAvatar: string;
   createdByRole: string;
   commentCount: number;

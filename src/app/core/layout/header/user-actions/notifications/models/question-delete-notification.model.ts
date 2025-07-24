@@ -2,11 +2,13 @@ import { type QuestionActionType } from '../../../../../../shared/models/enum/qu
 
 export interface QuestionDeleteNotification {
   questionId: string;
-  lessonMaterialId: string;
   title: string;
+  lessonMaterialId: string;
   lessonMaterialTitle: string;
   createdByUserId: string;
+  performedByUserId: string;
   createdByName: string;
+  performedByName: string;
   createdByAvatar: string;
   createdByRole: string;
   deletedAt: string;

@@ -53,7 +53,7 @@ export class NotificationService {
       );
   }
 
-  setNotificationAsRead(notificationId: string): Observable<void> {
+  markNotificationAsRead(notificationId: string): Observable<void> {
     return this.requestService
       .put(`${this.BASE_NOTIFICATION_API_URL}/${notificationId}/read`)
       .pipe(
@@ -62,7 +62,7 @@ export class NotificationService {
       );
   }
 
-  setAllNotificationAsRead(): Observable<void> {
+  markAllNotificationAsRead(): Observable<void> {
     return this.requestService
       .put(`${this.BASE_NOTIFICATION_API_URL}/read-all`)
       .pipe(

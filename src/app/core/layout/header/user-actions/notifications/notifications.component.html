@@ -19,9 +19,16 @@
           Đánh dấu đã đọc
         </button>
       </div>
-      <ul class="max-h-[70vh] overflow-y-auto overscroll-contain">
+      <ul
+        class="max-h-[70vh] overflow-y-auto overscroll-contain"
+        (scroll)="onScroll($event)">
         @for (notification of displayNotifications(); track notification.id) {
-          <li class="notify-item py-1">
+          <li
+            class="notify-item flex items-center gap-2 py-1"
+            [ngClass]="{
+              'cursor-pointer': !notification.formatted.disabled,
+              'cursor-default': notification.formatted.disabled,
+            }">
             <button
               class="mx-2 flex items-center gap-3 rounded-md p-2 pl-3 pr-6 transition-colors duration-300"
               [ngClass]="{
@@ -29,8 +36,10 @@
                 'dark:bg-dark-400': !notification.isRead,
                 'hover:bg-[#1618230d]': notification.isRead,
                 'dark:hover:bg-dark-400': notification.isRead,
+                'pointer-events-none cursor-default':
+                  notification.formatted.disabled,
               }"
-              (click)="markAsRead(notification.id)">
+              (click)="markAsRead(notification)">
               <img
                 [src]="notification.payload.createdByAvatar"
                 [alt]="notification.payload.createdByName"
@@ -39,10 +48,10 @@
                 <p
                   class="line-clamp-2 max-w-[255px] dark:text-white"
                   tooltipPosition="bottom"
-                  [pTooltip]="notification.payload.rawMessage"
-                  [innerHTML]="notification.payload.message | safeHtml"></p>
+                  [pTooltip]="notification.formatted.rawMessage"
+                  [innerHTML]="notification.formatted.message | safeHtml"></p>
                 <p class="max-w-[255px] text-gray-500 dark:text-dark-100">
-                  {{ notification.payload.date }}
+                  {{ notification.formatted.date }}
                 </p>
               </div>
             </button>

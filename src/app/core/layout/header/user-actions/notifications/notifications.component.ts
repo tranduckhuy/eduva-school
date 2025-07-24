@@ -7,6 +7,7 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { TooltipModule } from 'primeng/tooltip';
@@ -25,6 +26,13 @@ import { NotificationSkeletonComponent } from '../../../../../shared/components/
 
 import { type GetNotificationsRequest } from '../../../../../shared/models/api/request/query/get-notifications-request.model';
 
+interface FormattedNotification {
+  rawMessage?: string;
+  message: string;
+  date: string;
+  disabled?: boolean;
+}
+
 @Component({
   selector: 'header-notifications',
   standalone: true,
@@ -41,6 +49,7 @@ import { type GetNotificationsRequest } from '../../../../../shared/models/api/r
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationsComponent implements OnInit {
+  private readonly router = inject(Router);
   private readonly loadingService = inject(LoadingService);
   private readonly notificationService = inject(NotificationService);
 
@@ -52,17 +61,12 @@ export class NotificationsComponent implements OnInit {
 
   currentPage = signal<number>(0);
   pageSize = signal<number>(20);
+  hasMore = signal<boolean>(true);
 
   displayNotifications = computed(() =>
     this.notifications().map(n => ({
-      id: n.id,
-      type: n.type,
-      payload: {
-        ...n.payload,
-        ...this.formatNotification(n),
-      },
-      createdAt: n.createdAt,
-      isRead: n.isRead,
+      ...n,
+      formatted: this.formatNotification(n),
     }))
   );
 
@@ -72,7 +76,20 @@ export class NotificationsComponent implements OnInit {
     }
   }
 
+  onScroll(event: Event) {
+    const target = event.target as HTMLElement;
+    const threshold = 100;
+    if (
+      target.scrollHeight - target.scrollTop - target.clientHeight <
+      threshold
+    ) {
+      this.loadMore();
+    }
+  }
+
   loadMore() {
+    if (!this.hasMore() || this.isLoading()) return;
+
     const nextPage = this.currentPage() + 1;
 
     const request: GetNotificationsRequest = {
@@ -80,18 +97,26 @@ export class NotificationsComponent implements OnInit {
       pageSize: this.pageSize(),
     };
     this.notificationService.getNotifications(request).subscribe({
-      next: () => this.currentPage.set(nextPage),
+      next: res => {
+        this.currentPage.set(nextPage);
+        if (!res || res.length < this.pageSize()) {
+          this.hasMore.set(false);
+        }
+      },
     });
   }
 
-  markAsRead(notificationId: string) {
-    this.notificationService.setNotificationAsRead(notificationId).subscribe({
-      next: () => this.notificationService.optimisticMarkAsRead(notificationId),
+  markAsRead(notification: NotificationWithTypedPayload) {
+    this.notificationService.markNotificationAsRead(notification.id).subscribe({
+      next: () => {
+        this.notificationService.optimisticMarkAsRead(notification.id);
+        this.redirectBasedOnNotification(notification);
+      },
     });
   }
 
   markAllAsRead() {
-    this.notificationService.setAllNotificationAsRead().subscribe({
+    this.notificationService.markAllNotificationAsRead().subscribe({
       next: () => this.notificationService.optimisticMarkAllAsRead(),
     });
   }
@@ -115,7 +140,9 @@ export class NotificationsComponent implements OnInit {
     return `${years} năm trước`;
   }
 
-  private formatNotification(notification: NotificationWithTypedPayload) {
+  private formatNotification(
+    notification: NotificationWithTypedPayload
+  ): FormattedNotification {
     const payload = notification.payload as any;
     const { title, lessonMaterialTitle, createdByName, createdAt, deletedAt } =
       payload;
@@ -163,7 +190,50 @@ export class NotificationsComponent implements OnInit {
         return {
           message: 'Thông báo không xác định',
           date,
+          disabled: true,
         };
+    }
+  }
+
+  private redirectBasedOnNotification(
+    notification: NotificationWithTypedPayload
+  ) {
+    const payload = notification.payload;
+    const queryParams = {
+      isLinkedFromNotification: true,
+    };
+
+    switch (notification.type) {
+      case 'QuestionCreated':
+      case 'QuestionUpdated':
+      case 'QuestionDeleted':
+        this.router.navigate(
+          ['/teacher/view-lesson', payload.lessonMaterialId],
+          {
+            queryParams,
+          }
+        );
+        break;
+      case 'QuestionCommented':
+      case 'QuestionCommentUpdated':
+      case 'QuestionCommentDeleted':
+        this.router.navigate(
+          ['/teacher/view-lesson', payload.lessonMaterialId],
+          {
+            queryParams: {
+              ...queryParams,
+              questionId: payload.questionId,
+            },
+          }
+        );
+        break;
+
+      default:
+        this.router.navigate([
+          '/teacher/view-lesson',
+          payload.lessonMaterialId,
+        ]);
+        break;
     }
   }
 }

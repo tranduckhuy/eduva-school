@@ -1,13 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
+  OnInit,
   DestroyRef,
   effect,
   inject,
   input,
   output,
   signal,
+  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -35,13 +36,15 @@ import { type GetQuestionsRequest } from './model/request/query/get-questions-re
   styleUrl: './comment-modal.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CommentModalComponent {
+export class CommentModalComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly questionService = inject(QuestionService);
 
   materialId = input.required<string>();
   materialTitle = input.required<string>();
   visible = input.required<boolean>();
+
+  questionIdFromNotification = input<string>('');
 
   closeCommentDrawer = output<void>();
 
@@ -114,6 +117,12 @@ export class CommentModalComponent {
     );
 
     this.destroyRef.onDestroy(() => this.hasFetchedOnce.set(false));
+  }
+
+  ngOnInit(): void {
+    if (this.questionIdFromNotification()) {
+      this.handleViewQuestion(this.questionIdFromNotification());
+    }
   }
 
   handleViewQuestion(questionId: string) {

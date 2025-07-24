@@ -29,11 +29,12 @@ export class NotificationSocketService {
       this.disconnect();
     }
 
-    const accessToken = this.jwtService.getAccessToken();
-    const hubUrl = `${this.BASE_HUB_API}/question-comment?access_token=${accessToken}`;
+    const hubUrl = `${this.BASE_HUB_API}/notification`;
 
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl(hubUrl)
+      .withUrl(hubUrl, {
+        accessTokenFactory: () => this.jwtService.getAccessToken() ?? '',
+      })
       .configureLogging(signalR.LogLevel.Information)
       .withAutomaticReconnect()
       .build();
