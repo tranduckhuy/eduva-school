@@ -2,6 +2,7 @@ import { type QuestionNotification } from './question-notification.model';
 import { type QuestionDeleteNotification } from './question-delete-notification.model';
 import { type QuestionCommentNotification } from './question-comment-notification.model';
 import { type QuestionCommentDeleteNotification } from './question-comment-delete-notification.model';
+import { type LessonMaterialApprovalNotification } from './material-approval-notification.model';
 
 export interface NotificationPayloadMap {
   QuestionCreated: QuestionNotification;
@@ -10,4 +11,6 @@ export interface NotificationPayloadMap {
   QuestionCommented: QuestionCommentNotification;
   QuestionCommentUpdated: QuestionCommentNotification;
   QuestionCommentDeleted: QuestionCommentDeleteNotification;
+  LessonMaterialApproved: LessonMaterialApprovalNotification;
+  LessonMaterialRejected: LessonMaterialApprovalNotification;
 }

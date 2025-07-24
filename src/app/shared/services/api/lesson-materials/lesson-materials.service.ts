@@ -19,7 +19,8 @@ import {
 } from '../../../models/api/request/query/get-lesson-materials-request.model';
 import { type GetPagingLessonMaterialsResponse } from '../../../models/api/response/query/get-lesson-materials-response.model';
 import { type ApproveRejectMaterialRequest } from '../../../../features/moderation/moderate-lessons/models/approve-reject-material-request.model';
-import { DeleteMaterialRequest } from '../../../models/api/request/command/delete-material-request.model';
+import { type DeleteMaterialRequest } from '../../../models/api/request/command/delete-material-request.model';
+import { type LessonMaterialApproval } from '../../../models/entities/lesson-material-approval.model';
 
 @Injectable({
   providedIn: 'root',
@@ -37,6 +38,10 @@ export class LessonMaterialsService {
 
   private readonly lessonMaterialSignal = signal<LessonMaterial | null>(null);
   lessonMaterial = this.lessonMaterialSignal.asReadonly();
+
+  private readonly lessonMaterialApprovalSignal =
+    signal<LessonMaterialApproval | null>(null);
+  lessonMaterialApproval = this.lessonMaterialApprovalSignal.asReadonly();
 
   private readonly totalRecordsSignal = signal<number>(0);
   totalRecords = this.totalRecordsSignal.asReadonly();
@@ -139,12 +144,28 @@ export class LessonMaterialsService {
       );
   }
 
-  getLessonMaterialById(id: string): Observable<LessonMaterial | null> {
+  getLessonMaterialById(materialId: string): Observable<LessonMaterial | null> {
     return this.requestService
-      .get<LessonMaterial>(`${this.BASE_LESSON_MATERIALS_API_URL}/${id}`)
+      .get<LessonMaterial>(
+        `${this.BASE_LESSON_MATERIALS_API_URL}/${materialId}`
+      )
       .pipe(
         tap(res => this.handleDetailResponse(res)),
-        map(res => this.extractDetailResponse(res)),
+        map(res => this.extractDetailResponse<LessonMaterial>(res)),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  getLessonMaterialApprovalById(
+    materialId: string
+  ): Observable<LessonMaterialApproval[] | null> {
+    return this.requestService
+      .get<
+        LessonMaterialApproval[]
+      >(`${this.BASE_LESSON_MATERIALS_API_URL}/${materialId}/approvals`)
+      .pipe(
+        tap(res => this.handleApprovalDetailResponse(res)),
+        map(res => this.extractDetailResponse<LessonMaterialApproval[]>(res)),
         catchError((err: HttpErrorResponse) => this.handleError(err))
       );
   }
@@ -238,6 +259,16 @@ export class LessonMaterialsService {
     }
   }
 
+  private handleApprovalDetailResponse(res: any): void {
+    if (res.statusCode === StatusCode.SUCCESS && res.data) {
+      if (Array.isArray(res.data) && res.data.length > 0) {
+        this.lessonMaterialApprovalSignal.set(res.data?.[0]);
+      }
+    } else {
+      this.toastHandlingService.errorGeneral();
+    }
+  }
+
   private handleSuccessResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS) {
       this.toastHandlingService.successGeneral();
@@ -256,8 +287,8 @@ export class LessonMaterialsService {
       : null;
   }
 
-  private extractDetailResponse(res: any): LessonMaterial | null {
-    return res.statusCode === StatusCode.SUCCESS ? res.data : null;
+  private extractDetailResponse<T>(res: any): T | null {
+    return res.statusCode === StatusCode.SUCCESS ? (res.data as T) : null;
   }
 
   private handleError(err: HttpErrorResponse): Observable<null> {
