@@ -27,7 +27,7 @@ import { NotificationSkeletonComponent } from '../../../../../shared/components/
 import { type GetNotificationsRequest } from '../../../../../shared/models/api/request/query/get-notifications-request.model';
 
 interface FormattedNotification {
-  rawMessage?: string;
+  tooltip?: string;
   message: string;
   date: string;
   disabled?: boolean;
@@ -64,10 +64,18 @@ export class NotificationsComponent implements OnInit {
   hasMore = signal<boolean>(true);
 
   displayNotifications = computed(() =>
-    this.notifications().map(n => ({
-      ...n,
-      formatted: this.formatNotification(n),
-    }))
+    this.notifications().map(n => {
+      const formatted = this.formatNotification(n);
+      const { avatar, alt } = this.getNotificationAvatarAndAlt(n);
+      return {
+        ...n,
+        formatted: {
+          ...formatted,
+          avatar,
+          alt,
+        },
+      };
+    })
   );
 
   ngOnInit(): void {
@@ -121,6 +129,39 @@ export class NotificationsComponent implements OnInit {
     });
   }
 
+  private getNotificationAvatarAndAlt(
+    notification: NotificationWithTypedPayload
+  ): {
+    avatar: string;
+    alt: string;
+  } {
+    const payload = notification.payload as any;
+    const {
+      createdByUserId,
+      performedByUserId,
+      createdByAvatar,
+      performedByAvatar,
+      createdByName,
+      performedByName,
+    } = payload;
+    if (
+      (notification.type === 'QuestionDeleted' ||
+        notification.type === 'QuestionCommentDeleted') &&
+      createdByUserId !== undefined &&
+      performedByUserId !== undefined &&
+      createdByUserId !== performedByUserId
+    ) {
+      return {
+        avatar: performedByAvatar,
+        alt: performedByName,
+      };
+    }
+    return {
+      avatar: createdByAvatar,
+      alt: createdByName,
+    };
+  }
+
   private formatRelativeDate(dateString: string): string {
     const now = new Date();
     const target = new Date(dateString);
@@ -152,40 +193,70 @@ export class NotificationsComponent implements OnInit {
     switch (notification.type) {
       case 'QuestionCreated':
         return {
-          rawMessage: `Câu hỏi ${title} mới được thêm vào bài học: ${lessonMaterialTitle}`,
+          tooltip: `Câu hỏi ${title} mới được thêm vào bài học: ${lessonMaterialTitle}`,
           message: `Câu hỏi <strong>${title}</strong> mới được thêm vào bài học: <strong>${lessonMaterialTitle}</strong>`,
           date,
         };
       case 'QuestionUpdated':
         return {
-          rawMessage: `Câu hỏi ${title} mới được cập nhật tại bài học: ${lessonMaterialTitle}`,
+          tooltip: `Câu hỏi ${title} mới được cập nhật tại bài học: ${lessonMaterialTitle}`,
           message: `Câu hỏi <strong>${title}</strong> mới được cập nhật tại bài học: <strong>${lessonMaterialTitle}</strong>`,
           date,
         };
-      case 'QuestionDeleted':
-        return {
-          rawMessage: `Câu hỏi ${title} mới được xóa khỏi bài học: ${lessonMaterialTitle}`,
-          message: `Câu hỏi <strong>${title}</strong> mới được xóa khỏi bài học: <strong>${lessonMaterialTitle}</strong>`,
-          date,
-        };
+      case 'QuestionDeleted': {
+        const {
+          createdByUserId,
+          performedByUserId,
+          createdByName,
+          performedByName,
+        } = payload;
+        if (createdByUserId !== performedByUserId) {
+          return {
+            tooltip: `Giáo viên ${performedByName} đã xóa câu hỏi của ${createdByName} khỏi bài học: ${lessonMaterialTitle}`,
+            message: `Giáo viên <strong>${performedByName}</strong> đã xóa câu hỏi của <strong>${createdByName}</strong> khỏi bài học: <strong>${lessonMaterialTitle}</strong>`,
+            date,
+          };
+        } else {
+          return {
+            tooltip: `Câu hỏi ${title} mới được xóa khỏi bài học: ${lessonMaterialTitle}`,
+            message: `Câu hỏi <strong>${title}</strong> mới được xóa khỏi bài học: <strong>${lessonMaterialTitle}</strong>`,
+            date,
+          };
+        }
+      }
       case 'QuestionCommented':
         return {
-          rawMessage: `${createdByName} đã bình luận vào câu hỏi: ${title}`,
+          tooltip: `${createdByName} đã bình luận vào câu hỏi: ${title}`,
           message: `<strong>${createdByName}</strong> đã bình luận vào câu hỏi: <strong>${title}</strong>`,
           date,
         };
       case 'QuestionCommentUpdated':
         return {
-          rawMessage: `${createdByName} đã chỉnh sửa 1 bình luận của câu hỏi: ${title}`,
+          tooltip: `${createdByName} đã chỉnh sửa 1 bình luận của câu hỏi: ${title}`,
           message: `<strong>${createdByName}</strong> đã chỉnh sửa 1 bình luận của câu hỏi: <strong>${title}</strong>`,
           date,
         };
-      case 'QuestionCommentDeleted':
-        return {
-          rawMessage: `${createdByName} đã xóa 1 bình luận của câu hỏi: ${title}`,
-          message: `<strong>${createdByName}</strong> đã xóa 1 bình luận của câu hỏi: <strong>${title}</strong>`,
-          date,
-        };
+      case 'QuestionCommentDeleted': {
+        const {
+          createdByUserId,
+          performedByUserId,
+          createdByName,
+          performedByName,
+        } = payload;
+        if (createdByUserId !== performedByUserId) {
+          return {
+            tooltip: `Giáo viên ${performedByName} đã xóa 1 bình luận của ${createdByName} trong câu hỏi: ${title}`,
+            message: `Giáo viên <strong>${performedByName}</strong> đã xóa 1 bình luận của <strong>${createdByName}</strong> trong câu hỏi: <strong>${title}</strong>`,
+            date,
+          };
+        } else {
+          return {
+            tooltip: `${createdByName} đã xóa 1 bình luận của câu hỏi: ${title}`,
+            message: `<strong>${createdByName}</strong> đã xóa 1 bình luận của câu hỏi: <strong>${title}</strong>`,
+            date,
+          };
+        }
+      }
       default:
         return {
           message: 'Thông báo không xác định',
