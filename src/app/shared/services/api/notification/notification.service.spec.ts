@@ -6,8 +6,6 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { of, throwError, firstValueFrom } from 'rxjs';
 import * as utilFunctions from '../../../utils/util-functions';
 
-const BASE_API_URL = 'http://localhost/api';
-
 vi.mock('../../../utils/util-functions', async () => {
   const actual = await vi.importActual<any>('../../../utils/util-functions');
   return {
