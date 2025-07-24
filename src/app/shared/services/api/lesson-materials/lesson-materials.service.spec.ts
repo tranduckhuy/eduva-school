@@ -693,6 +693,98 @@ describe('LessonMaterialsService', () => {
     });
   });
 
+  describe('getLessonMaterialApprovalById', () => {
+    const materialId = 'material1';
+    const mockApproval = {
+      id: 'approval1',
+      lessonMaterialId: materialId,
+      lessonMaterialTitle: 'Test Material',
+      approverId: 'user2',
+      approverName: 'Approver User',
+      approverAvatarUrl: 'http://example.com/avatar.png',
+      statusChangeTo: LessonMaterialStatus.Approved,
+      feedback: 'Looks good',
+      createdAt: '2024-01-02T00:00:00Z',
+      creatorName: 'Test User',
+      schoolId: 'school1',
+      schoolName: 'Test School',
+    };
+
+    it('should get lesson material approval by id successfully', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: [mockApproval],
+      };
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await lastValueFrom(
+        service.getLessonMaterialApprovalById(materialId)
+      );
+
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/lesson-materials/${materialId}/approvals`)
+      );
+      expect(result).toEqual([mockApproval]);
+      expect(service.lessonMaterialApproval()).toEqual(mockApproval); // signal lấy phần tử đầu tiên
+    });
+
+    it('should handle get lesson material approval by id with empty array', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: [],
+      };
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await lastValueFrom(
+        service.getLessonMaterialApprovalById(materialId)
+      );
+
+      expect(result).toEqual([]);
+      expect(service.lessonMaterialApproval()).toBeNull();
+    });
+
+    it('should handle get lesson material approval by id failure', async () => {
+      const failureResponse = { statusCode: StatusCode.MODEL_INVALID };
+      (requestService.get as any).mockReturnValue(of(failureResponse));
+
+      const result = await lastValueFrom(
+        service.getLessonMaterialApprovalById(materialId)
+      );
+
+      expect(result).toBeNull();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+      expect(service.lessonMaterialApproval()).toBeNull();
+    });
+
+    it('should handle HTTP error for get approval by id', async () => {
+      const error = new HttpErrorResponse({ status: 500 });
+      (requestService.get as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.getLessonMaterialApprovalById(materialId))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+      expect(service.lessonMaterialApproval()).toBeNull();
+    });
+
+    it('should handle response with null data', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: null,
+      };
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await lastValueFrom(
+        service.getLessonMaterialApprovalById(materialId)
+      );
+
+      expect(result).toBeNull();
+      expect(service.lessonMaterialApproval()).toBeNull();
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+  });
+
   describe('approveRejectMaterial', () => {
     const materialId = 'material1';
     const mockRequest: ApproveRejectMaterialRequest = {

@@ -12,6 +12,7 @@ import { type QuestionNotification } from '../../../../core/layout/header/user-a
 import { type QuestionDeleteNotification } from '../../../../core/layout/header/user-actions/notifications/models/question-delete-notification.model';
 import { type QuestionCommentNotification } from '../../../../core/layout/header/user-actions/notifications/models/question-comment-notification.model';
 import { type QuestionCommentDeleteNotification } from '../../../../core/layout/header/user-actions/notifications/models/question-comment-delete-notification.model';
+import { type LessonMaterialApprovalNotification } from '../../../../core/layout/header/user-actions/notifications/models/material-approval-notification.model';
 
 @Injectable({
   providedIn: 'root',
@@ -55,6 +56,12 @@ export class NotificationSocketService {
         );
         this.registerConnectionHandler<QuestionCommentDeleteNotification>(
           'QuestionCommentDeleted'
+        );
+        this.registerConnectionHandler<LessonMaterialApprovalNotification>(
+          'LessonMaterialApproved'
+        );
+        this.registerConnectionHandler<LessonMaterialApprovalNotification>(
+          'LessonMaterialRejected'
         );
       })
       .catch(() => {});

@@ -133,6 +133,35 @@ describe('NotificationSocketService (Vitest)', () => {
       );
     });
 
+    it('should register and handle LessonMaterialApproved and LessonMaterialRejected events', async () => {
+      startMock.mockResolvedValueOnce(undefined);
+      service.connect();
+      await Promise.resolve();
+      // Tìm callback đã đăng ký cho 2 event này
+      const calls = onMock.mock.calls;
+      const approvedCall = calls.find(c => c[0] === 'LessonMaterialApproved');
+      const rejectedCall = calls.find(c => c[0] === 'LessonMaterialRejected');
+      expect(approvedCall).toBeDefined();
+      expect(rejectedCall).toBeDefined();
+      // Giả lập callback được gọi với payload
+      const approvedPayload = { lessonMaterialId: 'mat1', status: 1 };
+      const rejectedPayload = { lessonMaterialId: 'mat2', status: 2 };
+      if (approvedCall) approvedCall[1](approvedPayload);
+      if (rejectedCall) rejectedCall[1](rejectedPayload);
+      expect(mockAddNotification).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'LessonMaterialApproved',
+          payload: approvedPayload,
+        })
+      );
+      expect(mockAddNotification).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'LessonMaterialRejected',
+          payload: rejectedPayload,
+        })
+      );
+    });
+
     it('should disconnect previous connection before creating new one', async () => {
       startMock.mockResolvedValueOnce(undefined);
       startMock.mockResolvedValueOnce(undefined);
