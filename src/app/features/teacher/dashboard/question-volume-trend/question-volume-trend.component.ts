@@ -17,6 +17,7 @@ import {
   ApexPlotOptions,
   ApexFill,
   ApexLegend,
+  ApexStroke,
 } from 'ng-apexcharts';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
@@ -36,6 +37,7 @@ export type ChartOptions = {
   chart: ApexChart;
   xaxis: ApexXAxis;
   yaxis: ApexYAxis;
+  stroke: ApexStroke;
   tooltip: ApexTooltip;
   dataLabels: ApexDataLabels;
   plotOptions: ApexPlotOptions;
@@ -251,6 +253,9 @@ export class QuestionVolumeTrendComponent {
       },
       colors: ['#2093e7', '#22c03c'],
       dataLabels: { enabled: false },
+      stroke: {
+        curve: 'smooth',
+      },
       plotOptions: {},
       fill: { opacity: 1 },
 

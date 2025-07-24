@@ -22,9 +22,15 @@ import { UserService } from '../../../services/api/user/user.service';
 import { LessonMaterialsService } from '../../../services/api/lesson-materials/lesson-materials.service';
 import { LoadingService } from '../../../services/core/loading/loading.service';
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
+import {
+  ContentParserService,
+  type RenderBlock,
+} from '../../../services/layout/content-parse/content-parse.service';
 
-import { UserRoles } from '../../../constants/user-roles.constant';
+import { clearQueryParams } from '../../../utils/util-functions';
+
 import { PAGE_SIZE } from '../../../constants/common.constant';
+import { UserRoles } from '../../../constants/user-roles.constant';
 import { LessonMaterialStatus } from '../../../models/enum/lesson-material.enum';
 
 import { VideoViewerComponent } from '../video-viewer/video-viewer.component';
@@ -34,10 +40,6 @@ import { PdfViewerComponent } from '../pdf-viewer/pdf-viewer.component';
 import { PreviewLessonSkeletonComponent } from '../../skeleton/preview-lesson-skeleton/preview-lesson-skeleton.component';
 import { ModerateReasonModalComponent } from '../../../../features/moderation/moderate-lessons/moderate-reason-modal/moderate-reason-modal.component';
 import { CommentModalComponent } from '../../comment-components/comment-modal/comment-modal.component';
-import {
-  ContentParserService,
-  RenderBlock,
-} from '../../../services/layout/content-parse/content-parse.service';
 
 @Component({
   selector: 'app-preview-lesson',
@@ -75,7 +77,10 @@ export class PreviewLessonComponent implements OnInit {
   lessonMaterial = this.lessonMaterialService.lessonMaterial;
   isLoading = this.loadingService.isLoading;
 
+  questionIdFromNotification = signal<string>('');
+
   currentUrl = signal(this.router.url);
+
   currentPage = signal<number>(1);
   pageSize = signal<number>(PAGE_SIZE);
   isApprovedLesson = signal<boolean>(false);
@@ -111,7 +116,10 @@ export class PreviewLessonComponent implements OnInit {
     () => this.lessonMaterial()?.lessonStatus === LessonMaterialStatus.Pending
   );
 
-  private readonly showCommentButtonPaths = ['/teacher/file-manager'];
+  private readonly showCommentButtonPaths = [
+    '/teacher/file-manager',
+    '/teacher/view-lesson',
+  ];
   private readonly showActionButtonPaths = ['/moderation/view-lesson'];
 
   visible = false;
@@ -129,9 +137,24 @@ export class PreviewLessonComponent implements OnInit {
     this.activatedRoute.queryParamMap.subscribe(params => {
       const page = Number(params.get('page'));
       const size = Number(params.get('pageSize'));
+      const questionId = params.get('questionId');
+      const isLinkedFromNotification = params.has('isLinkedFromNotification');
 
       this.currentPage.set(!isNaN(page) && page > 0 ? page : 1);
       this.pageSize.set(!isNaN(size) && size > 0 ? size : PAGE_SIZE);
+
+      if (isLinkedFromNotification) {
+        this.visible = true;
+
+        if (questionId) {
+          this.questionIdFromNotification.set(questionId);
+        }
+
+        clearQueryParams(this.router, this.activatedRoute, [
+          'isLinkedFromNotification',
+          'questionId',
+        ]);
+      }
     });
 
     this.lessonMaterialService

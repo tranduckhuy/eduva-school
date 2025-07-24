@@ -1,0 +1,7 @@
+<ul class="max-h-[70vh] overflow-y-auto overscroll-contain">
+  @for (_ of skeletonItems; track $index) {
+    <li class="mx-2 mb-2 py-1">
+      <p-skeleton width="100%" height="80px" borderRadius="6px" />
+    </li>
+  }
+</ul>

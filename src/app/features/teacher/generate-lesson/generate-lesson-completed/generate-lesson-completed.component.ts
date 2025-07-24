@@ -38,7 +38,7 @@ export class GenerateLessonCompletedComponent implements OnInit {
   totalJobs = this.aiJobCompletedService.totalJobs;
 
   currentPage = signal<number>(1);
-  rows = signal<number>(10);
+  rows = signal<number>(11);
   first = signal<number>(0);
 
   ngOnInit(): void {
@@ -47,7 +47,7 @@ export class GenerateLessonCompletedComponent implements OnInit {
 
   onPageChange(event: PaginatorState) {
     this.first.set(event.first ?? 0);
-    this.rows.set(event.rows ?? 10);
+    this.rows.set(event.rows ?? 11);
 
     const page = this.first() / this.rows() + 1;
     this.currentPage.set(page);

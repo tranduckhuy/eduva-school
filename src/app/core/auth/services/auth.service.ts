@@ -112,7 +112,7 @@ export class AuthService {
         catchError(() => of(void 0)),
         map(() => void 0),
         tap(() => {
-          // ? Clear user profile cache
+          // ? Clear cookie and user profile cache
           this.clearSession();
 
           // ? Clear state cache
@@ -138,6 +138,12 @@ export class AuthService {
     this.redirectUserAfterLogin();
   }
 
+  clearSession(): void {
+    this.jwtService.clearAll();
+    this.userService.clearCurrentUser();
+    this.isLoggedInSignal.set(false);
+  }
+
   // ---------------------------
   //  Private Helper Functions
   // ---------------------------
@@ -158,7 +164,10 @@ export class AuthService {
         return;
       }
 
-      if (user.roles.includes(UserRoles.STUDENT)) {
+      if (
+        user.roles.includes(UserRoles.STUDENT) ||
+        user.roles.includes(UserRoles.SYSTEM_ADMIN)
+      ) {
         this.router.navigateByUrl('/errors/403');
         setTimeout(() => {
           this.clearSession();
@@ -231,11 +240,5 @@ export class AuthService {
         description: 'Vui lòng kiểm tra email của bạn để hoàn tất xác minh.',
       })
       .subscribe();
-  }
-
-  private clearSession(): void {
-    this.jwtService.clearAll();
-    this.userService.clearCurrentUser();
-    this.isLoggedInSignal.set(false);
   }
 }

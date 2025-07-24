@@ -60,7 +60,6 @@ export class ContentTypeStatsComponent {
       ],
       plotOptions: {
         pie: {
-          startAngle: 90, // Custom start angle
           donut: {
             size: '70%',
           },

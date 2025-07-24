@@ -104,8 +104,6 @@ export class MaterialTableComponent implements OnInit {
         this.previousPageSize.set(size);
       }
     });
-
-    this.onSearch();
   }
 
   onSearch(term?: string): void {
@@ -122,19 +120,47 @@ export class MaterialTableComponent implements OnInit {
       .subscribe();
   }
 
-  onUpdateVisibility(material: LessonMaterial) {
-    const request: UpdateLessonMaterialRequest = {
-      id: material.id,
-      title: material.title,
-      description: material.description,
-      duration: material.duration,
-      visibility: LessonMaterialVisibility.School,
-    };
-    this.lessonMaterialsService
-      .updateLessonMaterial(material.id, request)
-      .subscribe({
-        next: () => this.onSearch(),
+  onUpdateVisibility(materialId: string, status: LessonMaterialStatus) {
+    if (status !== LessonMaterialStatus.Approved) {
+      this.confirmationService.confirm({
+        header: 'Chia sẻ tài liệu?',
+        message: `
+          Tài liệu này chưa được phê duyệt nên sẽ không hiển thị trong danh sách tài liệu chia sẻ của trường cho đến khi được phê duyệt.
+          <br />
+          Bạn có chắc chắn muốn tiếp tục chia sẻ?
+        `,
+        icon: 'pi pi-info-circle',
+        rejectButtonProps: {
+          label: 'Không, quay lại',
+          severity: 'secondary',
+          outlined: true,
+        },
+        acceptButtonProps: {
+          label: 'Có, vẫn chia sẻ',
+        },
+        accept: () => {
+          const request: UpdateLessonMaterialRequest = {
+            id: materialId,
+            visibility: LessonMaterialVisibility.School,
+          };
+          this.lessonMaterialsService
+            .updateLessonMaterial(materialId, request)
+            .subscribe({
+              next: () => this.onSearch(),
+            });
+        },
       });
+    } else {
+      const request: UpdateLessonMaterialRequest = {
+        id: materialId,
+        visibility: LessonMaterialVisibility.School,
+      };
+      this.lessonMaterialsService
+        .updateLessonMaterial(materialId, request)
+        .subscribe({
+          next: () => this.onSearch(),
+        });
+    }
   }
 
   onDeleteMaterial(materialId: string) {

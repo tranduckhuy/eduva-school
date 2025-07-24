@@ -3,146 +3,77 @@
   clickOutsideSubmenu
   (clickOutside)="clickOutside.emit()">
   <div
-    class="animate-fadeInForward rounded-md bg-white shadow-2xl transition-all duration-300 ease-in-out will-change-[opacity,transform] dark:bg-dark-200">
+    class="animate-fadeInForward rounded-md bg-white shadow-main transition-all duration-300 ease-in-out will-change-[opacity,transform] dark:bg-dark-200">
     <div class="w-[350px]">
       <div
         class="sticky left-0 top-0 flex items-center justify-between border-b border-gray-100 px-5 py-4 dark:border-dark-500">
         <h3 class="text-[15px] font-semibold text-textBlack dark:text-white">
           Thông báo
-          <span class="font-normal text-gray-500 dark:text-dark-100">(03)</span>
+          <span class="font-normal text-gray-500 dark:text-dark-100">
+            ({{ totalNotification() | leadingZero }})
+          </span>
         </h3>
-        <span class="text-primary">Đánh dấu đã đọc</span>
+        <button
+          class="cursor-pointer select-none text-primary"
+          (click)="markAllAsRead()">
+          Đánh dấu đã đọc
+        </button>
       </div>
-      <ul class="max-h-[70vh] overflow-y-auto">
-        <li class="notify-item">
-          <div class="notify-item__icon-wrapper">
-            <fa-icon [icon]="['far', 'comment-dots']"></fa-icon>
-          </div>
-          <div class="flex flex-col text-left">
-            <p class="max-w-[255px] dark:text-white">
-              Bài học <strong>Tránh quên await với res.json()</strong> mới được
-              thêm vào.
-            </p>
-            <time
-              datetime="03/06/2025"
-              class="max-w-[255px] text-gray-500 dark:text-dark-100"
-              >19 ngày trước</time
-            >
-          </div>
-        </li>
-        <li class="notify-item">
-          <div class="notify-item__icon-wrapper">
-            <fa-icon [icon]="['far', 'comment-dots']"></fa-icon>
-          </div>
-          <div class="flex flex-col text-left">
-            <p class="max-w-[255px] dark:text-white">
-              Bài học <strong>Tránh quên await với res.json()</strong> mới được
-              thêm vào.
-            </p>
-            <time
-              datetime="03/06/2025"
-              class="max-w-[255px] text-gray-500 dark:text-dark-100"
-              >19 ngày trước</time
-            >
-          </div>
-        </li>
-        <li class="notify-item">
-          <div class="notify-item__icon-wrapper">
-            <fa-icon [icon]="['far', 'comment-dots']"></fa-icon>
-          </div>
-          <div class="flex flex-col text-left">
-            <p class="max-w-[255px] dark:text-white">
-              Bài học <strong>Tránh quên await với res.json()</strong> mới được
-              thêm vào.
-            </p>
-            <time
-              datetime="03/06/2025"
-              class="max-w-[255px] text-gray-500 dark:text-dark-100"
-              >19 ngày trước</time
-            >
-          </div>
-        </li>
-        <li class="notify-item">
-          <div class="notify-item__icon-wrapper">
-            <fa-icon [icon]="['far', 'comment-dots']"></fa-icon>
-          </div>
-          <div class="flex flex-col text-left">
-            <p class="max-w-[255px] dark:text-white">
-              Bài học <strong>Tránh quên await với res.json()</strong> mới được
-              thêm vào.
-            </p>
-            <time
-              datetime="03/06/2025"
-              class="max-w-[255px] text-gray-500 dark:text-dark-100"
-              >19 ngày trước</time
-            >
-          </div>
-        </li>
-        <li class="notify-item">
-          <div class="notify-item__icon-wrapper">
-            <fa-icon [icon]="['far', 'comment-dots']"></fa-icon>
-          </div>
-          <div class="flex flex-col text-left">
-            <p class="max-w-[255px] dark:text-white">
-              Bài học <strong>Tránh quên await với res.json()</strong> mới được
-              thêm vào.
-            </p>
-            <time
-              datetime="03/06/2025"
-              class="max-w-[255px] text-gray-500 dark:text-dark-100"
-              >19 ngày trước</time
-            >
-          </div>
-        </li>
-        <li class="notify-item">
-          <div class="notify-item__icon-wrapper">
-            <fa-icon [icon]="['far', 'comment-dots']"></fa-icon>
-          </div>
-          <div class="flex flex-col text-left">
-            <p class="max-w-[255px] dark:text-white">
-              Bài học <strong>Tránh quên await với res.json()</strong> mới được
-              thêm vào.
-            </p>
-            <time
-              datetime="03/06/2025"
-              class="max-w-[255px] text-gray-500 dark:text-dark-100"
-              >19 ngày trước</time
-            >
-          </div>
-        </li>
-        <li class="notify-item">
-          <div class="notify-item__icon-wrapper">
-            <fa-icon [icon]="['far', 'comment-dots']"></fa-icon>
-          </div>
-          <div class="flex flex-col text-left">
-            <p class="max-w-[255px] dark:text-white">
-              Bài học <strong>Tránh quên await với res.json()</strong> mới được
-              thêm vào.
-            </p>
-            <time
-              datetime="03/06/2025"
-              class="max-w-[255px] text-gray-500 dark:text-dark-100"
-              >19 ngày trước</time
-            >
-          </div>
-        </li>
-        <li class="notify-item">
-          <div class="notify-item__icon-wrapper">
-            <fa-icon [icon]="['far', 'comment-dots']"></fa-icon>
-          </div>
-          <div class="flex flex-col text-left">
-            <p class="max-w-[255px] dark:text-white">
-              Bài học <strong>Tránh quên await với res.json()</strong> mới được
-              thêm vào.
-            </p>
-            <time
-              datetime="03/06/2025"
-              class="max-w-[255px] text-gray-500 dark:text-dark-100"
-              >19 ngày trước</time
-            >
-          </div>
-        </li>
-      </ul>
+      @if (isLoading()) {
+        <notification-skeleton />
+      } @else {
+        <ul
+          class="max-h-[70vh] overflow-y-auto overscroll-contain"
+          (scroll)="onScroll($event)">
+          @for (notification of displayNotifications(); track notification.id) {
+            <li
+              class="notify-item flex items-center gap-2 py-1"
+              [ngClass]="{
+                'cursor-pointer': !notification.formatted.disabled,
+                'cursor-default': notification.formatted.disabled,
+              }">
+              <button
+                class="mx-2 flex items-center gap-3 rounded-md p-2 pl-3 pr-6 transition-colors duration-300"
+                [ngClass]="{
+                  'bg-primary-100': !notification.isRead,
+                  'dark:bg-dark-400': !notification.isRead,
+                  'hover:bg-[#1618230d]': notification.isRead,
+                  'dark:hover:bg-dark-400': notification.isRead,
+                  'pointer-events-none cursor-default':
+                    notification.formatted.disabled,
+                }"
+                (click)="markAsRead(notification)">
+                <img
+                  [src]="notification.formatted.avatar"
+                  [alt]="notification.formatted.alt"
+                  class="dark:bg-da size-12 rounded-full bg-white" />
+                <div class="flex flex-col text-left">
+                  <p
+                    class="line-clamp-2 max-w-[255px] dark:text-white"
+                    tooltipPosition="bottom"
+                    [pTooltip]="notification.formatted.tooltip"
+                    [innerHTML]="notification.formatted.message | safeHtml"></p>
+                  <p class="max-w-[255px] text-gray-500 dark:text-dark-100">
+                    {{ notification.formatted.date }}
+                  </p>
+                </div>
+              </button>
+            </li>
+          }
+          @if (displayNotifications().length <= 0 && !isLoading()) {
+            <li
+              class="flex size-full min-h-[40vh] flex-col items-center justify-center gap-2">
+              <img
+                src="./images/icons/notification-empty.svg"
+                alt="Chưa có thông báo nào"
+                class="size-14" />
+              <p class="text-gray-500 dark:text-dark-100">
+                Chưa có thông báo nào
+              </p>
+            </li>
+          }
+        </ul>
+      }
     </div>
   </div>
 </div>
