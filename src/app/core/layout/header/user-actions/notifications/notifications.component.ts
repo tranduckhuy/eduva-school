@@ -147,7 +147,7 @@ export class NotificationsComponent implements OnInit {
     const { title, lessonMaterialTitle, createdByName, createdAt, deletedAt } =
       payload;
 
-    const date = this.formatRelativeDate(createdAt || deletedAt);
+    const date = this.formatRelativeDate(createdAt ?? deletedAt);
 
     switch (notification.type) {
       case 'QuestionCreated':

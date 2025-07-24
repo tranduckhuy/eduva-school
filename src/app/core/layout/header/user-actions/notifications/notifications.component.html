@@ -19,60 +19,61 @@
           Đánh dấu đã đọc
         </button>
       </div>
-      <ul
-        class="max-h-[70vh] overflow-y-auto overscroll-contain"
-        (scroll)="onScroll($event)">
-        @for (notification of displayNotifications(); track notification.id) {
-          <li
-            class="notify-item flex items-center gap-2 py-1"
-            [ngClass]="{
-              'cursor-pointer': !notification.formatted.disabled,
-              'cursor-default': notification.formatted.disabled,
-            }">
-            <button
-              class="mx-2 flex items-center gap-3 rounded-md p-2 pl-3 pr-6 transition-colors duration-300"
+      @if (isLoading()) {
+        <notification-skeleton />
+      } @else {
+        <ul
+          class="max-h-[70vh] overflow-y-auto overscroll-contain"
+          (scroll)="onScroll($event)">
+          @for (notification of displayNotifications(); track notification.id) {
+            <li
+              class="notify-item flex items-center gap-2 py-1"
               [ngClass]="{
-                'bg-primary-100': !notification.isRead,
-                'dark:bg-dark-400': !notification.isRead,
-                'hover:bg-[#1618230d]': notification.isRead,
-                'dark:hover:bg-dark-400': notification.isRead,
-                'pointer-events-none cursor-default':
-                  notification.formatted.disabled,
-              }"
-              (click)="markAsRead(notification)">
+                'cursor-pointer': !notification.formatted.disabled,
+                'cursor-default': notification.formatted.disabled,
+              }">
+              <button
+                class="mx-2 flex items-center gap-3 rounded-md p-2 pl-3 pr-6 transition-colors duration-300"
+                [ngClass]="{
+                  'bg-primary-100': !notification.isRead,
+                  'dark:bg-dark-400': !notification.isRead,
+                  'hover:bg-[#1618230d]': notification.isRead,
+                  'dark:hover:bg-dark-400': notification.isRead,
+                  'pointer-events-none cursor-default':
+                    notification.formatted.disabled,
+                }"
+                (click)="markAsRead(notification)">
+                <img
+                  [src]="notification.payload.createdByAvatar"
+                  [alt]="notification.payload.createdByName"
+                  class="dark:bg-da size-12 rounded-full bg-white" />
+                <div class="flex flex-col text-left">
+                  <p
+                    class="line-clamp-2 max-w-[255px] dark:text-white"
+                    tooltipPosition="bottom"
+                    [pTooltip]="notification.formatted.rawMessage"
+                    [innerHTML]="notification.formatted.message | safeHtml"></p>
+                  <p class="max-w-[255px] text-gray-500 dark:text-dark-100">
+                    {{ notification.formatted.date }}
+                  </p>
+                </div>
+              </button>
+            </li>
+          }
+          @if (displayNotifications().length <= 0 && !isLoading()) {
+            <li
+              class="flex size-full min-h-[40vh] flex-col items-center justify-center gap-2">
               <img
-                [src]="notification.payload.createdByAvatar"
-                [alt]="notification.payload.createdByName"
-                class="dark:bg-da size-12 rounded-full bg-white" />
-              <div class="flex flex-col text-left">
-                <p
-                  class="line-clamp-2 max-w-[255px] dark:text-white"
-                  tooltipPosition="bottom"
-                  [pTooltip]="notification.formatted.rawMessage"
-                  [innerHTML]="notification.formatted.message | safeHtml"></p>
-                <p class="max-w-[255px] text-gray-500 dark:text-dark-100">
-                  {{ notification.formatted.date }}
-                </p>
-              </div>
-            </button>
-          </li>
-        }
-        @if (displayNotifications().length <= 0 && !isLoading()) {
-          <li
-            class="flex size-full min-h-[40vh] flex-col items-center justify-center gap-2">
-            <img
-              src="./images/icons/notification-empty.svg"
-              alt="Chưa có thông báo nào"
-              class="size-14" />
-            <p class="text-gray-500 dark:text-dark-100">
-              Chưa có thông báo nào
-            </p>
-          </li>
-        }
-        @if (isLoading()) {
-          <notification-skeleton />
-        }
-      </ul>
+                src="./images/icons/notification-empty.svg"
+                alt="Chưa có thông báo nào"
+                class="size-14" />
+              <p class="text-gray-500 dark:text-dark-100">
+                Chưa có thông báo nào
+              </p>
+            </li>
+          }
+        </ul>
+      }
     </div>
   </div>
 </div>
