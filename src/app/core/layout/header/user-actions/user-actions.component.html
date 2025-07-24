@@ -19,8 +19,8 @@
       (click)="toggleMenu('notifications')">
       <span class="material-symbols-outlined text-xl">notifications</span>
     </button>
-    @if (headerSubmenuService.getActiveSubmenuMenu() === 'notifications') {
-      <header-notifications (clickOutside)="headerSubmenuService.close()" />
+    @if (getActiveSubmenuMenu('notifications')) {
+      <header-notifications (clickOutside)="closeSubmenu()" />
     }
   </div>
 
@@ -42,11 +42,11 @@
         </span>
       </div>
     </div>
-    @if (headerSubmenuService.getActiveSubmenuMenu() === 'information') {
+    @if (getActiveSubmenuMenu('information')) {
       <header-information
         [isFullScreen]="isFullscreen()"
         (toggleFullSCreen)="toggleFullscreen()"
-        (clickOutside)="headerSubmenuService.close()" />
+        (clickOutside)="closeSubmenu()" />
     }
   </div>
 </div>

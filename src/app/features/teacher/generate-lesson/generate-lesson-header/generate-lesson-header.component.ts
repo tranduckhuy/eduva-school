@@ -9,12 +9,12 @@ import { Router, RouterLink, NavigationEnd } from '@angular/router';
 
 import { filter } from 'rxjs';
 
-import { GenerateLessonSettingsComponent } from './generate-lesson-settings/generate-lesson-settings.component';
+import { UserActionsComponent } from '../../../../core/layout/header/user-actions/user-actions.component';
 
 @Component({
   selector: 'generate-lesson-header',
   standalone: true,
-  imports: [RouterLink, GenerateLessonSettingsComponent],
+  imports: [RouterLink, UserActionsComponent],
   templateUrl: './generate-lesson-header.component.html',
   styleUrl: './generate-lesson-header.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
