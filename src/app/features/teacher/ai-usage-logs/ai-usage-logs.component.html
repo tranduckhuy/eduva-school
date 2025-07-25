@@ -1,0 +1,88 @@
+<div
+  class="rounded bg-white px-0 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <div class="p-[25px]">
+    <div class="xs:w-full">
+      <app-search-input (search)="onSearch($event)" />
+    </div>
+
+    <div class="mt-5">
+      @if (isLoading()) {
+        <app-table-skeleton [tableHead]="tableHeadSkeleton()" />
+      } @else {
+        <div class="relative">
+          <p-table
+            #table
+            [tableStyle]="{ 'min-width': '50rem' }"
+            [scrollHeight]="'500px'"
+            [lazy]="true"
+            [scrollable]="true"
+            [lazyLoadOnInit]="true"
+            [showCurrentPageReport]="true"
+            [rows]="pageSize()"
+            [value]="aiUsageLogs()"
+            [first]="firstRecordIndex()"
+            [totalRecords]="totalRecords()"
+            [paginator]="aiUsageLogs().length > 0"
+            (onLazyLoad)="onLazyLoad($event)"
+            currentPageReportTemplate="
+              Hiển thị {first} đến {last} trên {totalRecords} lần sử dụng dịch vụ AI
+            ">
+            <ng-template #header>
+              <tr>
+                <th scope="col" class="!w-[5%] !text-center">STT</th>
+                <th scope="col" class="!w-[20%]">Dịch vụ AI</th>
+                <th scope="col" class="!w-[15%] !text-center">
+                  Thời lượng (phút)
+                </th>
+                <th scope="col" class="!w-[20%] !text-center">
+                  Số Ecoin đã trừ
+                </th>
+                <th scope="col" class="!w-[25%]">Ngày sử dụng</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-usageLog let-i="rowIndex">
+              <tr>
+                <td class="!text-center">{{ i + 1 | leadingZero }}</td>
+                <td>{{ getAiUsageType(usageLog.aiServiceType) }}</td>
+                <td class="!text-center">
+                  {{ getAiDurationMinutes(usageLog.durationMinutes) }}
+                </td>
+                <td class="!text-center">
+                  <div class="flex items-center justify-center gap-2">
+                    <span>- {{ usageLog.creditsCharged | leadingZero }}</span>
+                    <img
+                      src="./images/icons/ecoin.png"
+                      alt="Ecoin"
+                      class="size-8" />
+                  </div>
+                </td>
+                <td>
+                  {{
+                    usageLog.createdAt
+                      | date: "EEEE, dd 'thg' MM, YYYY 'lúc' HH:mm:ss"
+                  }}
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+              <tr>
+                <td colspan="100%">
+                  <div class="h-[200px]"></div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+          @if (aiUsageLogs().length === 0) {
+            <div
+              class="pointer-events-none absolute left-0 right-0 top-[50%] -translate-y-[50%]">
+              <app-table-empty-state
+                icon="money_off"
+                title="Bạn chưa sử dụng dịch vụ AI"
+                subtitle="Hãy thử tạo bài giảng bằng AI để tiết kiệm thời gian và tăng hiệu quả!" />
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
