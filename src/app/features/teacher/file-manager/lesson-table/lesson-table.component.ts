@@ -48,7 +48,7 @@ import { RenameLessonModalComponent } from '../../../../shared/components/rename
 })
 export class LessonTableComponent implements OnInit {
   private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
+  private readonly activatedRoute = inject(ActivatedRoute);
   private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
   private readonly confirmationService = inject(ConfirmationService);
@@ -73,7 +73,7 @@ export class LessonTableComponent implements OnInit {
   ]);
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe(params => {
+    this.activatedRoute.queryParamMap.subscribe(params => {
       const page = Number(params.get('page'));
       const size = Number(params.get('pageSize'));
 
@@ -88,8 +88,8 @@ export class LessonTableComponent implements OnInit {
   }
 
   onLazyLoad(event: TableLazyLoadEvent): void {
-    const rows = event.rows ?? this.pageSize();
     const first = event.first ?? 0;
+    const rows = event.rows ?? this.pageSize();
     const page = Math.floor(first / rows) + 1;
 
     this.currentPage.set(page);
@@ -151,7 +151,7 @@ export class LessonTableComponent implements OnInit {
 
   goToFolderMaterials(folderId: string): void {
     this.router.navigate([folderId], {
-      relativeTo: this.route,
+      relativeTo: this.activatedRoute,
       queryParams: {
         page: this.currentPage(),
         pageSize: this.pageSize(),
@@ -167,6 +167,8 @@ export class LessonTableComponent implements OnInit {
       pageIndex: this.currentPage(),
       pageSize: this.pageSize(),
       status: EntityStatus.Active,
+      sortBy: 'lastModifiedAt',
+      sortDirection: 'desc',
     };
 
     this.folderService.getPersonalFolders(request).subscribe({

@@ -324,12 +324,18 @@ export class NavbarComponent implements OnInit {
 
     return [
       {
-        section: 'Tạo bài giảng',
+        section: 'Dịch vụ AI',
         navItems: [
           this.buildNavItem(
             'Tạo bài giảng tự động',
             'smart_display',
             '/teacher/generate-lesson',
+            schoolMissing
+          ),
+          this.buildNavItem(
+            'Lịch sử sử dụng AI',
+            'card_membership',
+            '/teacher/ai-usage-logs',
             schoolMissing
           ),
         ],
