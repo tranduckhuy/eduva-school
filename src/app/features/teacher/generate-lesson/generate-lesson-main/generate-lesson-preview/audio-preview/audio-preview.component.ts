@@ -89,9 +89,6 @@ export class AudioPreviewComponent implements OnInit {
       uploading ||
       this.isLoading() ||
       this.hasGeneratedSuccessfully() ||
-      !this.speedRate() ||
-      !this.voice() ||
-      !this.language() ||
       (this.totalCheckedSources() === 0 && !this.hasInteracted())
     );
   });
@@ -135,12 +132,12 @@ export class AudioPreviewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const audioBlob = this.job()?.audioOutputBlobName;
+    const audioBlobName = this.job()?.audioOutputBlobName;
 
-    if (!audioBlob) return;
+    if (!audioBlobName) return;
 
     this.audioState.set('generated');
-    this.audioUrl.set(audioBlob);
+    this.audioUrl.set(audioBlobName);
 
     this.resourcesStateService.markGeneratedSuccess();
   }
@@ -243,7 +240,7 @@ export class AudioPreviewComponent implements OnInit {
       type,
       voiceConfig: {
         language_code: this.language() ?? 'vi-VN',
-        name: this.voice() ?? 'vi-VN-Chirp3-HD-Despina',
+        name: this.voice() ?? 'vi-VN-Chirp3-HD-Enceladus',
         speaking_rate: this.speedRate() ?? 1,
       },
     };
