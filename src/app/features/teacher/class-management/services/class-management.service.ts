@@ -1,4 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { Observable, catchError, map, of, tap } from 'rxjs';
 
@@ -13,11 +14,10 @@ import { type ClassModel } from '../../../../shared/models/entities/class.model'
 import { type GetTeacherClassRequest } from '../models/request/query/get-teacher-class-request.model';
 import { type GetTeacherClassResponse } from '../models/response/query/get-teacher-class-response.model';
 import { type CreateClassRequest } from '../models/request/command/create-class-request.model';
-import { HttpErrorResponse } from '@angular/common/http';
-import { GetStudentsClassRequest } from '../models/request/query/get-students-class-request.model';
+import { type GetStudentsClassRequest } from '../models/request/query/get-students-class-request.model';
 import {
-  GetStudentsClassResponse,
-  StudentClassResponse,
+  type GetStudentsClassResponse,
+  type StudentClassResponse,
 } from '../models/response/query/get-students-class-response.model';
 
 @Injectable({

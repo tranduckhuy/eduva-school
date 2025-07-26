@@ -27,6 +27,7 @@
           inputId="folder"
           styleClass="mt-3 w-full"
           placeholder="Chọn một thư mục cá nhân của bạn"
+          filterPlaceholder="Tìm kiếm..."
           optionLabel="name"
           optionValue="id"
           [filter]="true"
@@ -55,12 +56,9 @@
           </span>
         </div>
         <p-picklist
-          filterBy="name"
           styleClass="mt-3"
-          scrollHeight="50rem"
+          scrollHeight="18rem"
           breakpoint="991.98px"
-          sourceFilterPlaceholder="Tìm kiếm bài giảng..."
-          targetFilterPlaceholder="Tìm kiếm bài giảng..."
           [responsive]="true"
           [showSourceControls]="false"
           [showTargetControls]="false"

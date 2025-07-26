@@ -54,12 +54,11 @@ export class PaymentsComponent {
   rows = signal<number>(PAGE_SIZE);
   sortField = signal<string | null>(null);
   sortOrder = signal<number>(-1); // 1 = asc, -1 = desc
-  paymentPurpose = signal<0 | 1 | undefined>(undefined); // 1 = SchoolSubscription, 0 = CreditPackage
   selectedTimeFilter = signal<
     { name: string; value: string | undefined } | undefined
   >(undefined);
   searchTerm = signal<string>('');
-  shouldStopRequest = signal<boolean>(true);
+  shouldStopRequest = signal<boolean>(false);
 
   tableHeadSkeleton = signal([
     'STT',
@@ -118,21 +117,6 @@ export class PaymentsComponent {
     this.loadData();
   }
 
-  getCreditPayments() {
-    this.paymentPurpose.set(0);
-    this.loadData();
-  }
-
-  getSubscriptionPlansPayments() {
-    this.paymentPurpose.set(1);
-    this.loadData();
-  }
-
-  getAllPayments() {
-    this.paymentPurpose.set(undefined);
-    this.loadData();
-  }
-
   onSearchTriggered(term: string): void {
     this.searchTerm.set(term);
     this.sortField.set('name');
@@ -142,7 +126,7 @@ export class PaymentsComponent {
   }
 
   private loadData(): void {
-    if (!this.shouldStopRequest()) return;
+    if (this.shouldStopRequest()) return;
 
     const params: PaymentListParams = {
       pageIndex: Math.floor(this.first() / this.rows()) + 1,
@@ -150,13 +134,12 @@ export class PaymentsComponent {
       searchTerm: this.searchTerm(),
       sortBy: this.sortField() ?? 'createdAt',
       sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
-      paymentPurpose: this.paymentPurpose(),
       paymentStatus: 1,
       paymentMethod: 1,
     };
 
     this.paymentService.getPayments(params).subscribe({
-      error: () => this.shouldStopRequest.set(false),
+      error: () => this.shouldStopRequest.set(true),
     });
   }
 }

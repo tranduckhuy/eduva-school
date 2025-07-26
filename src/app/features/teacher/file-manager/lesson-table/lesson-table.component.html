@@ -76,7 +76,12 @@
                   </div>
                 </td>
                 <td>{{ folder.ownerName }}</td>
-                <td>{{ folder.lastModifiedAt | date: 'fullDate' }}</td>
+                <td>
+                  {{
+                    folder.lastModifiedAt
+                      | date: "dd 'thg' MM, YYYY 'lúc' HH:mm"
+                  }}
+                </td>
                 <td class="!text-center">--</td>
                 <td
                   class="!border-l !border-l-gray-100 !text-center dark:!border-l-dark-500"

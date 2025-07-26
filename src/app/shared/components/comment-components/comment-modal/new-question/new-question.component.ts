@@ -21,6 +21,8 @@ import { ButtonModule } from 'primeng/button';
 import { LoadingService } from '../../../../../shared/services/core/loading/loading.service';
 import { QuestionService } from '../services/question.service';
 
+import { noOnlySpacesValidator } from '../../../../utils/form-validators';
+
 import { RichTextEditorComponent } from '../../../../../shared/components/rich-text-editor/rich-text-editor.component';
 
 import { type Question } from '../../../../../shared/models/entities/question.model';
@@ -63,8 +65,8 @@ export class NewQuestionComponent {
 
   constructor() {
     this.form = this.fb.group({
-      title: ['', Validators.required],
-      content: ['', Validators.required],
+      title: ['', Validators.required, noOnlySpacesValidator],
+      content: ['', [Validators.required, noOnlySpacesValidator]],
     });
 
     effect(
@@ -93,6 +95,8 @@ export class NewQuestionComponent {
   getErrorMessage(controlName: string): string {
     const control = this.form.get(controlName);
     if (control?.hasError('required')) return 'Trường này không được để trống';
+    if (control?.hasError('onlySpaces'))
+      return 'Trường này không được chỉ chứa khoảng trắng';
     return '';
   }
 
@@ -100,7 +104,7 @@ export class NewQuestionComponent {
     this.form.markAllAsTouched();
     const lessonMaterialId = this.materialId();
     const title = this.title?.value;
-    const content = this.contentControl?.value;
+    const content = this.contentControl?.value.trim();
 
     if (this.form.invalid || !title || !content) {
       this.invalid.set(true);

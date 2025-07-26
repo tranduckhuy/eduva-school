@@ -1,12 +1,8 @@
 .lesson-content {
-  --font-size: 14px;
   --line-height: 1.6;
-  --color: #2e3441;
   --marginParagraph: 6px 0;
 
-  font-size: var(--font-size);
   line-height: var(--line-height);
-  color: var(--color);
   word-break: break-word;
 }
 

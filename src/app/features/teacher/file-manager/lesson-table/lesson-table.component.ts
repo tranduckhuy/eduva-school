@@ -62,7 +62,7 @@ export class LessonTableComponent implements OnInit {
   pageSize = signal(PAGE_SIZE);
   firstRecordIndex = signal(0);
   searchValue = signal('');
-  shouldStopRequest = signal<boolean>(true);
+  shouldStopRequest = signal<boolean>(false);
 
   tableHeadSkeleton = signal([
     'Thư mục bài học',
@@ -160,7 +160,7 @@ export class LessonTableComponent implements OnInit {
   }
 
   private fetchFolders(): void {
-    if (!this.shouldStopRequest()) return;
+    if (this.shouldStopRequest()) return;
 
     const request: GetFoldersRequest = {
       name: this.searchValue(),
@@ -172,7 +172,7 @@ export class LessonTableComponent implements OnInit {
     };
 
     this.folderService.getPersonalFolders(request).subscribe({
-      error: () => this.shouldStopRequest.set(false),
+      error: () => this.shouldStopRequest.set(true),
     });
   }
 }

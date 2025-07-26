@@ -19,10 +19,11 @@ import { GlobalModalService } from '../../../../../shared/services/layout/global
 
 import { ContentType } from '../../../../../shared/models/enum/lesson-material.enum';
 
-import { type ClassModel } from '../../../../../shared/models/entities/class.model';
-import { type FolderWithMaterials } from '../class-detail.component';
 import { AddClassMaterialsModalComponent } from './add-class-materials-modal/add-class-materials-modal.component';
 import { RenameLessonModalComponent } from '../../../../../shared/components/rename-lesson-modal/rename-lesson-modal.component';
+
+import { type ClassModel } from '../../../../../shared/models/entities/class.model';
+import { type FolderWithMaterials } from '../class-detail.component';
 
 @Component({
   selector: 'class-folders',

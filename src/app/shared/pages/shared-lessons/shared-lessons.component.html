@@ -54,7 +54,7 @@
             </td>
             <td>{{ material.createdByName }}</td>
             <td>
-              {{ material.createdAt | date: 'fullDate' }}
+              {{ material.createdAt | date: "dd 'thg' MM, YYYY 'lúc' HH:mm" }}
             </td>
             <td class="!text-center">
               {{ material.fileSize | bytesToReadable: 'MB' : 2 }}
