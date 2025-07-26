@@ -70,7 +70,17 @@ export class ClassFolderManagementService {
   }
 
   private handleError(err: HttpErrorResponse): Observable<void> {
-    this.toastHandlingService.errorGeneral();
+    if (
+      err.error?.statusCode ===
+      StatusCode.LESSON_MATERIAL_ALREADY_EXISTS_IN_CLASS_FOLDER
+    ) {
+      this.toastHandlingService.warn(
+        'Cảnh báo',
+        'Tài liệu này đã tồn tại trong lớp học này.'
+      );
+    } else {
+      this.toastHandlingService.errorGeneral();
+    }
     return throwError(() => err);
   }
 }

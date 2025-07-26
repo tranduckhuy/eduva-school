@@ -311,9 +311,15 @@ export function clearQueryParams(
  *   - "2 năm trước" (2 years ago)
  *   - Returns an empty string if input is falsy.
  */
-export function formatRelativeDate(dateString: string): string {
-  const now = new Date();
+export function formatRelativeDate(
+  dateString: string | null | undefined
+): string {
+  if (typeof dateString !== 'string') return '';
+
   const target = new Date(dateString);
+  if (isNaN(target.getTime())) return '';
+
+  const now = new Date();
   const diffMs = now.getTime() - target.getTime();
 
   const minutes = Math.floor(diffMs / (1000 * 60));

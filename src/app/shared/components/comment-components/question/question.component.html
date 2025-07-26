@@ -11,7 +11,7 @@
             {{ question()?.createdByName }}
           </h3>
           <span class="text-[13px] font-normal text-[#808b9a]">
-            {{ question()?.createdAt | date: 'fullDate' }}
+            {{ question()?.createdAt | date: "dd 'thg' MM, YYYY 'lúc' HH:mm" }}
           </span>
         </div>
       </div>

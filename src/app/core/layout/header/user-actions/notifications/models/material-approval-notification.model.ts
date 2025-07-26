@@ -1,6 +1,7 @@
 import { type LessonMaterialStatus } from '../../../../../../shared/models/enum/lesson-material.enum';
 
 export interface LessonMaterialApprovalNotification {
+  userNotificationId: string;
   lessonMaterialId: string;
   lessonMaterialTitle: string;
   status: LessonMaterialStatus;

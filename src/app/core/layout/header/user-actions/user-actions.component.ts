@@ -11,6 +11,7 @@ import {
 import { ThemeService } from '../../../../shared/services/core/theme/theme.service';
 import { HeaderSubmenuService } from '../services/header-submenu.service';
 import { UserService } from '../../../../shared/services/api/user/user.service';
+import { NotificationService } from '../../../../shared/services/api/notification/notification.service';
 import { NotificationSocketService } from '../../../../shared/services/api/notification/notification-socket.service';
 
 import { NotificationsComponent } from './notifications/notifications.component';
@@ -29,15 +30,18 @@ export class UserActionsComponent implements OnInit {
   private readonly themeService = inject(ThemeService);
   private readonly headerSubmenuService = inject(HeaderSubmenuService);
   private readonly userService = inject(UserService);
+  private readonly notificationService = inject(NotificationService);
   private readonly notificationSocketService = inject(
     NotificationSocketService
   );
 
   theme = this.themeService.theme;
-  readonly user = this.userService.currentUser;
+  user = this.userService.currentUser;
+  unreadCount = this.notificationService.unreadCount;
 
   isFullscreen = signal(false);
 
+  readonly hasUnreadNotification = computed(() => this.unreadCount() > 0);
   readonly isDarkMode = computed(() => this.theme() === 'dark');
 
   constructor() {
@@ -52,6 +56,7 @@ export class UserActionsComponent implements OnInit {
     });
 
     this.notificationSocketService.connect();
+    this.notificationService.getNotificationSummary().subscribe();
   }
 
   toggleMenu(submenuKey: string): void {

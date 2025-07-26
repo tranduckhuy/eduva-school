@@ -1,16 +1,18 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 
-import { catchError, EMPTY, map, Observable, finalize } from 'rxjs';
+import { EMPTY, Observable, map, catchError } from 'rxjs';
+
+import { environment } from '../../../../../environments/environment';
 
 import { RequestService } from '../../../../shared/services/core/request/request.service';
 import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
-import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
-import { environment } from '../../../../../environments/environment';
+
 import { StatusCode } from '../../../../shared/constants/status-code.constant';
-import { BaseResponse } from '../../../../shared/models/api/base-response.model';
-import { DashboardSchoolAdminResponse } from '../../../models/api/response/query/dashboard-sa-response.model';
-import { DashboardRequest } from '../../../models/api/request/command/dashboard-request.model';
-import { DashboardTeacherResponse } from '../../../models/api/response/query/dashboard-teacher-response.model';
+
+import { type BaseResponse } from '../../../../shared/models/api/base-response.model';
+import { type DashboardRequest } from '../../../models/api/request/command/dashboard-request.model';
+import { type DashboardTeacherResponse } from '../../../models/api/response/query/dashboard-teacher-response.model';
+import { type DashboardSchoolAdminResponse } from '../../../models/api/response/query/dashboard-sa-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -18,12 +20,11 @@ import { DashboardTeacherResponse } from '../../../models/api/response/query/das
 export class DashboardService {
   private readonly requestService = inject(RequestService);
   private readonly toastService = inject(ToastHandlingService);
-  private readonly loadingService = inject(LoadingService);
 
   // API URLs
   private readonly BASE_URL = `${environment.baseApiUrl}/dashboards`;
-  private readonly DASHBOARD_SCHOOL_ADMIN_URL = `${this.BASE_URL}/school-admin`;
-  private readonly DASHBOARD_TEACHER_URL = `${this.BASE_URL}/teacher`;
+  private readonly DASHBOARD_SCHOOL_ADMIN_API_URL = `${this.BASE_URL}/school-admin`;
+  private readonly DASHBOARD_TEACHER_API_URL = `${this.BASE_URL}/teacher`;
 
   // Signals
   private readonly dashboardSchoolAdminSignal =
@@ -41,19 +42,18 @@ export class DashboardService {
    * @returns Observable with DashboardResponse or null
    */
   getDashboardSchoolAdminData(
-    req: DashboardRequest
+    req?: DashboardRequest
   ): Observable<DashboardSchoolAdminResponse | null> {
-    this.loadingService.start('dashboard');
-
     return this.handleRequest<DashboardSchoolAdminResponse>(
       this.requestService.get<DashboardSchoolAdminResponse>(
-        this.DASHBOARD_SCHOOL_ADMIN_URL,
-        { ...req, topTeachersLimit: 7, reviewLessonsLimit: 7 }
+        this.DASHBOARD_SCHOOL_ADMIN_API_URL,
+        { ...req, topTeachersLimit: 7, reviewLessonsLimit: 7 },
+        { loadingKey: 'dashboard' }
       ),
       {
         successHandler: data => this.dashboardSchoolAdminSignal.set(data),
       }
-    ).pipe(finalize(() => this.loadingService.stop('dashboard')));
+    );
   }
 
   /**
@@ -61,19 +61,18 @@ export class DashboardService {
    * @returns Observable with DashboardResponse or null
    */
   getTeacherDashboardData(
-    req: DashboardRequest
+    req?: DashboardRequest
   ): Observable<DashboardTeacherResponse | null> {
-    this.loadingService.start('dashboard');
-
     return this.handleRequest<DashboardTeacherResponse>(
       this.requestService.get<DashboardTeacherResponse>(
-        this.DASHBOARD_TEACHER_URL,
-        req
+        this.DASHBOARD_TEACHER_API_URL,
+        req,
+        { loadingKey: 'dashboard' }
       ),
       {
         successHandler: data => this.dashboardTeacherSignal.set(data),
       }
-    ).pipe(finalize(() => this.loadingService.stop('dashboard')));
+    ).pipe();
   }
 
   // private fn

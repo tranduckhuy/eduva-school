@@ -87,12 +87,26 @@ export class NotificationSocketService {
     type: string,
     payload: T
   ): NotificationModel<T> {
+    const id = this.hasUserNotificationId(payload)
+      ? payload.userNotificationId
+      : crypto.randomUUID();
     return {
-      id: crypto.randomUUID(),
+      id: id,
       type,
       payload,
       createdAt: new Date().toISOString(),
       isRead: false,
     };
+  }
+
+  private hasUserNotificationId(
+    obj: unknown
+  ): obj is { userNotificationId: string } {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'userNotificationId' in obj &&
+      typeof (obj as any).userNotificationId === 'string'
+    );
   }
 }

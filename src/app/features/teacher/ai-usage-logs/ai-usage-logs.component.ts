@@ -48,7 +48,7 @@ export class AiUsageLogsComponent {
   pageSize = signal(PAGE_SIZE);
   firstRecordIndex = signal(0);
   searchValue = signal('');
-  shouldStopRequest = signal<boolean>(true);
+  shouldStopRequest = signal<boolean>(false);
 
   tableHeadSkeleton = signal([
     'STT',
@@ -109,7 +109,7 @@ export class AiUsageLogsComponent {
   }
 
   private loadData(): void {
-    if (!this.shouldStopRequest()) return;
+    if (this.shouldStopRequest()) return;
 
     const request: GetAiUsageLogsRequest = {
       pageIndex: this.currentPage(),
@@ -118,6 +118,8 @@ export class AiUsageLogsComponent {
       sortBy: 'createdAt',
       sortDirection: 'desc',
     };
-    this.aiUsageLogsService.getAiUsageLogs(request).subscribe();
+    this.aiUsageLogsService.getAiUsageLogs(request).subscribe({
+      error: () => this.shouldStopRequest.set(true),
+    });
   }
 }

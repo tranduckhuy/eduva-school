@@ -96,7 +96,8 @@
                   <td>
                     {{
                       material.lastModifiedAt
-                        ? (material.lastModifiedAt | date: 'fullDate')
+                        ? (material.lastModifiedAt
+                          | date: "dd 'thg' MM, YYYY 'lúc' HH:mm")
                         : 'Chưa cập nhật'
                     }}
                   </td>

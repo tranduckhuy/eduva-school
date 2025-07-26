@@ -23,7 +23,10 @@ import { MODAL_DATA } from '../../../../shared/tokens/injection/modal-data.token
 
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 
+import { noOnlySpacesValidator } from '../../../../shared/utils/form-validators';
+
 import { LessonMaterialStatus } from '../../../../shared/models/enum/lesson-material.enum';
+
 import { type ApproveRejectMaterialRequest } from '../models/approve-reject-material-request.model';
 
 interface ModerateReasonModalData {
@@ -61,7 +64,7 @@ export class ModerateReasonModalComponent implements OnInit {
 
   constructor() {
     this.form = this.fb.group({
-      reason: '',
+      reason: ['', noOnlySpacesValidator],
     });
   }
 
@@ -73,17 +76,23 @@ export class ModerateReasonModalComponent implements OnInit {
     }
   }
 
+  get reasonControl() {
+    return this.form.get('reason');
+  }
+
   onSubmit() {
     this.submitted.set(true);
     this.form.markAllAsTouched();
 
-    if (this.form.invalid) return;
+    const reason = this.reasonControl?.value.trim();
+
+    if (this.form.invalid || !reason) return;
 
     const request: ApproveRejectMaterialRequest = {
       status: this.modalData.isApproved
         ? LessonMaterialStatus.Approved
         : LessonMaterialStatus.Rejected,
-      feedback: this.form.get('reason')?.value,
+      feedback: reason,
     };
     this.lessonMaterialService
       .approveRejectMaterial(this.modalData.materialId, request)

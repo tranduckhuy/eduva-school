@@ -30,8 +30,9 @@
             <span class="text-xs text-[#808b9a]">
               {{
                 !isReplyMode()
-                  ? (comment()?.createdAt | date: 'fullDate')
-                  : (reply()?.createdAt | date: 'fullDate')
+                  ? (comment()?.createdAt
+                    | date: "dd 'thg' MM, YYYY 'lúc' HH:mm")
+                  : (reply()?.createdAt | date: "dd 'thg' MM, YYYY 'lúc' HH:mm")
               }}
             </span>
           </div>

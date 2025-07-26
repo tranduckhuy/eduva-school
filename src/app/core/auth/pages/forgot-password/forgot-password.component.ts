@@ -82,7 +82,7 @@ export class ForgotPasswordComponent {
 
         if (this.currentUser()) {
           this.form.patchValue({
-            email: [this.currentUser()?.email],
+            email: this.currentUser()?.email,
           });
         } else {
           this.form.reset();

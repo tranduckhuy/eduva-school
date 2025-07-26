@@ -1,10 +1,10 @@
 <div
-  class="absolute right-0 top-10 z-10 sm:-right-[50%] sm:translate-x-[50%]"
+  class="absolute right-0 top-10 z-10 sm:-right-[50%] sm:translate-x-[50%] xs:-right-[20%] xs:translate-x-[20%]"
   clickOutsideSubmenu
   (clickOutside)="clickOutside.emit()">
   <div
     class="animate-fadeInForward rounded-md bg-white shadow-main transition-all duration-300 ease-in-out will-change-[opacity,transform] dark:bg-dark-200">
-    <div class="w-[350px]">
+    <div class="w-[350px] xs:w-[300px]">
       <div
         class="sticky left-0 top-0 flex items-center justify-between border-b border-gray-100 px-5 py-4 dark:border-dark-500">
         <h3 class="text-[15px] font-semibold text-textBlack dark:text-white">
@@ -19,10 +19,11 @@
           Đánh dấu đã đọc
         </button>
       </div>
-      @if (isLoading()) {
+      @if (isLoading() && currentPage() === 0) {
         <notification-skeleton />
       } @else {
         <ul
+          #scrollContainer
           class="max-h-[70vh] overflow-y-auto overscroll-contain"
           (scroll)="onScroll($event)">
           @for (notification of displayNotifications(); track notification.id) {
@@ -60,9 +61,14 @@
               </button>
             </li>
           }
+          @if (isLoading()) {
+            <li class="flex w-full items-center justify-center pb-2 pt-3">
+              <p-progressspinner [style]="{ width: '30px', height: '30px' }" />
+            </li>
+          }
           @if (displayNotifications().length <= 0 && !isLoading()) {
             <li
-              class="flex size-full min-h-[40vh] flex-col items-center justify-center gap-2">
+              class="flex size-full min-h-[40vh] flex-col items-center justify-center gap-1">
               <img
                 src="./images/icons/notification-empty.svg"
                 alt="Chưa có thông báo nào"

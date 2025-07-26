@@ -20,6 +20,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { LessonMaterialsService } from '../../../../shared/services/api/lesson-materials/lesson-materials.service';
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 
+import { noOnlySpacesValidator } from '../../../../shared/utils/form-validators';
+
 import { FormControlComponent } from '../../../../shared/components/form-control/form-control.component';
 import { UpdateMaterialRichTextComponent } from './update-material-rich-text/update-material-rich-text.component';
 
@@ -59,7 +61,7 @@ export class UpdateMaterialComponent implements OnInit {
   constructor() {
     this.form = this.fb.group({
       title: ['', Validators.required],
-      description: [''],
+      description: ['', noOnlySpacesValidator],
     });
   }
 

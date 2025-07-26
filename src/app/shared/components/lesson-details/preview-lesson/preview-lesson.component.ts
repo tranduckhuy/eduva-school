@@ -155,8 +155,8 @@ export class PreviewLessonComponent implements OnInit {
 
   ngOnInit(): void {
     this.handleRouteQueryParams();
+
     this.loadDetailData();
-    this.loadApprovalData();
   }
 
   get approvalRelativeDate(): string {
@@ -190,7 +190,16 @@ export class PreviewLessonComponent implements OnInit {
       .subscribe({
         next: () => {
           const lessonMaterial = this.lessonMaterial();
-          this.contentParse(lessonMaterial ? lessonMaterial.description : '');
+          this.contentParse(lessonMaterial?.description ?? '');
+
+          const currentUser = this.user();
+          if (
+            lessonMaterial &&
+            currentUser &&
+            lessonMaterial.createdById === currentUser.id
+          ) {
+            this.loadApprovalData();
+          }
         },
       });
   }
