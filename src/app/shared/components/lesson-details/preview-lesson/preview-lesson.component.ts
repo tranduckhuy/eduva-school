@@ -190,7 +190,7 @@ export class PreviewLessonComponent implements OnInit {
       .subscribe({
         next: () => {
           const lessonMaterial = this.lessonMaterial();
-          this.contentParse(lessonMaterial?.description || '');
+          this.contentParse(lessonMaterial?.description ?? '');
 
           const currentUser = this.user();
           if (

@@ -1310,6 +1310,302 @@ describe('LessonMaterialsService', () => {
       }
     });
 
+    it('should handle lesson material not found error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_NOT_FOUND },
+        status: 404,
+      });
+      (requestService.get as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.getLessonMaterialById('material1'))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle lesson material already approved error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_ALREADY_APPROVED },
+        status: 400,
+      });
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      const approveRequest: ApproveRejectMaterialRequest = {
+        status: LessonMaterialStatus.Approved,
+        feedback: 'Good content',
+      };
+
+      await expect(
+        lastValueFrom(
+          service.approveRejectMaterial('material1', approveRequest)
+        )
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle lesson material already rejected error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_ALREADY_REJECTED },
+        status: 400,
+      });
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      const rejectRequest: ApproveRejectMaterialRequest = {
+        status: LessonMaterialStatus.Rejected,
+        feedback: 'Content needs improvement',
+      };
+
+      await expect(
+        lastValueFrom(service.approveRejectMaterial('material1', rejectRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle lesson material not approved error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_NOT_APPROVED },
+        status: 400,
+      });
+      (requestService.get as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.getLessonMaterialById('material1'))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle reason required when rejecting lesson material error', async () => {
+      const error = new HttpErrorResponse({
+        error: {
+          statusCode:
+            StatusCode.REASON_IS_REQUIRED_WHEN_REJECTING_LESSON_MATERIAL,
+        },
+        status: 400,
+      });
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      const rejectRequest: ApproveRejectMaterialRequest = {
+        status: LessonMaterialStatus.Rejected,
+        feedback: '', // Empty feedback
+      };
+
+      await expect(
+        lastValueFrom(service.approveRejectMaterial('material1', rejectRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle lesson material restore failed error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_RESTORE_FAILED },
+        status: 400,
+      });
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.restoreMaterial('folder1', ['material1']))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle storage quota exceeded error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.STORAGE_QUOTA_EXCEEDED },
+        status: 400,
+      });
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      const mockRequest: CreateLessonMaterialsRequest = {
+        folderId: 'folder1',
+        blobNames: ['large-file.pdf'],
+        lessonMaterials: [
+          {
+            title: 'Large Material',
+            description: 'Large file that exceeds quota',
+            contentType: 3,
+            duration: 60,
+            fileSize: 1024 * 1024 * 100, // 100MB
+            isAIContent: false,
+            sourceUrl: 'http://example.com/large-file.pdf',
+          },
+        ],
+      };
+
+      await expect(
+        lastValueFrom(service.createLessonMaterials(mockRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle insufficient permission error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.INSUFFICIENT_PERMISSION },
+        status: 403,
+      });
+      (requestService.get as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.getLessonMaterialsByFolder('folder1'))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle folder not found error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.FOLDER_NOT_FOUND },
+        status: 404,
+      });
+      (requestService.get as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.getLessonMaterialsByFolder('non-existent-folder'))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle lesson material not found in folder error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_NOT_FOUND_IN_FOLDER },
+        status: 404,
+      });
+      (requestService.get as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.getLessonMaterialsByFolder('folder1'))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle invalid blob name error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.INVALID_BLOB_NAME },
+        status: 400,
+      });
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      const mockRequest: CreateLessonMaterialsRequest = {
+        folderId: 'folder1',
+        blobNames: ['invalid-blob-name'],
+        lessonMaterials: [
+          {
+            title: 'Test Material',
+            description: 'Test Description',
+            contentType: 3,
+            duration: 60,
+            fileSize: 1024,
+            isAIContent: false,
+            sourceUrl: 'http://example.com/file.pdf',
+          },
+        ],
+      };
+
+      await expect(
+        lastValueFrom(service.createLessonMaterials(mockRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle blob not found error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.BLOB_NOT_FOUND },
+        status: 404,
+      });
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      const mockRequest: CreateLessonMaterialsRequest = {
+        folderId: 'folder1',
+        blobNames: ['non-existent-blob'],
+        lessonMaterials: [
+          {
+            title: 'Test Material',
+            description: 'Test Description',
+            contentType: 3,
+            duration: 60,
+            fileSize: 1024,
+            isAIContent: false,
+            sourceUrl: 'http://example.com/file.pdf',
+          },
+        ],
+      };
+
+      await expect(
+        lastValueFrom(service.createLessonMaterials(mockRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle invalid file type error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.INVALID_FILE_TYPE },
+        status: 400,
+      });
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      const mockRequest: CreateLessonMaterialsRequest = {
+        folderId: 'folder1',
+        blobNames: ['invalid-file.exe'],
+        lessonMaterials: [
+          {
+            title: 'Invalid File',
+            description: 'Invalid file type',
+            contentType: 3,
+            duration: 60,
+            fileSize: 1024,
+            isAIContent: false,
+            sourceUrl: 'http://example.com/invalid-file.exe',
+          },
+        ],
+      };
+
+      await expect(
+        lastValueFrom(service.createLessonMaterials(mockRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle file is required error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.FILE_IS_REQUIRED },
+        status: 400,
+      });
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      const mockRequest: CreateLessonMaterialsRequest = {
+        folderId: 'folder1',
+        blobNames: [],
+        lessonMaterials: [
+          {
+            title: 'Test Material',
+            description: 'Test Description',
+            contentType: 3,
+            duration: 60,
+            fileSize: 1024,
+            isAIContent: false,
+            sourceUrl: 'http://example.com/file.pdf',
+          },
+        ],
+      };
+
+      await expect(
+        lastValueFrom(service.createLessonMaterials(mockRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
     it('should handle network errors', async () => {
       const networkError = new HttpErrorResponse({
         status: 0,
@@ -1350,6 +1646,128 @@ describe('LessonMaterialsService', () => {
       await expect(
         lastValueFrom(
           service.getPersonalLessonMaterials({ pageIndex: 1, pageSize: 10 })
+        )
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Thiếu gói đăng ký',
+        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+      );
+    });
+
+    it('should handle lesson material not active error for get by id', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_NOT_ACTIVE },
+        status: 400,
+      });
+      (requestService.get as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.getLessonMaterialById('material1'))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Bài giảng đã bị xóa',
+        'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
+      );
+    });
+
+    it('should handle student not enrolled in class with material error', async () => {
+      const error = new HttpErrorResponse({
+        error: {
+          statusCode: StatusCode.STUDENT_NOT_ENROLLED_IN_CLASS_WITH_MATERIAL,
+        },
+        status: 400,
+      });
+      (requestService.get as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.getLessonMaterialById('material1'))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Chưa tham gia lớp học',
+        'Bạn chưa tham gia lớp học có chứa tài liệu này.'
+      );
+    });
+
+    it('should handle school subscription not found error for update', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
+        status: 400,
+      });
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      const updateRequest: UpdateLessonMaterialRequest = {
+        id: 'material1',
+        title: 'Updated Material',
+        description: 'Updated Description',
+        visibility: 1,
+      };
+
+      await expect(
+        lastValueFrom(service.updateLessonMaterial('material1', updateRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Thiếu gói đăng ký',
+        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+      );
+    });
+
+    it('should handle school subscription not found error for delete', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
+        status: 400,
+      });
+      (requestService.deleteWithBody as any).mockReturnValue(
+        throwError(() => error)
+      );
+
+      const deleteRequest = { ids: ['material1'], permanent: true };
+
+      await expect(
+        lastValueFrom(service.deleteMaterial(deleteRequest))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Thiếu gói đăng ký',
+        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+      );
+    });
+
+    it('should handle school subscription not found error for restore', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
+        status: 400,
+      });
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.restoreMaterial('folder1', ['material1']))
+      ).rejects.toThrow();
+
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Thiếu gói đăng ký',
+        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+      );
+    });
+
+    it('should handle school subscription not found error for approve/reject', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
+        status: 400,
+      });
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      const approveRequest: ApproveRejectMaterialRequest = {
+        status: LessonMaterialStatus.Approved,
+        feedback: 'Good content',
+      };
+
+      await expect(
+        lastValueFrom(
+          service.approveRejectMaterial('material1', approveRequest)
         )
       ).rejects.toThrow();
 

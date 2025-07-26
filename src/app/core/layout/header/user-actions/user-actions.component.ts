@@ -4,7 +4,6 @@ import {
   DestroyRef,
   OnInit,
   computed,
-  effect,
   inject,
   signal,
 } from '@angular/core';

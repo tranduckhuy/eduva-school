@@ -71,12 +71,12 @@ export class ClassFolderManagementService {
 
   private handleError(err: HttpErrorResponse): Observable<void> {
     if (
-      err.error.statusCode ===
+      err.error?.statusCode ===
       StatusCode.LESSON_MATERIAL_ALREADY_EXISTS_IN_CLASS_FOLDER
     ) {
       this.toastHandlingService.warn(
         'Cảnh báo',
-        'Tài liệu này đã tồn tại trong 1 thư mục của lớp này.'
+        'Tài liệu này đã tồn tại trong lớp học này.'
       );
     } else {
       this.toastHandlingService.errorGeneral();

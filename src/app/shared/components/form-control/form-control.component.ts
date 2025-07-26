@@ -68,7 +68,7 @@ export class FormControlComponent
   phone = input<boolean>(false);
   required = input<boolean>(false);
   pattern = input<string | RegExp | null>(null);
-  noSpace = input<boolean>(false);
+  noSpaces = input<boolean>(false);
   errorMessages = input<{ [key: string]: string }>({});
   validatePassword = input<boolean>(false);
   confirmPassword = input<string | null>(null);
@@ -188,7 +188,7 @@ export class FormControlComponent
       validators.push((c: AbstractControl) =>
         matchPasswordValidator(c, this.confirmPassword()!)
       );
-    if (this.noSpace()) validators.push(noOnlySpacesValidator);
+    if (this.noSpaces()) validators.push(noOnlySpacesValidator);
     return validators;
   }
 

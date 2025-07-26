@@ -27,6 +27,7 @@ describe('ClassFolderManagementService', () => {
     toastHandlingService = {
       successGeneral: vi.fn(),
       errorGeneral: vi.fn(),
+      warn: vi.fn(),
     } as any;
 
     TestBed.configureTestingModule({
@@ -93,10 +94,11 @@ describe('ClassFolderManagementService', () => {
       });
     });
 
-    it('should handle HttpErrorResponse and show error toast', async () => {
+    it('should handle HttpErrorResponse with null error and show error toast', async () => {
       const error = new HttpErrorResponse({
         status: 400,
         statusText: 'Bad Request',
+        error: null,
       });
 
       (requestService.post as any).mockReturnValue(throwError(() => error));
@@ -109,6 +111,57 @@ describe('ClassFolderManagementService', () => {
           error: err => {
             expect(err).toBe(error);
             expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
+            resolve();
+          },
+        });
+      });
+    });
+
+    it('should handle HttpErrorResponse with valid error object and show error toast', async () => {
+      const error = new HttpErrorResponse({
+        status: 400,
+        statusText: 'Bad Request',
+        error: { statusCode: StatusCode.SYSTEM_ERROR },
+      });
+
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      await new Promise<void>(resolve => {
+        service.addMaterialsForClass(classId, folderId, request).subscribe({
+          next: () => {
+            throw new Error('Should not reach next');
+          },
+          error: err => {
+            expect(err).toBe(error);
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
+            resolve();
+          },
+        });
+      });
+    });
+
+    it('should handle HttpErrorResponse with LESSON_MATERIAL_ALREADY_EXISTS_IN_CLASS_FOLDER and show warning toast', async () => {
+      const error = new HttpErrorResponse({
+        status: 400,
+        statusText: 'Bad Request',
+        error: {
+          statusCode: StatusCode.LESSON_MATERIAL_ALREADY_EXISTS_IN_CLASS_FOLDER,
+        },
+      });
+
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      await new Promise<void>(resolve => {
+        service.addMaterialsForClass(classId, folderId, request).subscribe({
+          next: () => {
+            throw new Error('Should not reach next');
+          },
+          error: err => {
+            expect(err).toBe(error);
+            expect(toastHandlingService.warn).toHaveBeenCalledWith(
+              'Cảnh báo',
+              'Tài liệu này đã tồn tại trong lớp học này.'
+            );
             resolve();
           },
         });
@@ -188,10 +241,35 @@ describe('ClassFolderManagementService', () => {
       });
     });
 
-    it('should handle HttpErrorResponse and show error toast', async () => {
+    it('should handle HttpErrorResponse with null error and show error toast', async () => {
       const error = new HttpErrorResponse({
         status: 500,
         statusText: 'Internal Server Error',
+        error: null,
+      });
+      (requestService.deleteWithBody as any).mockReturnValue(
+        throwError(() => error)
+      );
+
+      await new Promise<void>(resolve => {
+        service.removeMaterialsFromClass(classId, folderId, request).subscribe({
+          next: () => {
+            throw new Error('Should not reach next');
+          },
+          error: err => {
+            expect(err).toBe(error);
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
+            resolve();
+          },
+        });
+      });
+    });
+
+    it('should handle HttpErrorResponse with valid error object and show error toast', async () => {
+      const error = new HttpErrorResponse({
+        status: 500,
+        statusText: 'Internal Server Error',
+        error: { statusCode: StatusCode.SYSTEM_ERROR },
       });
       (requestService.deleteWithBody as any).mockReturnValue(
         throwError(() => error)

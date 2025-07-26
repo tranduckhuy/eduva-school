@@ -65,8 +65,8 @@ export class NewQuestionComponent {
 
   constructor() {
     this.form = this.fb.group({
-      title: ['', Validators.required],
-      content: [''],
+      title: ['', Validators.required, noOnlySpacesValidator],
+      content: ['', [Validators.required, noOnlySpacesValidator]],
     });
 
     effect(
@@ -95,6 +95,8 @@ export class NewQuestionComponent {
   getErrorMessage(controlName: string): string {
     const control = this.form.get(controlName);
     if (control?.hasError('required')) return 'Trường này không được để trống';
+    if (control?.hasError('onlySpaces'))
+      return 'Trường này không được chỉ chứa khoảng trắng';
     return '';
   }
 

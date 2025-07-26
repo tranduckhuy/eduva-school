@@ -76,17 +76,23 @@ export class ModerateReasonModalComponent implements OnInit {
     }
   }
 
+  get reasonControl() {
+    return this.form.get('reason');
+  }
+
   onSubmit() {
     this.submitted.set(true);
     this.form.markAllAsTouched();
 
-    if (this.form.invalid) return;
+    const reason = this.reasonControl?.value.trim();
+
+    if (this.form.invalid || !reason) return;
 
     const request: ApproveRejectMaterialRequest = {
       status: this.modalData.isApproved
         ? LessonMaterialStatus.Approved
         : LessonMaterialStatus.Rejected,
-      feedback: this.form.get('reason')?.value,
+      feedback: reason,
     };
     this.lessonMaterialService
       .approveRejectMaterial(this.modalData.materialId, request)

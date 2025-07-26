@@ -15,7 +15,7 @@ import { type NotificationModel } from '../../../models/entities/notification.mo
 import { type NotificationPayloadMap } from '../../../../core/layout/header/user-actions/notifications/models/notification-payload-mapping.model';
 import { type GetNotificationsRequest } from '../../../models/api/request/query/get-notifications-request.model';
 import { type GetNotificationsResponse } from '../../../models/api/response/query/get-notifications-response.model';
-import { GetNotificationSummaryResponse } from '../../../models/api/response/query/get-notification-summary-response.model';
+import { type GetNotificationSummaryResponse } from '../../../models/api/response/query/get-notification-summary-response.model';
 
 export type NotificationWithTypedPayload = {
   [K in keyof NotificationPayloadMap]: NotificationModel<

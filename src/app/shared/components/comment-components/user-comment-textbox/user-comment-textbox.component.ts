@@ -20,6 +20,8 @@ import { UserService } from '../../../services/api/user/user.service';
 import { LoadingService } from '../../../services/core/loading/loading.service';
 import { CommentService } from '../comment-modal/services/comment.service';
 
+import { noOnlySpacesValidator } from '../../../utils/form-validators';
+
 import { RichTextEditorComponent } from '../../rich-text-editor/rich-text-editor.component';
 
 import { type CreateCommentRequest } from '../comment-modal/model/request/command/create-comment-request.model';
@@ -62,7 +64,7 @@ export class UserCommentTextboxComponent implements OnInit {
 
   constructor() {
     this.form = this.fb.group({
-      content: [''],
+      content: ['', [Validators.required, noOnlySpacesValidator]],
     });
   }
 
