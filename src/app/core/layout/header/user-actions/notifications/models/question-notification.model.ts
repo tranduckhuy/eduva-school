@@ -1,6 +1,7 @@
 import { type QuestionActionType } from '../../../../../../shared/models/enum/question-action-type.enum';
 
 export interface QuestionNotification {
+  userNotificationId: string;
   questionId: string;
   title: string;
   lessonMaterialId: string;

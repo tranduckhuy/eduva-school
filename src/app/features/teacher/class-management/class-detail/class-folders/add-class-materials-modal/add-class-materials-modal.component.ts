@@ -28,11 +28,12 @@ import { GlobalModalService } from '../../../../../../shared/services/layout/glo
 import { debounceSignal } from '../../../../../../shared/utils/util-functions';
 
 import { MODAL_DATA } from '../../../../../../shared/tokens/injection/modal-data.token';
+import { EntityStatus } from '../../../../../../shared/models/enum/entity-status.enum';
+import { FolderOwnerType } from '../../../../../../shared/models/enum/folder-owner-type.enum';
 import {
   ContentType,
   LessonMaterialStatus,
 } from '../../../../../../shared/models/enum/lesson-material.enum';
-import { EntityStatus } from '../../../../../../shared/models/enum/entity-status.enum';
 
 import { type Folder } from '../../../../../../shared/models/entities/folder.model';
 import { type LessonMaterial } from '../../../../../../shared/models/entities/lesson-material.model';
@@ -241,18 +242,21 @@ export class AddClassMaterialsModalComponent implements OnInit {
 
   private loadPersonalFolders() {
     const request: GetFoldersRequest = {
-      status: EntityStatus.Active,
+      isPaging: false,
       sortBy: 'createdAt',
       sortDirection: 'desc',
+      ownerType: FolderOwnerType.Personal,
+      status: EntityStatus.Active,
     };
     this.folderService.getPersonalFolders(request).subscribe();
   }
 
   private loadSourceMaterials(folderId: string, searchTerm: string = '') {
     const request: GetLessonMaterialsRequest = {
+      searchTerm,
       sortBy: 'createdAt',
       sortDirection: 'desc',
-      searchTerm,
+      status: EntityStatus.Active,
       lessonStatus: LessonMaterialStatus.Approved,
     };
 
@@ -267,9 +271,10 @@ export class AddClassMaterialsModalComponent implements OnInit {
 
   private loadTargetMaterials(folderId: string, searchTerm: string = '') {
     const request: GetLessonMaterialsRequest = {
+      searchTerm,
       sortBy: 'createdAt',
       sortDirection: 'desc',
-      searchTerm,
+      status: EntityStatus.Active,
     };
 
     this.lessonMaterialService

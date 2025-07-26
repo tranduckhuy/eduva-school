@@ -97,7 +97,7 @@ export class PasswordService {
 
   private handleResetPasswordError(err: HttpErrorResponse): Observable<void> {
     switch (err.error?.statusCode) {
-      case StatusCode.INVALID_TOKEN:
+      case StatusCode.UNAUTHORIZED:
         this.toastHandlingService.error(
           'Liên kết hết hạn',
           'Vui lòng gửi lại yêu cầu đặt lại mật khẩu mới.'

@@ -18,7 +18,7 @@ import { UserService } from '../../../shared/services/api/user/user.service';
 
 import { AccordionItemComponent } from './accordion-item/accordion-item.component';
 import {
-  UserRole,
+  type UserRoleType,
   UserRoles,
 } from '../../../shared/constants/user-roles.constant';
 
@@ -67,17 +67,10 @@ export class NavbarComponent implements OnInit {
 
   schoolMissing = computed(() => !this.user()?.school);
   planExpired = computed(() => {
-    const isPlanActive =
-      this.user()?.userSubscriptionResponse.isSubscriptionActive;
-    const subscriptionEnd =
-      this.user()?.userSubscriptionResponse.subscriptionEndDate;
-
-    return (
-      isPlanActive &&
-      subscriptionEnd &&
-      !isPlanActive &&
-      new Date(subscriptionEnd) < new Date()
-    );
+    const subscription = this.user()?.userSubscriptionResponse;
+    const isActive = subscription?.isSubscriptionActive;
+    const endDate = subscription?.subscriptionEndDate;
+    return !isActive || (endDate && new Date(endDate) < new Date());
   });
 
   navConfigs: NavbarConfig[] = [];
@@ -86,7 +79,7 @@ export class NavbarComponent implements OnInit {
     effect(
       () => {
         const user = this.user();
-        const userRole = user?.roles?.[0] as UserRole;
+        const userRole = user?.roles?.[0] as UserRoleType;
 
         this.navConfigs = this.getNavbarConfigByRole(userRole);
 
@@ -147,7 +140,7 @@ export class NavbarComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  private getNavbarConfigByRole(role: UserRole): NavbarConfig[] {
+  private getNavbarConfigByRole(role: UserRoleType): NavbarConfig[] {
     const isAdmin = this.isAdminRole(role);
     const isTeacher = role === UserRoles.TEACHER;
     const isModerator = role === UserRoles.CONTENT_MODERATOR;
@@ -198,7 +191,7 @@ export class NavbarComponent implements OnInit {
     return navItems;
   }
 
-  private isAdminRole(role: UserRole): boolean {
+  private isAdminRole(role: UserRoleType): boolean {
     return role === UserRoles.SCHOOL_ADMIN || role === UserRoles.SYSTEM_ADMIN;
   }
 

@@ -27,6 +27,8 @@ import { ClassFoldersComponent } from './class-folders/class-folders.component';
 import { type Folder } from '../../../../shared/models/entities/folder.model';
 import { type LessonMaterial } from '../../../../shared/models/entities/lesson-material.model';
 import { type StudentClassResponse } from '../models/response/query/get-students-class-response.model';
+import { GetLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
+import { EntityStatus } from '../../../../shared/models/enum/entity-status.enum';
 
 export interface FolderWithMaterials {
   folder: Folder;
@@ -120,16 +122,19 @@ export class ClassDetailComponent implements OnInit {
     return this.folderManagementService.getClassFolders(classId).pipe(
       switchMap(folders => {
         if (!folders || folders.length === 0) return of([]);
-        const requests = folders.map(folder =>
-          this.lessonMaterialsService
-            .getLessonMaterialsByFolder(folder.id)
+        const requests = folders.map(folder => {
+          const request: GetLessonMaterialsRequest = {
+            status: EntityStatus.Active,
+          };
+          return this.lessonMaterialsService
+            .getLessonMaterialsByFolder(folder.id, request)
             .pipe(
               map(materials => ({
                 folder,
                 materials: materials ?? [],
               }))
-            )
-        );
+            );
+        });
         return forkJoin(requests);
       })
     );

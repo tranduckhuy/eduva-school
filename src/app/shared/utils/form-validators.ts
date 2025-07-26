@@ -103,3 +103,17 @@ export function customEmailValidator(
   if (!value) return null;
   return EMAIL_REGEX.test(value) ? null : { email: true };
 }
+
+export function noOnlySpacesValidator(
+  control: AbstractControl
+): ValidationErrors | null {
+  const value = control.value;
+  if (
+    typeof value === 'string' &&
+    value.trim().length === 0 &&
+    value.length > 0
+  ) {
+    return { onlySpaces: true };
+  }
+  return null;
+}

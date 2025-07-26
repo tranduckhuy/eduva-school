@@ -18,6 +18,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ResourcesStateService } from '../../services/utils/resources-state.service';
 import { GenerateSettingsSelectionService } from '../services/generate-settings-selection.service';
 import { ToastHandlingService } from '../../../../../../shared/services/core/toast/toast-handling.service';
+import { UserService } from '../../../../../../shared/services/api/user/user.service';
 import { AiJobsService } from '../../services/api/ai-jobs.service';
 import { AiSocketService } from '../../services/api/ai-socket.service';
 import { LessonMaterialsService } from '../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
@@ -52,8 +53,9 @@ export class VideoPreviewComponent implements OnInit {
   private readonly generateSettingsService = inject(
     GenerateSettingsSelectionService
   );
-  private readonly confirmationService = inject(ConfirmationService);
   private readonly toastHandlingService = inject(ToastHandlingService);
+  private readonly confirmationService = inject(ConfirmationService);
+  private readonly userService = inject(UserService);
   private readonly aiJobService = inject(AiJobsService);
   private readonly aiSocketService = inject(AiSocketService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
@@ -112,6 +114,8 @@ export class VideoPreviewComponent implements OnInit {
         ) {
           this.videoUrl.set(payload.videoOutputBlobNameUrl);
           this.videoState.set('generated');
+
+          this.userService.getCurrentProfile().subscribe();
 
           this.resourcesStateService.setAiGeneratedMetadata({
             title: this.generateAutoTitle(),

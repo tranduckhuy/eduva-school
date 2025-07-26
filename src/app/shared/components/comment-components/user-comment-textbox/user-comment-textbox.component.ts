@@ -62,7 +62,7 @@ export class UserCommentTextboxComponent implements OnInit {
 
   constructor() {
     this.form = this.fb.group({
-      content: ['', Validators.required],
+      content: [''],
     });
   }
 
@@ -88,7 +88,7 @@ export class UserCommentTextboxComponent implements OnInit {
   onSubmit() {
     this.form.markAllAsTouched();
 
-    const content = this.content?.value;
+    const content = this.content?.value.trim();
 
     if (this.form.invalid || !content) {
       this.invalid.set(true);

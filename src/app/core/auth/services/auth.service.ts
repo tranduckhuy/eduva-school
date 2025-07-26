@@ -15,7 +15,7 @@ import { GlobalModalService } from '../../../shared/services/layout/global-modal
 
 import { StatusCode } from '../../../shared/constants/status-code.constant';
 import {
-  UserRole,
+  type UserRoleType,
   UserRoles,
 } from '../../../shared/constants/user-roles.constant';
 
@@ -176,7 +176,7 @@ export class AuthService {
         return;
       }
 
-      const roleRedirectMap: Partial<Record<UserRole, string>> = {
+      const roleRedirectMap: Partial<Record<UserRoleType, string>> = {
         SchoolAdmin: '/school-admin',
         ContentModerator: '/teacher',
         Teacher: '/teacher',

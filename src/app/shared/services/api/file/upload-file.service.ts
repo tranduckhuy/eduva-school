@@ -1,9 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import {
-  HttpClient,
-  HttpContext,
-  HttpErrorResponse,
-} from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
@@ -22,12 +18,19 @@ import { environment } from '../../../../../environments/environment';
 import { RequestService } from '../../../../shared/services/core/request/request.service';
 import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
 
-import { StatusCode } from '../../../../shared/constants/status-code.constant';
+import {
+  StatusCode,
+  type StatusCodeType,
+} from '../../../../shared/constants/status-code.constant';
 import { BYPASS_AUTH } from '../../../tokens/context/http-context.token';
 
 import { type FileStorageRequest } from '../../../models/api/request/command/file-storage-request.model';
 import { type FileStorageResponse } from '../../../models/api/response/command/file-storage-response.model';
 
+type UploadError = {
+  isBusinessError: true;
+  statusCode: StatusCodeType;
+};
 @Injectable({
   providedIn: 'root',
 })
@@ -56,19 +59,19 @@ export class UploadFileService {
       .post<FileStorageResponse>(this.UPLOAD_FILE_TO_STORAGE_API_URL, request)
       .pipe(
         switchMap(res => {
-          if (res.statusCode !== StatusCode.SUCCESS || !res.data) {
-            this.toastHandlingService.errorGeneral();
-            return of(null);
+          if (
+            !res.data ||
+            res.statusCode !== StatusCode.SUCCESS ||
+            res.data.uploadTokens.length !== files.length
+          ) {
+            const error: UploadError = {
+              isBusinessError: true,
+              statusCode: res.statusCode,
+            };
+            return throwError(() => error);
           }
 
           const tokens = res.data.uploadTokens;
-
-          // ? Tokens length must equal to files length
-          if (tokens.length !== files.length) {
-            this.toastHandlingService.errorGeneral();
-            return of(null);
-          }
-
           const failedFiles: string[] = [];
 
           // ? Call API by method 'PUT' for upload each file by each BlobUrl to Azure Storage
@@ -105,12 +108,16 @@ export class UploadFileService {
             })
           );
         }),
-        catchError((err: HttpErrorResponse) => {
-          if (err.error?.statusCode === StatusCode.STORAGE_QUOTA_EXCEEDED) {
-            this.toastHandlingService.warn(
-              'Đã đạt giới hạn lưu trữ',
-              'Vui lòng liên hệ quản trị viên để nâng cấp gói và tiếp tục sử dụng.'
-            );
+        catchError((err: UploadError) => {
+          if (err?.isBusinessError) {
+            if (err.statusCode === StatusCode.STORAGE_QUOTA_EXCEEDED) {
+              this.toastHandlingService.warn(
+                'Đã đạt giới hạn lưu trữ',
+                'Vui lòng liên hệ quản trị viên để nâng cấp gói và tiếp tục sử dụng.'
+              );
+            } else {
+              this.toastHandlingService.errorGeneral();
+            }
           } else {
             this.toastHandlingService.errorGeneral();
           }

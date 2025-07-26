@@ -1,7 +1,7 @@
-import { School } from './school.model';
+import { type School } from './school.model';
 
-import { UserRole } from '../../constants/user-roles.constant';
-import { EntityStatus } from '../enum/entity-status.enum';
+import { type UserRoleType } from '../../constants/user-roles.constant';
+import { type EntityStatus } from '../enum/entity-status.enum';
 
 export interface User {
   id: string;
@@ -10,7 +10,7 @@ export interface User {
   email: string;
   avatarUrl: string;
   school?: School;
-  roles: UserRole[];
+  roles: UserRoleType[];
   creditBalance: number;
   is2FAEnabled: boolean;
   isEmailConfirmed: boolean;

@@ -292,14 +292,30 @@ export class LessonMaterialsService {
   }
 
   private handleError(err: HttpErrorResponse): Observable<null> {
-    if (err.error?.statusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND) {
-      this.toastHandlingService.warn(
-        'Thiếu gói đăng ký',
-        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
-      );
-    } else {
-      this.toastHandlingService.errorGeneral();
+    switch (err.error?.statusCode) {
+      case StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND:
+        this.toastHandlingService.warn(
+          'Thiếu gói đăng ký',
+          'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+        );
+        break;
+      case StatusCode.LESSON_MATERIAL_NOT_ACTIVE:
+        this.toastHandlingService.warn(
+          'Bài giảng đã bị xóa',
+          'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
+        );
+        break;
+      case StatusCode.STUDENT_NOT_ENROLLED_IN_CLASS_WITH_MATERIAL:
+        this.toastHandlingService.warn(
+          'Chưa tham gia lớp học',
+          'Bạn chưa tham gia lớp học có chứa tài liệu này.'
+        );
+        window.history.back();
+        break;
+      default:
+        this.toastHandlingService.errorGeneral();
     }
+
     return throwError(() => err);
   }
 }

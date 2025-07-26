@@ -67,7 +67,6 @@ export class TrashBinComponent {
   private readonly lessonMaterialService = inject(LessonMaterialsService);
 
   isLoading = input<boolean>(false);
-  shouldStopRequest = signal<boolean>(false);
 
   trashItems = signal<TrashItem[]>([]);
   totalRecords = signal<number>(0);
@@ -76,6 +75,7 @@ export class TrashBinComponent {
   pageSize = signal(PAGE_SIZE);
   firstRecordIndex = signal(0);
   searchValue = signal('');
+  shouldStopRequest = signal<boolean>(false);
 
   tableHeadSkeleton = signal([
     'Tên thư mục/tài liệu',
