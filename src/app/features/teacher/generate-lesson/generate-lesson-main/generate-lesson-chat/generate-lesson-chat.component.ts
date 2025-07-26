@@ -71,19 +71,19 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   readonly jobUpdateProgress = this.aiSocketService.jobUpdateProgress;
 
   readonly checkedFiles = this.resourcesStateService.checkedFiles;
-  readonly hasPreviewContentSuccessfully =
-    this.resourcesStateService.hasPreviewContentSuccessfully;
   readonly totalUploaded = this.resourcesStateService.totalSources;
   readonly totalChecked = this.resourcesStateService.totalCheckedSources;
   readonly isLoading = this.resourcesStateService.isLoading;
+  readonly hasPreviewContentSuccessfully =
+    this.resourcesStateService.hasPreviewContentSuccessfully;
 
   messages = signal<ChatMessage[]>([]);
   showScrollButton = signal(false);
 
   disabledSendButton = computed(() => {
     return (
-      this.totalChecked() === 0 ||
       this.isLoading() ||
+      this.totalChecked() === 0 ||
       this.hasPreviewContentSuccessfully()
     );
   });

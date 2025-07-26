@@ -110,7 +110,7 @@
               <button
                 type="button"
                 class="chip-btn border border-[#dde1eb] bg-transparent hover:!bg-[#f0f1f1] dark:text-[#e6e6e6] dark:hover:!bg-dark-400"
-                [disabled]="isLoading()"
+                [disabled]="disabledSendButton()"
                 (click)="handleChipClick(button.title)">
                 <span class="line-clamp-1">
                   Tạo bài giảng về {{ button.title }}

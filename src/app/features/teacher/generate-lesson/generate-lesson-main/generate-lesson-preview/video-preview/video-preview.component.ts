@@ -89,9 +89,6 @@ export class VideoPreviewComponent implements OnInit {
       uploading ||
       this.isLoading() ||
       this.hasGeneratedSuccessfully() ||
-      !this.speedRate() ||
-      !this.voice() ||
-      !this.language() ||
       (this.totalCheckedSources() === 0 && !this.hasInteracted())
     );
   });
@@ -106,8 +103,8 @@ export class VideoPreviewComponent implements OnInit {
 
         if (
           payload &&
-          jobStatus === JobStatus.Completed &&
           !failureReason &&
+          jobStatus === JobStatus.Completed &&
           generationType === LessonGenerationType.Video
         ) {
           this.videoUrl.set(payload.videoOutputBlobNameUrl);
@@ -135,12 +132,12 @@ export class VideoPreviewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const videoBlob = this.job()?.videoOutputBlobName;
+    const videoBlobName = this.job()?.videoOutputBlobName;
 
-    if (!videoBlob) return;
+    if (!videoBlobName) return;
 
     this.videoState.set('generated');
-    this.videoUrl.set(videoBlob);
+    this.videoUrl.set(videoBlobName);
 
     this.resourcesStateService.markGeneratedSuccess();
   }
@@ -245,7 +242,7 @@ export class VideoPreviewComponent implements OnInit {
       type,
       voiceConfig: {
         language_code: this.language() ?? 'vi-VN',
-        name: this.voice() ?? 'vi-VN-Chirp3-HD-Despina',
+        name: this.voice() ?? 'vi-VN-Chirp3-HD-Enceladus',
         speaking_rate: this.speedRate() ?? 1,
       },
     };

@@ -15,19 +15,13 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SubmenuDirective } from '../../../../../shared/directives/submenu/submenu.directive';
 
 import { GlobalModalService } from '../../../../../shared/services/layout/global-modal/global-modal.service';
-import { ResourcesStateService } from '../services/utils/resources-state.service';
 import { AiJobsService } from '../services/api/ai-jobs.service';
+import {
+  ResourcesStateService,
+  type SourceItem,
+} from '../services/utils/resources-state.service';
 
 import { UploadResourcesModalComponent } from './upload-resources-modal/upload-resources-modal.component';
-
-interface SourceItem {
-  id: string;
-  name: string;
-  checked: boolean;
-  isUploading?: boolean;
-  type: 'pdf' | 'txt';
-  file?: File;
-}
 
 @Component({
   selector: 'generate-lesson-upload',
@@ -131,14 +125,13 @@ export class GenerateLessonUploadComponent implements OnInit {
     if (this.currentCount() >= this.maxCount) return;
 
     const handleUploadedFile = (file: File) => {
-      const isAllChecked = this.selectAll();
       const fileExt = file.name.split('.').pop()?.toLowerCase() ?? 'txt';
       const fileType = fileExt === 'pdf' ? 'pdf' : 'txt';
 
       const newItem: SourceItem = {
         id: Date.now().toString(),
         name: file.name,
-        checked: isAllChecked,
+        checked: true,
         type: fileType,
         isUploading: true,
         file,
@@ -147,6 +140,12 @@ export class GenerateLessonUploadComponent implements OnInit {
       this.resourcesStateService.updateSourceList(list => [...list, newItem]);
 
       this.markFileAsUploadedAfterDelay(newItem.id);
+
+      const allChecked = this.sourceList()
+        .filter(i => !i.isUploading)
+        .every(i => i.checked);
+
+      this.selectAll.set(allChecked);
     };
 
     this.modalService.open(UploadResourcesModalComponent, {

@@ -54,6 +54,7 @@ export class GenerateSettingsModalComponent implements OnInit {
       value: 'vi-VN',
     },
   ]);
+
   voiceOptions = signal<VoiceOption[]>([
     {
       name: 'Nữ trầm',
@@ -90,7 +91,7 @@ export class GenerateSettingsModalComponent implements OnInit {
   constructor() {
     this.form = this.fb.group({
       speed: this.speed() ?? '1',
-      voice: this.voice(),
+      voice: this.voice() ?? 'vi-VN-Chirp3-HD-Enceladus',
       language: this.language() ?? 'vi-VN',
       folderId: this.folderId(),
     });
@@ -120,8 +121,4 @@ export class GenerateSettingsModalComponent implements OnInit {
   closeModal() {
     this.globalModalService.close();
   }
-
-  compareFolders = (folder1: any, folder2: any) => {
-    return folder1 && folder2 && folder1.id === folder2.id;
-  };
 }
