@@ -11,8 +11,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { switchMap, tap, catchError } from 'rxjs';
-import { throwError } from 'rxjs';
+import { switchMap } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
