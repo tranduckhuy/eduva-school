@@ -22,20 +22,20 @@ import { LessonMaterialsService } from '../../../../shared/services/api/lesson-m
 
 import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
 import { EntityStatus } from '../../../../shared/models/enum/entity-status.enum';
-import { FolderOwnerType } from '../../../../shared/models/enum/folder-owner-type.enum';
 import { ContentType } from '../../../../shared/models/enum/lesson-material.enum';
+import { FolderOwnerType } from '../../../../shared/models/enum/folder-owner-type.enum';
 
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
 import { TableSkeletonComponent } from '../../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 import { TableEmptyStateComponent } from '../../../../shared/components/table-empty-state/table-empty-state.component';
+import { ChoosePersonalFolderModalComponent } from './choose-personal-folder-modal/choose-personal-folder-modal.component';
 
 import { type Folder } from '../../../../shared/models/entities/folder.model';
 import { type LessonMaterial } from '../../../../shared/models/entities/lesson-material.model';
 import { type GetFoldersRequest } from '../../../../shared/models/api/request/query/get-folders-request.model';
 import { type GetPersonalLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
 import { type DeleteMaterialRequest } from '../../../../shared/models/api/request/command/delete-material-request.model';
-import { ChoosePersonalFolderModalComponent } from './choose-personal-folder-modal/choose-personal-folder-modal.component';
 
 type TrashItem =
   | { type: 'folder'; data: Folder }
@@ -50,11 +50,11 @@ type TrashItem =
     ButtonModule,
     TooltipModule,
     TableModule,
+    BytesToReadablePipe,
     SearchInputComponent,
     ButtonComponent,
     TableSkeletonComponent,
     TableEmptyStateComponent,
-    BytesToReadablePipe,
   ],
   templateUrl: './trash-bin.component.html',
   styleUrl: './trash-bin.component.css',
@@ -67,7 +67,6 @@ export class TrashBinComponent {
   private readonly lessonMaterialService = inject(LessonMaterialsService);
 
   isLoading = input<boolean>(false);
-  shouldStopRequest = signal<boolean>(false);
 
   trashItems = signal<TrashItem[]>([]);
   totalRecords = signal<number>(0);
@@ -76,6 +75,7 @@ export class TrashBinComponent {
   pageSize = signal(PAGE_SIZE);
   firstRecordIndex = signal(0);
   searchValue = signal('');
+  shouldStopRequest = signal<boolean>(false);
 
   tableHeadSkeleton = signal([
     'Tên thư mục/tài liệu',
@@ -217,7 +217,7 @@ export class TrashBinComponent {
       pageSize,
       sortBy: 'lastModifiedAt',
       searchTerm: this.searchValue(),
-      isPaging: true,
+      isPagingEnabled: true,
     };
 
     const materialRequest: GetPersonalLessonMaterialsRequest = {

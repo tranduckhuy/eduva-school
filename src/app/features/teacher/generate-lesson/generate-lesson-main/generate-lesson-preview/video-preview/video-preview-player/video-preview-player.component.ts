@@ -10,6 +10,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { switchMap } from 'rxjs';
+
 import { VgApiService, VgCoreModule } from '@videogular/ngx-videogular/core';
 import { VgControlsModule } from '@videogular/ngx-videogular/controls';
 import { VgOverlayPlayModule } from '@videogular/ngx-videogular/overlay-play';
@@ -23,6 +25,9 @@ import { GenerateSettingsSelectionService } from '../../services/generate-settin
 import { LoadingService } from '../../../../../../../shared/services/core/loading/loading.service';
 import { LessonMaterialsService } from '../../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
 import { AiJobsService } from '../../../services/api/ai-jobs.service';
+import { DownloadGeneratedContentService } from '../../services/download-generated-content.service';
+
+import { LessonGenerationType } from '../../../../../../../shared/models/enum/lesson-generation-type.enum';
 
 import { VideoSettingsMenuComponent } from '../video-settings-menu/video-settings-menu.component';
 
@@ -30,7 +35,6 @@ import {
   type CreateLessonMaterialRequest,
   type CreateLessonMaterialsRequest,
 } from '../../../../../../../shared/models/api/request/command/create-lesson-material-request.model';
-import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'video-preview-player',
@@ -63,12 +67,19 @@ export class VideoPreviewPlayerComponent {
   private readonly loadingService = inject(LoadingService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
   private readonly aiJobService = inject(AiJobsService);
+  private readonly downloadGeneratedContentService = inject(
+    DownloadGeneratedContentService
+  );
 
   videoUrl = input<string>('');
 
-  isLoadingCreateMaterial = this.loadingService.isLoading;
-  hasGeneratedSuccessfully = this.resourceStateService.hasGeneratedSuccessfully;
+  isLoadingCreateMaterial = this.loadingService.is('create-lesson-materials');
+  isLoadingDownload = this.loadingService.is('download-generated-content');
+
   folderId = this.generateSettingsService.selectedFolderId;
+
+  generatedMetadataMap = this.resourceStateService.aiGeneratedMetadataMap;
+  hasGeneratedSuccessfully = this.resourceStateService.hasGeneratedSuccessfully;
 
   private hideControlsTimeout!: ReturnType<typeof setTimeout>;
 
@@ -280,19 +291,20 @@ export class VideoPreviewPlayerComponent {
 
   onSaveGeneratedContent() {
     const folderId = this.folderId();
-    const metadata = this.resourceStateService.aiGeneratedMetadata();
+    const metadata = this.generatedMetadataMap();
 
     if (!folderId || !metadata) return;
 
     this.aiJobService
-      .getFileSizeByBlobNameUrl(metadata.blobName)
+      .getFileSizeByBlobNameUrl(metadata[LessonGenerationType.Video].blobName)
       .pipe(
         switchMap(fileSize => {
-          const cleanBlobName = metadata.blobName.split('?')[0];
+          const cleanBlobName =
+            metadata[LessonGenerationType.Video].blobName.split('?')[0];
           const material: CreateLessonMaterialRequest = {
-            title: metadata.title,
-            contentType: metadata.contentType,
-            duration: metadata.duration,
+            title: metadata[LessonGenerationType.Video].title,
+            contentType: metadata[LessonGenerationType.Video].contentType,
+            duration: metadata[LessonGenerationType.Video].duration,
             fileSize: fileSize,
             isAIContent: true,
             sourceUrl: cleanBlobName,
@@ -309,11 +321,7 @@ export class VideoPreviewPlayerComponent {
           );
         })
       )
-      .subscribe({
-        next: () => {
-          this.resourceStateService.clearAiGeneratedMetadata();
-        },
-      });
+      .subscribe();
   }
 
   private getVideoElement(): HTMLVideoElement {
@@ -340,5 +348,15 @@ export class VideoPreviewPlayerComponent {
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
     onMouseMove(event);
+  }
+
+  onDownloadGeneratedContent() {
+    const metadata = this.generatedMetadataMap();
+
+    if (!metadata) return;
+
+    this.downloadGeneratedContentService
+      .downloadGeneratedContent(metadata[LessonGenerationType.Video].blobName)
+      .subscribe();
   }
 }

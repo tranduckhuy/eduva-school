@@ -10,17 +10,20 @@ import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 
 import { UserService } from '../../../shared/services/api/user/user.service';
 import { PaymentService } from '../../../shared/services/api/payment/payment.service';
+import { LoadingService } from '../../../shared/services/core/loading/loading.service';
+import { DashboardService } from '../../../shared/services/api/dashboard/dashboard.service';
+
+import { PeriodType } from '../../../shared/models/enum/period-type.enum';
 
 import { StatCardComponent } from './stat-card/stat-card.component';
 import { LessonCreationComponent } from './lesson-creation/lesson-creation.component';
 import { TopTeachersComponent } from './top-teachers/top-teachers.component';
-import { type ConfirmPaymentReturnRequest } from '../../../shared/models/api/request/query/confirm-payment-return-request.model';
-import { DashboardService } from '../../../shared/services/api/dashboard/dashboard.service';
-import { LoadingService } from '../../../shared/services/core/loading/loading.service';
 import { ReviewLessonsComponent } from './review-lessons/review-lessons.component';
 import { ContentTypeStatsComponent } from './content-type-stats/content-type-stats.component';
 import { LessonStatusStatsComponent } from './lesson-status-stats/lesson-status-stats.component';
-import { PeriodType } from '../../../shared/models/enum/period-type.enum';
+
+import { type DashboardRequest } from '../../../shared/models/api/request/command/dashboard-request.model';
+import { type ConfirmPaymentReturnRequest } from '../../../shared/models/api/request/query/confirm-payment-return-request.model';
 
 interface StatCard {
   title: string;
@@ -64,9 +67,19 @@ export class DashboardComponent implements OnInit {
   private readonly dashboardService = inject(DashboardService);
   private readonly loadingService = inject(LoadingService);
 
+  readonly currentUser = this.userService.currentUser;
+  readonly isLoadingDashboard = this.loadingService.is('dashboard');
   readonly dashboardSchoolAdminData =
     this.dashboardService.dashboardSchoolAdminData;
-  readonly isLoadingDashboard = this.loadingService.is('dashboard');
+
+  schoolMissing = computed(() => !this.currentUser()?.school);
+
+  planExpired = computed(() => {
+    const subscription = this.currentUser()?.userSubscriptionResponse;
+    const isActive = subscription?.isSubscriptionActive;
+    const endDate = subscription?.subscriptionEndDate;
+    return !isActive || (endDate && new Date(endDate) < new Date());
+  });
 
   readonly usersStatCard = computed<StatCard>(() => {
     const data = this.dashboardSchoolAdminData();
@@ -149,6 +162,23 @@ export class DashboardComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.handleRouteQueryParams();
+
+    const hasSchool = !this.schoolMissing();
+    const isPlanValid = !this.planExpired();
+    if (hasSchool && isPlanValid) {
+      this.loadData();
+    }
+  }
+
+  private loadData() {
+    const request: DashboardRequest = {
+      lessonStatusPeriod: PeriodType.Week,
+    };
+    this.dashboardService.getDashboardSchoolAdminData(request).subscribe();
+  }
+
+  private handleRouteQueryParams() {
     this.activatedRoute.queryParams.subscribe(params => {
       const { code, id, status, orderCode } = params;
       if (code && id && status && orderCode) {
@@ -165,9 +195,5 @@ export class DashboardComponent implements OnInit {
         });
       }
     });
-
-    this.dashboardService
-      .getDashboardSchoolAdminData({ lessonStatusPeriod: PeriodType.Week })
-      .subscribe();
   }
 }

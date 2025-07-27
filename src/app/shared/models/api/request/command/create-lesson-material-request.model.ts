@@ -1,4 +1,4 @@
-import { ContentType } from '../../../enum/lesson-material.enum';
+import { type ContentType } from '../../../enum/lesson-material.enum';
 
 export interface CreateLessonMaterialRequest {
   title: string;

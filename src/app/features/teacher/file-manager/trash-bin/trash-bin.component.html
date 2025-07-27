@@ -76,7 +76,12 @@
                     </div>
                   </td>
                   <td>{{ item.data.ownerName }}</td>
-                  <td>{{ item.data.lastModifiedAt | date: 'fullDate' }}</td>
+                  <td>
+                    {{
+                      item.data.lastModifiedAt
+                        | date: "dd 'thg' MM, YYYY 'lúc' HH:mm"
+                    }}
+                  </td>
                   <td class="!text-center">--</td>
                   <td
                     class="!border-l !border-l-gray-100 !text-center dark:!border-l-dark-500"
@@ -122,7 +127,12 @@
                     </div>
                   </td>
                   <td>{{ item.data.createdByName }}</td>
-                  <td>{{ item.data.lastModifiedAt | date: 'fullDate' }}</td>
+                  <td>
+                    {{
+                      item.data.lastModifiedAt
+                        | date: "dd 'thg' MM, YYYY 'lúc' HH:mm"
+                    }}
+                  </td>
                   <td class="!text-center">
                     {{ item.data.fileSize | bytesToReadable: 'MB' : 2 }}
                   </td>

@@ -1,4 +1,4 @@
-import { LessonMaterialVisibility } from '../../../enum/lesson-material.enum';
+import { type LessonMaterialVisibility } from '../../../enum/lesson-material.enum';
 
 export interface UpdateLessonMaterialRequest {
   id: string;

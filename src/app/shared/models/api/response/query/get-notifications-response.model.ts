@@ -1,4 +1,4 @@
-import { NotificationModel } from '../../../entities/notification.model';
+import { type NotificationModel } from '../../../entities/notification.model';
 
 export interface GetNotificationsResponse {
   pageIndex: number;

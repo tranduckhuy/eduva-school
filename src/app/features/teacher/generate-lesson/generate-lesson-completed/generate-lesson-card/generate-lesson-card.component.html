@@ -9,7 +9,7 @@
     {{ job().topic }}
   </h3>
   <span class="mt-auto text-xs text-gray-400 dark:text-gray-300">
-    {{ job().createdAt | date: 'HH:mm:ss, EEEE, dd MMMM, yyyy' }} ·
+    {{ job().createdAt | date: "dd 'thg' MM, YYYY 'lúc' HH:mm" }} ·
     {{ job().sourceBlobNames.length }} tài liệu
   </span>
 </a>

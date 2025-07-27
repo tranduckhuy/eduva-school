@@ -140,7 +140,7 @@ export function debounceSignal<T>(
   };
 }
 
-/*
+/**
  * Converts all <figure class="image"><img /></figure> blocks in the given HTML string
  * into <p><p-image /></p> format, preserving relevant attributes like src, alt, and width.
  * This is typically used to convert image tags into a custom component format for rendering or editing.
@@ -311,9 +311,15 @@ export function clearQueryParams(
  *   - "2 năm trước" (2 years ago)
  *   - Returns an empty string if input is falsy.
  */
-export function formatRelativeDate(dateString: string): string {
-  const now = new Date();
+export function formatRelativeDate(
+  dateString: string | null | undefined
+): string {
+  if (typeof dateString !== 'string') return '';
+
   const target = new Date(dateString);
+  if (isNaN(target.getTime())) return '';
+
+  const now = new Date();
   const diffMs = now.getTime() - target.getTime();
 
   const minutes = Math.floor(diffMs / (1000 * 60));

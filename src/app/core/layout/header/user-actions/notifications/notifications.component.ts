@@ -2,15 +2,18 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
-  computed,
   inject,
   output,
   signal,
+  computed,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
+import { finalize } from 'rxjs';
+
 import { TooltipModule } from 'primeng/tooltip';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 import { SubmenuDirective } from '../../../../../shared/directives/submenu/submenu.directive';
 import { SafeHtmlPipe } from '../../../../../shared/pipes/safe-html.pipe';
@@ -46,6 +49,7 @@ interface FormattedNotification {
   imports: [
     CommonModule,
     TooltipModule,
+    ProgressSpinnerModule,
     SubmenuDirective,
     SafeHtmlPipe,
     LeadingZeroPipe,
@@ -65,10 +69,12 @@ export class NotificationsComponent implements OnInit {
   isLoading = this.loadingService.is('get-notifications');
   notifications = this.notificationService.notifications;
   totalNotification = this.notificationService.totalNotification;
+  hasLoaded = this.notificationService.hasLoaded;
 
   currentPage = signal<number>(0);
   pageSize = signal<number>(20);
   hasMore = signal<boolean>(true);
+  isFetchMore = signal<boolean>(false);
 
   displayNotifications = computed(() =>
     this.notifications().map(n => {
@@ -86,39 +92,43 @@ export class NotificationsComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    if (this.notifications().length === 0) {
+    if (!this.hasLoaded()) {
       this.loadMore();
     }
   }
 
   onScroll(event: Event) {
     const target = event.target as HTMLElement;
-    const threshold = 100;
-    if (
-      target.scrollHeight - target.scrollTop - target.clientHeight <
-      threshold
-    ) {
+
+    const isAtBottom =
+      Math.ceil(target.scrollTop + target.clientHeight) >= target.scrollHeight;
+
+    if (isAtBottom) {
       this.loadMore();
     }
   }
 
   loadMore() {
-    if (!this.hasMore() || this.isLoading()) return;
+    if (!this.hasMore() || this.isLoading() || this.isFetchMore()) return;
+
+    this.isFetchMore.set(true);
 
     const nextPage = this.currentPage() + 1;
-
     const request: GetNotificationsRequest = {
       pageIndex: nextPage,
       pageSize: this.pageSize(),
     };
-    this.notificationService.getNotifications(request).subscribe({
-      next: res => {
-        this.currentPage.set(nextPage);
-        if (!res || res.length < this.pageSize()) {
-          this.hasMore.set(false);
-        }
-      },
-    });
+    this.notificationService
+      .getNotifications(request)
+      .pipe(finalize(() => this.isFetchMore.set(false)))
+      .subscribe({
+        next: res => {
+          this.currentPage.set(nextPage);
+          if (!res || res.length < this.pageSize()) {
+            this.hasMore.set(false);
+          }
+        },
+      });
   }
 
   markAsRead(notification: NotificationWithTypedPayload) {
@@ -173,10 +183,16 @@ export class NotificationsComponent implements OnInit {
     notification: NotificationWithTypedPayload
   ): FormattedNotification {
     const payload = notification.payload as any;
-    const { title, lessonMaterialTitle, createdByName, createdAt, deletedAt } =
-      payload;
+    const {
+      title,
+      lessonMaterialTitle,
+      createdByName,
+      createdAt,
+      deletedAt,
+      approvedAt,
+    } = payload;
 
-    const date = formatRelativeDate(createdAt ?? deletedAt);
+    const date = formatRelativeDate(createdAt ?? deletedAt ?? approvedAt);
 
     switch (notification.type) {
       case 'QuestionCreated':

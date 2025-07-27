@@ -15,6 +15,7 @@ import { type NotificationModel } from '../../../models/entities/notification.mo
 import { type NotificationPayloadMap } from '../../../../core/layout/header/user-actions/notifications/models/notification-payload-mapping.model';
 import { type GetNotificationsRequest } from '../../../models/api/request/query/get-notifications-request.model';
 import { type GetNotificationsResponse } from '../../../models/api/response/query/get-notifications-response.model';
+import { type GetNotificationSummaryResponse } from '../../../models/api/response/query/get-notification-summary-response.model';
 
 export type NotificationWithTypedPayload = {
   [K in keyof NotificationPayloadMap]: NotificationModel<
@@ -30,6 +31,8 @@ export class NotificationService {
 
   private readonly BASE_API_URL = environment.baseApiUrl;
   private readonly BASE_NOTIFICATION_API_URL = `${this.BASE_API_URL}/notifications`;
+  private readonly GET_NOTIFICATION_SUMMARY_API_URL = `${this.BASE_NOTIFICATION_API_URL}/summary`;
+  private readonly MARK_ALL_NOTIFICATION_AS_READ_API_URL = `${this.BASE_NOTIFICATION_API_URL}/read-all`;
 
   private readonly notificationsSignal = signal<NotificationModel[]>([]);
   notifications = computed<NotificationWithTypedPayload[]>(
@@ -38,6 +41,12 @@ export class NotificationService {
 
   private readonly totalNotificationSignal = signal<number>(0);
   totalNotification = this.totalNotificationSignal.asReadonly();
+
+  private readonly unreadCountSignal = signal<number>(0);
+  unreadCount = this.unreadCountSignal.asReadonly();
+
+  private readonly hasLoadedSignal = signal(false);
+  hasLoaded = this.hasLoadedSignal.asReadonly();
 
   getNotifications(
     request: GetNotificationsRequest
@@ -53,10 +62,23 @@ export class NotificationService {
       );
   }
 
+  getNotificationSummary(): Observable<number> {
+    return this.requestService
+      .get<GetNotificationSummaryResponse>(
+        this.GET_NOTIFICATION_SUMMARY_API_URL
+      )
+      .pipe(
+        tap(res => this.handleNotificationSummaryResponse(res)),
+        map(res => this.extractNotificationSummaryResponse(res)),
+        catchError((err: HttpErrorResponse) => throwError(() => err))
+      );
+  }
+
   markNotificationAsRead(notificationId: string): Observable<void> {
     return this.requestService
       .put(`${this.BASE_NOTIFICATION_API_URL}/${notificationId}/read`)
       .pipe(
+        tap(() => this.getNotificationSummary().subscribe()),
         map(() => void 0),
         catchError((err: HttpErrorResponse) => throwError(() => err))
       );
@@ -64,8 +86,9 @@ export class NotificationService {
 
   markAllNotificationAsRead(): Observable<void> {
     return this.requestService
-      .put(`${this.BASE_NOTIFICATION_API_URL}/read-all`)
+      .put(this.MARK_ALL_NOTIFICATION_AS_READ_API_URL)
       .pipe(
+        tap(() => this.getNotificationSummary().subscribe()),
         map(() => void 0),
         catchError((err: HttpErrorResponse) => throwError(() => err))
       );
@@ -73,7 +96,11 @@ export class NotificationService {
 
   addNotification<T>(notification: NotificationModel<T>): void {
     const current = this.notificationsSignal();
+    const currentTotal = this.totalNotificationSignal();
+    const currentUnreadCount = this.unreadCountSignal();
     this.notificationsSignal.set([notification, ...current]);
+    this.totalNotificationSignal.set(currentTotal + 1);
+    this.unreadCountSignal.set(currentUnreadCount + 1);
   }
 
   optimisticMarkAsRead(notificationId: string) {
@@ -115,14 +142,19 @@ export class NotificationService {
         }
       });
 
-      this.notificationsSignal.set([
-        ...this.notificationsSignal(),
-        ...typedList,
-      ]);
+      this.notificationsSignal.update(old => [...old, ...typedList]);
       this.totalNotificationSignal.set(res.data.count);
+      this.hasLoadedSignal.set(true);
     } else {
       this.notificationsSignal.set([]);
       this.totalNotificationSignal.set(0);
+      this.hasLoadedSignal.set(true);
+    }
+  }
+
+  private handleNotificationSummaryResponse(res: any) {
+    if (res.statusCode === StatusCode.SUCCESS && res.data) {
+      this.unreadCountSignal.set(res.data.unreadCount);
     }
   }
 
@@ -131,5 +163,12 @@ export class NotificationService {
       return res.data.data as NotificationModel[];
     }
     return null;
+  }
+
+  private extractNotificationSummaryResponse(res: any): number {
+    if (res.statusCode === StatusCode.SUCCESS && res.data) {
+      return res.data.unreadCount;
+    }
+    return 0;
   }
 }

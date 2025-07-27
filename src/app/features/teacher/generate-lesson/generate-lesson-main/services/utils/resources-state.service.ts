@@ -9,7 +9,7 @@ export type SourceItem = {
   name: string;
   checked: boolean;
   isUploading?: boolean;
-  type: 'pdf' | 'txt';
+  type: 'pdf' | 'docx';
   file?: File;
 };
 
@@ -48,9 +48,12 @@ export class ResourcesStateService {
   );
   readonly generatedType = this.generatedTypeSignal.asReadonly();
 
-  private readonly aiGeneratedMetadataSignal =
-    signal<AiGeneratedMetadata | null>(null);
-  readonly aiGeneratedMetadata = this.aiGeneratedMetadataSignal.asReadonly();
+  private readonly aiGeneratedMetadataMapSignal = signal<Record<
+    LessonGenerationType,
+    AiGeneratedMetadata
+  > | null>(null);
+  readonly aiGeneratedMetadataMap =
+    this.aiGeneratedMetadataMapSignal.asReadonly();
 
   // ? Computed
   readonly checkedFiles = computed(() =>
@@ -98,12 +101,19 @@ export class ResourcesStateService {
     this.generatedTypeSignal.set(type);
   }
 
-  setAiGeneratedMetadata(data: AiGeneratedMetadata) {
-    this.aiGeneratedMetadataSignal.set(data);
+  setAiGeneratedMetadata(
+    type: LessonGenerationType,
+    metadata: AiGeneratedMetadata
+  ) {
+    const current = this.aiGeneratedMetadataMapSignal() ?? {};
+    this.aiGeneratedMetadataMapSignal.set({
+      ...current,
+      [type]: metadata,
+    } as Record<LessonGenerationType, AiGeneratedMetadata>);
   }
 
   clearAiGeneratedMetadata() {
-    this.aiGeneratedMetadataSignal.set(null);
+    this.aiGeneratedMetadataMapSignal.set(null);
   }
 
   resetAll(): void {
@@ -113,6 +123,6 @@ export class ResourcesStateService {
     this.hasPreviewContentSignal.set(false);
     this.hasGeneratedSuccessfullySignal.set(false);
     this.generatedTypeSignal.set(null);
-    this.aiGeneratedMetadataSignal.set(null);
+    this.aiGeneratedMetadataMapSignal.set(null);
   }
 }

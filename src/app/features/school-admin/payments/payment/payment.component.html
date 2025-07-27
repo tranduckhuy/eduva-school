@@ -118,9 +118,9 @@
               {{
                 isCreditPack()
                   ? (creditTransactionDetail()?.createdAt
-                    | date: 'HH:mm:ss, EEEE, dd MMMM, yyyy')
+                    | date: "dd 'thg' MM, YYYY 'lúc' HH:mm")
                   : (schoolSubscriptionDetail()?.startDate
-                    | date: 'HH:mm:ss, EEEE, dd MMMM, yyyy')
+                    | date: "dd 'thg' MM, YYYY 'lúc' HH:mm")
               }}
             </p>
           </div>
@@ -133,9 +133,9 @@
                 {{
                   isCreditPack()
                     ? (creditTransactionDetail()?.createdAt
-                      | date: 'HH:mm:ss, EEEE, dd MMMM, yyyy')
+                      | date: "dd 'thg' MM, YYYY 'lúc' HH:mm")
                     : (schoolSubscriptionDetail()?.endDate
-                      | date: 'HH:mm:ss, EEEE, dd MMMM, yyyy')
+                      | date: "dd 'thg' MM, YYYY 'lúc' HH:mm")
                 }}
               </p>
             </div>

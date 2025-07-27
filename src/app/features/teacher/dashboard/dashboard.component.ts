@@ -1,18 +1,19 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
-  inject,
   OnInit,
-  signal,
+  inject,
+  computed,
 } from '@angular/core';
+
+import { UserService } from '../../../shared/services/api/user/user.service';
+import { LoadingService } from '../../../shared/services/core/loading/loading.service';
+import { DashboardService } from '../../../shared/services/api/dashboard/dashboard.service';
+
+import { UserRoles } from '../../../shared/constants/user-roles.constant';
 
 import { StatCardComponent } from './stat-card/stat-card.component';
 import { LessonCreationComponent } from './lesson-creation/lesson-creation.component';
-import { UserService } from '../../../shared/services/api/user/user.service';
-import { DashboardService } from '../../../shared/services/api/dashboard/dashboard.service';
-import { LoadingService } from '../../../shared/services/core/loading/loading.service';
-import { UserRoles } from '../../../shared/constants/user-roles.constant';
 import { ContentTypeStatsComponent } from './content-type-stats/content-type-stats.component';
 import { ReviewLessonsComponent } from './review-lessons/review-lessons.component';
 import { RecentLessonsComponent } from './recent-lessons/recent-lessons.component';
@@ -54,14 +55,23 @@ interface SubItem {
 })
 export class DashboardComponent implements OnInit {
   private readonly userService = inject(UserService);
-  private readonly dashboardService = inject(DashboardService);
   private readonly loadingService = inject(LoadingService);
+  private readonly dashboardService = inject(DashboardService);
 
-  readonly dashboardData = this.dashboardService.dashboardTeacherData;
   readonly currentUser = this.userService.currentUser;
   readonly isLoadingDashboard = this.loadingService.is('dashboard');
+  readonly dashboardData = this.dashboardService.dashboardTeacherData;
 
   isTeacher = this.currentUser()?.roles?.includes(UserRoles.TEACHER);
+
+  schoolMissing = computed(() => !this.currentUser()?.school);
+
+  planExpired = computed(() => {
+    const subscription = this.currentUser()?.userSubscriptionResponse;
+    const isActive = subscription?.isSubscriptionActive;
+    const endDate = subscription?.subscriptionEndDate;
+    return !isActive || (endDate && new Date(endDate) < new Date());
+  });
 
   studentsStatCard = computed<StatCard>(() => {
     const data = this.dashboardData();
@@ -73,6 +83,7 @@ export class DashboardComponent implements OnInit {
       iconColor: 'text-primary',
     };
   });
+
   classesStatCard = computed<StatCard>(() => {
     const data = this.dashboardData();
     return {
@@ -83,6 +94,7 @@ export class DashboardComponent implements OnInit {
       iconColor: 'text-primary',
     };
   });
+
   lessonsStatCard = computed<StatCard>(() => {
     const data = this.dashboardData();
     return {
@@ -103,6 +115,7 @@ export class DashboardComponent implements OnInit {
       ],
     };
   });
+
   storageStatCard = computed<StatCard>(() => {
     const data = this.dashboardData();
     return {
@@ -114,6 +127,7 @@ export class DashboardComponent implements OnInit {
       iconColor: 'text-danger',
     };
   });
+
   remainCreditPointsStatCard = computed<StatCard>(() => {
     const data = this.dashboardData();
     return {
@@ -125,14 +139,7 @@ export class DashboardComponent implements OnInit {
       iconColor: 'text-warning',
     };
   });
-  pricingPlanRevenueStatCard = signal<StatCard>({
-    title: 'Credit',
-    description: 'Doanh thu credit theo tháng',
-    value: 20000000,
-    icon: 'paid',
-    isRevenue: true,
-    iconColor: 'text-warning',
-  });
+
   pendingLessonStatCard = computed<StatCard>(() => {
     const data = this.dashboardData();
     return {
@@ -147,6 +154,7 @@ export class DashboardComponent implements OnInit {
       iconColor: 'text-warning',
     };
   });
+
   unAnswerQuestionStatCard = computed<StatCard>(() => {
     const data = this.dashboardData();
     return {
@@ -159,6 +167,11 @@ export class DashboardComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.dashboardService.getTeacherDashboardData({}).subscribe();
+    const hasSchool = !this.schoolMissing();
+    const isPlanValid = !this.planExpired();
+
+    if (hasSchool && isPlanValid) {
+      this.dashboardService.getTeacherDashboardData().subscribe();
+    }
   }
 }

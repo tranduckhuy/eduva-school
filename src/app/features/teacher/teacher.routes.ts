@@ -59,7 +59,9 @@ export const teacherRoutes: Routes = [
       {
         path: 'view-lesson/:materialId',
         data: {
-          title: 'Chi tiết bài học',
+          title: 'Chi tiết bài giảng',
+          heading: 'Chi tiết bài giảng',
+          breadcrumb: 'Chi tiết bài giảng',
         },
         loadComponent: () =>
           import(
@@ -69,12 +71,26 @@ export const teacherRoutes: Routes = [
       {
         path: 'shared-lessons',
         data: {
-          title: 'Bài học chia sẻ trong trường',
+          title: 'Bài giảng chia sẻ trong trường',
+          heading: 'Bài giảng chia sẻ trong trường',
+          breadcrumb: 'Bài giảng chia sẻ trong trường',
         },
         loadComponent: () =>
           import(
             '../../shared/pages/shared-lessons/shared-lessons.component'
           ).then(mod => mod.SharedLessonsComponent),
+      },
+      {
+        path: 'ai-usage-logs',
+        data: {
+          title: 'Lịch sử sử dụng AI',
+          heading: 'Lịch sử sử dụng AI',
+          breadcrumb: 'Lịch sử sử dụng AI',
+        },
+        loadComponent: () =>
+          import('./ai-usage-logs/ai-usage-logs.component').then(
+            mod => mod.AiUsageLogsComponent
+          ),
       },
       {
         path: 'settings',

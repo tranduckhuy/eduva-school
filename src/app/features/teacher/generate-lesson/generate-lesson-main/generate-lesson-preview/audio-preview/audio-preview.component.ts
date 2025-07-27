@@ -18,6 +18,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ResourcesStateService } from '../../services/utils/resources-state.service';
 import { GenerateSettingsSelectionService } from '../services/generate-settings-selection.service';
 import { ToastHandlingService } from '../../../../../../shared/services/core/toast/toast-handling.service';
+import { UserService } from '../../../../../../shared/services/api/user/user.service';
 import { AiJobsService } from '../../services/api/ai-jobs.service';
 import { AiSocketService } from '../../services/api/ai-socket.service';
 import { LessonMaterialsService } from '../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
@@ -54,6 +55,7 @@ export class AudioPreviewComponent implements OnInit {
   );
   private readonly toastHandlingService = inject(ToastHandlingService);
   private readonly confirmationService = inject(ConfirmationService);
+  private readonly userService = inject(UserService);
   private readonly aiJobService = inject(AiJobsService);
   private readonly aiSocketService = inject(AiSocketService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
@@ -65,10 +67,13 @@ export class AudioPreviewComponent implements OnInit {
   jobUpdateProgress = this.aiSocketService.jobUpdateProgress;
 
   isLoading = this.resourcesStateService.isLoading;
-  totalCheckedSources = this.resourcesStateService.totalCheckedSources;
   hasInteracted = this.resourcesStateService.hasInteracted;
+  totalCheckedSources = this.resourcesStateService.totalCheckedSources;
+  aiGeneratedMetadataMap = this.resourcesStateService.aiGeneratedMetadataMap;
   hasGeneratedSuccessfully =
     this.resourcesStateService.hasGeneratedSuccessfully;
+  hasPreviewContentSuccessfully =
+    this.resourcesStateService.hasPreviewContentSuccessfully;
 
   speedRate = this.generateSettingsService.selectedRate;
   voice = this.generateSettingsService.selectedVoice;
@@ -78,6 +83,7 @@ export class AudioPreviewComponent implements OnInit {
   audioUrl = signal<string>('');
   audioState = signal<'empty' | 'loading' | 'generated'>('empty');
 
+  hasFetchedProfileOnce = signal<boolean>(false);
   currentGeneratedType = signal<LessonGenerationType | null>(null);
 
   readonly disableGenerate = computed(() => {
@@ -89,9 +95,7 @@ export class AudioPreviewComponent implements OnInit {
       uploading ||
       this.isLoading() ||
       this.hasGeneratedSuccessfully() ||
-      !this.speedRate() ||
-      !this.voice() ||
-      !this.language() ||
+      !this.hasPreviewContentSuccessfully() ||
       (this.totalCheckedSources() === 0 && !this.hasInteracted())
     );
   });
@@ -99,6 +103,7 @@ export class AudioPreviewComponent implements OnInit {
   constructor() {
     effect(
       () => {
+        const hasFetchProfile = this.hasFetchedProfileOnce();
         const generationType = this.generationType();
         const payload = this.jobUpdateProgress();
         const jobStatus = payload?.status;
@@ -106,20 +111,27 @@ export class AudioPreviewComponent implements OnInit {
 
         if (
           payload &&
-          jobStatus === JobStatus.Completed &&
           !failureReason &&
+          !hasFetchProfile &&
+          jobStatus === JobStatus.Completed &&
           generationType === LessonGenerationType.Audio
         ) {
           this.audioUrl.set(payload.audioOutputBlobNameUrl);
           this.audioState.set('generated');
 
-          this.resourcesStateService.setAiGeneratedMetadata({
-            title: this.generateAutoTitle(),
-            contentType: ContentType.Audio,
-            duration: Math.round(payload.actualDurationSeconds) ?? 0,
-            fileSize: 1,
-            blobName: payload.audioOutputBlobNameUrl,
-          });
+          this.userService.getCurrentProfile().subscribe();
+          this.hasFetchedProfileOnce.set(true);
+
+          this.resourcesStateService.setAiGeneratedMetadata(
+            LessonGenerationType.Audio,
+            {
+              title: this.generateAutoTitle(),
+              contentType: ContentType.Audio,
+              duration: Math.round(payload.actualDurationSeconds) ?? 0,
+              fileSize: 1,
+              blobName: payload.audioOutputBlobNameUrl,
+            }
+          );
         }
       },
       { allowSignalWrites: true }
@@ -135,28 +147,38 @@ export class AudioPreviewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const audioBlob = this.job()?.audioOutputBlobName;
+    this.resetAll();
 
-    if (!audioBlob) return;
+    const job = this.job();
+    if (!job) return;
 
     this.audioState.set('generated');
-    this.audioUrl.set(audioBlob);
-
+    this.audioUrl.set(job.audioOutputBlobName);
     this.resourcesStateService.markGeneratedSuccess();
+    this.resourcesStateService.setAiGeneratedMetadata(
+      LessonGenerationType.Audio,
+      {
+        title: job.topic,
+        contentType: ContentType.Audio,
+        duration: 0,
+        fileSize: 1,
+        blobName: job.audioOutputBlobName,
+      }
+    );
   }
 
   // ? Confirm Generate
   confirmGenerateAudio() {
     this.handleConfirmGenerate(LessonGenerationType.Audio, () => {
-      this.handleSaveAudio(() =>
+      this.handleSaveGeneratedContent(() =>
         this.confirmGenerationRequest(LessonGenerationType.Audio)
       );
     });
   }
 
-  private handleSaveAudio(onSuccess: () => void) {
+  private handleSaveGeneratedContent(onSuccess: () => void) {
     const folderId = this.folderId();
-    const metadata = this.resourcesStateService.aiGeneratedMetadata();
+    const metadata = this.aiGeneratedMetadataMap();
 
     if (!folderId || !metadata) return;
 
@@ -167,14 +189,15 @@ export class AudioPreviewComponent implements OnInit {
     );
 
     this.aiJobService
-      .getFileSizeByBlobNameUrl(metadata.blobName)
+      .getFileSizeByBlobNameUrl(metadata[LessonGenerationType.Video].blobName)
       .pipe(
         switchMap(fileSize => {
-          const cleanBlobName = metadata.blobName.split('?')[0];
+          const cleanBlobName =
+            metadata[LessonGenerationType.Video].blobName.split('?')[0];
           const material: CreateLessonMaterialRequest = {
-            title: metadata.title,
-            contentType: metadata.contentType,
-            duration: metadata.duration,
+            title: metadata[LessonGenerationType.Video].title,
+            contentType: metadata[LessonGenerationType.Video].contentType,
+            duration: metadata[LessonGenerationType.Video].duration,
             fileSize: fileSize,
             isAIContent: true,
             sourceUrl: cleanBlobName,
@@ -219,7 +242,7 @@ export class AudioPreviewComponent implements OnInit {
 
     if (currentGenerated === type) return;
 
-    if (currentGenerated && currentGenerated !== type) {
+    if (currentGenerated !== null && currentGenerated !== type) {
       this.confirmOverwrite(
         () => {
           saveBeforeContinue();
@@ -243,7 +266,7 @@ export class AudioPreviewComponent implements OnInit {
       type,
       voiceConfig: {
         language_code: this.language() ?? 'vi-VN',
-        name: this.voice() ?? 'vi-VN-Chirp3-HD-Despina',
+        name: this.voice() ?? 'vi-VN-Chirp3-HD-Enceladus',
         speaking_rate: this.speedRate() ?? 1,
       },
     };
@@ -285,5 +308,11 @@ export class AudioPreviewComponent implements OnInit {
       accept: onAccept,
       reject: onReject,
     });
+  }
+
+  private resetAll() {
+    this.audioUrl.set('');
+    this.audioState.set('empty');
+    this.hasFetchedProfileOnce.set(false);
   }
 }

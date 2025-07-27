@@ -5,7 +5,7 @@ import { Router, CanMatchFn } from '@angular/router';
 import { UserService } from '../../shared/services/api/user/user.service';
 
 import {
-  UserRole,
+  type UserRoleType,
   UserRoles,
 } from '../../shared/constants/user-roles.constant';
 
@@ -13,7 +13,7 @@ export const roleGuard: CanMatchFn = route => {
   const userService = inject(UserService);
   const router = inject(Router);
 
-  const expectedRoles = route.data?.['roles'] as UserRole[] | undefined;
+  const expectedRoles = route.data?.['roles'] as UserRoleType[] | undefined;
   const user = userService.currentUser();
 
   const isLoggedIn =

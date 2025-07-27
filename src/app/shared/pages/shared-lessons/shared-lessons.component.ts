@@ -71,6 +71,7 @@ export class SharedLessonsComponent {
   pageSize = signal(PAGE_SIZE);
   firstRecordIndex = signal(0);
   searchTerm = signal('');
+  shouldStopRequest = signal<boolean>(true);
 
   tableHeadSkeleton = signal([
     'Tài liệu bài học',
@@ -99,6 +100,8 @@ export class SharedLessonsComponent {
     this.currentPage.set(page);
     this.pageSize.set(rows);
     this.firstRecordIndex.set(first);
+
+    this.loadMaterials();
   }
 
   onSearch(term?: string): void {
@@ -164,12 +167,16 @@ export class SharedLessonsComponent {
   }
 
   private loadMaterials(): void {
+    if (this.shouldStopRequest()) return;
+
     const request: GetSharedLessonMaterialsRequest = {
       searchTerm: this.searchTerm(),
       pageIndex: this.currentPage(),
       pageSize: this.pageSize(),
     };
 
-    this.lessonMaterialsService.getSharedLessonMaterials(request).subscribe();
+    this.lessonMaterialsService.getSharedLessonMaterials(request).subscribe({
+      error: () => this.shouldStopRequest.set(true),
+    });
   }
 }

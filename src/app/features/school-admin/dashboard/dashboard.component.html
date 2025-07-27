@@ -40,7 +40,7 @@
         <span class="text-base font-semibold dark:text-gray-100">
           {{
             dashboardSchoolAdminData()?.systemOverview?.currentSubscription
-              ?.startDate | date: 'dd/MM/yyyy'
+              ?.startDate | date: "dd 'thg' MM, YYYY 'lúc' HH:mm"
           }}
         </span>
       </p>
@@ -50,7 +50,7 @@
         <span class="text-base font-semibold dark:text-gray-100">
           {{
             dashboardSchoolAdminData()?.systemOverview?.currentSubscription
-              ?.endDate | date: 'dd/MM/yyyy'
+              ?.endDate | date: "dd 'thg' MM, YYYY 'lúc' HH:mm"
           }}
         </span>
       </p>

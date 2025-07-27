@@ -65,7 +65,7 @@ export class ChoosePersonalFolderModalComponent implements OnInit {
     const request: GetFoldersRequest = {
       ownerType: FolderOwnerType.Personal,
       sortBy: 'createdAt',
-      isPaging: false,
+      isPagingEnabled: false,
     };
     this.folderService.getPersonalFolders(request).subscribe();
   }

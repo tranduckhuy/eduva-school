@@ -109,10 +109,11 @@ describe('UserService', () => {
         throwError(() => new Error('Network error'))
       );
       await new Promise<void>(resolve => {
-        service.getCurrentProfile().subscribe(result => {
-          expect(result).toBeNull();
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
+        service.getCurrentProfile().subscribe({
+          error: () => {
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            resolve();
+          },
         });
       });
     });
@@ -150,10 +151,11 @@ describe('UserService', () => {
         throwError(() => new Error('Network error'))
       );
       await new Promise<void>(resolve => {
-        service.updateUserProfile(mockUpdateRequest).subscribe(result => {
-          expect(result).toBeNull();
-          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-          resolve();
+        service.updateUserProfile(mockUpdateRequest).subscribe({
+          error: () => {
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            resolve();
+          },
         });
       });
     });

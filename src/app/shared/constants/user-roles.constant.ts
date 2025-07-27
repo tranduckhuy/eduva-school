@@ -6,4 +6,4 @@ export const UserRoles = {
   STUDENT: 'Student',
 } as const;
 
-export type UserRole = (typeof UserRoles)[keyof typeof UserRoles];
+export type UserRoleType = (typeof UserRoles)[keyof typeof UserRoles];

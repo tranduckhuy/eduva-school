@@ -1,28 +1,6 @@
 <div
   class="rounded border border-gray-100 bg-white p-5 shadow-main dark:border-dark-500 dark:bg-dark-200">
-  <div class="mb-5 flex flex-wrap items-center justify-between gap-5">
-    <div class="flex items-center gap-4">
-      <app-button
-        (clicked)="getAllPayments()"
-        [variant]="'outline'"
-        [class]="
-          paymentPurpose() === undefined ? '!bg-primary !text-white' : ''
-        ">
-        Tất cả
-      </app-button>
-      <app-button
-        (clicked)="getCreditPayments()"
-        [variant]="'outline'"
-        [class]="paymentPurpose() === 0 ? '!bg-primary !text-white' : ''">
-        Gói credit
-      </app-button>
-      <app-button
-        (clicked)="getSubscriptionPlansPayments()"
-        [variant]="'outline'"
-        [class]="paymentPurpose() === 1 ? '!bg-primary !text-white' : ''">
-        Gói trường
-      </app-button>
-    </div>
+  <div class="mb-5 flex flex-wrap items-center justify-start gap-5">
     <div class="flex flex-wrap gap-3 sm:flex-row sm:items-center sm:gap-4">
       <!-- Time filter -->
       <p-select
@@ -104,7 +82,9 @@
               {{ payment.paymentPurpose === 0 ? 'Gói credit' : 'Gói trường' }}
             </td>
             <td>{{ payment.paymentMethod === 0 ? 'VNPAY' : 'PayOS' }}</td>
-            <td>{{ payment.createdAt | date: 'mediumDate' }}</td>
+            <td>
+              {{ payment.createdAt | date: "dd 'thg' MM, YYYY 'lúc' HH:mm" }}
+            </td>
             <td class="!text-center">
               <div class="flex items-center justify-center gap-2">
                 <a

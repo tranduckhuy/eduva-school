@@ -1,8 +1,8 @@
 import {
-  ContentType,
-  LessonMaterialStatus,
+  type ContentType,
+  type LessonMaterialStatus,
 } from '../../../enum/lesson-material.enum';
-import { BillingCycle } from '../../request/command/create-plan-payment-link-request.model';
+import { type BillingCycle } from '../../request/command/create-plan-payment-link-request.model';
 
 interface LessonActivity {
   period: string;

@@ -72,7 +72,7 @@ export class TeachersComponent {
     { name: string; value: string | undefined } | undefined
   >(undefined);
   searchTerm = signal<string>('');
-  shouldStopRequest = signal<boolean>(true);
+  shouldStopRequest = signal<boolean>(false);
 
   tableHeadSkeleton = signal([
     'STT',
@@ -213,7 +213,7 @@ export class TeachersComponent {
   }
 
   private loadData(): void {
-    if (!this.shouldStopRequest()) return;
+    if (this.shouldStopRequest()) return;
 
     const params: UserListParams = {
       role: Role.Teacher,
@@ -227,7 +227,7 @@ export class TeachersComponent {
     };
 
     this.userService.getUsers(params).subscribe({
-      error: () => this.shouldStopRequest.set(false),
+      error: () => this.shouldStopRequest.set(true),
     });
   }
 }

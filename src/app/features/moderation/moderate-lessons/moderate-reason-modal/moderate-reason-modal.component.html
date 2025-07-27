@@ -21,6 +21,7 @@
         label="Lý do"
         placeholder="Nhập lý do..."
         [isTextarea]="true"
+        [noSpaces]="true"
         [submitted]="submitted()"
         [required]="!modalData.isApproved">
       </app-form-control>

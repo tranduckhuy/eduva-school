@@ -211,4 +211,4 @@ export const StatusCode = {
   NOTIFICATION_NOT_FOUND: 4950,
 } as const;
 
-export type StatusCodeValue = (typeof StatusCode)[keyof typeof StatusCode];
+export type StatusCodeType = (typeof StatusCode)[keyof typeof StatusCode];

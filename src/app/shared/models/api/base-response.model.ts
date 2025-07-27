@@ -1,5 +1,7 @@
+import { type StatusCodeType } from '../../constants/status-code.constant';
+
 export interface BaseResponse<T = null | undefined> {
-  statusCode: string | number;
+  statusCode: StatusCodeType;
   data?: T;
   message?: string;
 }

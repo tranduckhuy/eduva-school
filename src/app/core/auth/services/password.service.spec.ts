@@ -166,7 +166,7 @@ describe('PasswordService', () => {
     });
     it('should handle reset password error - invalid token', async () => {
       const error = new HttpErrorResponse({
-        error: { statusCode: StatusCode.INVALID_TOKEN },
+        error: { statusCode: StatusCode.UNAUTHORIZED },
       });
       (requestService.post as any).mockReturnValue(throwError(() => error));
       await new Promise<void>(resolve => {
@@ -369,7 +369,7 @@ describe('PasswordService', () => {
     });
     it('should handleResetPasswordError invalid token', () => {
       const error = new HttpErrorResponse({
-        error: { statusCode: StatusCode.INVALID_TOKEN },
+        error: { statusCode: StatusCode.UNAUTHORIZED },
       });
       try {
         (service as any).handleResetPasswordError(error);

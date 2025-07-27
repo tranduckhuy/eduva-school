@@ -67,7 +67,14 @@ export class UpdateStudentComponent {
   constructor(private readonly datePipe: DatePipe) {}
 
   formatDateVi(date: Date | string): string {
-    return this.datePipe.transform(date, 'medium', undefined, 'vi') ?? '';
+    return (
+      this.datePipe.transform(
+        date,
+        "dd 'thg' MM, YYYY 'lúc' HH:mm",
+        undefined,
+        'vi'
+      ) ?? ''
+    );
   }
 
   ngOnInit(): void {
