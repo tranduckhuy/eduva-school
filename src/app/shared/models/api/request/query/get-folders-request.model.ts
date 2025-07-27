@@ -1,5 +1,5 @@
-import { EntityStatus } from '../../../enum/entity-status.enum';
-import { FolderOwnerType } from '../../../enum/folder-owner-type.enum';
+import { type EntityStatus } from '../../../enum/entity-status.enum';
+import { type FolderOwnerType } from '../../../enum/folder-owner-type.enum';
 
 export interface GetFoldersRequest {
   classId?: string;
@@ -12,5 +12,5 @@ export interface GetFoldersRequest {
   sortBy?: string;
   sortDirection?: string;
   searchTerm?: string;
-  isPaging?: boolean;
+  isPagingEnabled?: boolean;
 }

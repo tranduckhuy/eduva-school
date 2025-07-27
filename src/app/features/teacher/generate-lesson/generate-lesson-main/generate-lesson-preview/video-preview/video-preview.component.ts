@@ -68,9 +68,12 @@ export class VideoPreviewComponent implements OnInit {
 
   isLoading = this.resourcesStateService.isLoading;
   hasInteracted = this.resourcesStateService.hasInteracted;
+  totalCheckedSources = this.resourcesStateService.totalCheckedSources;
+  aiGeneratedMetadataMap = this.resourcesStateService.aiGeneratedMetadataMap;
   hasGeneratedSuccessfully =
     this.resourcesStateService.hasGeneratedSuccessfully;
-  totalCheckedSources = this.resourcesStateService.totalCheckedSources;
+  hasPreviewContentSuccessfully =
+    this.resourcesStateService.hasPreviewContentSuccessfully;
 
   speedRate = this.generateSettingsService.selectedRate;
   voice = this.generateSettingsService.selectedVoice;
@@ -80,6 +83,7 @@ export class VideoPreviewComponent implements OnInit {
   videoUrl = signal<string>('');
   videoState = signal<'empty' | 'loading' | 'generated'>('empty');
 
+  hasFetchedProfileOnce = signal<boolean>(false);
   currentGeneratedType = signal<LessonGenerationType | null>(null);
 
   readonly disableGenerate = computed(() => {
@@ -91,9 +95,7 @@ export class VideoPreviewComponent implements OnInit {
       uploading ||
       this.isLoading() ||
       this.hasGeneratedSuccessfully() ||
-      !this.speedRate() ||
-      !this.voice() ||
-      !this.language() ||
+      !this.hasPreviewContentSuccessfully() ||
       (this.totalCheckedSources() === 0 && !this.hasInteracted())
     );
   });
@@ -101,6 +103,7 @@ export class VideoPreviewComponent implements OnInit {
   constructor() {
     effect(
       () => {
+        const hasFetchProfile = this.hasFetchedProfileOnce();
         const generationType = this.generationType();
         const payload = this.jobUpdateProgress();
         const jobStatus = payload?.status;
@@ -108,22 +111,27 @@ export class VideoPreviewComponent implements OnInit {
 
         if (
           payload &&
-          jobStatus === JobStatus.Completed &&
           !failureReason &&
+          !hasFetchProfile &&
+          jobStatus === JobStatus.Completed &&
           generationType === LessonGenerationType.Video
         ) {
           this.videoUrl.set(payload.videoOutputBlobNameUrl);
           this.videoState.set('generated');
 
           this.userService.getCurrentProfile().subscribe();
+          this.hasFetchedProfileOnce.set(true);
 
-          this.resourcesStateService.setAiGeneratedMetadata({
-            title: this.generateAutoTitle(),
-            contentType: ContentType.Video,
-            duration: Math.round(payload.actualDurationSeconds) ?? 0,
-            fileSize: 1,
-            blobName: payload.videoOutputBlobNameUrl,
-          });
+          this.resourcesStateService.setAiGeneratedMetadata(
+            LessonGenerationType.Video,
+            {
+              title: this.generateAutoTitle(),
+              contentType: ContentType.Video,
+              duration: Math.round(payload.actualDurationSeconds) ?? 0,
+              fileSize: 1,
+              blobName: payload.videoOutputBlobNameUrl,
+            }
+          );
         }
       },
       { allowSignalWrites: true }
@@ -139,28 +147,38 @@ export class VideoPreviewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const videoBlob = this.job()?.videoOutputBlobName;
+    this.resetAll();
 
-    if (!videoBlob) return;
+    const job = this.job();
+    if (!job) return;
 
     this.videoState.set('generated');
-    this.videoUrl.set(videoBlob);
-
+    this.videoUrl.set(job.videoOutputBlobName);
     this.resourcesStateService.markGeneratedSuccess();
+    this.resourcesStateService.setAiGeneratedMetadata(
+      LessonGenerationType.Video,
+      {
+        title: job.topic,
+        contentType: ContentType.Video,
+        duration: 0,
+        fileSize: 1,
+        blobName: job.videoOutputBlobName,
+      }
+    );
   }
 
   // ? Confirm Generate
   confirmGenerateVideo() {
     this.handleConfirmGenerate(LessonGenerationType.Video, () => {
-      this.handleSaveVideo(() =>
+      this.handleSaveGeneratedContent(() =>
         this.confirmGenerationRequest(LessonGenerationType.Video)
       );
     });
   }
 
-  private handleSaveVideo(onSuccess: () => void) {
+  private handleSaveGeneratedContent(onSuccess: () => void) {
     const folderId = this.folderId();
-    const metadata = this.resourcesStateService.aiGeneratedMetadata();
+    const metadata = this.aiGeneratedMetadataMap();
 
     if (!folderId || !metadata) return;
 
@@ -171,14 +189,15 @@ export class VideoPreviewComponent implements OnInit {
     );
 
     this.aiJobService
-      .getFileSizeByBlobNameUrl(metadata.blobName)
+      .getFileSizeByBlobNameUrl(metadata[LessonGenerationType.Audio].blobName)
       .pipe(
         switchMap(fileSize => {
-          const cleanBlobName = metadata.blobName.split('?')[0];
+          const cleanBlobName =
+            metadata[LessonGenerationType.Audio].blobName.split('?')[0];
           const material: CreateLessonMaterialRequest = {
-            title: metadata.title,
-            contentType: metadata.contentType,
-            duration: metadata.duration,
+            title: metadata[LessonGenerationType.Audio].title,
+            contentType: metadata[LessonGenerationType.Audio].contentType,
+            duration: metadata[LessonGenerationType.Audio].duration,
             fileSize: fileSize,
             isAIContent: true,
             sourceUrl: cleanBlobName,
@@ -224,7 +243,7 @@ export class VideoPreviewComponent implements OnInit {
     if (currentGenerated === type) return;
 
     // ? If have any type generated then popup confirmation for user decide to save content or not
-    if (currentGenerated && currentGenerated !== type) {
+    if (currentGenerated !== null && currentGenerated !== type) {
       this.confirmOverwrite(
         () => {
           saveBeforeContinue();
@@ -249,7 +268,7 @@ export class VideoPreviewComponent implements OnInit {
       type,
       voiceConfig: {
         language_code: this.language() ?? 'vi-VN',
-        name: this.voice() ?? 'vi-VN-Chirp3-HD-Despina',
+        name: this.voice() ?? 'vi-VN-Chirp3-HD-Enceladus',
         speaking_rate: this.speedRate() ?? 1,
       },
     };
@@ -296,5 +315,11 @@ export class VideoPreviewComponent implements OnInit {
       accept: onAccept,
       reject: onReject,
     });
+  }
+
+  private resetAll() {
+    this.videoUrl.set('');
+    this.videoState.set('empty');
+    this.hasFetchedProfileOnce.set(false);
   }
 }

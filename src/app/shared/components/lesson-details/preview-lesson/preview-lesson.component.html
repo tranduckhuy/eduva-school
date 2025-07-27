@@ -142,25 +142,24 @@
       size="large"
       [raised]="true"
       [rounded]="true"
-      (onClick)="visible = true" />
+      (onClick)="isCommentModalOpen = true" />
   </div>
 }
 
 @if (showCommentButton() && lessonMaterial()) {
   <p-drawer
-    header="Hỏi đáp"
     position="right"
     baseZIndex="900"
     styleClass="!w-[50vw] md:!w-[70vw] sm:!w-full"
     [closeOnEscape]="true"
-    [(visible)]="visible">
+    [(visible)]="isCommentModalOpen">
     <ng-template #headless>
       <comment-modal
-        [visible]="visible"
+        [isOpen]="isCommentModalOpen"
         [materialId]="lessonMaterial()!.id"
         [materialTitle]="lessonMaterial()!.title"
         [questionIdFromNotification]="questionIdFromNotification()"
-        (closeCommentDrawer)="visible = false" />
+        (closeCommentDrawer)="isCommentModalOpen = false" />
     </ng-template>
   </p-drawer>
 }

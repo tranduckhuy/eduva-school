@@ -50,6 +50,7 @@ export class GenerateLessonMainComponent implements OnInit, OnChanges {
   constructor() {
     this.destroyRef.onDestroy(() => {
       this.aiSocketService.disconnect();
+      this.aiSocketService.resetSignal();
       this.resourceStateService.resetAll();
     });
   }

@@ -217,7 +217,7 @@ export class TrashBinComponent {
       pageSize,
       sortBy: 'lastModifiedAt',
       searchTerm: this.searchValue(),
-      isPaging: true,
+      isPagingEnabled: true,
     };
 
     const materialRequest: GetPersonalLessonMaterialsRequest = {

@@ -50,7 +50,9 @@ export class LessonMaterialsService {
     request: CreateLessonMaterialsRequest
   ): Observable<null> {
     return this.requestService
-      .post(this.BASE_LESSON_MATERIALS_API_URL, request)
+      .post(this.BASE_LESSON_MATERIALS_API_URL, request, {
+        loadingKey: 'create-lesson-materials',
+      })
       .pipe(
         tap(res => this.handleSuccessResponse(res)),
         map(() => null),

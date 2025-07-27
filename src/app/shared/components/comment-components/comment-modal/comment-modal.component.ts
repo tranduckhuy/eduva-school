@@ -42,7 +42,7 @@ export class CommentModalComponent implements OnInit {
 
   materialId = input.required<string>();
   materialTitle = input.required<string>();
-  visible = input.required<boolean>();
+  isOpen = input.required<boolean>();
 
   questionIdFromNotification = input<string>('');
 
@@ -96,9 +96,8 @@ export class CommentModalComponent implements OnInit {
   constructor() {
     effect(
       () => {
-        if (this.visible() && !this.hasFetchedOnce()) {
+        if (this.isOpen() && !this.hasFetchedOnce()) {
           this.fetchAllQuestions();
-          this.hasFetchedOnce.set(true);
         }
       },
       { allowSignalWrites: true }
@@ -208,6 +207,7 @@ export class CommentModalComponent implements OnInit {
       },
       complete: () => {
         this.isLoading.set(false);
+        this.hasFetchedOnce.set(true);
         this.currentState.set('list');
       },
     });

@@ -75,12 +75,12 @@ export class FolderManagementService {
       .pipe(
         tap(res =>
           this.handleFolderListResponse(res, {
-            isPaging: request.isPaging !== false,
+            isPagingEnabled: request.isPagingEnabled !== false,
           })
         ),
         map(res =>
           this.extractFolderListFromResponse(res, {
-            isPaging: request.isPaging !== false,
+            isPagingEnabled: request.isPagingEnabled !== false,
           })
         ),
         catchError(err => this.handleError(err))
@@ -163,10 +163,10 @@ export class FolderManagementService {
 
   private handleFolderListResponse(
     res: any,
-    options: { isPaging?: boolean } = {}
+    options: { isPagingEnabled?: boolean } = {}
   ) {
     if (res.statusCode === StatusCode.SUCCESS && res.data) {
-      const isPaging = options.isPaging ?? false;
+      const isPaging = options.isPagingEnabled ?? false;
       const folders = isPaging ? (res.data.data ?? []) : (res.data ?? []);
 
       this.folderListSignal.set([...folders]);
@@ -184,11 +184,11 @@ export class FolderManagementService {
 
   private extractFolderListFromResponse(
     res: any,
-    options: { isPaging?: boolean } = {}
+    options: { isPagingEnabled?: boolean } = {}
   ): Folder[] | null {
     if (res.statusCode !== StatusCode.SUCCESS || !res.data) return null;
 
-    const isPaging = options.isPaging ?? false;
+    const isPaging = options.isPagingEnabled ?? false;
     return isPaging
       ? ((res.data.data as Folder[]) ?? null)
       : ((res.data as Folder[]) ?? null);

@@ -242,11 +242,11 @@ export class AddClassMaterialsModalComponent implements OnInit {
 
   private loadPersonalFolders() {
     const request: GetFoldersRequest = {
-      isPaging: false,
-      sortBy: 'createdAt',
-      sortDirection: 'desc',
       ownerType: FolderOwnerType.Personal,
       status: EntityStatus.Active,
+      sortBy: 'createdAt',
+      sortDirection: 'desc',
+      isPagingEnabled: false,
     };
     this.folderService.getPersonalFolders(request).subscribe();
   }

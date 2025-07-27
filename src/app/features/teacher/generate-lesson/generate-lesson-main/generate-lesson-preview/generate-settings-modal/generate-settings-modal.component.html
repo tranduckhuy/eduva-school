@@ -112,16 +112,11 @@
               placeholder="Chọn giọng đọc phù hợp yêu cầu"
               emptyMessage="Chưa có giọng đọc nào."
               class="w-full"
+              optionLabel="name"
+              optionValue="value"
               [checkmark]="true"
               [showClear]="true"
-              [options]="voiceOptions()">
-              <ng-template let-selectedVoice #selectedItem>
-                {{ selectedVoice.name }}
-              </ng-template>
-              <ng-template let-voice #item>
-                {{ voice.name }}
-              </ng-template>
-            </p-select>
+              [options]="voiceOptions()" />
           </div>
         </div>
         <div
@@ -137,16 +132,11 @@
               placeholder="Chọn ngôn ngữ phù hợp yêu cầu"
               emptyMessage="Chưa có ngôn ngữ nào."
               class="w-full"
+              optionLabel="name"
+              optionValue="value"
               [checkmark]="true"
               [showClear]="true"
-              [options]="languageOptions()">
-              <ng-template let-selectedLanguage #selectedItem>
-                {{ selectedLanguage.name }}
-              </ng-template>
-              <ng-template let-language #item>
-                {{ language.name }}
-              </ng-template>
-            </p-select>
+              [options]="languageOptions()" />
           </div>
         </div>
       </div>

@@ -105,7 +105,7 @@ export class PreviewLessonComponent implements OnInit {
 
   contentBlocks = signal<RenderBlock[]>([]);
 
-  visible = false;
+  isCommentModalOpen = false;
 
   // ? Computed Properties
   showCommentButton = computed(() => {
@@ -225,7 +225,7 @@ export class PreviewLessonComponent implements OnInit {
       this.pageSize.set(!isNaN(size) && size > 0 ? size : PAGE_SIZE);
 
       if (isLinkedFromNotification) {
-        this.visible = true;
+        this.isCommentModalOpen = true;
         if (questionId) {
           this.questionIdFromNotification.set(questionId);
         }

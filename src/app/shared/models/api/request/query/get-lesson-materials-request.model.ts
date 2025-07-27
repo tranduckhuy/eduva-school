@@ -1,7 +1,7 @@
-import { EntityStatus } from '../../../enum/entity-status.enum';
+import { type EntityStatus } from '../../../enum/entity-status.enum';
 import {
-  ContentType,
-  LessonMaterialStatus,
+  type ContentType,
+  type LessonMaterialStatus,
 } from '../../../enum/lesson-material.enum';
 
 export interface GetLessonMaterialsRequest {
