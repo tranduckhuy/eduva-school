@@ -80,11 +80,11 @@ export class VideoPreviewComponent implements OnInit {
   language = this.generateSettingsService.selectedLanguage;
   folderId = this.generateSettingsService.selectedFolderId;
 
-  videoUrl = signal<string>('');
-  videoState = signal<'empty' | 'loading' | 'generated'>('empty');
+  videoUrl = this.resourcesStateService.videoUrl;
+  videoState = this.resourcesStateService.videoState;
 
-  hasFetchedProfileOnce = signal<boolean>(false);
-  currentGeneratedType = signal<LessonGenerationType | null>(null);
+  hasFetchedProfileOnce = this.resourcesStateService.hasFetchedProfileOnce;
+  currentGeneratedType = this.resourcesStateService.currentGeneratedType;
 
   readonly disableGenerate = computed(() => {
     const uploading = this.resourcesStateService
@@ -116,11 +116,13 @@ export class VideoPreviewComponent implements OnInit {
           jobStatus === JobStatus.Completed &&
           generationType === LessonGenerationType.Video
         ) {
-          this.videoUrl.set(payload.videoOutputBlobNameUrl);
-          this.videoState.set('generated');
+          this.resourcesStateService.setVideoUrl(
+            payload.videoOutputBlobNameUrl
+          );
+          this.resourcesStateService.setVideoState('generated');
 
           this.userService.getCurrentProfile().subscribe();
-          this.hasFetchedProfileOnce.set(true);
+          this.resourcesStateService.setHasFetchedProfileOnce(true);
 
           this.resourcesStateService.setAiGeneratedMetadata(
             LessonGenerationType.Video,
@@ -140,7 +142,7 @@ export class VideoPreviewComponent implements OnInit {
     effect(
       () => {
         const current = this.resourcesStateService.generatedType();
-        this.currentGeneratedType.set(current);
+        this.resourcesStateService.setCurrentGeneratedType(current);
       },
       { allowSignalWrites: true }
     );
@@ -152,8 +154,8 @@ export class VideoPreviewComponent implements OnInit {
     const job = this.job();
     if (!job) return;
 
-    this.videoState.set('generated');
-    this.videoUrl.set(job.videoOutputBlobName);
+    this.resourcesStateService.setVideoState('generated');
+    this.resourcesStateService.setVideoUrl(job.videoOutputBlobName);
     this.resourcesStateService.markGeneratedSuccess();
     this.resourcesStateService.setAiGeneratedMetadata(
       LessonGenerationType.Video,
@@ -279,7 +281,7 @@ export class VideoPreviewComponent implements OnInit {
       .pipe(finalize(() => this.resourcesStateService.updateIsLoading(false)))
       .subscribe({
         next: () => {
-          this.videoState.set('loading');
+          this.resourcesStateService.setVideoState('loading');
           this.resourcesStateService.setGeneratedType(type);
         },
       });
@@ -318,8 +320,8 @@ export class VideoPreviewComponent implements OnInit {
   }
 
   private resetAll() {
-    this.videoUrl.set('');
-    this.videoState.set('empty');
-    this.hasFetchedProfileOnce.set(false);
+    this.resourcesStateService.setVideoUrl('');
+    this.resourcesStateService.setVideoState('empty');
+    this.resourcesStateService.setHasFetchedProfileOnce(false);
   }
 }

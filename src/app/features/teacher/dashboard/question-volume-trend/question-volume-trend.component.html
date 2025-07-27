@@ -9,17 +9,15 @@
     </div>
     <div class="ml-auto flex gap-2">
       <p-select
-        [options]="timeSelectOptions"
-        [ngModel]="timeSelect()"
-        (ngModelChange)="onTimeSelectChange($event)"
+        class="w-40"
+        inputId="timeSelect"
         optionLabel="name"
         placeholder="Chọn khoảng thời gian"
+        [options]="timeSelectOptions"
+        [ngModel]="timeSelect()"
+        [loading]="isChangingPeriod()"
         [disabled]="isChangingPeriod()"
-        class="w-40" />
-      <div *ngIf="isChangingPeriod()" class="ml-2">
-        <div
-          class="h-4 w-4 animate-spin rounded-full border-b-2 border-primary"></div>
-      </div>
+        (onChange)="onTimeSelectChange($event)" />
     </div>
   </div>
   <div id="chart" class="p-5">

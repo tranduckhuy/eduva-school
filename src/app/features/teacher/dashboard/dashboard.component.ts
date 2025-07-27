@@ -4,6 +4,7 @@ import {
   OnInit,
   inject,
   computed,
+  signal,
 } from '@angular/core';
 
 import { UserService } from '../../../shared/services/api/user/user.service';
@@ -11,6 +12,7 @@ import { LoadingService } from '../../../shared/services/core/loading/loading.se
 import { DashboardService } from '../../../shared/services/api/dashboard/dashboard.service';
 
 import { UserRoles } from '../../../shared/constants/user-roles.constant';
+import { PeriodType } from '../../../shared/models/enum/period-type.enum';
 
 import { StatCardComponent } from './stat-card/stat-card.component';
 import { LessonCreationComponent } from './lesson-creation/lesson-creation.component';
@@ -19,6 +21,8 @@ import { ReviewLessonsComponent } from './review-lessons/review-lessons.componen
 import { RecentLessonsComponent } from './recent-lessons/recent-lessons.component';
 import { UnanswerQuestionsComponent } from './unanswer-questions/unanswer-questions.component';
 import { QuestionVolumeTrendComponent } from './question-volume-trend/question-volume-trend.component';
+
+import { type DashboardRequest } from '../../../shared/models/api/request/query/dashboard-request.model';
 
 interface StatCard {
   title: string;
@@ -63,6 +67,9 @@ export class DashboardComponent implements OnInit {
   readonly dashboardData = this.dashboardService.dashboardTeacherData;
 
   isTeacher = this.currentUser()?.roles?.includes(UserRoles.TEACHER);
+
+  currentLessonCreationPeriod = signal<PeriodType>(PeriodType.Week);
+  currentQuestionVolumePeriod = signal<PeriodType>(PeriodType.Week);
 
   schoolMissing = computed(() => !this.currentUser()?.school);
 
@@ -167,11 +174,30 @@ export class DashboardComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.loadData();
+  }
+
+  onLessonCreationPeriodChange(period: PeriodType) {
+    this.currentLessonCreationPeriod.set(period);
+    this.loadData();
+  }
+
+  onQuestionVolumePeriodChange(period: PeriodType) {
+    this.currentQuestionVolumePeriod.set(period);
+    this.loadData();
+  }
+
+  private loadData() {
+    const user = this.currentUser();
     const hasSchool = !this.schoolMissing();
     const isPlanValid = !this.planExpired();
 
-    if (hasSchool && isPlanValid) {
-      this.dashboardService.getTeacherDashboardData().subscribe();
-    }
+    if (!user || !hasSchool || !isPlanValid) return;
+
+    const request: DashboardRequest = {
+      lessonActivityPeriod: this.currentLessonCreationPeriod(),
+      questionVolumePeriod: this.currentQuestionVolumePeriod(),
+    };
+    this.dashboardService.getTeacherDashboardData(request).subscribe();
   }
 }

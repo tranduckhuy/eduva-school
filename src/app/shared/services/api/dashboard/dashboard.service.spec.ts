@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { of, firstValueFrom } from 'rxjs';
 import { DashboardSchoolAdminResponse } from '../../../models/api/response/query/dashboard-sa-response.model';
-import { DashboardRequest } from '../../../models/api/request/command/dashboard-request.model';
+import { DashboardRequest } from '../../../models/api/request/query/dashboard-request.model';
 import { BaseResponse } from '../../../../shared/models/api/base-response.model';
 import { vi } from 'vitest';
 import {

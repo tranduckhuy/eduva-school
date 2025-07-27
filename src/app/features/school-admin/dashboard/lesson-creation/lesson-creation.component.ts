@@ -3,8 +3,10 @@ import {
   Component,
   signal,
   computed,
-  inject,
   effect,
+  input,
+  output,
+  inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -23,12 +25,16 @@ import {
   ApexStroke,
 } from 'ng-apexcharts';
 
-import { Select } from 'primeng/select';
+import { SelectModule, type SelectChangeEvent } from 'primeng/select';
 import { TableModule } from 'primeng/table';
-import { DashboardService } from '../../../../shared/services/api/dashboard/dashboard.service';
+
+import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
+
 import { PeriodType } from '../../../../shared/models/enum/period-type.enum';
-import { DashboardSchoolAdminResponse } from '../../../../shared/models/api/response/query/dashboard-sa-response.model';
+
 import { getLastNWeekNumbers } from '../../../../shared/utils/util-functions';
+
+import { type DashboardSchoolAdminResponse } from '../../../../shared/models/api/response/query/dashboard-sa-response.model';
 
 type DataPoint = {
   x: string | number | Date;
@@ -70,19 +76,22 @@ interface TopCreator {
 @Component({
   selector: 'app-lesson-creation',
   standalone: true,
-  imports: [NgApexchartsModule, FormsModule, Select, TableModule],
+  imports: [FormsModule, NgApexchartsModule, SelectModule, TableModule],
   templateUrl: './lesson-creation.component.html',
   styleUrl: './lesson-creation.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LessonCreationComponent {
-  private readonly dashboardService = inject(DashboardService);
+  private readonly loadingService = inject(LoadingService);
 
-  dashboardData = signal<DashboardSchoolAdminResponse | null>(null);
+  dashboardData = input.required<DashboardSchoolAdminResponse | null>();
+
+  periodChange = output<PeriodType>();
+
+  isChangingPeriod = this.loadingService.is('dashboard');
 
   timeSelect = signal<SelectOption>({ name: 'Theo tuần', code: 'weekly' });
-  isChangingPeriod = signal<boolean>(false);
-  lastRequestedPeriod = signal<PeriodType>(PeriodType.Week);
+  hasUserChangedTimeSelect = signal<boolean>(false);
 
   readonly timeSelectOptions = signal<SelectOption[]>([
     { name: 'Theo tuần', code: 'weekly' },
@@ -91,33 +100,6 @@ export class LessonCreationComponent {
 
   topCreators = signal<TopCreator[]>([]);
 
-  constructor() {
-    // Effect to detect when dashboard data changes and ensure timeSelect matches the data
-    effect(
-      () => {
-        const data = this.dashboardData();
-
-        if (data?.lessonActivity && data.lessonActivity.length > 0) {
-          // Check if the data format matches the current selection
-          const firstPeriod = data.lessonActivity[0].period;
-          const isWeeklyData = firstPeriod.includes('-W');
-          const isMonthlyData = /^\d{4}-\d{2}$/.exec(firstPeriod);
-
-          // Update timeSelect to match the actual data format
-          if (isWeeklyData && this.timeSelect().code !== 'weekly') {
-            this.timeSelect.set({ name: 'Theo tuần', code: 'weekly' });
-          } else if (isMonthlyData && this.timeSelect().code !== 'monthly') {
-            this.timeSelect.set({ name: 'Theo tháng', code: 'monthly' });
-          }
-        }
-      },
-      { allowSignalWrites: true }
-    );
-    // Fetch data for the first time
-    this.fetchDashboardData(PeriodType.Week);
-  }
-
-  // Computed chart data that reacts to dashboard data changes
   readonly chartData = computed(() => {
     const data = this.dashboardData();
     const timeSelectValue = this.timeSelect();
@@ -129,11 +111,10 @@ export class LessonCreationComponent {
     if (timeSelectValue.code === 'weekly') {
       return this.generateWeeklyData(12, data);
     } else {
-      return this.generateMonthlyData(data, 12);
+      return this.generateMonthlyData(data);
     }
   });
 
-  // Computed chart options that react to chart data changes
   readonly chartOptions = computed<ChartOptions>(() => {
     const chartData = this.chartData();
     const timeSelectValue = this.timeSelect();
@@ -164,29 +145,6 @@ export class LessonCreationComponent {
             reset: true,
           },
         },
-        animations: {
-          enabled: true,
-          easing: 'easeinout',
-          speed: 800,
-          animateGradually: {
-            enabled: true,
-            delay: 150,
-          },
-          dynamicAnimation: {
-            enabled: true,
-            speed: 350,
-          },
-        },
-        zoom: {
-          enabled: true,
-          type: 'x',
-        },
-        events: {
-          click: (event, chartContext, config) => {
-            // Handle bar click for daily breakdown
-            // this.handleBarClick(config.dataPointIndex);
-          },
-        },
       },
       colors: ['#2093e7', '#22c03c'],
       dataLabels: {
@@ -197,16 +155,7 @@ export class LessonCreationComponent {
         curve: 'smooth',
       },
       markers: {
-        size: 4,
-        hover: {
-          size: 6,
-        },
-      },
-      grid: {
-        padding: {
-          right: 30,
-          left: 20,
-        },
+        size: 5,
       },
       fill: {
         opacity: 1,
@@ -244,36 +193,48 @@ export class LessonCreationComponent {
     };
   });
 
-  onTimeSelectChange(selected: SelectOption) {
-    // Only proceed if the selection actually changed
-    if (selected.code === this.timeSelect().code) {
+  constructor() {
+    effect(
+      () => {
+        const data = this.dashboardData();
+
+        if (this.hasUserChangedTimeSelect()) return;
+
+        if (data?.lessonActivity && data.lessonActivity.length > 0) {
+          const firstPeriod = data.lessonActivity[0].period;
+          const isWeeklyData = firstPeriod.includes('-W');
+          const isMonthlyData = /^\d{4}-\d{2}$/.exec(firstPeriod);
+
+          if (isWeeklyData && this.timeSelect().code !== 'weekly') {
+            this.timeSelect.set({ name: 'Theo tuần', code: 'weekly' });
+          } else if (isMonthlyData && this.timeSelect().code !== 'monthly') {
+            this.timeSelect.set({ name: 'Theo tháng', code: 'monthly' });
+          }
+        }
+      },
+      { allowSignalWrites: true }
+    );
+  }
+
+  ngOnInit(): void {
+    const data = this.dashboardData();
+    if (!data) return;
+
+    this.generateWeeklyData(12, data);
+  }
+
+  onTimeSelectChange(selected: SelectChangeEvent) {
+    if (!selected || selected.value.code === this.timeSelect().code) {
       return;
     }
 
-    this.timeSelect.set(selected);
+    this.hasUserChangedTimeSelect.set(true);
+    this.timeSelect.set(selected.value);
+
     const periodType =
-      selected.code === 'weekly' ? PeriodType.Week : PeriodType.Month;
-    this.lastRequestedPeriod.set(periodType);
-    this.fetchDashboardData(periodType);
-  }
+      selected.value.code === 'weekly' ? PeriodType.Week : PeriodType.Month;
 
-  private fetchDashboardData(period: PeriodType) {
-    this.isChangingPeriod.set(true);
-    this.dashboardService
-      .getDashboardSchoolAdminData({ lessonActivityPeriod: period })
-      .subscribe({
-        next: data => {
-          this.dashboardData.set(data);
-          this.isChangingPeriod.set(false);
-        },
-        error: error => {
-          this.isChangingPeriod.set(false);
-        },
-      });
-  }
-
-  private handleBarClick(index: number) {
-    // Implement logic to show daily breakdown
+    this.periodChange.emit(periodType);
   }
 
   private generateWeeklyData(
@@ -320,10 +281,7 @@ export class LessonCreationComponent {
     return { ai: result.aiData, uploaded: result.uploaded };
   }
 
-  private generateMonthlyData(
-    data: DashboardSchoolAdminResponse,
-    months: number = 12
-  ): {
+  private generateMonthlyData(data: DashboardSchoolAdminResponse): {
     ai: DataPoint[];
     uploaded: DataPoint[];
   } {
@@ -333,16 +291,19 @@ export class LessonCreationComponent {
     }
 
     const currentYear = new Date().getFullYear();
+
     // Only keep months from the current year
     const yearMonthRegex = /(\d{4})-(\d{2})/;
     const filtered = lessonActivities
       .map(item => {
         const match = yearMonthRegex.exec(item.period);
         if (match) {
+          const year = parseInt(match[1], 10);
+          const month = parseInt(match[2], 10);
           return {
             ...item,
-            year: parseInt(match[1], 10),
-            month: parseInt(match[2], 10),
+            year,
+            month,
           };
         }
         return null;
@@ -353,7 +314,10 @@ export class LessonCreationComponent {
         ): item is DashboardSchoolAdminResponse['lessonActivity'][0] & {
           year: number;
           month: number;
-        } => !!item && item.year === currentYear
+        } => {
+          const isValid = !!item && item.year === currentYear;
+          return isValid;
+        }
       );
 
     // Sort by month ascending
@@ -371,29 +335,8 @@ export class LessonCreationComponent {
       y: item.uploadedCount,
       fill: { type: 'solid' },
     }));
-    return { ai: aiData, uploaded: uploadedData };
-  }
-}
 
-// Add this to your Date prototype for week number calculation
-declare global {
-  interface Date {
-    getWeek(): number;
+    const result = { ai: aiData, uploaded: uploadedData };
+    return result;
   }
-}
-
-function getWeek(date: Date): number {
-  const d = new Date(date.getTime());
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
-  const week1 = new Date(d.getFullYear(), 0, 4);
-  return (
-    1 +
-    Math.round(
-      ((d.getTime() - week1.getTime()) / 86400000 -
-        3 +
-        ((week1.getDay() + 6) % 7)) /
-        7
-    )
-  );
 }

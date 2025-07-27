@@ -98,6 +98,7 @@ export class CommentModalComponent implements OnInit {
       () => {
         if (this.isOpen() && !this.hasFetchedOnce()) {
           this.fetchAllQuestions();
+          this.hasFetchedOnce.set(true);
         }
       },
       { allowSignalWrites: true }
@@ -207,7 +208,6 @@ export class CommentModalComponent implements OnInit {
       },
       complete: () => {
         this.isLoading.set(false);
-        this.hasFetchedOnce.set(true);
         this.currentState.set('list');
       },
     });

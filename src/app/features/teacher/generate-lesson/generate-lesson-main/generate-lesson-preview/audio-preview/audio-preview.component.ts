@@ -80,11 +80,11 @@ export class AudioPreviewComponent implements OnInit {
   language = this.generateSettingsService.selectedLanguage;
   folderId = this.generateSettingsService.selectedFolderId;
 
-  audioUrl = signal<string>('');
-  audioState = signal<'empty' | 'loading' | 'generated'>('empty');
+  audioUrl = this.resourcesStateService.audioUrl;
+  audioState = this.resourcesStateService.audioState;
 
-  hasFetchedProfileOnce = signal<boolean>(false);
-  currentGeneratedType = signal<LessonGenerationType | null>(null);
+  hasFetchedProfileOnce = this.resourcesStateService.hasFetchedProfileOnce;
+  currentGeneratedType = this.resourcesStateService.currentGeneratedType;
 
   readonly disableGenerate = computed(() => {
     const uploading = this.resourcesStateService
@@ -116,11 +116,13 @@ export class AudioPreviewComponent implements OnInit {
           jobStatus === JobStatus.Completed &&
           generationType === LessonGenerationType.Audio
         ) {
-          this.audioUrl.set(payload.audioOutputBlobNameUrl);
-          this.audioState.set('generated');
+          this.resourcesStateService.setAudioUrl(
+            payload.audioOutputBlobNameUrl
+          );
+          this.resourcesStateService.setAudioState('generated');
 
           this.userService.getCurrentProfile().subscribe();
-          this.hasFetchedProfileOnce.set(true);
+          this.resourcesStateService.setHasFetchedProfileOnce(true);
 
           this.resourcesStateService.setAiGeneratedMetadata(
             LessonGenerationType.Audio,
@@ -140,7 +142,7 @@ export class AudioPreviewComponent implements OnInit {
     effect(
       () => {
         const current = this.resourcesStateService.generatedType();
-        this.currentGeneratedType.set(current);
+        this.resourcesStateService.setCurrentGeneratedType(current);
       },
       { allowSignalWrites: true }
     );
@@ -152,8 +154,8 @@ export class AudioPreviewComponent implements OnInit {
     const job = this.job();
     if (!job) return;
 
-    this.audioState.set('generated');
-    this.audioUrl.set(job.audioOutputBlobName);
+    this.resourcesStateService.setAudioState('generated');
+    this.resourcesStateService.setAudioUrl(job.audioOutputBlobName);
     this.resourcesStateService.markGeneratedSuccess();
     this.resourcesStateService.setAiGeneratedMetadata(
       LessonGenerationType.Audio,
@@ -277,7 +279,7 @@ export class AudioPreviewComponent implements OnInit {
       .pipe(finalize(() => this.resourcesStateService.updateIsLoading(false)))
       .subscribe({
         next: () => {
-          this.audioState.set('loading');
+          this.resourcesStateService.setAudioState('loading');
           this.resourcesStateService.setGeneratedType(type);
         },
       });
@@ -311,8 +313,8 @@ export class AudioPreviewComponent implements OnInit {
   }
 
   private resetAll() {
-    this.audioUrl.set('');
-    this.audioState.set('empty');
-    this.hasFetchedProfileOnce.set(false);
+    this.resourcesStateService.setAudioUrl('');
+    this.resourcesStateService.setAudioState('empty');
+    this.resourcesStateService.setHasFetchedProfileOnce(false);
   }
 }

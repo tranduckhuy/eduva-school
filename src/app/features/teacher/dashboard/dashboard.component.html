@@ -24,7 +24,9 @@
 
 <div class="e-row e-g-4">
   <div class="e-col-7 e-col-xl-12">
-    <app-lesson-creation />
+    <app-lesson-creation
+      [dashboardData]="dashboardData()"
+      (periodChange)="onLessonCreationPeriodChange($event)" />
   </div>
   <div class="e-col-5 e-col-xl-12">
     <app-content-type-stats [dashboardData]="dashboardData()!" />
@@ -37,7 +39,9 @@
       [questions]="dashboardData()?.unAnswerQuestions ?? []" />
   </div>
   <div class="e-col-6 e-col-xl-12">
-    <app-question-volume-trend />
+    <app-question-volume-trend
+      [dashboardData]="dashboardData()"
+      (periodChange)="onQuestionVolumePeriodChange($event)" />
   </div>
 </div>
 

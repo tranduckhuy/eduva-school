@@ -10,7 +10,7 @@ import { ToastHandlingService } from '../../../../shared/services/core/toast/toa
 import { StatusCode } from '../../../../shared/constants/status-code.constant';
 
 import { type BaseResponse } from '../../../../shared/models/api/base-response.model';
-import { type DashboardRequest } from '../../../models/api/request/command/dashboard-request.model';
+import { type DashboardRequest } from '../../../models/api/request/query/dashboard-request.model';
 import { type DashboardTeacherResponse } from '../../../models/api/response/query/dashboard-teacher-response.model';
 import { type DashboardSchoolAdminResponse } from '../../../models/api/response/query/dashboard-sa-response.model';
 

@@ -36,6 +36,7 @@ import { UserRoles } from '../../constants/user-roles.constant';
 
 import { type LessonMaterial } from '../../models/entities/lesson-material.model';
 import { type GetSharedLessonMaterialsRequest } from '../../models/api/request/query/get-lesson-materials-request.model';
+import { EntityStatus } from '../../models/enum/entity-status.enum';
 
 @Component({
   selector: 'app-lessons',
@@ -71,7 +72,7 @@ export class SharedLessonsComponent {
   pageSize = signal(PAGE_SIZE);
   firstRecordIndex = signal(0);
   searchTerm = signal('');
-  shouldStopRequest = signal<boolean>(true);
+  shouldStopRequest = signal<boolean>(false);
 
   tableHeadSkeleton = signal([
     'Tài liệu bài học',
@@ -173,6 +174,10 @@ export class SharedLessonsComponent {
       searchTerm: this.searchTerm(),
       pageIndex: this.currentPage(),
       pageSize: this.pageSize(),
+      entityStatus: EntityStatus.Active,
+      sortBy: 'createdAt',
+      sortDirection: 'desc',
+      isPagingEnabled: true,
     };
 
     this.lessonMaterialsService.getSharedLessonMaterials(request).subscribe({
