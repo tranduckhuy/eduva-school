@@ -40,7 +40,10 @@
         <span class="text-base font-semibold dark:text-gray-100">
           {{
             dashboardSchoolAdminData()?.systemOverview?.currentSubscription
-              ?.startDate | date: "dd 'thg' MM, YYYY 'lúc' HH:mm"
+              ?.startDate
+              ? (dashboardSchoolAdminData()?.systemOverview?.currentSubscription
+                  ?.startDate | date: "dd 'thg' MM, YYYY")
+              : 'Chưa đăng ký gói'
           }}
         </span>
       </p>
@@ -50,7 +53,10 @@
         <span class="text-base font-semibold dark:text-gray-100">
           {{
             dashboardSchoolAdminData()?.systemOverview?.currentSubscription
-              ?.endDate | date: "dd 'thg' MM, YYYY 'lúc' HH:mm"
+              ?.endDate
+              ? (dashboardSchoolAdminData()?.systemOverview?.currentSubscription
+                  ?.endDate | date: "dd 'thg' MM, YYYY")
+              : 'Chưa đăng ký gói'
           }}
         </span>
       </p>
@@ -60,7 +66,9 @@
 
 <div class="e-row e-g-4">
   <div class="e-col-7 e-col-xl-12">
-    <app-lesson-creation />
+    <app-lesson-creation
+      [dashboardData]="dashboardSchoolAdminData()"
+      (periodChange)="onLessonCreationPeriodChange($event)" />
   </div>
   <div class="e-col-5 e-col-xl-12">
     <app-content-type-stats [dashboardData]="dashboardSchoolAdminData()!" />
@@ -73,7 +81,9 @@
       [teachers]="dashboardSchoolAdminData()?.topTeachers ?? []" />
   </div>
   <div class="e-col-7 e-col-xl-12">
-    <app-lesson-status-stats [dashboardData]="dashboardSchoolAdminData()" />
+    <app-lesson-status-stats
+      [dashboardData]="dashboardSchoolAdminData()"
+      (periodChange)="onLessonStatusPeriodChange($event)" />
   </div>
 </div>
 

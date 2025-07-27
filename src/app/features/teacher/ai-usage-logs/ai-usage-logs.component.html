@@ -1,10 +1,6 @@
 <div
   class="rounded bg-white px-0 shadow-main dark:border-dark-500 dark:bg-dark-200">
   <div class="p-[25px]">
-    <div class="xs:w-full">
-      <app-search-input (search)="onSearch($event)" />
-    </div>
-
     <div class="mt-5">
       @if (isLoading()) {
         <app-table-skeleton [tableHead]="tableHeadSkeleton()" />

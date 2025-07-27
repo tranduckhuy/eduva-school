@@ -14,7 +14,9 @@
               | currency: 'VND' : 'symbol' : '1.0-0' : 'vi-VN')
             : statCard().value
         }}
-        {{ statCard().compareValue && ' / ' + statCard().compareValue }}
+        @if (statCard().compareValue) {
+          / {{ statCard().compareValue }}
+        }
       </p>
     </div>
     <div class="self-end">
@@ -35,12 +37,12 @@
             <span class="font-medium">{{ subItem.value }} </span>
           </div>
           <p-progressbar
-            [pTooltip]="getPercent(subItem.value) + '%'"
-            tooltipPosition="top"
             color="#2093e7"
-            [showValue]="false"
             valueStyleClass="custom-progress"
-            [value]="getPercent(subItem.value)" />
+            tooltipPosition="top"
+            [showValue]="false"
+            [value]="getPercent(subItem.value)"
+            [pTooltip]="subItem.value.toString()" />
         </div>
       }
     </div>

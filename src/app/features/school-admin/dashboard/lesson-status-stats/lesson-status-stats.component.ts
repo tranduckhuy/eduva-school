@@ -3,9 +3,10 @@ import {
   Component,
   signal,
   computed,
-  inject,
   effect,
   input,
+  output,
+  inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
@@ -23,13 +24,15 @@ import {
 } from 'ng-apexcharts';
 import { CommonModule } from '@angular/common';
 
-import { Select } from 'primeng/select';
+import { SelectModule, type SelectChangeEvent } from 'primeng/select';
 
-import { DashboardSchoolAdminResponse } from '../../../../shared/models/api/response/query/dashboard-sa-response.model';
-import { PeriodType } from '../../../../shared/models/enum/period-type.enum';
-import { DashboardService } from '../../../../shared/services/api/dashboard/dashboard.service';
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
+
+import { PeriodType } from '../../../../shared/models/enum/period-type.enum';
+
 import { getLastNWeekNumbers } from '../../../../shared/utils/util-functions';
+
+import { type DashboardSchoolAdminResponse } from '../../../../shared/models/api/response/query/dashboard-sa-response.model';
 
 interface SelectOption {
   name: string;
@@ -53,35 +56,50 @@ export type ChartOptions = {
 @Component({
   selector: 'app-lesson-status-stats',
   standalone: true,
-  imports: [CommonModule, NgApexchartsModule, FormsModule, Select],
+  imports: [CommonModule, FormsModule, NgApexchartsModule, SelectModule],
   templateUrl: './lesson-status-stats.component.html',
   styleUrl: './lesson-status-stats.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LessonStatusStatsComponent {
-  private readonly dashboardService = inject(DashboardService);
   private readonly loadingService = inject(LoadingService);
 
   dashboardData = input.required<DashboardSchoolAdminResponse | null>();
 
-  readonly isLoading = this.loadingService.isLoading;
+  periodChange = output<PeriodType>();
 
-  readonly timeSelectOptions = [
+  isChangingPeriod = this.loadingService.is('dashboard');
+
+  timeSelect = signal<SelectOption>({ name: 'Theo tuần', code: 'weekly' });
+  hasUserChangedTimeSelect = signal<boolean>(false);
+
+  readonly chartData = computed(() => {
+    const data = this.dashboardData();
+    const timeSelectValue = this.timeSelect();
+    if (!data)
+      return { pending: [], approved: [], rejected: [], categories: [] };
+    const stats = data.lessonStatusStats || [];
+    if (timeSelectValue.code === 'weekly') {
+      return this.generateWeeklyData(this.numberOfWeeks, stats);
+    } else {
+      return this.generateMonthlyData(stats);
+    }
+  });
+
+  readonly timeSelectOptions = signal<SelectOption[]>([
     { name: 'Theo tuần', code: 'weekly' },
     { name: 'Theo tháng', code: 'monthly' },
-  ];
-  timeSelect = signal(this.timeSelectOptions[0]);
-  isChangingPeriod = signal(false);
-  lastRequestedPeriod = signal<PeriodType>(PeriodType.Week);
+  ]);
 
   readonly numberOfWeeks = 7;
   readonly numberOfMonths = 12;
 
   constructor() {
-    // Effect: fetch data when filter changes
     effect(
       () => {
         const data = this.dashboardData();
+
+        if (this.hasUserChangedTimeSelect()) return;
 
         if (data?.lessonStatusStats && data.lessonStatusStats.length > 0) {
           // Check if the data format matches the current selection
@@ -101,43 +119,17 @@ export class LessonStatusStatsComponent {
     );
   }
 
-  fetchDashboardData(period: PeriodType) {
-    this.isChangingPeriod.set(true);
-    this.dashboardService
-      .getDashboardSchoolAdminData({ lessonStatusPeriod: period })
-      .subscribe({
-        next: data => {
-          this.isChangingPeriod.set(false);
-        },
-        error: () => {
-          this.isChangingPeriod.set(false);
-        },
-      });
-  }
+  onTimeSelectChange(selected: SelectChangeEvent) {
+    if (selected.value.code === this.timeSelect().code) return;
 
-  onTimeSelectChange(selected: SelectOption) {
-    if (selected.code === this.timeSelect().code) return;
-    this.timeSelect.set(selected);
-    this.dashboardService
-      .getDashboardSchoolAdminData({
-        lessonStatusPeriod:
-          selected.code === 'weekly' ? PeriodType.Week : PeriodType.Month,
-      })
-      .subscribe();
-  }
+    this.timeSelect.set(selected.value);
+    this.hasUserChangedTimeSelect.set(true);
 
-  readonly chartData = computed(() => {
-    const data = this.dashboardData();
-    const timeSelectValue = this.timeSelect();
-    if (!data)
-      return { pending: [], approved: [], rejected: [], categories: [] };
-    const stats = data.lessonStatusStats || [];
-    if (timeSelectValue.code === 'weekly') {
-      return this.generateWeeklyData(this.numberOfWeeks, stats);
-    } else {
-      return this.generateMonthlyData(this.numberOfMonths, stats);
-    }
-  });
+    const periodType =
+      selected.value.code === 'weekly' ? PeriodType.Week : PeriodType.Month;
+
+    this.periodChange.emit(periodType);
+  }
 
   private generateWeeklyData(
     weeks: number,
@@ -170,7 +162,6 @@ export class LessonStatusStatsComponent {
   }
 
   private generateMonthlyData(
-    months: number,
     stats: Array<{
       period: string;
       pending: number;

@@ -107,6 +107,8 @@ export class ClassManagementComponent implements OnInit {
       pageIndex: this.currentPage(),
       pageSize: this.pageSize(),
       searchTerm: this.searchTerm(),
+      sortBy: 'createdAt',
+      sortDirection: 'desc',
     };
     this.classManagementService.getClasses(request).subscribe();
   }

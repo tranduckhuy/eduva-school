@@ -4,7 +4,6 @@ import {
   OnInit,
   computed,
   inject,
-  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -44,8 +43,8 @@ export class GenerateLessonUploadComponent implements OnInit {
   private readonly resourcesStateService = inject(ResourcesStateService);
   private readonly aiJobService = inject(AiJobsService);
 
-  readonly selectAll = signal(false);
-  readonly openedMenuId = signal<string | null>(null);
+  readonly selectAll = this.resourcesStateService.selectAll;
+  readonly openedMenuId = this.resourcesStateService.openedMenuId;
 
   readonly job = this.aiJobService.job;
 
@@ -98,7 +97,7 @@ export class GenerateLessonUploadComponent implements OnInit {
   }
 
   toggleAll(checked: boolean) {
-    this.selectAll.set(checked);
+    this.resourcesStateService.setSelectAll(checked);
     this.resourcesStateService.updateSourceList(items =>
       items.map(item => (item.isUploading ? item : { ...item, checked }))
     );
@@ -116,7 +115,7 @@ export class GenerateLessonUploadComponent implements OnInit {
       .filter(i => !i.isUploading)
       .every(i => i.checked);
 
-    this.selectAll.set(allChecked);
+    this.resourcesStateService.setSelectAll(allChecked);
   }
 
   removeItem(id: string) {
@@ -128,11 +127,13 @@ export class GenerateLessonUploadComponent implements OnInit {
     const allChecked = current
       .filter(i => !i.isUploading)
       .every(i => i.checked);
-    this.selectAll.set(allChecked);
+    this.resourcesStateService.setSelectAll(allChecked);
   }
 
   toggleMenu(id: string) {
-    this.openedMenuId.set(this.openedMenuId() === id ? null : id);
+    this.resourcesStateService.setOpenedMenuId(
+      this.openedMenuId() === id ? null : id
+    );
   }
 
   openUploadModal() {
@@ -159,7 +160,7 @@ export class GenerateLessonUploadComponent implements OnInit {
         .filter(i => !i.isUploading)
         .every(i => i.checked);
 
-      this.selectAll.set(allChecked);
+      this.resourcesStateService.setSelectAll(allChecked);
     };
 
     this.modalService.open(UploadResourcesModalComponent, {

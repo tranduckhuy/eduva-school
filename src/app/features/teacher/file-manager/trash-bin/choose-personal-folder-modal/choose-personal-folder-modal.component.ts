@@ -22,6 +22,7 @@ import { LoadingService } from '../../../../../shared/services/core/loading/load
 import { GlobalModalService } from '../../../../../shared/services/layout/global-modal/global-modal.service';
 
 import { MODAL_DATA } from '../../../../../shared/tokens/injection/modal-data.token';
+import { EntityStatus } from '../../../../../shared/models/enum/entity-status.enum';
 import { FolderOwnerType } from '../../../../../shared/models/enum/folder-owner-type.enum';
 
 import { type GetFoldersRequest } from '../../../../../shared/models/api/request/query/get-folders-request.model';
@@ -64,7 +65,9 @@ export class ChoosePersonalFolderModalComponent implements OnInit {
   ngOnInit(): void {
     const request: GetFoldersRequest = {
       ownerType: FolderOwnerType.Personal,
-      sortBy: 'createdAt',
+      status: EntityStatus.Active,
+      sortBy: 'lastModifiedAt',
+      sortDirection: 'desc',
       isPagingEnabled: false,
     };
     this.folderService.getPersonalFolders(request).subscribe();

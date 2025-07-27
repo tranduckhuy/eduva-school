@@ -155,8 +155,8 @@ export class AddFileModalComponent {
     const files = this.selectedFiles();
 
     if (files.length === 0) {
-      this.toastHandlingService.error(
-        'Lỗi',
+      this.toastHandlingService.warn(
+        'Cảnh báo',
         'Vui lòng chọn ít nhất một tệp để tải lên.'
       );
       return;

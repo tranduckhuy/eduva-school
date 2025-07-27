@@ -1,7 +1,7 @@
 <div
-  class="max-h-[calc(100vh-80px)] w-[50vw] rounded-2xl bg-white dark:bg-dark-300 lg:w-[80vw]">
+  class="max-h-[calc(100vh-80px)] w-[50vw] overflow-y-auto rounded-2xl bg-white dark:bg-dark-300 lg:w-[80vw]">
   <header
-    class="relative flex h-14 w-full items-center rounded-t-lg bg-white px-6 py-3 pb-2 dark:bg-dark-300">
+    class="sticky left-0 top-0 z-[1] flex h-14 w-full items-center rounded-t-lg bg-white px-6 py-3 pb-2 dark:bg-dark-300">
     <h2 class="text-lg">Cài đặt bài giảng AI</h2>
     <span
       class="pi pi-times absolute right-0 top-[50%] -translate-y-[50%] cursor-pointer px-5 py-3 text-xl"
@@ -25,7 +25,7 @@
       <!-- ? Speed -->
       <div class="flex flex-col">
         <span class="text-base font-semibold dark:text-white">Tốc độ đọc</span>
-        <div class="mt-4 flex gap-3">
+        <div class="mt-4 flex flex-wrap gap-3">
           <input
             type="radio"
             formControlName="speed"

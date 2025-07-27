@@ -27,6 +27,7 @@ import { FormControlComponent } from '../../../components/form-control/form-cont
 import { UpdateAvatarModalComponent } from './update-avatar-modal/update-avatar-modal.component';
 
 import { VIETNAM_PHONE_REGEX } from '../../../constants/common.constant';
+import { noSpecialCharactersOrNumbersValidator } from '../../../utils/form-validators';
 
 import { type User } from '../../../models/entities/user.model';
 import { type UpdateProfileRequest } from './models/update-profile-request.model';
@@ -60,8 +61,14 @@ export class PersonalInformationComponent implements OnInit {
   constructor() {
     this.form = this.fb.group({
       avatar: [''],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      firstName: [
+        '',
+        [Validators.required, noSpecialCharactersOrNumbersValidator],
+      ],
+      lastName: [
+        '',
+        [Validators.required, noSpecialCharactersOrNumbersValidator],
+      ],
       fullName: [''],
       phoneNumber: ['', [Validators.pattern(VIETNAM_PHONE_REGEX)]],
     });
