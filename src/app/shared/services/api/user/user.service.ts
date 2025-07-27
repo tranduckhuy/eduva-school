@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
+import { Observable, catchError, map, tap, of, throwError } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 import { RequestService } from '../../core/request/request.service';
@@ -10,7 +10,7 @@ import { StatusCode } from '../../../constants/status-code.constant';
 
 import { type User } from '../../../models/entities/user.model';
 import { type UpdateProfileRequest } from '../../../pages/settings-page/personal-information/models/update-profile-request.model';
-import { EntityListResponse } from '../../../models/api/response/query/entity-list-response.model';
+import { type EntityListResponse } from '../../../models/api/response/query/entity-list-response.model';
 import { BaseResponse } from '../../../models/api/base-response.model';
 import { UserListParams } from '../../../models/api/request/query/user-list-params';
 import { CreateUserRequest } from '../../../models/api/request/command/create-user-request.model';
@@ -53,7 +53,7 @@ export class UserService {
     return this.requestService.get<User>(this.USER_PROFILE_API_URL).pipe(
       tap(res => this.handleGetProfileSideEffect(res)),
       map(res => this.extractUserFromResponse(res)),
-      catchError(() => this.handleErrorResponse())
+      catchError((err: HttpErrorResponse) => this.handleErrorResponse(err))
     );
   }
 
@@ -63,7 +63,7 @@ export class UserService {
       .pipe(
         tap(res => this.handleUpdateProfileSideEffect(res)),
         map(res => this.extractUserFromResponse(res)),
-        catchError(() => this.handleErrorResponse())
+        catchError((err: HttpErrorResponse) => this.handleErrorResponse(err))
       );
   }
 
@@ -211,9 +211,9 @@ export class UserService {
     return null;
   }
 
-  private handleErrorResponse(): Observable<null> {
+  private handleErrorResponse(err: HttpErrorResponse): Observable<null> {
     this.toastHandlingService.errorGeneral();
-    return of(null);
+    return throwError(() => err);
   }
 
   private loadUserFromStorage(): User | null {

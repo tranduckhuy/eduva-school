@@ -1,4 +1,4 @@
-import { EntityListParams } from './entity-list-params';
+import { type EntityListParams } from './entity-list-params';
 
 type UserRole =
   | 0 // System admin

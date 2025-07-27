@@ -9,6 +9,7 @@ import {
   inject,
   signal,
   viewChild,
+  DestroyRef,
 } from '@angular/core';
 import {
   ReactiveFormsModule,
@@ -62,6 +63,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   private readonly scrollContainer = viewChild<ElementRef>('scrollContainer');
 
   private readonly fb = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly resourcesStateService = inject(ResourcesStateService);
   private readonly aiJobService = inject(AiJobsService);
   private readonly aiSocketService = inject(AiSocketService);
@@ -121,6 +123,8 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       },
       { allowSignalWrites: true }
     );
+
+    this.destroyRef.onDestroy(() => this.resetAll());
   }
 
   ngOnInit(): void {
@@ -369,5 +373,9 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     };
 
     this.messages.set([userMessage, systemMessage]);
+  }
+
+  private resetAll() {
+    this.messages.set([]);
   }
 }

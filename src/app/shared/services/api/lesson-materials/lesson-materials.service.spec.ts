@@ -135,7 +135,8 @@ describe('LessonMaterialsService', () => {
 
       expect(requestService.post).toHaveBeenCalledWith(
         expect.stringContaining('/lesson-materials'),
-        mockRequest
+        mockRequest,
+        { loadingKey: 'create-lesson-materials' }
       );
       expect(result).toBeNull();
       expect(toastHandlingService.successGeneral).toHaveBeenCalled();
@@ -149,6 +150,11 @@ describe('LessonMaterialsService', () => {
         service.createLessonMaterials(mockRequest)
       );
 
+      expect(requestService.post).toHaveBeenCalledWith(
+        expect.stringContaining('/lesson-materials'),
+        mockRequest,
+        { loadingKey: 'create-lesson-materials' }
+      );
       expect(result).toBeNull();
       expect(toastHandlingService.errorGeneral).toHaveBeenCalledWith();
     });
@@ -164,6 +170,11 @@ describe('LessonMaterialsService', () => {
         lastValueFrom(service.createLessonMaterials(mockRequest))
       ).rejects.toThrow();
 
+      expect(requestService.post).toHaveBeenCalledWith(
+        expect.stringContaining('/lesson-materials'),
+        mockRequest,
+        { loadingKey: 'create-lesson-materials' }
+      );
       expect(toastHandlingService.warn).toHaveBeenCalledWith(
         'Thiếu gói đăng ký',
         'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
@@ -178,6 +189,11 @@ describe('LessonMaterialsService', () => {
         lastValueFrom(service.createLessonMaterials(mockRequest))
       ).rejects.toThrow();
 
+      expect(requestService.post).toHaveBeenCalledWith(
+        expect.stringContaining('/lesson-materials'),
+        mockRequest,
+        { loadingKey: 'create-lesson-materials' }
+      );
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
   });
@@ -1245,7 +1261,8 @@ describe('LessonMaterialsService', () => {
       service.createLessonMaterials(mockRequest);
       expect(requestService.post).toHaveBeenCalledWith(
         expect.stringContaining('/lesson-materials'),
-        mockRequest
+        mockRequest,
+        { loadingKey: 'create-lesson-materials' }
       );
 
       const updateRequest: UpdateLessonMaterialRequest = {
@@ -1441,6 +1458,11 @@ describe('LessonMaterialsService', () => {
         lastValueFrom(service.createLessonMaterials(mockRequest))
       ).rejects.toThrow();
 
+      expect(requestService.post).toHaveBeenCalledWith(
+        expect.stringContaining('/lesson-materials'),
+        mockRequest,
+        { loadingKey: 'create-lesson-materials' }
+      );
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
@@ -1513,6 +1535,11 @@ describe('LessonMaterialsService', () => {
         lastValueFrom(service.createLessonMaterials(mockRequest))
       ).rejects.toThrow();
 
+      expect(requestService.post).toHaveBeenCalledWith(
+        expect.stringContaining('/lesson-materials'),
+        mockRequest,
+        { loadingKey: 'create-lesson-materials' }
+      );
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
@@ -1543,6 +1570,11 @@ describe('LessonMaterialsService', () => {
         lastValueFrom(service.createLessonMaterials(mockRequest))
       ).rejects.toThrow();
 
+      expect(requestService.post).toHaveBeenCalledWith(
+        expect.stringContaining('/lesson-materials'),
+        mockRequest,
+        { loadingKey: 'create-lesson-materials' }
+      );
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
@@ -1573,6 +1605,11 @@ describe('LessonMaterialsService', () => {
         lastValueFrom(service.createLessonMaterials(mockRequest))
       ).rejects.toThrow();
 
+      expect(requestService.post).toHaveBeenCalledWith(
+        expect.stringContaining('/lesson-materials'),
+        mockRequest,
+        { loadingKey: 'create-lesson-materials' }
+      );
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
@@ -1603,6 +1640,11 @@ describe('LessonMaterialsService', () => {
         lastValueFrom(service.createLessonMaterials(mockRequest))
       ).rejects.toThrow();
 
+      expect(requestService.post).toHaveBeenCalledWith(
+        expect.stringContaining('/lesson-materials'),
+        mockRequest,
+        { loadingKey: 'create-lesson-materials' }
+      );
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 

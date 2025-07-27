@@ -11,7 +11,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { switchMap } from 'rxjs';
+import { switchMap, tap, catchError } from 'rxjs';
+import { throwError } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -21,8 +22,12 @@ import { SubmenuDirective } from '../../../../../../../shared/directives/submenu
 
 import { ResourcesStateService } from '../../../services/utils/resources-state.service';
 import { GenerateSettingsSelectionService } from '../../services/generate-settings-selection.service';
+import { LoadingService } from '../../../../../../../shared/services/core/loading/loading.service';
 import { LessonMaterialsService } from '../../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
 import { AiJobsService } from '../../../services/api/ai-jobs.service';
+import { DownloadGeneratedContentService } from '../../services/download-generated-content.service';
+
+import { LessonGenerationType } from '../../../../../../../shared/models/enum/lesson-generation-type.enum';
 
 import {
   type CreateLessonMaterialRequest,
@@ -51,12 +56,21 @@ export class AudioPreviewPlayerComponent {
   private readonly generateSettingsService = inject(
     GenerateSettingsSelectionService
   );
+  private readonly loadingService = inject(LoadingService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
   private readonly aiJobService = inject(AiJobsService);
+  private readonly downloadGeneratedContentService = inject(
+    DownloadGeneratedContentService
+  );
 
   audioUrl = input<string>('');
-  hasGeneratedSuccessfully = this.resourceStateService.hasGeneratedSuccessfully;
+
+  isLoadingCreateMaterial = this.loadingService.is('create-lesson-materials');
+  isLoadingDownload = this.loadingService.is('download-generated-content');
   folderId = this.generateSettingsService.selectedFolderId;
+
+  generatedMetadataMap = this.resourceStateService.aiGeneratedMetadataMap;
+  hasGeneratedSuccessfully = this.resourceStateService.hasGeneratedSuccessfully;
 
   currentTime = signal<number>(0);
   duration = signal<number>(0);
@@ -198,19 +212,20 @@ export class AudioPreviewPlayerComponent {
 
   onSaveGeneratedContent() {
     const folderId = this.folderId();
-    const metadata = this.resourceStateService.aiGeneratedMetadata();
+    const metadata = this.generatedMetadataMap();
 
     if (!folderId || !metadata) return;
 
     this.aiJobService
-      .getFileSizeByBlobNameUrl(metadata.blobName)
+      .getFileSizeByBlobNameUrl(metadata[LessonGenerationType.Audio].blobName)
       .pipe(
         switchMap(fileSize => {
-          const cleanBlobName = metadata.blobName.split('?')[0];
+          const cleanBlobName =
+            metadata[LessonGenerationType.Audio].blobName.split('?')[0];
           const material: CreateLessonMaterialRequest = {
-            title: metadata.title,
-            contentType: metadata.contentType,
-            duration: metadata.duration,
+            title: metadata[LessonGenerationType.Audio].title,
+            contentType: metadata[LessonGenerationType.Audio].contentType,
+            duration: metadata[LessonGenerationType.Audio].duration,
             fileSize: fileSize,
             isAIContent: true,
             sourceUrl: cleanBlobName,
@@ -227,10 +242,17 @@ export class AudioPreviewPlayerComponent {
           );
         })
       )
-      .subscribe({
-        next: () => {
-          this.resourceStateService.clearAiGeneratedMetadata();
-        },
-      });
+      .subscribe();
+  }
+
+  onDownloadGeneratedContent() {
+    const metadata = this.generatedMetadataMap();
+    console.log(metadata);
+
+    if (!metadata) return;
+
+    this.downloadGeneratedContentService
+      .downloadGeneratedContent(metadata[LessonGenerationType.Audio].blobName)
+      .subscribe();
   }
 }

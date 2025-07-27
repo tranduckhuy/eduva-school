@@ -44,8 +44,18 @@
         </div>
       </div>
       <button
-        class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300">
-        <span class="pi pi-download"></span>
+        class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
+        [ngClass]="{
+          'pointer-events-none cursor-default opacity-60 hover:!bg-[#f0f4f9]':
+            isLoadingDownload(),
+        }"
+        (click)="onDownloadGeneratedContent()">
+        <span
+          class="pi"
+          [ngClass]="{
+            'pi-download': !isLoadingDownload(),
+            'pi-spin pi-spinner': isLoadingDownload(),
+          }"></span>
         <span>Tải xuống bản xem trước</span>
       </button>
       @if (!hasGeneratedSuccessfully()) {
@@ -56,10 +66,17 @@
             !this.folderId() ? 'Vui lòng chọn thư mục trước khi lưu' : ''
           "
           [ngClass]="{
-            'pointer-events-none cursor-default opacity-80': !this.folderId(),
+            'pointer-events-none': isLoadingCreateMaterial(),
+            'cursor-default opacity-60 hover:!bg-[#f0f4f9]':
+              !folderId() || isLoadingCreateMaterial(),
           }"
           (click)="onSaveGeneratedContent()">
-          <span class="pi pi-save"></span>
+          <span
+            class="pi"
+            [ngClass]="{
+              'pi-save': !isLoadingCreateMaterial(),
+              'pi-spin pi-spinner': isLoadingCreateMaterial(),
+            }"></span>
           <span>Lưu nội dung</span>
         </button>
       }

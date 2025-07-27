@@ -300,10 +300,10 @@ describe('FolderManagementService', () => {
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
-    it('should handle isPaging: false explicitly', async () => {
-      const requestWithIsPagingFalse = {
+    it('should handle isPagingEnabled: false explicitly', async () => {
+      const requestWithIsPagingEnabledFalse = {
         ...mockGetFoldersRequest,
-        isPaging: false,
+        isPagingEnabled: false,
       };
       const successResponse = {
         statusCode: StatusCode.SUCCESS,
@@ -313,7 +313,7 @@ describe('FolderManagementService', () => {
       (requestService.get as any).mockReturnValue(of(successResponse));
 
       const result = await firstValueFrom(
-        service.getPersonalFolders(requestWithIsPagingFalse)
+        service.getPersonalFolders(requestWithIsPagingEnabledFalse)
       );
 
       expect(result).toEqual([mockFolder, mockFolder2]);
@@ -323,10 +323,10 @@ describe('FolderManagementService', () => {
       expect(service.totalTrashRecords()).toBe(0);
     });
 
-    it('should handle isPaging: true explicitly', async () => {
-      const requestWithIsPagingTrue = {
+    it('should handle isPagingEnabled: true explicitly', async () => {
+      const requestWithIsPagingEnabledTrue = {
         ...mockGetFoldersRequest,
-        isPaging: true,
+        isPagingEnabled: true,
       };
       const successResponse = {
         statusCode: StatusCode.SUCCESS,
@@ -336,7 +336,7 @@ describe('FolderManagementService', () => {
       (requestService.get as any).mockReturnValue(of(successResponse));
 
       const result = await firstValueFrom(
-        service.getPersonalFolders(requestWithIsPagingTrue)
+        service.getPersonalFolders(requestWithIsPagingEnabledTrue)
       );
 
       expect(result).toEqual([mockFolder, mockFolder2]);
@@ -345,9 +345,9 @@ describe('FolderManagementService', () => {
       expect(service.totalTrashRecords()).toBe(2);
     });
 
-    it('should handle isPaging: undefined (default to true)', async () => {
-      const requestWithIsPagingUndefined = { ...mockGetFoldersRequest };
-      delete requestWithIsPagingUndefined.isPaging;
+    it('should handle isPagingEnabled: undefined (default to true)', async () => {
+      const requestWithIsPagingEnabledUndefined = { ...mockGetFoldersRequest };
+      delete requestWithIsPagingEnabledUndefined.isPagingEnabled;
 
       const successResponse = {
         statusCode: StatusCode.SUCCESS,
@@ -357,7 +357,7 @@ describe('FolderManagementService', () => {
       (requestService.get as any).mockReturnValue(of(successResponse));
 
       const result = await firstValueFrom(
-        service.getPersonalFolders(requestWithIsPagingUndefined)
+        service.getPersonalFolders(requestWithIsPagingEnabledUndefined)
       );
 
       expect(result).toEqual([mockFolder, mockFolder2]);
@@ -687,7 +687,10 @@ describe('FolderManagementService', () => {
     });
 
     it('should handle non-paging response for personal folders', async () => {
-      const nonPagingRequest = { ...mockGetFoldersRequest, isPaging: false };
+      const nonPagingRequest = {
+        ...mockGetFoldersRequest,
+        isPagingEnabled: false,
+      };
       const successResponse = {
         statusCode: StatusCode.SUCCESS,
         data: [mockFolder, mockFolder2],
@@ -851,9 +854,9 @@ describe('FolderManagementService', () => {
     });
 
     it('should handle undefined data in non-paging response', async () => {
-      const requestWithIsPagingFalse = {
+      const requestWithIsPagingEnabledFalse = {
         ...mockGetFoldersRequest,
-        isPaging: false,
+        isPagingEnabled: false,
       };
       const responseWithUndefinedData = {
         statusCode: StatusCode.SUCCESS,
@@ -865,7 +868,7 @@ describe('FolderManagementService', () => {
       );
 
       const result = await firstValueFrom(
-        service.getPersonalFolders(requestWithIsPagingFalse)
+        service.getPersonalFolders(requestWithIsPagingEnabledFalse)
       );
 
       expect(result).toBeNull();
@@ -873,9 +876,9 @@ describe('FolderManagementService', () => {
     });
 
     it('should handle null data in non-paging response', async () => {
-      const requestWithIsPagingFalse = {
+      const requestWithIsPagingEnabledFalse = {
         ...mockGetFoldersRequest,
-        isPaging: false,
+        isPagingEnabled: false,
       };
       const responseWithNullData = {
         statusCode: StatusCode.SUCCESS,
@@ -885,7 +888,7 @@ describe('FolderManagementService', () => {
       (requestService.get as any).mockReturnValue(of(responseWithNullData));
 
       const result = await firstValueFrom(
-        service.getPersonalFolders(requestWithIsPagingFalse)
+        service.getPersonalFolders(requestWithIsPagingEnabledFalse)
       );
 
       expect(result).toBeNull();

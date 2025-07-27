@@ -99,9 +99,9 @@ export class GenerateSettingsModalComponent implements OnInit {
 
   ngOnInit(): void {
     const request: GetFoldersRequest = {
-      sortBy: 'createdBy',
+      sortBy: 'createdAt',
       sortDirection: 'desc',
-      isPaging: true,
+      isPagingEnabled: true,
       status: EntityStatus.Active,
     };
     this.folderService.getPersonalFolders(request).subscribe();

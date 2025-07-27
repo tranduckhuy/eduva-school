@@ -1,6 +1,6 @@
 import {
-  ContentType,
-  LessonMaterialStatus,
+  type ContentType,
+  type LessonMaterialStatus,
 } from '../../../enum/lesson-material.enum';
 
 interface LessonActivity {

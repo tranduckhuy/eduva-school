@@ -140,7 +140,7 @@ export function debounceSignal<T>(
   };
 }
 
-/*
+/**
  * Converts all <figure class="image"><img /></figure> blocks in the given HTML string
  * into <p><p-image /></p> format, preserving relevant attributes like src, alt, and width.
  * This is typically used to convert image tags into a custom component format for rendering or editing.

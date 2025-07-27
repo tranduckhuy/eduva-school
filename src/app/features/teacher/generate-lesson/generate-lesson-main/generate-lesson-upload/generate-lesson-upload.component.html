@@ -12,7 +12,7 @@
       pTooltip="Tài liệu cho AI tạo bài giảng"
       tooltipPosition="bottom"
       class="flex h-10 w-full items-center justify-center rounded-full border border-[#dde1eb] text-[#5f6368] shadow-transparent transition-colors ease-in hover:bg-[#ecf2fc] dark:text-[#e6e6e6] dark:hover:bg-dark-400"
-      [ngClass]="{ 'pointer-events-none opacity-80': disableUploadButton }"
+      [ngClass]="{ 'pointer-events-none opacity-80': disableUploadButton() }"
       (click)="openUploadModal()">
       <div class="flex items-center gap-2">
         <span
@@ -42,7 +42,7 @@
           styleClass="relative bottom-[3px]"
           [binary]="true"
           [ngModel]="selectAll()"
-          [disabled]="disableCheckboxAll"
+          [disabled]="disableCheckboxAll()"
           (onChange)="toggleAll($event.checked)" />
       </div>
     }
@@ -57,7 +57,7 @@
             class="type-icon material-symbols-rounded select-none"
             [ngClass]="{
               'text-orange': item.type === 'pdf',
-              'text-primary': item.type === 'txt',
+              'text-primary': item.type === 'docx',
               'opacity-80': item.isUploading,
             }">
             {{ item.type === 'pdf' ? 'picture_as_pdf' : 'description' }}
@@ -88,7 +88,7 @@
               [binary]="true"
               [inputId]="item.id"
               [ngModel]="item.checked"
-              [disabled]="item.isUploading! || isLoading()"
+              [disabled]="disableCheckboxItem()[item.id]"
               (onChange)="toggleItem(item.id, $event.checked)" />
           } @else {
             <p-progress-spinner

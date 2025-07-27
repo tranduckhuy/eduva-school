@@ -1,4 +1,4 @@
-import { PeriodType } from '../../../enum/period-type.enum';
+import { type PeriodType } from '../../../enum/period-type.enum';
 
 export interface DashboardRequest {
   startDate?: string;

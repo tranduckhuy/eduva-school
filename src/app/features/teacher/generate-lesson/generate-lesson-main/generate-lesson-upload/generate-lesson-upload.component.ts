@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
+  computed,
   inject,
   signal,
 } from '@angular/core';
@@ -55,23 +56,14 @@ export class GenerateLessonUploadComponent implements OnInit {
   readonly currentCount = this.resourcesStateService.totalSources;
   readonly maxCount = 5;
 
-  ngOnInit(): void {
-    const job = this.job();
-
-    if (!job) return;
-
-    this.resourcesStateService.markGeneratedSuccess();
-  }
-
-  get disableUploadButton() {
-    return (
-      this.currentCount() >= 5 ||
+  disableUploadButton = computed(
+    () =>
       this.isLoading() ||
+      this.currentCount() >= 5 ||
       this.hasGeneratedSuccessfully()
-    );
-  }
+  );
 
-  get disableCheckboxAll() {
+  disableCheckboxAll = computed(() => {
     const sourceList = this.sourceList();
     const hasUploading = sourceList.some(item => item.isUploading);
 
@@ -81,6 +73,28 @@ export class GenerateLessonUploadComponent implements OnInit {
       this.hasGeneratedSuccessfully() ||
       this.sourceList().length <= 0
     );
+  });
+
+  disableCheckboxItem = computed(() => {
+    const list = this.sourceList();
+    const loading = this.isLoading();
+    const generated = this.hasGeneratedSuccessfully();
+
+    const result: Record<string, boolean> = {};
+
+    for (const item of list) {
+      result[item.id] = item.isUploading || loading || generated;
+    }
+
+    return result;
+  });
+
+  ngOnInit(): void {
+    const job = this.job();
+
+    if (!job) return;
+
+    this.resourcesStateService.markGeneratedSuccess();
   }
 
   toggleAll(checked: boolean) {
@@ -125,8 +139,8 @@ export class GenerateLessonUploadComponent implements OnInit {
     if (this.currentCount() >= this.maxCount) return;
 
     const handleUploadedFile = (file: File) => {
-      const fileExt = file.name.split('.').pop()?.toLowerCase() ?? 'txt';
-      const fileType = fileExt === 'pdf' ? 'pdf' : 'txt';
+      const fileExt = file.name.split('.').pop()?.toLowerCase() ?? 'docx';
+      const fileType = fileExt === 'pdf' ? 'pdf' : 'docx';
 
       const newItem: SourceItem = {
         id: Date.now().toString(),

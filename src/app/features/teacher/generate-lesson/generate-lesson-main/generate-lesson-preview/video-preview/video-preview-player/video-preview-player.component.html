@@ -138,5 +138,8 @@
     icon="pi pi-download"
     styleClass="mt-3"
     [rounded]="true"
-    [fluid]="true" />
+    [fluid]="true"
+    [loading]="isLoadingDownload()"
+    [disabled]="isLoadingDownload()"
+    (onClick)="onDownloadGeneratedContent()" />
 </div>
