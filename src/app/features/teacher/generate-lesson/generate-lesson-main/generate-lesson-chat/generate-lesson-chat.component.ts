@@ -7,7 +7,6 @@ import {
   computed,
   effect,
   inject,
-  signal,
   viewChild,
   DestroyRef,
 } from '@angular/core';

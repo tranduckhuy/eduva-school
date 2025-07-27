@@ -4,10 +4,18 @@ import { type ContentType } from '../../../../../../shared/models/enum/lesson-ma
 
 import { type LessonGenerationType } from '../../../../../../shared/models/enum/lesson-generation-type.enum';
 
-interface ChatMessage {
+export interface ChatMessage {
   sender: 'user' | 'system';
   content: string;
   isLoading?: boolean;
+}
+
+export interface AiGeneratedMetadata {
+  title: string;
+  contentType: ContentType;
+  duration: number;
+  fileSize: number;
+  blobName: string;
 }
 
 export type SourceItem = {
@@ -19,13 +27,7 @@ export type SourceItem = {
   file?: File;
 };
 
-export interface AiGeneratedMetadata {
-  title: string;
-  contentType: ContentType;
-  duration: number;
-  fileSize: number;
-  blobName: string;
-}
+export type ContentState = 'empty' | 'loading' | 'generated';
 
 @Injectable({
   providedIn: 'root',
@@ -62,14 +64,10 @@ export class ResourcesStateService {
     this.aiGeneratedMetadataMapSignal.asReadonly();
 
   // ? Preview State Management (shared between desktop and mobile)
-  private readonly videoStateSignal = signal<'empty' | 'loading' | 'generated'>(
-    'empty'
-  );
+  private readonly videoStateSignal = signal<ContentState>('empty');
   readonly videoState = this.videoStateSignal.asReadonly();
 
-  private readonly audioStateSignal = signal<'empty' | 'loading' | 'generated'>(
-    'empty'
-  );
+  private readonly audioStateSignal = signal<ContentState>('empty');
   readonly audioState = this.audioStateSignal.asReadonly();
 
   private readonly videoUrlSignal = signal<string>('');
@@ -191,11 +189,11 @@ export class ResourcesStateService {
   }
 
   // ? Preview State Methods
-  setVideoState(state: 'empty' | 'loading' | 'generated') {
+  setVideoState(state: ContentState) {
     this.videoStateSignal.set(state);
   }
 
-  setAudioState(state: 'empty' | 'loading' | 'generated') {
+  setAudioState(state: ContentState) {
     this.audioStateSignal.set(state);
   }
 

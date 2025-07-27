@@ -5,7 +5,6 @@ import {
   computed,
   effect,
   inject,
-  signal,
 } from '@angular/core';
 
 import { finalize, switchMap } from 'rxjs';
