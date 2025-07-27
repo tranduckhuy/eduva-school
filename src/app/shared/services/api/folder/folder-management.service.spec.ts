@@ -548,30 +548,60 @@ describe('FolderManagementService', () => {
       expect(toastHandlingService.successGeneral).toHaveBeenCalled();
     });
 
-    it('should handle rename failure and show error toast', async () => {
-      const failureResponse = {
-        statusCode: StatusCode.SYSTEM_ERROR,
-      };
+    it('should handle FOLDER_NAME_ALREADY_EXISTS error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.FOLDER_NAME_ALREADY_EXISTS },
+      });
 
-      (requestService.put as any).mockReturnValue(of(failureResponse));
+      (requestService.post as any).mockReturnValue(throwError(() => error));
 
-      const result = await firstValueFrom(
-        service.renameFolder(folderId, mockRenameRequest)
+      await expect(
+        firstValueFrom(service.createFolder(mockCreateRequest))
+      ).rejects.toBe(error);
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Cảnh báo',
+        'Tên thư mục đã tồn tại. Vui lòng chọn tên khác.'
       );
+    });
 
-      expect(result).toBeNull();
+    it('should handle FOLDER_CREATE_FAILED error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.FOLDER_CREATE_FAILED },
+      });
+
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        firstValueFrom(service.createFolder(mockCreateRequest))
+      ).rejects.toBe(error);
+      expect(toastHandlingService.error).toHaveBeenCalledWith(
+        'Tạo thư mục thất bại',
+        'Đã xảy ra sự cố trong quá trình tạo thư mục. Vui lòng thử lại sau.'
+      );
+    });
+
+    it('should handle unknown error with errorGeneral', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: 9999 },
+      });
+
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        firstValueFrom(service.createFolder(mockCreateRequest))
+      ).rejects.toBe(error);
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
-    it('should handle error and call errorGeneral', async () => {
+    it('should handle network error', async () => {
       const error = new HttpErrorResponse({
         error: new Error('Network error'),
       });
 
-      (requestService.put as any).mockReturnValue(throwError(() => error));
+      (requestService.post as any).mockReturnValue(throwError(() => error));
 
       await expect(
-        firstValueFrom(service.renameFolder(folderId, mockRenameRequest))
+        firstValueFrom(service.createFolder(mockCreateRequest))
       ).rejects.toBe(error);
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });

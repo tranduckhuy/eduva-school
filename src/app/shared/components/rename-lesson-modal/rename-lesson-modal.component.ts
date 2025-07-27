@@ -99,7 +99,9 @@ export class RenameLessonModalComponent {
   }
 
   private resetForm() {
-    this.form.reset();
     this.form.markAsUntouched();
+    this.form.patchValue({
+      name: this.modalData.folderName,
+    });
   }
 }

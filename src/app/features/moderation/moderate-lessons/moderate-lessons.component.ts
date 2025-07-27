@@ -59,7 +59,7 @@ export class ModerateLessonsComponent {
   pageSize = signal(PAGE_SIZE);
   firstRecordIndex = signal(0);
   searchTerm = signal('');
-  shouldStopRequest = signal<boolean>(true);
+  shouldStopRequest = signal<boolean>(false);
 
   tableHeadSkeleton = signal([
     'Tài liệu bài học',
@@ -119,16 +119,19 @@ export class ModerateLessonsComponent {
   }
 
   private loadMaterials(): void {
-    if (!this.shouldStopRequest()) return;
+    if (this.shouldStopRequest()) return;
 
     const request: GetPendingLessonMaterialsRequest = {
       searchTerm: this.searchTerm(),
       pageIndex: this.currentPage(),
       pageSize: this.pageSize(),
+      sortBy: 'createdAt',
+      sortDirection: 'desc',
+      isPagingEnabled: true,
     };
 
     this.lessonMaterialsService.getPendingLessonMaterials(request).subscribe({
-      error: () => this.shouldStopRequest.set(false),
+      error: () => this.shouldStopRequest.set(true),
     });
   }
 }

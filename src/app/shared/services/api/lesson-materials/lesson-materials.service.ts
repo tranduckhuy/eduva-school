@@ -16,6 +16,7 @@ import {
   type GetLessonMaterialsRequest,
   type GetPersonalLessonMaterialsRequest,
   type GetPendingLessonMaterialsRequest,
+  type GetSharedLessonMaterialsRequest,
 } from '../../../models/api/request/query/get-lesson-materials-request.model';
 import { type GetPagingLessonMaterialsResponse } from '../../../models/api/response/query/get-lesson-materials-response.model';
 import { type ApproveRejectMaterialRequest } from '../../../../features/moderation/moderate-lessons/models/approve-reject-material-request.model';
@@ -129,7 +130,7 @@ export class LessonMaterialsService {
   }
 
   getSharedLessonMaterials(
-    request: GetPendingLessonMaterialsRequest
+    request: GetSharedLessonMaterialsRequest
   ): Observable<LessonMaterial[] | null> {
     return this.requestService
       .get<GetPagingLessonMaterialsResponse>(

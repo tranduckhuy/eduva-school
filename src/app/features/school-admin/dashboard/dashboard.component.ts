@@ -4,6 +4,7 @@ import {
   computed,
   inject,
   OnInit,
+  signal,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
@@ -22,7 +23,7 @@ import { ReviewLessonsComponent } from './review-lessons/review-lessons.componen
 import { ContentTypeStatsComponent } from './content-type-stats/content-type-stats.component';
 import { LessonStatusStatsComponent } from './lesson-status-stats/lesson-status-stats.component';
 
-import { type DashboardRequest } from '../../../shared/models/api/request/command/dashboard-request.model';
+import { type DashboardRequest } from '../../../shared/models/api/request/query/dashboard-request.model';
 import { type ConfirmPaymentReturnRequest } from '../../../shared/models/api/request/query/confirm-payment-return-request.model';
 
 interface StatCard {
@@ -72,9 +73,12 @@ export class DashboardComponent implements OnInit {
   readonly dashboardSchoolAdminData =
     this.dashboardService.dashboardSchoolAdminData;
 
-  schoolMissing = computed(() => !this.currentUser()?.school);
+  readonly currentLessonCreationPeriod = signal<PeriodType>(PeriodType.Week);
+  readonly currentLessonStatusPeriod = signal<PeriodType>(PeriodType.Week);
 
-  planExpired = computed(() => {
+  readonly schoolMissing = computed(() => !this.currentUser()?.school);
+
+  readonly planExpired = computed(() => {
     const subscription = this.currentUser()?.userSubscriptionResponse;
     const isActive = subscription?.isSubscriptionActive;
     const endDate = subscription?.subscriptionEndDate;
@@ -155,7 +159,7 @@ export class DashboardComponent implements OnInit {
     return {
       title: 'Gói đăng ký',
       description: 'Gói đăng ký hiện tại',
-      value: data?.systemOverview.currentSubscription.name ?? '',
+      value: data?.systemOverview.currentSubscription.name ?? 'Chưa có gói',
       icon: 'request_quote',
       iconColor: 'text-warning',
     };
@@ -163,17 +167,29 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.handleRouteQueryParams();
+    this.loadData();
+  }
 
-    const hasSchool = !this.schoolMissing();
-    const isPlanValid = !this.planExpired();
-    if (hasSchool && isPlanValid) {
-      this.loadData();
-    }
+  onLessonCreationPeriodChange(period: PeriodType) {
+    this.currentLessonCreationPeriod.set(period);
+    this.loadData();
+  }
+
+  onLessonStatusPeriodChange(period: PeriodType) {
+    this.currentLessonStatusPeriod.set(period);
+    this.loadData();
   }
 
   private loadData() {
+    const user = this.currentUser();
+    const hasSchool = !this.schoolMissing();
+    const isPlanValid = !this.planExpired();
+
+    if (!user || !hasSchool || !isPlanValid) return;
+
     const request: DashboardRequest = {
-      lessonStatusPeriod: PeriodType.Week,
+      lessonActivityPeriod: this.currentLessonCreationPeriod(),
+      lessonStatusPeriod: this.currentLessonStatusPeriod(),
     };
     this.dashboardService.getDashboardSchoolAdminData(request).subscribe();
   }

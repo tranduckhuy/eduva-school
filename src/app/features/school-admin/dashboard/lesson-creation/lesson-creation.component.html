@@ -7,19 +7,15 @@
     </div>
     <div class="ml-auto flex gap-2">
       <p-select
-        [options]="timeSelectOptions()"
-        [ngModel]="timeSelect()"
-        (ngModelChange)="onTimeSelectChange($event)"
+        inputId="timeSelect"
         optionLabel="name"
         placeholder="Chọn khoảng thời gian"
+        [ngModel]="timeSelect()"
+        [options]="timeSelectOptions()"
+        [loading]="isChangingPeriod()"
         [disabled]="isChangingPeriod()"
+        (onChange)="onTimeSelectChange($event)"
         class="!dark:bg-dark-200 flex h-11 w-full items-center sm:w-40" />
-      @if (isChangingPeriod()) {
-        <div class="flex items-center">
-          <div
-            class="h-4 w-4 animate-spin rounded-full border-b-2 border-primary"></div>
-        </div>
-      }
     </div>
   </div>
 

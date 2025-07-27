@@ -7,7 +7,6 @@ import {
   computed,
   effect,
   inject,
-  signal,
   viewChild,
   DestroyRef,
 } from '@angular/core';
@@ -79,8 +78,8 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   readonly hasPreviewContentSuccessfully =
     this.resourcesStateService.hasPreviewContentSuccessfully;
 
-  messages = signal<ChatMessage[]>([]);
-  showScrollButton = signal(false);
+  messages = this.resourcesStateService.messages;
+  showScrollButton = this.resourcesStateService.showScrollButton;
 
   disabledSendButton = computed(() => {
     return (
@@ -146,7 +145,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       const nearBottom =
         container.scrollHeight - container.scrollTop - container.clientHeight <
         200;
-      this.showScrollButton.set(!nearBottom);
+      this.resourcesStateService.setShowScrollButton(!nearBottom);
     });
   }
 
@@ -161,7 +160,10 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     if (!content) return;
 
     this.resourcesStateService.updateHasInteracted(true);
-    this.messages.update(prev => [...prev, { sender: 'user', content }]);
+    this.resourcesStateService.updateMessages(prev => [
+      ...prev,
+      { sender: 'user', content },
+    ]);
 
     this.createAiJob();
     this.form.reset();
@@ -172,7 +174,10 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
 
     const content = `Tạo bài giảng về ${title}`;
     this.resourcesStateService.updateHasInteracted(true);
-    this.messages.update(prev => [...prev, { sender: 'user', content }]);
+    this.resourcesStateService.updateMessages(prev => [
+      ...prev,
+      { sender: 'user', content },
+    ]);
 
     this.form.patchValue({ topic: content });
 
@@ -208,7 +213,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     this.resourcesStateService.resetGeneratedStatus();
     this.resourcesStateService.resetGeneratedPreviewContentStatus();
 
-    this.messages.update(prev => [
+    this.resourcesStateService.updateMessages(prev => [
       ...prev,
       { sender: 'system', content: '', isLoading: true },
     ]);
@@ -251,7 +256,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       ? this.renderFailureMessage(failureReason)
       : this.renderSuccessMessage(previewContent, audioCost, videoCost);
 
-    this.messages.update(prev => {
+    this.resourcesStateService.updateMessages(prev => {
       const updated = [...prev];
       const idx = updated.findIndex(m => m.sender === 'system' && m.isLoading);
 
@@ -372,10 +377,10 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       isLoading: false,
     };
 
-    this.messages.set([userMessage, systemMessage]);
+    this.resourcesStateService.setMessages([userMessage, systemMessage]);
   }
 
   private resetAll() {
-    this.messages.set([]);
+    this.resourcesStateService.setMessages([]);
   }
 }

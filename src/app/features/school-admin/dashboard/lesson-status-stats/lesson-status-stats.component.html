@@ -5,16 +5,19 @@
     <h2 class="text-base font-semibold">Thống kê trạng thái bài giảng</h2>
     <div class="ml-auto flex gap-2">
       <p-select
-        [options]="timeSelectOptions"
-        [ngModel]="timeSelect()"
-        (ngModelChange)="onTimeSelectChange($event)"
+        inputId="timeSelect"
         optionLabel="name"
         placeholder="Chọn khoảng thời gian"
+        [ngModel]="timeSelect()"
+        [options]="timeSelectOptions()"
+        [loading]="isChangingPeriod()"
+        [disabled]="isChangingPeriod()"
+        (onChange)="onTimeSelectChange($event)"
         class="!dark:bg-dark-200 flex h-11 w-full items-center sm:w-40" />
     </div>
   </div>
   <div id="chart" class="p-5">
-    <ng-container *ngIf="isLoading(); else chartBlock">
+    <ng-container *ngIf="isChangingPeriod(); else chartBlock">
       <div class="flex h-64 items-center justify-center">
         <div class="text-center">
           <div

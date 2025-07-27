@@ -50,7 +50,7 @@ export class CreditPackComponent implements OnInit {
   currentPage = signal<number>(1);
   pageSize = signal<number>(PAGE_SIZE);
   firstRecordIndex = signal<number>(0);
-  shouldStopRequest = signal<boolean>(true);
+  shouldStopRequest = signal<boolean>(false);
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(params => {
@@ -83,7 +83,7 @@ export class CreditPackComponent implements OnInit {
   }
 
   loadCreditTransactions(pageChangeValue?: PageChangeValue) {
-    if (!this.shouldStopRequest()) return;
+    if (this.shouldStopRequest()) return;
 
     const request: GetCreditTransactionRequest = {
       pageIndex: pageChangeValue?.currentPage ?? this.currentPage(),
@@ -92,7 +92,7 @@ export class CreditPackComponent implements OnInit {
       sortDirection: 'desc',
     };
     this.creditTransactionService.getCreditTransactions(request).subscribe({
-      error: () => this.shouldStopRequest.set(false),
+      error: () => this.shouldStopRequest.set(true),
     });
   }
 }

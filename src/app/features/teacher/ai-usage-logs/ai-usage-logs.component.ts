@@ -5,6 +5,7 @@ import {
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
+
 import { TableModule, type TableLazyLoadEvent } from 'primeng/table';
 
 import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
@@ -15,7 +16,6 @@ import { LoadingService } from '../../../shared/services/core/loading/loading.se
 import { PAGE_SIZE } from '../../../shared/constants/common.constant';
 import { LessonGenerationType } from '../../../shared/models/enum/lesson-generation-type.enum';
 
-import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
 
@@ -28,7 +28,6 @@ import { type GetAiUsageLogsRequest } from './models/get-ai-usage-logs-request.m
     DatePipe,
     TableModule,
     LeadingZeroPipe,
-    SearchInputComponent,
     TableSkeletonComponent,
     TableEmptyStateComponent,
   ],
@@ -47,7 +46,6 @@ export class AiUsageLogsComponent {
   currentPage = signal(1);
   pageSize = signal(PAGE_SIZE);
   firstRecordIndex = signal(0);
-  searchValue = signal('');
   shouldStopRequest = signal<boolean>(false);
 
   tableHeadSkeleton = signal([
@@ -57,14 +55,6 @@ export class AiUsageLogsComponent {
     'Số Ecoin đã trừ',
     'Ngày sử dụng',
   ]);
-
-  onSearch(searchTerm?: string): void {
-    this.searchValue.set(searchTerm ?? '');
-    this.currentPage.set(1);
-    this.firstRecordIndex.set(0);
-
-    this.loadData();
-  }
 
   onLazyLoad(event: TableLazyLoadEvent): void {
     const rows = event.rows ?? this.pageSize();
@@ -114,7 +104,6 @@ export class AiUsageLogsComponent {
     const request: GetAiUsageLogsRequest = {
       pageIndex: this.currentPage(),
       pageSize: this.pageSize(),
-      searchTerm: this.searchValue(),
       sortBy: 'createdAt',
       sortDirection: 'desc',
     };

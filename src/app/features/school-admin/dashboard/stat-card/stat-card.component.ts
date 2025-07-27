@@ -33,6 +33,8 @@ export class StatCardComponent {
   statCard = input.required<StatCard>();
 
   getPercent(value: number) {
+    if (!value || Number.isNaN(value)) return 0;
+
     return Math.round((value / Number(this.statCard().value)) * 100);
   }
 }

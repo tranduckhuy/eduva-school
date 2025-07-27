@@ -13,6 +13,7 @@ import {
   GetLessonMaterialsRequest,
   GetPersonalLessonMaterialsRequest,
   GetPendingLessonMaterialsRequest,
+  GetSharedLessonMaterialsRequest,
 } from '../../../models/api/request/query/get-lesson-materials-request.model';
 import { GetPagingLessonMaterialsResponse } from '../../../models/api/response/query/get-lesson-materials-response.model';
 import { ApproveRejectMaterialRequest } from '../../../../features/moderation/moderate-lessons/models/approve-reject-material-request.model';
@@ -581,7 +582,7 @@ describe('LessonMaterialsService', () => {
   });
 
   describe('getSharedLessonMaterials', () => {
-    const mockRequest: GetPendingLessonMaterialsRequest = {
+    const mockRequest: GetSharedLessonMaterialsRequest = {
       pageIndex: 1,
       pageSize: 10,
     };

@@ -55,8 +55,14 @@
                 formControlName="firstName"
                 name="firstName"
                 [required]="true"
+                [noSpecialCharactersOrNumbers]="true"
                 [readOnly]="!isEdit()"
-                [submitted]="submitted()" />
+                [submitted]="submitted()"
+                [errorMessages]="{
+                  required: 'Họ không được để trống',
+                  noSpecialCharactersOrNumbers:
+                    'Họ chỉ được chứa chữ cái và dấu tiếng Việt',
+                }" />
             </div>
             <div class="e-col-6 e-col-xs-12">
               <app-form-control
@@ -65,8 +71,14 @@
                 formControlName="lastName"
                 name="lastName"
                 [required]="true"
+                [noSpecialCharactersOrNumbers]="true"
                 [readOnly]="!isEdit()"
-                [submitted]="submitted()" />
+                [submitted]="submitted()"
+                [errorMessages]="{
+                  required: 'Tên không được để trống',
+                  noSpecialCharactersOrNumbers:
+                    'Tên chỉ được chứa chữ cái và dấu tiếng Việt',
+                }" />
             </div>
           </div>
         </div>

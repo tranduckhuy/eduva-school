@@ -146,8 +146,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
       const errorStatusCode = error.error?.statusCode;
 
-      if (!errorStatusCode) return throwError(() => error);
-
+      // Handle server errors
       if (isServerError) {
         handleServerError();
         return throwError(() => error);
@@ -157,6 +156,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         handleUnauthorized();
         return throwError(() => error);
       }
+
+      if (!errorStatusCode) return throwError(() => error);
 
       if (
         isPaymentRequired &&

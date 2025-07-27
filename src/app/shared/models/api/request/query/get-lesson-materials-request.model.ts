@@ -23,7 +23,6 @@ export interface GetPersonalLessonMaterialsRequest {
 }
 
 export interface GetPendingLessonMaterialsRequest {
-  tag?: string;
   contentType?: ContentType;
   classId?: string;
   folderId?: string;
@@ -32,6 +31,7 @@ export interface GetPendingLessonMaterialsRequest {
   sortBy?: string;
   sortDirection?: string;
   searchTerm?: string;
+  isPagingEnabled?: boolean;
 }
 
 export interface GetSharedLessonMaterialsRequest {
@@ -44,4 +44,5 @@ export interface GetSharedLessonMaterialsRequest {
   sortBy?: string;
   sortDirection?: string;
   searchTerm?: string;
+  isPagingEnabled?: boolean;
 }
