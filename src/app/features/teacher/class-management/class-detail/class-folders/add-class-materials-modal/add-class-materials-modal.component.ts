@@ -91,10 +91,6 @@ export class AddClassMaterialsModalComponent implements OnInit {
     this.targetMaterials().some(m => !this.initialTargetIds().has(m.id))
   );
 
-  constructor() {
-    this.setupFilterDebounces();
-  }
-
   ngOnInit(): void {
     this.loadPersonalFolders();
     this.loadTargetMaterials(this.modalData.targetFolderId);
@@ -205,34 +201,6 @@ export class AddClassMaterialsModalComponent implements OnInit {
         bgColor: 'bg-gray-100',
       }
     );
-  }
-
-  private setupFilterDebounces() {
-    const sourceCleanup = debounceSignal(
-      this.sourceFilterText,
-      () => {
-        const folder = this.folder?.value;
-        if (folder) {
-          this.loadSourceMaterials(folder.id, this.sourceFilterText());
-        }
-      },
-      300
-    );
-
-    const targetCleanup = debounceSignal(
-      this.targetFilterText,
-      () =>
-        this.loadTargetMaterials(
-          this.modalData.targetFolderId,
-          this.targetFilterText()
-        ),
-      300
-    );
-
-    this.destroyRef.onDestroy(() => {
-      sourceCleanup();
-      targetCleanup();
-    });
   }
 
   private refreshMaterialSignals() {
