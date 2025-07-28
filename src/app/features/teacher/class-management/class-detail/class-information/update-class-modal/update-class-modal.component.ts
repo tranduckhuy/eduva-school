@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  OnInit,
   inject,
   signal,
 } from '@angular/core';
@@ -37,7 +36,7 @@ interface UpdateClassModalData {
   styleUrl: './update-class-modal.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UpdateClassModalComponent implements OnInit {
+export class UpdateClassModalComponent {
   private readonly fb = inject(FormBuilder);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly loadingService = inject(LoadingService);
@@ -69,8 +68,6 @@ export class UpdateClassModalComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
-
   get name() {
     return this.form.get('name')!;
   }
@@ -94,7 +91,7 @@ export class UpdateClassModalComponent implements OnInit {
   openChooseImageModal() {
     this.globalModalService.open(ChooseImageModalComponent, {
       currentImageUrl:
-        this.backgroundImageUrl.value || this.modalData.backgroundImageUrl,
+        this.backgroundImageUrl.value ?? this.modalData.backgroundImageUrl,
       onImageSelected: (selectedImageUrl: string) => {
         this.backgroundImageUrl.setValue(selectedImageUrl);
         this.cdr.markForCheck();

@@ -25,8 +25,6 @@ import { ClassFolderManagementService } from '../../../services/class-folder-man
 import { LoadingService } from '../../../../../../shared/services/core/loading/loading.service';
 import { GlobalModalService } from '../../../../../../shared/services/layout/global-modal/global-modal.service';
 
-import { debounceSignal } from '../../../../../../shared/utils/util-functions';
-
 import { MODAL_DATA } from '../../../../../../shared/tokens/injection/modal-data.token';
 import { EntityStatus } from '../../../../../../shared/models/enum/entity-status.enum';
 import { FolderOwnerType } from '../../../../../../shared/models/enum/folder-owner-type.enum';

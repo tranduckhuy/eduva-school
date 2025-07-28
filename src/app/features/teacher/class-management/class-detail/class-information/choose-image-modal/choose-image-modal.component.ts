@@ -36,8 +36,8 @@ export class ChooseImageModalComponent implements OnInit {
   readonly backgroundImageUrls = signal<string[]>([]);
   readonly selectedImageUrl = signal<string>('');
 
-  async ngOnInit(): Promise<void> {
-    await this.loadBackgroundImageUrls();
+  ngOnInit(): void {
+    this.loadBackgroundImageUrls();
   }
 
   private async loadBackgroundImageUrls(): Promise<void> {
@@ -53,7 +53,7 @@ export class ChooseImageModalComponent implements OnInit {
       if (this.modalData.currentImageUrl) {
         this.selectedImageUrl.set(this.modalData.currentImageUrl);
       }
-    } catch (error) {
+    } catch {
       this.backgroundImageUrls.set([]);
     }
   }
