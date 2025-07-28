@@ -1,0 +1,84 @@
+<div
+  class="max-h-[calc(100vh-40px)] w-full overflow-y-auto rounded bg-white dark:bg-dark-300">
+  <form [formGroup]="form" (ngSubmit)="onSave()">
+    <header
+      class="sticky left-0 top-0 z-[1] block w-full rounded-t-lg bg-gray-50 p-[25px] dark:bg-dark-400">
+      <h2 class="text-lg xs:hidden">Chỉnh sửa thông tin lớp học</h2>
+      <h2 class="hidden text-lg xs:block">Chỉnh sửa thông tin</h2>
+      <span
+        class="pi pi-times absolute right-[5px] top-[50%] -translate-y-[50%] cursor-pointer px-5 py-3 text-xl"
+        (click)="closeModal()"></span>
+    </header>
+
+    <div class="mt-[25px] w-[600px] px-[25px] pb-0 xs:w-[350px]">
+      <img
+        [src]="backgroundImageUrl.value || modalData.backgroundImageUrl"
+        [alt]="name.value || modalData.name"
+        class="h-[180px] w-full rounded object-cover" />
+      <div class="mt-4 flex flex-wrap items-center justify-between gap-y-2">
+        <span class="font-bold dark:text-white">Chọn hình nền cho lớp học</span>
+        <p-button
+          label="Chọn hình nền"
+          variant="outlined"
+          size="small"
+          icon="pi pi-image"
+          [rounded]="true"
+          (onClick)="openChooseImageModal()" />
+      </div>
+    </div>
+
+    <div class="mt-[25px] w-[600px] px-[25px] pb-0 xs:w-[350px]">
+      <label for="name" class="font-bold dark:text-white"> Tên lớp học </label>
+      <div
+        class="relative mt-3 h-[50px] w-full rounded-md border-[1.5px] border-[#e9edf6] bg-white px-5 transition-colors duration-200 ease-in focus-within:border-primary dark:bg-dark-400"
+        [ngClass]="{
+          '!border-[#f33a58] dark:!border-[#f33a58]':
+            name.invalid && name.touched,
+        }"
+        [style.backgroundColor]="
+          name.invalid && name.touched ? '#ff00001a' : ''
+        ">
+        <input
+          type="text"
+          id="name"
+          name="name"
+          formControlName="name"
+          placeholder="E.g. 12_A5_HoaHoc_2526"
+          (blur)="onBlur('name')"
+          class="h-full w-full border-none bg-transparent outline-none placeholder:font-medium placeholder:tracking-wide placeholder:text-gray-500 dark:text-white dark:placeholder:text-gray-400"
+          [class.text-[#f33a58]]="name.invalid && name.touched && name.dirty" />
+        @if (name.invalid && name.touched) {
+          <div class="absolute right-[14px] top-1/2 -translate-y-1/2">
+            <i
+              class="fa-solid fa-triangle-exclamation animate-shake text-base text-[#f33a58]">
+            </i>
+          </div>
+        }
+      </div>
+      @if (name.invalid && name.touched) {
+        <div class="mt-2 font-medium leading-normal text-[#f33a58]">
+          {{ getErrorMessage('name') }}
+        </div>
+      }
+    </div>
+
+    <footer
+      class="sticky bottom-0 left-0 z-[1] flex justify-end gap-2 bg-white p-[25px] dark:bg-dark-300">
+      <p-button
+        label="Hủy"
+        variant="outlined"
+        severity="danger"
+        icon="pi pi-times"
+        size="small"
+        (onClick)="closeModal()" />
+      <p-button
+        type="submit"
+        label="Lưu"
+        variant="outlined"
+        size="small"
+        icon="pi pi-save"
+        [loading]="isLoading()"
+        [disabled]="form.invalid || isLoading()" />
+    </footer>
+  </form>
+</div>
