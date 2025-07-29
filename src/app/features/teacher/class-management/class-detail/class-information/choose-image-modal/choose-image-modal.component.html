@@ -10,29 +10,35 @@
   </header>
 
   <div class="mt-[25px] w-[calc(100vw-80px)] px-[25px] pb-0 xs:w-[350px]">
-    <div class="grid grid-cols-3 gap-3 lg:grid-cols-2 sm:grid-cols-1">
-      @for (url of backgroundImageUrls(); track $index) {
-        <div class="col-span-1">
-          <div
-            class="group relative col-span-1 cursor-pointer rounded-lg border-4"
-            [ngClass]="{
-              'border-primary bg-primary/10': selectedImageUrl() === url,
-              'border-transparent': selectedImageUrl() !== url,
-            }"
-            (click)="selectImage(url)">
-            @if (selectedImageUrl() === url) {
-              <span
-                class="pi pi-check-circle absolute left-3 top-3 z-[1] text-white"
-                style="font-size: 20px; font-weight: 600"></span>
-            }
-            <img
-              class="h-32 w-full rounded object-cover transition-opacity duration-200 group-hover:opacity-80"
-              [src]="url"
-              [alt]="'Background ' + $index" />
+    @if (isLoading()) {
+      <div class="flex h-[300px] items-center justify-center">
+        <p-progress-spinner [style]="{ width: '50px', height: '50px' }" />
+      </div>
+    } @else {
+      <div class="grid grid-cols-3 gap-3 lg:grid-cols-2 sm:grid-cols-1">
+        @for (url of backgroundImageUrls(); track $index) {
+          <div class="col-span-1">
+            <div
+              class="group relative col-span-1 cursor-pointer rounded-lg border-4"
+              [ngClass]="{
+                'border-primary bg-primary/10': selectedImageUrl() === url,
+                'border-transparent': selectedImageUrl() !== url,
+              }"
+              (click)="selectImage(url)">
+              @if (selectedImageUrl() === url) {
+                <span
+                  class="pi pi-check-circle absolute left-3 top-3 z-[1] text-white"
+                  style="font-size: 20px; font-weight: 600"></span>
+              }
+              <img
+                class="h-32 w-full rounded object-cover transition-opacity duration-200 group-hover:opacity-80"
+                [src]="url"
+                [alt]="'Background ' + $index" />
+            </div>
           </div>
-        </div>
-      }
-    </div>
+        }
+      </div>
+    }
   </div>
 
   <footer
@@ -49,8 +55,7 @@
       variant="outlined"
       size="small"
       icon="pi pi-save"
-      [loading]="isLoading()"
-      [disabled]="isLoading() || !selectedImageUrl()"
+      [disabled]="!selectedImageUrl()"
       (onClick)="onSave()" />
   </footer>
 </div>

@@ -8,9 +8,10 @@ import {
 import { CommonModule } from '@angular/common';
 
 import { ButtonModule } from 'primeng/button';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
-import { LoadingService } from '../../../../../../shared/services/core/loading/loading.service';
 import { UploadFileService } from '../../../../../../shared/services/api/file/upload-file.service';
+
 import { MODAL_DATA } from '../../../../../../shared/tokens/injection/modal-data.token';
 
 interface ChooseImageModalData {
@@ -22,25 +23,43 @@ interface ChooseImageModalData {
 @Component({
   selector: 'app-choose-image-modal',
   standalone: true,
-  imports: [CommonModule, ButtonModule],
+  imports: [CommonModule, ButtonModule, ProgressSpinnerModule],
   templateUrl: './choose-image-modal.component.html',
   styleUrl: './choose-image-modal.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChooseImageModalComponent implements OnInit {
-  private readonly loadingService = inject(LoadingService);
   private readonly uploadFileService = inject(UploadFileService);
   readonly modalData = inject(MODAL_DATA) as ChooseImageModalData;
 
-  readonly isLoading = this.loadingService.is('update-class-information');
   readonly backgroundImageUrls = signal<string[]>([]);
   readonly selectedImageUrl = signal<string>('');
+  readonly isLoading = signal<boolean>(false);
 
   ngOnInit(): void {
     this.loadBackgroundImageUrls();
   }
 
+  selectImage(imageUrl: string) {
+    this.selectedImageUrl.set(imageUrl);
+  }
+
+  onSave() {
+    const selectedUrl = this.selectedImageUrl();
+    if (selectedUrl && this.modalData.onImageSelected) {
+      this.modalData.onImageSelected(selectedUrl);
+    }
+    this.closeModal();
+  }
+
+  closeModal() {
+    if (this.modalData.onModalClosed) {
+      this.modalData.onModalClosed();
+    }
+  }
+
   private async loadBackgroundImageUrls(): Promise<void> {
+    this.isLoading.set(true);
     try {
       const urls = await this.uploadFileService.getBackgroundImageUrls();
 
@@ -53,7 +72,10 @@ export class ChooseImageModalComponent implements OnInit {
       if (this.modalData.currentImageUrl) {
         this.selectedImageUrl.set(this.modalData.currentImageUrl);
       }
+
+      this.isLoading.set(false);
     } catch {
+      this.isLoading.set(false);
       this.backgroundImageUrls.set([]);
     }
   }
@@ -74,23 +96,5 @@ export class ChooseImageModalComponent implements OnInit {
     // ? Move current URL to the beginning
     const filteredUrls = urls.filter(url => url !== currentUrl);
     return [currentUrl, ...filteredUrls];
-  }
-
-  selectImage(imageUrl: string) {
-    this.selectedImageUrl.set(imageUrl);
-  }
-
-  onSave() {
-    const selectedUrl = this.selectedImageUrl();
-    if (selectedUrl && this.modalData.onImageSelected) {
-      this.modalData.onImageSelected(selectedUrl);
-    }
-    this.closeModal();
-  }
-
-  closeModal() {
-    if (this.modalData.onModalClosed) {
-      this.modalData.onModalClosed();
-    }
   }
 }
