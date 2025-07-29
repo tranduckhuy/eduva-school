@@ -71,17 +71,37 @@
                   </button>
                   <button
                     class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
+                    [ngClass]="{
+                      'pointer-events-none cursor-default opacity-60 hover:!bg-[#f0f4f9]':
+                        isLoadingRemoveFolder(),
+                    }"
                     (click)="onRemoveFolder(folderWithMaterials.folder.id)">
-                    <span class="pi pi-trash" style="font-size: 14px"></span>
+                    <span
+                      style="font-size: 14px"
+                      class="pi"
+                      [ngClass]="{
+                        'pi-trash': !isLoadingRemoveFolder(),
+                        'pi-spin pi-spinner': isLoadingRemoveFolder(),
+                      }"></span>
                     <span>Xóa thư mục</span>
                   </button>
                   @if (folderWithMaterials.materials.length > 0) {
                     <button
                       class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
+                      [ngClass]="{
+                        'pointer-events-none cursor-default opacity-60 hover:!bg-[#f0f4f9]':
+                          isLoadingRemoveMaterials(),
+                      }"
                       (click)="
                         onRemoveMaterials(folderWithMaterials.folder.id)
                       ">
-                      <span class="pi pi-trash" style="font-size: 14px"></span>
+                      <span
+                        style="font-size: 14px"
+                        class="pi"
+                        [ngClass]="{
+                          'pi-trash': !isLoadingRemoveMaterials(),
+                          'pi-spin pi-spinner': isLoadingRemoveMaterials(),
+                        }"></span>
                       <span>Xóa toàn bộ tài liệu</span>
                     </button>
                   }
@@ -144,13 +164,23 @@
                       ">
                       <button
                         class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
+                        [ngClass]="{
+                          'pointer-events-none cursor-default opacity-60 hover:!bg-[#f0f4f9]':
+                            isLoadingRemoveMaterials(),
+                        }"
                         (click)="
                           onRemoveMaterials(
                             folderWithMaterials.folder.id,
                             material.id
                           )
                         ">
-                        <span class="pi pi-trash"></span>
+                        <span
+                          style="font-size: 14px"
+                          class="pi"
+                          [ngClass]="{
+                            'pi-trash': !isLoadingRemoveMaterials(),
+                            'pi-spin pi-spinner': isLoadingRemoveMaterials(),
+                          }"></span>
                         <span>Xóa tài liệu</span>
                       </button>
                     </div>

@@ -16,6 +16,7 @@ import { GlobalModalService } from '../../../shared/services/layout/global-modal
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
 
 import { PAGE_SIZE } from '../../../shared/constants/common.constant';
+import { EntityStatus } from '../../../shared/models/enum/entity-status.enum';
 
 import { ClassCardComponent } from './class-card/class-card.component';
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
@@ -85,12 +86,12 @@ export class ClassManagementComponent implements OnInit {
     this.loadClass();
   }
 
-  onSearch(value: string) {
-    this.searchTerm.set(value);
+  onSearch(value?: string) {
+    this.searchTerm.set(value ?? '');
     this.currentPage.set(1);
     this.first.set(0);
 
-    this.isSearching.set(!!value.trim());
+    this.isSearching.set(!!value?.trim());
 
     this.loadClass();
   }
@@ -107,8 +108,10 @@ export class ClassManagementComponent implements OnInit {
       pageIndex: this.currentPage(),
       pageSize: this.pageSize(),
       searchTerm: this.searchTerm(),
-      sortBy: 'createdAt',
+      sortBy: 'lastModifiedAt',
       sortDirection: 'desc',
+      isPagingEnabled: true,
+      status: EntityStatus.Active,
     };
     this.classManagementService.getClasses(request).subscribe();
   }

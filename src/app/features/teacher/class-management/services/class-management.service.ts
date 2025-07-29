@@ -58,18 +58,19 @@ export class ClassManagementService {
         loadingKey: 'update-class-information',
       })
       .pipe(
-        tap(res => {
-          if (res.statusCode === StatusCode.SUCCESS) {
-            this.toastHandlingService.successGeneral();
-          } else {
-            this.toastHandlingService.errorGeneral();
-          }
-        }),
+        tap(res => this.handleSuccess(res)),
         map(() => null),
-        catchError((err: HttpErrorResponse) => {
-          this.toastHandlingService.errorGeneral();
-          return throwError(() => err);
-        })
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  archiveClass(classId: string): Observable<null> {
+    return this.requestService
+      .post<null>(`${this.BASE_CLASS_API_URL}/${classId}/archive`)
+      .pipe(
+        tap(res => this.handleSuccess(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
       );
   }
 
@@ -238,5 +239,18 @@ export class ClassManagementService {
       return students;
     }
     return null;
+  }
+
+  private handleSuccess(res: any): void {
+    if (res.statusCode === StatusCode.SUCCESS) {
+      this.toastHandlingService.successGeneral();
+    } else {
+      this.toastHandlingService.errorGeneral();
+    }
+  }
+
+  private handleError(err: HttpErrorResponse): Observable<null> {
+    this.toastHandlingService.errorGeneral();
+    return throwError(() => err);
   }
 }
