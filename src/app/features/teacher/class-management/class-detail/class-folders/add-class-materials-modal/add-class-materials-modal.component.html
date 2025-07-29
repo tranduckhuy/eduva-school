@@ -71,17 +71,7 @@
           (onSourceFilter)="handleSourceFilter($event)"
           (onTargetFilter)="handleTargetFilter($event)">
           <ng-template let-material #item>
-            <div
-              class="flex w-full items-center gap-3 p-1"
-              [ngClass]="{
-                'pointer-events-none cursor-default opacity-50':
-                  initialTargetIds().has(material.id),
-              }"
-              [pTooltip]="
-                initialTargetIds().has(material.id)
-                  ? 'Bài học này đã tồn tại sẵn trong lớp và không thể di chuyển về thư mục cá nhân'
-                  : ''
-              ">
+            <div class="flex w-full items-center gap-3 p-1">
               <span
                 class="icon-wrapper"
                 [ngClass]="getMaterialIconConfig(material.contentType).bgColor">

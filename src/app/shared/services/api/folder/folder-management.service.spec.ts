@@ -482,7 +482,7 @@ describe('FolderManagementService', () => {
   describe('removeClassFolder', () => {
     const folderId = 'folder-123';
 
-    it('should remove folder successfully and show success toast', async () => {
+    it('should remove folder successfully with correct loading key and show success toast', async () => {
       const successResponse = {
         statusCode: StatusCode.DELETED,
       };
@@ -493,12 +493,16 @@ describe('FolderManagementService', () => {
 
       expect(result).toBeNull();
       expect(requestService.delete).toHaveBeenCalledWith(
-        expect.stringContaining(`/folders/${folderId}`)
+        expect.stringContaining(`/folders/${folderId}`),
+        undefined,
+        {
+          loadingKey: 'remove-class-folder',
+        }
       );
       expect(toastHandlingService.successGeneral).toHaveBeenCalled();
     });
 
-    it('should handle remove failure and show error toast', async () => {
+    it('should handle remove failure with correct loading key and show error toast', async () => {
       const failureResponse = {
         statusCode: StatusCode.SYSTEM_ERROR,
       };
@@ -508,10 +512,17 @@ describe('FolderManagementService', () => {
       const result = await firstValueFrom(service.removeClassFolder(folderId));
 
       expect(result).toBeNull();
+      expect(requestService.delete).toHaveBeenCalledWith(
+        expect.stringContaining(`/folders/${folderId}`),
+        undefined,
+        {
+          loadingKey: 'remove-class-folder',
+        }
+      );
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
-    it('should handle error and call errorGeneral', async () => {
+    it('should handle error with correct loading key and call errorGeneral', async () => {
       const error = new HttpErrorResponse({
         error: new Error('Network error'),
       });
@@ -521,7 +532,34 @@ describe('FolderManagementService', () => {
       await expect(
         firstValueFrom(service.removeClassFolder(folderId))
       ).rejects.toBe(error);
+      expect(requestService.delete).toHaveBeenCalledWith(
+        expect.stringContaining(`/folders/${folderId}`),
+        undefined,
+        {
+          loadingKey: 'remove-class-folder',
+        }
+      );
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should work correctly with empty folderId and correct loading key', async () => {
+      const successResponse = {
+        statusCode: StatusCode.DELETED,
+      };
+
+      (requestService.delete as any).mockReturnValue(of(successResponse));
+
+      const result = await firstValueFrom(service.removeClassFolder(''));
+
+      expect(result).toBeNull();
+      expect(requestService.delete).toHaveBeenCalledWith(
+        expect.stringContaining('/folders/'),
+        undefined,
+        {
+          loadingKey: 'remove-class-folder',
+        }
+      );
+      expect(toastHandlingService.successGeneral).toHaveBeenCalled();
     });
   });
 

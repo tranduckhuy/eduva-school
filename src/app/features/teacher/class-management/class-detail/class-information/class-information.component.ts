@@ -37,10 +37,12 @@ export class ClassInformationComponent {
 
   openEditClassModal() {
     this.globalModalService.open(UpdateClassModalComponent, {
+      classId: this.classModel()?.id ?? '',
       name: this.classModel()?.name ?? '',
       backgroundImageUrl: this.classModel()?.backgroundImageUrl ?? '',
       updateClassSuccess: () => {
         this.classUpdated.emit();
+        this.globalModalService.close();
       },
     });
   }

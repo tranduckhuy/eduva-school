@@ -20,7 +20,9 @@
               <class-card
                 [classModel]="class"
                 [currentPage]="currentPage()"
-                [pageSize]="pageSize()" />
+                [pageSize]="pageSize()"
+                (classArchived)="onSearch()"
+                (classUpdated)="onSearch()" />
             </div>
           }
         </div>

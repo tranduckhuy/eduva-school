@@ -15,6 +15,7 @@ import {
 
 import { ButtonModule } from 'primeng/button';
 
+import { ClassManagementService } from '../../../services/class-management.service';
 import { LoadingService } from '../../../../../../shared/services/core/loading/loading.service';
 import { GlobalModalService } from '../../../../../../shared/services/layout/global-modal/global-modal.service';
 
@@ -22,7 +23,10 @@ import { MODAL_DATA } from '../../../../../../shared/tokens/injection/modal-data
 
 import { ChooseImageModalComponent } from '../choose-image-modal/choose-image-modal.component';
 
+import { type CreateClassRequest } from '../../../models/request/command/create-class-request.model';
+
 interface UpdateClassModalData {
+  classId: string;
   name: string;
   backgroundImageUrl: string;
   updateClassSuccess: () => void;
@@ -39,6 +43,7 @@ interface UpdateClassModalData {
 export class UpdateClassModalComponent {
   private readonly fb = inject(FormBuilder);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly classService = inject(ClassManagementService);
   private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
   readonly modalData = inject(MODAL_DATA) as UpdateClassModalData;
@@ -98,6 +103,7 @@ export class UpdateClassModalComponent {
       },
       onModalClosed: () => {
         this.globalModalService.open(UpdateClassModalComponent, {
+          classId: this.modalData.classId,
           name: this.name.value,
           backgroundImageUrl: this.backgroundImageUrl.value,
           updateClassSuccess: this.modalData.updateClassSuccess,
@@ -111,6 +117,11 @@ export class UpdateClassModalComponent {
     this.form.markAllAsTouched();
 
     if (this.form.invalid) return;
+
+    const request: CreateClassRequest = this.form.value;
+    this.classService.updateClass(this.modalData.classId, request).subscribe({
+      next: () => this.modalData.updateClassSuccess(),
+    });
   }
 
   closeModal() {

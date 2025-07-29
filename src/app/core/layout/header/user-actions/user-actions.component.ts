@@ -55,8 +55,10 @@ export class UserActionsComponent implements OnInit {
       this.isFullscreen.set(!!document.fullscreenElement);
     });
 
-    this.notificationSocketService.connect();
-    this.notificationService.getNotificationSummary().subscribe();
+    if (this.user()) {
+      this.notificationSocketService.connect();
+      this.notificationService.getNotificationSummary().subscribe();
+    }
   }
 
   toggleMenu(submenuKey: string): void {

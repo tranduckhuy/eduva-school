@@ -139,7 +139,9 @@ export class FolderManagementService {
 
   removeClassFolder(folderId: string): Observable<null> {
     return this.requestService
-      .delete(`${this.BASE_FOLDERS_API_URL}/${folderId}`)
+      .delete(`${this.BASE_FOLDERS_API_URL}/${folderId}`, undefined, {
+        loadingKey: 'remove-class-folder',
+      })
       .pipe(
         tap(res => this.handleRemoveResponse(res)),
         map(() => null),
