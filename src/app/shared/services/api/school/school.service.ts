@@ -106,15 +106,13 @@ export class SchoolService {
   }
 
   private handleError(err: HttpErrorResponse): Observable<null> {
-    switch (err.error.statusCode) {
-      case StatusCode.PROVIDED_INFORMATION_IS_INVALID:
-        this.toastHandlingService.warn(
-          'Cảnh báo',
-          'Địa chỉ email liên hệ đã tồn tại. Vui lòng kiểm tra lại.'
-        );
-        break;
-      default:
-        this.toastHandlingService.errorGeneral();
+    if (err.error.statusCode === StatusCode.PROVIDED_INFORMATION_IS_INVALID) {
+      this.toastHandlingService.warn(
+        'Cảnh báo',
+        'Địa chỉ email liên hệ đã tồn tại. Vui lòng kiểm tra lại.'
+      );
+    } else {
+      this.toastHandlingService.errorGeneral();
     }
 
     return throwError(() => err);
