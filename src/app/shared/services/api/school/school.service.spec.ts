@@ -3,7 +3,7 @@ import { of, throwError } from 'rxjs';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { CreateSchoolService } from './create-school.service';
+import { SchoolService } from './school.service';
 import { RequestService } from '../../core/request/request.service';
 import { ToastHandlingService } from '../../core/toast/toast-handling.service';
 import { UserService } from '../user/user.service';
@@ -11,8 +11,8 @@ import { StatusCode } from '../../../constants/status-code.constant';
 import { type School } from '../../../models/entities/school.model';
 import { type CreateSchoolRequest } from '../../../models/api/request/command/create-school-request.model';
 
-describe('CreateSchoolService', () => {
-  let service: CreateSchoolService;
+describe('SchoolService', () => {
+  let service: SchoolService;
   let requestService: RequestService;
   let toastHandlingService: ToastHandlingService;
   let userService: UserService;
@@ -48,13 +48,13 @@ describe('CreateSchoolService', () => {
     } as any;
     TestBed.configureTestingModule({
       providers: [
-        CreateSchoolService,
+        SchoolService,
         { provide: RequestService, useValue: requestService },
         { provide: ToastHandlingService, useValue: toastHandlingService },
         { provide: UserService, useValue: userService },
       ],
     });
-    service = TestBed.inject(CreateSchoolService);
+    service = TestBed.inject(SchoolService);
   });
 
   afterEach(() => {

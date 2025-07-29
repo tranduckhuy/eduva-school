@@ -141,7 +141,7 @@ export class NavbarComponent implements OnInit {
   }
 
   private getNavbarConfigByRole(role: UserRoleType): NavbarConfig[] {
-    const isAdmin = this.isAdminRole(role);
+    const isAdmin = role === UserRoles.SCHOOL_ADMIN;
     const isTeacher = role === UserRoles.TEACHER;
     const isModerator = role === UserRoles.CONTENT_MODERATOR;
     const isTeacherOrMod = isTeacher || isModerator;
@@ -191,10 +191,6 @@ export class NavbarComponent implements OnInit {
     return navItems;
   }
 
-  private isAdminRole(role: UserRoleType): boolean {
-    return role === UserRoles.SCHOOL_ADMIN || role === UserRoles.SYSTEM_ADMIN;
-  }
-
   private buildNavItem(
     label: string,
     icon: string,
@@ -218,6 +214,11 @@ export class NavbarComponent implements OnInit {
     const fallback = '/school-admin/subscription-plans';
 
     const links = [
+      {
+        label: 'Trường học',
+        icon: 'school',
+        path: '/school-admin/school-information',
+      },
       {
         label: 'Giáo viên',
         icon: 'co_present',

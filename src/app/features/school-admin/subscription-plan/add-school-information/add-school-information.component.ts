@@ -20,7 +20,7 @@ import { ButtonModule } from 'primeng/button';
 
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 import { SubscriptionPlanService } from '../services/subscription-plan.service';
-import { CreateSchoolService } from '../../../../shared/services/api/school/create-school.service';
+import { SchoolService } from '../../../../shared/services/api/school/school.service';
 import { JwtService } from '../../../../core/auth/services/jwt.service';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { PaymentService } from '../../../../shared/services/api/payment/payment.service';
@@ -28,6 +28,7 @@ import { PaymentService } from '../../../../shared/services/api/payment/payment.
 import {
   customEmailValidator,
   normalizeUrl,
+  noSpecialCharactersOrNumbersValidator,
 } from '../../../../shared/utils/form-validators';
 import {
   VIETNAM_PHONE_REGEX,
@@ -64,7 +65,7 @@ export class AddSchoolInformationComponent implements OnInit {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly loadingService = inject(LoadingService);
   private readonly subscriptionPlanService = inject(SubscriptionPlanService);
-  private readonly createSchoolService = inject(CreateSchoolService);
+  private readonly schoolService = inject(SchoolService);
   private readonly jwtService = inject(JwtService);
   private readonly authService = inject(AuthService);
   private readonly paymentService = inject(PaymentService);
@@ -83,7 +84,7 @@ export class AddSchoolInformationComponent implements OnInit {
 
   constructor() {
     this.form = this.fb.group({
-      name: ['', Validators.required],
+      name: ['', Validators.required, noSpecialCharactersOrNumbersValidator],
       contactEmail: ['', [Validators.required, customEmailValidator]],
       contactPhone: [
         '',
@@ -112,7 +113,7 @@ export class AddSchoolInformationComponent implements OnInit {
       ...this.form.value,
       websiteUrl: normalizeUrl(this.form.get('websiteUrl')?.value),
     };
-    this.createSchoolService
+    this.schoolService
       .createSchool(createSchoolRequest)
       .pipe(
         filter((school): school is School => school !== null),
