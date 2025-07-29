@@ -5,7 +5,6 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './table-empty-state.component.html',
-  styleUrl: './table-empty-state.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableEmptyStateComponent {
