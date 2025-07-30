@@ -4,7 +4,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { TooltipModule } from 'primeng/tooltip';
@@ -61,6 +61,7 @@ export class TeachersComponent {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly userService = inject(UserService);
   private readonly loadingService = inject(LoadingService);
+  private readonly router = inject(Router);
 
   // Pagination & Sorting signals
   first = signal<number>(0);
@@ -98,6 +99,7 @@ export class TeachersComponent {
   isLoadingGet = this.loadingService.is('get-users');
   isLoadingArchive = this.loadingService.is('archive-user');
   isLoadingActive = this.loadingService.is('active-user');
+  isLoadingUpdateRole = this.loadingService.is('update-user-role');
 
   users = this.userService.users;
   currentUser = this.userService.currentUser;
@@ -195,6 +197,34 @@ export class TeachersComponent {
         this.userService.activateUser(userId).subscribe({
           next: () => this.loadData(),
         });
+      },
+    });
+  }
+
+  openConfirmUpdateUpdateRoleDialog(event: Event, userId: string): void {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message:
+        'Bạn có chắc chắn muốn cấp quyền kiểm duyệt cho người dùng này? Họ sẽ trở thành kiểm duyệt viên.',
+      header: 'Thay đổi vai trò người dùng',
+      icon: 'pi pi-exclamation-triangle',
+      rejectLabel: 'Hủy',
+      rejectButtonProps: {
+        label: 'Hủy',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Xác nhận',
+      },
+      accept: () => {
+        this.userService
+          .updateUserRole(userId, { roles: [Role.ContentModerator] })
+          .subscribe({
+            next: () => {
+              this.router.navigate(['/school-admin/content-moderators']);
+            },
+          });
       },
     });
   }

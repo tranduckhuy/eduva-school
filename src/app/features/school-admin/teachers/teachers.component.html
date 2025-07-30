@@ -126,6 +126,18 @@
                     visibility
                   </app-button>
                 </a>
+                <app-button
+                  pTooltip="Trở thành kiểm duyệt viên"
+                  tooltipPosition="top"
+                  variant="rounded"
+                  size="xs"
+                  class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent"
+                  [loading]="isLoadingUpdateRole()"
+                  (clicked)="
+                    openConfirmUpdateUpdateRoleDialog($event, teacher.id)
+                  ">
+                  sync
+                </app-button>
                 @if (teacher.status === 0) {
                   <app-button
                     pTooltip="Vô hiệu hóa"

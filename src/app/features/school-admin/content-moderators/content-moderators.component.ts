@@ -4,7 +4,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { SelectModule } from 'primeng/select';
@@ -30,6 +30,7 @@ import { TableSkeletonComponent } from '../../../shared/components/skeleton/tabl
 import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
 import { AddContentModeratorComponent } from './add-content-moderator/add-content-moderator.component';
 import { ImportAccountModalsComponent } from '../../../shared/components/import-accounts/import-account-modals/import-account-modals.component';
+import { isJSDoc } from 'typescript';
 
 interface StatusOption {
   name: string;
@@ -60,6 +61,7 @@ export class ContentModeratorsComponent {
   private readonly userService = inject(UserService);
   private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
+  private readonly router = inject(Router);
 
   // Pagination & Sorting signals
   first = signal<number>(0);
@@ -98,6 +100,7 @@ export class ContentModeratorsComponent {
   isLoadingGet = this.loadingService.is('get-Schools');
   isLoadingArchive = this.loadingService.is('archive-school');
   isLoadingActive = this.loadingService.is('active-school');
+  isLoadingUpdateRole = this.loadingService.is('update-user-role');
 
   users = this.userService.users;
   currentUser = this.userService.currentUser;
@@ -202,6 +205,34 @@ export class ContentModeratorsComponent {
         this.userService.activateUser(userId).subscribe({
           next: () => this.loadData(),
         });
+      },
+    });
+  }
+
+  openConfirmUpdateUpdateRoleDialog(event: Event, userId: string): void {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message:
+        'Xác nhận loại bỏ quyền kiểm duyệt của người dùng này? Sau khi thay đổi, họ sẽ trở thành giáo viên.',
+      header: 'Thay đổi vai trò người dùng',
+      icon: 'pi pi-exclamation-triangle',
+      rejectLabel: 'Hủy',
+      rejectButtonProps: {
+        label: 'Hủy',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Xác nhận',
+      },
+      accept: () => {
+        this.userService
+          .updateUserRole(userId, { roles: [Role.Teacher] })
+          .subscribe({
+            next: () => {
+              this.router.navigate(['/school-admin/teachers']);
+            },
+          });
       },
     });
   }
