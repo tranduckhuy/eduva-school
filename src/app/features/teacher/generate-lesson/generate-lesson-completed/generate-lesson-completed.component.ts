@@ -16,6 +16,7 @@ import { GenerateLessonCardComponent } from './generate-lesson-card/generate-les
 import { AiJobCompletedService } from './services/ai-job-completed.service';
 
 import { type GetAiJobCompletedRequest } from './models/get-job-completed-request.model';
+import { type DeleteJobRequest } from './models/delete-job-request.model';
 
 @Component({
   selector: 'app-generate-lesson-completed',
@@ -43,6 +44,19 @@ export class GenerateLessonCompletedComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadJob();
+  }
+
+  onRemoveJob(jobId: string) {
+    const request: DeleteJobRequest = {
+      permanent: true,
+    };
+    this.aiJobCompletedService.removeAiJob(jobId, request).subscribe({
+      next: () => {
+        this.currentPage.set(1);
+        this.first.set(0);
+        this.loadJob();
+      },
+    });
   }
 
   onPageChange(event: PaginatorState) {

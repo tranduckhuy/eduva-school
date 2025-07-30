@@ -13,7 +13,6 @@ import { TableModule } from 'primeng/table';
   standalone: true,
   imports: [Skeleton, TableModule],
   templateUrl: './table-skeleton.component.html',
-  styleUrl: './table-skeleton.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TableSkeletonComponent implements OnInit {

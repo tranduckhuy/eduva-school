@@ -1,0 +1,104 @@
+<div
+  class="rounded border border-gray-100 bg-white p-6 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <div class="mb-2 flex items-center justify-between">
+    <h2 class="text-base font-medium">Thông tin quản lý</h2>
+    @if (!isLoadingGet()) {
+      <app-button
+        [variant]="'light'"
+        (clicked)="!isEdit() ? toggleEdit() : onSubmit()">
+        {{ !isEdit() ? 'Chỉnh sửa' : 'Lưu thông tin' }}
+      </app-button>
+    } @else {
+      <p-skeleton width="100px" height="40px" borderRadius="4px" />
+    }
+  </div>
+  <div
+    class="rounded border border-gray-200 p-6 dark:border-dark-500 dark:bg-dark-200">
+    @if (isLoadingGet() || !schoolDetail()) {
+      <app-school-information-skeleton [isSchoolInformation]="true" />
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="e-row e-g-4">
+        <div class="e-col-12">
+          <app-form-control
+            formControlName="name"
+            name="name"
+            label="Tên trường"
+            placeholder="Nhập tên của trường bạn"
+            [submitted]="submitted()"
+            [readOnly]="!isEdit()">
+          </app-form-control>
+        </div>
+        <div class="e-col-6">
+          <app-form-control
+            formControlName="contactEmail"
+            name="contactEmail"
+            type="email"
+            label="Email liên hệ"
+            placeholder="Nhập địa chỉ email của trường bạn"
+            [submitted]="submitted()"
+            [readOnly]="!isEdit()">
+          </app-form-control>
+        </div>
+        <div class="e-col-6">
+          <app-form-control
+            formControlName="contactPhone"
+            name="contactPhone"
+            label="Số điện thoại"
+            placeholder="Nhập số điện thoại của trường bạn"
+            [submitted]="submitted()"
+            [readOnly]="!isEdit()">
+          </app-form-control>
+        </div>
+        <div class="e-col-6">
+          <app-form-control
+            formControlName="address"
+            name="address"
+            label="Địa chỉ trường học"
+            placeholder="Nhập địa chỉ của trường bạn"
+            [submitted]="submitted()"
+            [readOnly]="!isEdit()">
+          </app-form-control>
+        </div>
+        <div class="e-col-6">
+          <app-form-control
+            formControlName="websiteUrl"
+            name="websiteUrl"
+            label="Địa chỉ website"
+            placeholder="Nhập địa chỉ website của trường bạn"
+            [submitted]="submitted()"
+            [readOnly]="!isEdit()">
+          </app-form-control>
+        </div>
+      </form>
+    }
+  </div>
+</div>
+<div
+  class="mt-10 rounded border border-gray-100 bg-white p-6 shadow-main dark:border-dark-500 dark:bg-dark-200">
+  <h2 class="text-base font-medium">Thông tin quản lý</h2>
+  <div
+    class="rounded border border-gray-200 p-6 dark:border-dark-500 dark:bg-dark-200">
+    @if (isLoadingGet() || !schoolDetail()) {
+      <app-school-information-skeleton [isSchoolInformation]="false" />
+    } @else {
+      <div class="e-row e-row-cols-2 e-row-cols-md-1 e-g-4">
+        <div class="e-col">
+          <app-form-control
+            label="Tên"
+            type="text"
+            [value]="schoolDetail()!.schoolAdminFullName"
+            [readOnly]="true">
+          </app-form-control>
+        </div>
+        <div class="e-col">
+          <app-form-control
+            label="Email liên hệ"
+            type="email"
+            [value]="schoolDetail()!.schoolAdminEmail"
+            [readOnly]="true">
+          </app-form-control>
+        </div>
+      </div>
+    }
+  </div>
+</div>

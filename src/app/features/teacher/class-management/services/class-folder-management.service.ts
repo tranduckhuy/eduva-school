@@ -48,7 +48,10 @@ export class ClassFolderManagementService {
     return this.requestService
       .deleteWithBody(
         `${this.BASE_CLASS_API_URL}/${classId}/folders/${folderId}/lesson-materials`,
-        request
+        request,
+        {
+          loadingKey: 'remove-materials-class-folder',
+        }
       )
       .pipe(
         tap(res => this.handleResponse(res)),

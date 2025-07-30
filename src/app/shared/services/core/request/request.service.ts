@@ -154,9 +154,11 @@ export class RequestService {
    */
   delete<T>(
     url: string,
+    params?: any,
     options?: RequestOptions
   ): Observable<BaseResponse<T>> {
     return this.http.delete<BaseResponse<T>>(url, {
+      params: createRequestParams(params),
       context: buildHttpContext(options),
     });
   }

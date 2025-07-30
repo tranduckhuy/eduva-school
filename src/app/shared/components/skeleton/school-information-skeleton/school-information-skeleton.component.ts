@@ -3,16 +3,12 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
-  selector: 'notification-skeleton',
+  selector: 'app-school-information-skeleton',
   standalone: true,
   imports: [SkeletonModule],
-  templateUrl: './notification-skeleton.component.html',
+  templateUrl: './school-information-skeleton.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NotificationSkeletonComponent {
-  limit = input<number>(5);
-
-  get skeletonItems() {
-    return Array.from({ length: this.limit() });
-  }
+export class SchoolInformationSkeletonComponent {
+  isSchoolInformation = input.required<boolean>();
 }

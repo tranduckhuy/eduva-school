@@ -1,6 +1,7 @@
 <div
   class="group relative h-[280px] cursor-pointer rounded-md border border-[#dadce0] bg-white transition-shadow duration-200 ease-in-out hover:shadow-md dark:bg-dark-300 dark:hover:shadow-gray-700">
   <figure class="relative h-[120px] pt-[20%]">
+    <div class="bg-overlay"></div>
     <div class="absolute left-4 top-4 z-10 flex flex-col gap-1">
       <h3 class="line-clamp-1 max-w-[230px] text-lg font-medium text-white">
         <a
@@ -17,6 +18,59 @@
         Trường học: {{ classModel().schoolName }}
       </p>
     </div>
+    <div class="absolute right-2 top-3 z-10">
+      <p-button
+        variant="text"
+        [rounded]="true"
+        (onClick)="toggleMenu(classModel().id)">
+        <ng-template #icon>
+          <span
+            class="pi pi-ellipsis-v text-white"
+            style="font-size: 16px"></span>
+        </ng-template>
+      </p-button>
+      @if (openedMenuId() === classModel().id) {
+        <div
+          class="absolute right-0 top-[40px] z-[1] flex w-auto min-w-[160px] max-w-[200px] origin-top-right animate-scaleIn flex-col overflow-hidden rounded bg-[#f0f4f9] dark:bg-dark-400 sm:left-auto sm:right-0 sm:origin-top-right"
+          clickOutsideSubmenu
+          (clickOutside)="toggleMenu(classModel().id)">
+          <button
+            class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-200"
+            (click)="copyClassCode()">
+            <span
+              class="pi"
+              style="font-size: 14px"
+              [ngClass]="{
+                'pi-clipboard': !isCopied(),
+                'pi-check': isCopied(),
+              }"></span>
+            <span>{{ isCopied() ? 'Đã sao chép' : 'Sao chép mã lớp' }}</span>
+          </button>
+          <button
+            class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-200"
+            (click)="openEditClassModal()">
+            <span class="pi pi-pencil" style="font-size: 14px"></span>
+            <span>Chỉnh sửa</span>
+          </button>
+          <button
+            class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-200"
+            [ngClass]="{
+              'pointer-events-none cursor-default opacity-60 hover:!bg-[#f0f4f9]':
+                isLoadingArchive(),
+            }"
+            (click)="onArchiveClass(classModel().id)">
+            <span
+              style="font-size: 14px"
+              class="pi"
+              [ngClass]="{
+                'pi-trash': !isLoadingArchive(),
+                'pi-spin pi-spinner': isLoadingArchive(),
+              }"></span>
+            <span>Xóa lớp học</span>
+          </button>
+        </div>
+      }
+    </div>
     <p class="text absolute bottom-2 left-4 z-10 line-clamp-1 text-white">
       {{ classModel().teacherName }}
     </p>
@@ -27,7 +81,7 @@
     <img
       [src]="classModel().teacherAvatarUrl"
       [alt]="classModel().teacherName"
-      class="absolute right-5 top-[60%] z-[3] size-[75px] rounded-full object-cover" />
+      class="absolute right-5 top-[60%] z-[3] size-[75px] rounded-full bg-white object-cover dark:bg-dark-300" />
   </figure>
   <div
     class="absolute bottom-0 left-0 right-0 flex h-16 items-center justify-end gap-2 border-t border-t-[#dadce0] p-3">

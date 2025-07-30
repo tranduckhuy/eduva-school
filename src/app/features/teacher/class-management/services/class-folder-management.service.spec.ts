@@ -206,7 +206,7 @@ describe('ClassFolderManagementService', () => {
     const folderId = 'folder-456';
     const request = ['material-1', 'material-2'];
 
-    it('should call deleteWithBody and show success toast on SUCCESS', async () => {
+    it('should call deleteWithBody with correct loading key and show success toast on SUCCESS', async () => {
       (requestService.deleteWithBody as any).mockReturnValue(
         of({ statusCode: StatusCode.SUCCESS })
       );
@@ -216,7 +216,13 @@ describe('ClassFolderManagementService', () => {
           .removeMaterialsFromClass(classId, folderId, request)
           .subscribe(result => {
             expect(result).toBeUndefined();
-            expect(requestService.deleteWithBody).toHaveBeenCalledOnce();
+            expect(requestService.deleteWithBody).toHaveBeenCalledWith(
+              `${service['BASE_CLASS_API_URL']}/${classId}/folders/${folderId}/lesson-materials`,
+              request,
+              {
+                loadingKey: 'remove-materials-class-folder',
+              }
+            );
             expect(toastHandlingService.successGeneral).toHaveBeenCalledOnce();
             expect(toastHandlingService.errorGeneral).not.toHaveBeenCalled();
             resolve();
@@ -224,7 +230,7 @@ describe('ClassFolderManagementService', () => {
       });
     });
 
-    it('should call deleteWithBody and show error toast on non-SUCCESS statusCode', async () => {
+    it('should call deleteWithBody with correct loading key and show error toast on non-SUCCESS statusCode', async () => {
       (requestService.deleteWithBody as any).mockReturnValue(
         of({ statusCode: StatusCode.SYSTEM_ERROR })
       );
@@ -234,6 +240,13 @@ describe('ClassFolderManagementService', () => {
           .removeMaterialsFromClass(classId, folderId, request)
           .subscribe(result => {
             expect(result).toBeUndefined();
+            expect(requestService.deleteWithBody).toHaveBeenCalledWith(
+              `${service['BASE_CLASS_API_URL']}/${classId}/folders/${folderId}/lesson-materials`,
+              request,
+              {
+                loadingKey: 'remove-materials-class-folder',
+              }
+            );
             expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
             expect(toastHandlingService.successGeneral).not.toHaveBeenCalled();
             resolve();
@@ -258,6 +271,13 @@ describe('ClassFolderManagementService', () => {
           },
           error: err => {
             expect(err).toBe(error);
+            expect(requestService.deleteWithBody).toHaveBeenCalledWith(
+              `${service['BASE_CLASS_API_URL']}/${classId}/folders/${folderId}/lesson-materials`,
+              request,
+              {
+                loadingKey: 'remove-materials-class-folder',
+              }
+            );
             expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
             resolve();
           },
@@ -282,6 +302,13 @@ describe('ClassFolderManagementService', () => {
           },
           error: err => {
             expect(err).toBe(error);
+            expect(requestService.deleteWithBody).toHaveBeenCalledWith(
+              `${service['BASE_CLASS_API_URL']}/${classId}/folders/${folderId}/lesson-materials`,
+              request,
+              {
+                loadingKey: 'remove-materials-class-folder',
+              }
+            );
             expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
             resolve();
           },
@@ -289,7 +316,7 @@ describe('ClassFolderManagementService', () => {
       });
     });
 
-    it('should work correctly even if request is undefined', async () => {
+    it('should work correctly with correct loading key even if request is undefined', async () => {
       (requestService.deleteWithBody as any).mockReturnValue(
         of({ statusCode: StatusCode.SUCCESS })
       );
@@ -299,7 +326,13 @@ describe('ClassFolderManagementService', () => {
           .removeMaterialsFromClass(classId, folderId)
           .subscribe(result => {
             expect(result).toBeUndefined();
-            expect(requestService.deleteWithBody).toHaveBeenCalledOnce();
+            expect(requestService.deleteWithBody).toHaveBeenCalledWith(
+              `${service['BASE_CLASS_API_URL']}/${classId}/folders/${folderId}/lesson-materials`,
+              undefined,
+              {
+                loadingKey: 'remove-materials-class-folder',
+              }
+            );
             resolve();
           });
       });

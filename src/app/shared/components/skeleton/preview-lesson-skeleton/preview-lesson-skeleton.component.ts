@@ -7,7 +7,6 @@ import { SkeletonModule } from 'primeng/skeleton';
   standalone: true,
   imports: [SkeletonModule],
   templateUrl: './preview-lesson-skeleton.component.html',
-  styleUrl: './preview-lesson-skeleton.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreviewLessonSkeletonComponent {}

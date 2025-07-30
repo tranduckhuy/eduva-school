@@ -39,7 +39,9 @@
           <!-- ? Job Cards -->
           @for (job of jobList(); track job.id) {
             <div class="e-col">
-              <generate-lesson-card [job]="job" />
+              <generate-lesson-card
+                [job]="job"
+                (removeJob)="onRemoveJob($event)" />
             </div>
           }
         </div>

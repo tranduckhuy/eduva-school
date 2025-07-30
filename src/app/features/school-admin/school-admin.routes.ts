@@ -19,6 +19,18 @@ export const schoolAdminRoutes: Routes = [
           ),
       },
       {
+        path: 'school-information',
+        data: {
+          title: 'Thông tin trường học',
+          heading: 'Thông tin trường học',
+          breadcrumb: 'Thông tin trường học',
+        },
+        loadComponent: () =>
+          import('./school-information/school-information.component').then(
+            mod => mod.SchoolInformationComponent
+          ),
+      },
+      {
         path: 'teachers',
         loadChildren: () =>
           import('./teachers/teachers.routes').then(mod => mod.teachersRoute),

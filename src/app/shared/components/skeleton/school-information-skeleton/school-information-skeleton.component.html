@@ -1,0 +1,49 @@
+<div class="e-container-fluid !px-0">
+  <div class="e-row e-g-4">
+    @if (isSchoolInformation()) {
+      <div class="e-col-12">
+        <span class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+          Tên trường
+        </span>
+        <p-skeleton width="100%" height="44px" borderRadius="6px" />
+      </div>
+      <div class="e-col-6">
+        <span class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+          Email liên hệ
+        </span>
+        <p-skeleton width="100%" height="44px" borderRadius="6px" />
+      </div>
+      <div class="e-col-6">
+        <span class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+          Số điện thoại
+        </span>
+        <p-skeleton width="100%" height="44px" borderRadius="6px" />
+      </div>
+      <div class="e-col-6">
+        <span class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+          Địa chỉ trường học
+        </span>
+        <p-skeleton width="100%" height="44px" borderRadius="6px" />
+      </div>
+      <div class="e-col-6">
+        <span class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+          Địa chỉ website
+        </span>
+        <p-skeleton width="100%" height="44px" borderRadius="6px" />
+      </div>
+    } @else {
+      <div class="e-col-6">
+        <span class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+          Tên
+        </span>
+        <p-skeleton width="100%" height="44px" borderRadius="6px" />
+      </div>
+      <div class="e-col-6">
+        <span class="mb-2 block font-semibold text-gray-900 dark:text-gray-300">
+          Email liên hệ
+        </span>
+        <p-skeleton width="100%" height="44px" borderRadius="6px" />
+      </div>
+    }
+  </div>
+</div>
