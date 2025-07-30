@@ -30,7 +30,6 @@ import { TableSkeletonComponent } from '../../../shared/components/skeleton/tabl
 import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
 import { AddContentModeratorComponent } from './add-content-moderator/add-content-moderator.component';
 import { ImportAccountModalsComponent } from '../../../shared/components/import-accounts/import-account-modals/import-account-modals.component';
-import { isJSDoc } from 'typescript';
 
 interface StatusOption {
   name: string;
