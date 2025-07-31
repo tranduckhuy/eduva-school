@@ -15,6 +15,7 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
 
 import { UserService } from '../../../shared/services/api/user/user.service';
+import { ExportFileService } from '../../../shared/services/api/file/export-file.service';
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
 import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
 
@@ -30,6 +31,8 @@ import { TableSkeletonComponent } from '../../../shared/components/skeleton/tabl
 import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
 import { AddContentModeratorComponent } from './add-content-moderator/add-content-moderator.component';
 import { ImportAccountModalsComponent } from '../../../shared/components/import-accounts/import-account-modals/import-account-modals.component';
+
+import { type ExportUsersRequest } from '../../../shared/models/api/request/query/export-users-request.model';
 
 interface StatusOption {
   name: string;
@@ -58,6 +61,7 @@ interface StatusOption {
 export class ContentModeratorsComponent {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly userService = inject(UserService);
+  private readonly exportFileService = inject(ExportFileService);
   private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
   private readonly router = inject(Router);
@@ -97,6 +101,7 @@ export class ContentModeratorsComponent {
 
   // Signals from service
   isLoadingGet = this.loadingService.is('get-Schools');
+  isLoadingExport = this.loadingService.is('export-users');
   isLoadingArchive = this.loadingService.is('archive-school');
   isLoadingActive = this.loadingService.is('active-school');
   isLoadingUpdateRole = this.loadingService.is('update-user-role');
@@ -234,6 +239,17 @@ export class ContentModeratorsComponent {
           });
       },
     });
+  }
+
+  onExportUsers() {
+    const request: ExportUsersRequest = {
+      role: Role.ContentModerator,
+      status: this.statusSelect()?.code,
+      searchTerm: this.searchTerm(),
+      sortBy: this.sortField() ?? 'createdAt',
+      sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
+    };
+    this.exportFileService.exportUsers(request).subscribe();
   }
 
   openAddContentModeratorModal() {

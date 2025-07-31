@@ -152,6 +152,8 @@ export class AddFileModalComponent {
   }
 
   async onSubmit() {
+    if (this.isLoading()) return;
+
     const files = this.selectedFiles();
 
     if (files.length === 0) {
@@ -213,8 +215,6 @@ export class AddFileModalComponent {
       .uploadBlobs(request, files)
       .pipe(
         switchMap(res => {
-          if (!res) return throwError(() => new Error());
-
           const materials: CreateLessonMaterialRequest[] = fileMetadata.map(
             ({ file, duration }, index) => ({
               title: file.name,
@@ -223,7 +223,7 @@ export class AddFileModalComponent {
               duration: Math.round(duration),
               fileSize: file.size,
               isAIContent: false,
-              sourceUrl: res.uploadTokens[index],
+              sourceUrl: res?.uploadTokens[index] ?? '',
             })
           );
 
@@ -237,18 +237,15 @@ export class AddFileModalComponent {
             createRequest
           );
         }),
+        switchMap(() => this.fileStorageService.getFileStorageQuota()),
         switchMap(() =>
           this.lessonMaterialsService.getLessonMaterialsByFolder(folderId)
         ),
-        switchMap(() => this.fileStorageService.getFileStorageQuota()),
         finalize(() => this.isLoading.set(false))
       )
       .subscribe({
         next: () => {
           this.closeModal();
-        },
-        error: () => {
-          this.toastHandlingService.errorGeneral();
         },
       });
   }

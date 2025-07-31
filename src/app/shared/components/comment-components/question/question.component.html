@@ -60,10 +60,7 @@
       <span class="text-xs font-normal text-[#4e586b]">
         {{ question()?.lastModifiedAt ? 'Đã chỉnh sửa' : '' }}
       </span>
-      @if (
-        user()?.id === question()?.createdByUserId &&
-        (question()?.canUpdate || question()?.canDelete)
-      ) {
+      @if (question()?.canUpdate || question()?.canDelete) {
         <button (click)="toggleFooterOptions()">
           <span
             class="pi pi-ellipsis-h relative top-[3px] cursor-pointer text-[#0093fc] hover:opacity-70"></span>

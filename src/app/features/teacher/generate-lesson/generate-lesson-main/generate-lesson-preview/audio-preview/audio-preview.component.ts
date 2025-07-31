@@ -82,7 +82,6 @@ export class AudioPreviewComponent implements OnInit {
   audioUrl = this.resourcesStateService.audioUrl;
   audioState = this.resourcesStateService.audioState;
 
-  hasFetchedProfileOnce = this.resourcesStateService.hasFetchedProfileOnce;
   currentGeneratedType = this.resourcesStateService.currentGeneratedType;
 
   readonly disableGenerate = computed(() => {
@@ -102,7 +101,6 @@ export class AudioPreviewComponent implements OnInit {
   constructor() {
     effect(
       () => {
-        const hasFetchProfile = this.hasFetchedProfileOnce();
         const generationType = this.generationType();
         const payload = this.jobUpdateProgress();
         const jobStatus = payload?.status;
@@ -111,7 +109,6 @@ export class AudioPreviewComponent implements OnInit {
         if (
           payload &&
           !failureReason &&
-          !hasFetchProfile &&
           jobStatus === JobStatus.Completed &&
           generationType === LessonGenerationType.Audio
         ) {
@@ -119,9 +116,6 @@ export class AudioPreviewComponent implements OnInit {
             payload.audioOutputBlobNameUrl
           );
           this.resourcesStateService.setAudioState('generated');
-
-          this.userService.getCurrentProfile().subscribe();
-          this.resourcesStateService.setHasFetchedProfileOnce(true);
 
           this.resourcesStateService.setAiGeneratedMetadata(
             LessonGenerationType.Audio,
@@ -275,7 +269,10 @@ export class AudioPreviewComponent implements OnInit {
     this.resourcesStateService.updateIsLoading(true);
     this.aiJobService
       .confirmCreateContent(jobId, request)
-      .pipe(finalize(() => this.resourcesStateService.updateIsLoading(false)))
+      .pipe(
+        switchMap(() => this.userService.getCurrentProfile()),
+        finalize(() => this.resourcesStateService.updateIsLoading(false))
+      )
       .subscribe({
         next: () => {
           this.resourcesStateService.setAudioState('loading');
@@ -314,6 +311,5 @@ export class AudioPreviewComponent implements OnInit {
   private resetAll() {
     this.resourcesStateService.setAudioUrl('');
     this.resourcesStateService.setAudioState('empty');
-    this.resourcesStateService.setHasFetchedProfileOnce(false);
   }
 }

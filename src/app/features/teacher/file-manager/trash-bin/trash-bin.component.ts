@@ -141,34 +141,18 @@ export class TrashBinComponent {
   }
 
   onDeleteAllItem(): void {
-    const currentTrashItems = this.trashItems();
-
-    const folderIds = currentTrashItems
-      .filter(item => item.type === 'folder')
-      .map(item => item.data.id);
-
-    const materialIds = currentTrashItems
-      .filter(item => item.type === 'material')
-      .map(item => item.data.id);
-
-    if (folderIds.length === 0 && materialIds.length === 0) return;
-
     this.confirmDelete({
       header: 'Xóa toàn bộ mục trong thùng rác?',
       message:
         'Toàn bộ mục trong thùng rác sẽ bị xóa vĩnh viễn. Bạn có chắc chắn muốn tiếp tục?',
       accept: () => {
-        const deleteFolder$ = folderIds.length
-          ? this.folderService
-              .removeFolder(folderIds)
-              .pipe(catchError(() => of(null)))
-          : of(null);
+        const deleteFolder$ = this.folderService
+          .removeFolder([])
+          .pipe(catchError(() => of(null)));
 
-        const deleteMaterial$ = materialIds.length
-          ? this.lessonMaterialService
-              .deleteMaterial({ ids: materialIds, permanent: true })
-              .pipe(catchError(() => of(null)))
-          : of(null);
+        const deleteMaterial$ = this.lessonMaterialService
+          .deleteMaterial({ ids: [], permanent: true })
+          .pipe(catchError(() => of(null)));
 
         forkJoin([deleteFolder$, deleteMaterial$]).subscribe({
           next: () => this.loadTrashItems(),

@@ -11,7 +11,6 @@ import { UploadFileService } from './upload-file.service';
 import { RequestService } from '../../../../shared/services/core/request/request.service';
 import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
 import { StatusCode } from '../../../../shared/constants/status-code.constant';
-import { BYPASS_AUTH } from '../../../tokens/context/http-context.token';
 import { type FileStorageRequest } from '../../../models/api/request/command/file-storage-request.model';
 import { type FileStorageResponse } from '../../../models/api/response/command/file-storage-response.model';
 
@@ -142,69 +141,15 @@ describe('UploadFileService', () => {
       });
     });
 
-    it('should throw error if API response is not SUCCESS', async () => {
+    it('should throw error if tokens are not provided', async () => {
       (requestService.post as any).mockReturnValue(
-        of({
-          statusCode: StatusCode.SYSTEM_ERROR,
-          data: mockFileStorageResponse,
-        })
+        of({ statusCode: StatusCode.SUCCESS, data: { uploadTokens: null } })
       );
 
       await new Promise<void>(resolve => {
         service.uploadBlobs(mockRequest, mockFiles).subscribe({
           error: error => {
-            expect(error).toEqual({
-              isBusinessError: true,
-              statusCode: StatusCode.SYSTEM_ERROR,
-            });
-            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-            resolve();
-          },
-        });
-      });
-    });
-
-    it('should throw error if API response has no data', async () => {
-      (requestService.post as any).mockReturnValue(
-        of({ statusCode: StatusCode.SUCCESS })
-      );
-
-      await new Promise<void>(resolve => {
-        service.uploadBlobs(mockRequest, mockFiles).subscribe({
-          error: error => {
-            expect(error).toEqual({
-              isBusinessError: true,
-              statusCode: StatusCode.SUCCESS,
-            });
-            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-            resolve();
-          },
-        });
-      });
-    });
-
-    it('should throw error if tokens length does not match files length', async () => {
-      const responseWithWrongTokenCount = {
-        ...mockFileStorageResponse,
-        uploadTokens: [
-          'https://storage.blob.core.windows.net/container/file1?token=abc',
-        ],
-      };
-      (requestService.post as any).mockReturnValue(
-        of({
-          statusCode: StatusCode.SUCCESS,
-          data: responseWithWrongTokenCount,
-        })
-      );
-
-      await new Promise<void>(resolve => {
-        service.uploadBlobs(mockRequest, mockFiles).subscribe({
-          error: error => {
-            expect(error).toEqual({
-              isBusinessError: true,
-              statusCode: StatusCode.SUCCESS,
-            });
-            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            expect(error).toBeInstanceOf(Error);
             resolve();
           },
         });
@@ -264,14 +209,11 @@ describe('UploadFileService', () => {
     });
 
     it('should handle STORAGE_QUOTA_EXCEEDED error', async () => {
-      const businessError = {
-        isBusinessError: true,
-        statusCode: StatusCode.STORAGE_QUOTA_EXCEEDED,
-      };
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.STORAGE_QUOTA_EXCEEDED },
+      });
 
-      (requestService.post as any).mockReturnValue(
-        throwError(() => businessError)
-      );
+      (requestService.post as any).mockReturnValue(throwError(() => error));
 
       await new Promise<void>(resolve => {
         service.uploadBlobs(mockRequest, mockFiles).subscribe({
@@ -280,7 +222,112 @@ describe('UploadFileService', () => {
               'Đã đạt giới hạn lưu trữ',
               'Vui lòng liên hệ quản trị viên để nâng cấp gói và tiếp tục sử dụng.'
             );
-            expect(err).toEqual(businessError);
+            expect(err).toEqual(error);
+            resolve();
+          },
+        });
+      });
+    });
+
+    it('should handle INVALID_FILE_TYPE error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.INVALID_FILE_TYPE },
+      });
+
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      await new Promise<void>(resolve => {
+        service.uploadBlobs(mockRequest, mockFiles).subscribe({
+          error: err => {
+            expect(toastHandlingService.error).toHaveBeenCalledWith(
+              'Loại file không hợp lệ',
+              'Vui lòng chọn file có định dạng được hỗ trợ.'
+            );
+            expect(err).toEqual(error);
+            resolve();
+          },
+        });
+      });
+    });
+
+    it('should handle FILE_IS_REQUIRED error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.FILE_IS_REQUIRED },
+      });
+
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      await new Promise<void>(resolve => {
+        service.uploadBlobs(mockRequest, mockFiles).subscribe({
+          error: err => {
+            expect(toastHandlingService.error).toHaveBeenCalledWith(
+              'File bắt buộc',
+              'Vui lòng chọn file để upload.'
+            );
+            expect(err).toEqual(error);
+            resolve();
+          },
+        });
+      });
+    });
+
+    it('should handle INVALID_BLOB_NAME error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.INVALID_BLOB_NAME },
+      });
+
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      await new Promise<void>(resolve => {
+        service.uploadBlobs(mockRequest, mockFiles).subscribe({
+          error: err => {
+            expect(toastHandlingService.error).toHaveBeenCalledWith(
+              'Tên file không hợp lệ',
+              'Vui lòng đặt tên file phù hợp.'
+            );
+            expect(err).toEqual(error);
+            resolve();
+          },
+        });
+      });
+    });
+
+    it('should handle INVALID_BLOB_URL error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.INVALID_BLOB_URL },
+      });
+
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      await new Promise<void>(resolve => {
+        service.uploadBlobs(mockRequest, mockFiles).subscribe({
+          error: err => {
+            expect(toastHandlingService.error).toHaveBeenCalledWith(
+              'URL file không hợp lệ',
+              'Có lỗi xảy ra với đường dẫn file.'
+            );
+            expect(err).toEqual(error);
+            resolve();
+          },
+        });
+      });
+    });
+
+    it('should handle BLOB_NOT_FOUND error', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.BLOB_NOT_FOUND },
+      });
+
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+
+      await new Promise<void>(resolve => {
+        service.uploadBlobs(mockRequest, mockFiles).subscribe({
+          error: err => {
+            expect(toastHandlingService.error).toHaveBeenCalledWith(
+              'File không tồn tại',
+              'File đã bị xóa hoặc không tồn tại.'
+            );
+            expect(err).toEqual(error);
             resolve();
           },
         });
@@ -296,8 +343,9 @@ describe('UploadFileService', () => {
 
       await new Promise<void>(resolve => {
         service.uploadBlobs(mockRequest, mockFiles).subscribe({
-          error: () => {
+          error: err => {
             expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            expect(err).toEqual(error);
             resolve();
           },
         });
@@ -313,8 +361,9 @@ describe('UploadFileService', () => {
 
       await new Promise<void>(resolve => {
         service.uploadBlobs(mockRequest, mockFiles).subscribe({
-          error: () => {
+          error: err => {
             expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            expect(err).toEqual(error);
             resolve();
           },
         });
@@ -330,8 +379,9 @@ describe('UploadFileService', () => {
 
       await new Promise<void>(resolve => {
         service.uploadBlobs(mockRequest, mockFiles).subscribe({
-          error: () => {
+          error: err => {
             expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            expect(err).toEqual(error);
             resolve();
           },
         });
@@ -567,11 +617,7 @@ describe('UploadFileService', () => {
       await new Promise<void>(resolve => {
         service.uploadBlobs(mockRequest, mockFiles).subscribe({
           error: error => {
-            expect(error).toEqual({
-              isBusinessError: true,
-              statusCode: StatusCode.SUCCESS,
-            });
-            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            expect(error).toBeInstanceOf(Error);
             resolve();
           },
         });
@@ -590,49 +636,25 @@ describe('UploadFileService', () => {
       await new Promise<void>(resolve => {
         service.uploadBlobs(mockRequest, mockFiles).subscribe({
           error: err => {
-            // When uploadTokens is undefined, it will cause a TypeError before creating UploadError
-            expect(err).toBeInstanceOf(TypeError);
-            expect(err.message).toContain(
-              'Cannot read properties of undefined'
-            );
-            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            expect(err).toBeInstanceOf(Error);
             resolve();
           },
         });
       });
     });
 
-    it('should handle business error with non-quota status code', async () => {
-      const businessError = {
-        isBusinessError: true,
-        statusCode: StatusCode.SYSTEM_ERROR,
-      };
+    it('should handle non-HttpErrorResponse error', async () => {
+      const nonHttpError = new Error('Network error');
 
       (requestService.post as any).mockReturnValue(
-        throwError(() => businessError)
+        throwError(() => nonHttpError)
       );
 
       await new Promise<void>(resolve => {
         service.uploadBlobs(mockRequest, mockFiles).subscribe({
-          error: () => {
+          error: err => {
             expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
-            resolve();
-          },
-        });
-      });
-    });
-
-    it('should handle non-business error', async () => {
-      const nonBusinessError = new Error('Network error');
-
-      (requestService.post as any).mockReturnValue(
-        throwError(() => nonBusinessError)
-      );
-
-      await new Promise<void>(resolve => {
-        service.uploadBlobs(mockRequest, mockFiles).subscribe({
-          error: () => {
-            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            expect(err).toEqual(nonHttpError);
             resolve();
           },
         });

@@ -14,7 +14,6 @@ import { ClassOverviewComponent } from './class-overview/class-overview.componen
 import { UpdateClassModalComponent } from './update-class-modal/update-class-modal.component';
 
 import { type ClassModel } from '../../../../../shared/models/entities/class.model';
-import { type FolderWithMaterials } from '../class-detail.component';
 
 @Component({
   selector: 'class-information',
@@ -28,7 +27,6 @@ export class ClassInformationComponent {
   private readonly globalModalService = inject(GlobalModalService);
 
   classModel = input<ClassModel | null>(null);
-  folderWithMaterials = input<FolderWithMaterials[]>([]);
   folderCount = input<number>(0);
   materialCount = input<number>(0);
 

@@ -86,7 +86,7 @@ export class ModerateReasonModalComponent implements OnInit {
 
     const reason = this.reasonControl?.value.trim();
 
-    if (this.form.invalid || !reason) return;
+    if (this.form.invalid) return;
 
     const request: ApproveRejectMaterialRequest = {
       status: this.modalData.isApproved

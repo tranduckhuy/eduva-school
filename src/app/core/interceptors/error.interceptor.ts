@@ -15,6 +15,7 @@ import { StatusCode } from '../../shared/constants/status-code.constant';
 import { UserRoles } from '../../shared/constants/user-roles.constant';
 import {
   BYPASS_AUTH_ERROR,
+  BYPASS_NOT_FOUND_ERROR,
   BYPASS_PAYMENT_ERROR,
 } from '../../shared/tokens/context/http-context.token';
 
@@ -29,10 +30,21 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const user = userService.currentUser;
   const isByPassAuth = req.context.get(BYPASS_AUTH_ERROR);
   const isByPassPayment = req.context.get(BYPASS_PAYMENT_ERROR);
+  const isByPassNotFound = req.context.get(BYPASS_NOT_FOUND_ERROR);
 
   const handleServerError = () => {
     globalModalService.close();
     router.navigateByUrl('/errors/500');
+  };
+
+  const handleForbidden = () => {
+    globalModalService.close();
+    router.navigateByUrl('/errors/403');
+  };
+
+  const handleNotFound = () => {
+    globalModalService.close();
+    router.navigateByUrl('/errors/404');
   };
 
   const handleUnauthorized = () => {
@@ -63,11 +75,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         router.navigateByUrl('/auth/login', { replaceUrl: true });
       },
     });
-  };
-
-  const handleForbidden = () => {
-    globalModalService.close();
-    router.navigateByUrl('/errors/403');
   };
 
   const handleMissingSchoolOrSubscription = () => {
@@ -177,11 +184,12 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
-      if (
-        isNotFound &&
-        errorStatusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND
-      ) {
-        handleMissingSchoolOrSubscription();
+      if (isNotFound && !isByPassNotFound) {
+        if (errorStatusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND) {
+          handleMissingSchoolOrSubscription();
+        } else {
+          handleNotFound();
+        }
         return throwError(() => error);
       }
 

@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 import { Observable, map, catchError, throwError, tap } from 'rxjs';
 
@@ -20,6 +21,7 @@ import { type UpdateQuestionRequest } from '../model/request/command/update-ques
   providedIn: 'root',
 })
 export class QuestionService {
+  private readonly router = inject(Router);
   private readonly requestService = inject(RequestService);
   private readonly toastHandlingService = inject(ToastHandlingService);
 
@@ -35,7 +37,10 @@ export class QuestionService {
     return this.requestService
       .get<GetQuestionsResponse>(
         `${this.GET_LESSON_QUESTIONS_API_URL}/${materialId}`,
-        request
+        request,
+        {
+          bypassAuthError: true,
+        }
       )
       .pipe(
         map(res => this.extractDataResponse<GetQuestionsResponse>(res)),
@@ -47,7 +52,9 @@ export class QuestionService {
     request: GetQuestionsRequest
   ): Observable<GetQuestionsResponse | null> {
     return this.requestService
-      .get<GetQuestionsResponse>(this.GET_MY_QUESTIONS_API_URL, request)
+      .get<GetQuestionsResponse>(this.GET_MY_QUESTIONS_API_URL, request, {
+        bypassAuthError: true,
+      })
       .pipe(
         map(res => this.extractDataResponse<GetQuestionsResponse>(res)),
         catchError((err: HttpErrorResponse) => this.handleError(err))
@@ -56,7 +63,9 @@ export class QuestionService {
 
   getQuestionById(questionId: string): Observable<Question | null> {
     return this.requestService
-      .get<Question>(`${this.BASE_QUESTION_API_URL}/${questionId}`)
+      .get<Question>(`${this.BASE_QUESTION_API_URL}/${questionId}`, {
+        bypassNotFoundError: true,
+      })
       .pipe(
         map(res => this.extractDataResponse<Question>(res)),
         catchError((err: HttpErrorResponse) => this.handleError(err))
@@ -132,7 +141,35 @@ export class QuestionService {
   }
 
   private handleError(err: HttpErrorResponse) {
-    this.toastHandlingService.errorGeneral();
+    switch (err.error?.statusCode) {
+      case StatusCode.LESSON_MATERIAL_NOT_ACTIVE:
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 2000);
+        this.toastHandlingService.warn(
+          'Bài giảng đã bị xóa',
+          'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
+        );
+        break;
+      case StatusCode.STUDENT_NOT_ENROLLED_IN_CLASS_WITH_MATERIAL:
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 2000);
+        this.toastHandlingService.warn(
+          'Không thể truy cập bài giảng',
+          'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
+        );
+        break;
+      case StatusCode.QUESTION_NOT_FOUND:
+        this.toastHandlingService.warn(
+          'Câu hỏi không tồn tại',
+          'Câu hỏi đã bị người đăng xóa hoặc không tồn tại.'
+        );
+        break;
+      case StatusCode.QUESTION_NOT_ACTIVE:
+      default:
+        this.toastHandlingService.errorGeneral();
+    }
     return throwError(() => err);
   }
 }

@@ -4,12 +4,14 @@ import {
   DestroyRef,
   OnInit,
   computed,
+  effect,
   inject,
   signal,
 } from '@angular/core';
 
 import { ThemeService } from '../../../../shared/services/core/theme/theme.service';
 import { HeaderSubmenuService } from '../services/header-submenu.service';
+import { AuthService } from '../../../auth/services/auth.service';
 import { UserService } from '../../../../shared/services/api/user/user.service';
 import { NotificationService } from '../../../../shared/services/api/notification/notification.service';
 import { NotificationSocketService } from '../../../../shared/services/api/notification/notification-socket.service';
@@ -29,6 +31,7 @@ export class UserActionsComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly themeService = inject(ThemeService);
   private readonly headerSubmenuService = inject(HeaderSubmenuService);
+  private readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
   private readonly notificationService = inject(NotificationService);
   private readonly notificationSocketService = inject(
@@ -36,6 +39,7 @@ export class UserActionsComponent implements OnInit {
   );
 
   theme = this.themeService.theme;
+  isLoggedIn = this.authService.isLoggedIn;
   user = this.userService.currentUser;
   unreadCount = this.notificationService.unreadCount;
 
@@ -45,6 +49,17 @@ export class UserActionsComponent implements OnInit {
   readonly isDarkMode = computed(() => this.theme() === 'dark');
 
   constructor() {
+    effect(() => {
+      if (this.isLoggedIn()) {
+        this.notificationSocketService.connect();
+        setTimeout(() => {
+          this.notificationService.getNotificationSummary().subscribe();
+        }, 100);
+      } else {
+        this.notificationSocketService.disconnect();
+      }
+    });
+
     this.destroyRef.onDestroy(() => {
       this.notificationSocketService.disconnect();
     });
@@ -54,11 +69,6 @@ export class UserActionsComponent implements OnInit {
     document.addEventListener('fullscreenchange', () => {
       this.isFullscreen.set(!!document.fullscreenElement);
     });
-
-    if (this.user()) {
-      this.notificationSocketService.connect();
-      this.notificationService.getNotificationSummary().subscribe();
-    }
   }
 
   toggleMenu(submenuKey: string): void {

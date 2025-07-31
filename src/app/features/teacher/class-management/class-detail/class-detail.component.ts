@@ -8,32 +8,24 @@ import {
 } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
-import { forkJoin, map, of, switchMap, tap } from 'rxjs';
+import { tap } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { TabsModule } from 'primeng/tabs';
 
 import { ClassManagementService } from '../services/class-management.service';
-import { FolderManagementService } from '../../../../shared/services/api/folder/folder-management.service';
-import { LessonMaterialsService } from '../../../../shared/services/api/lesson-materials/lesson-materials.service';
+import { ClassMaterialsManagementService } from '../services/class-materials-management.service';
 
 import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
+import { EntityStatus } from '../../../../shared/models/enum/entity-status.enum';
+import { LessonMaterialStatus } from '../../../../shared/models/enum/lesson-material.enum';
 
 import { ClassInformationComponent } from './class-information/class-information.component';
 import { ClassMemberComponent } from './class-member/class-member.component';
-
 import { ClassFoldersComponent } from './class-folders/class-folders.component';
 
-import { type Folder } from '../../../../shared/models/entities/folder.model';
-import { type LessonMaterial } from '../../../../shared/models/entities/lesson-material.model';
+import { type GetLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
 import { type StudentClassResponse } from '../models/response/query/get-students-class-response.model';
-import { GetLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
-import { EntityStatus } from '../../../../shared/models/enum/entity-status.enum';
-
-export interface FolderWithMaterials {
-  folder: Folder;
-  materials: LessonMaterial[];
-}
 
 @Component({
   selector: 'app-class-detail',
@@ -53,14 +45,14 @@ export class ClassDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly classManagementService = inject(ClassManagementService);
-  private readonly folderManagementService = inject(FolderManagementService);
-  private readonly lessonMaterialsService = inject(LessonMaterialsService);
+  private readonly classMaterialsService = inject(
+    ClassMaterialsManagementService
+  );
 
   classId = input<string>('');
 
   classModel = this.classManagementService.classModel;
 
-  folderMaterials = signal<FolderWithMaterials[]>([]);
   folderCount = signal<number>(0);
   materialCount = signal<number>(0);
   students = signal<StudentClassResponse[]>([]);
@@ -93,23 +85,23 @@ export class ClassDetailComponent implements OnInit {
     this.classManagementService
       .getClassById(this.classId())
       .pipe(
-        switchMap(classModel => {
-          if (!classModel?.id) return this.handleEmptyClass();
+        tap(classModel => {
+          if (!classModel?.id) {
+            this.handleEmptyClass();
+            return;
+          }
 
           this.loadStudents(classModel.id);
-          return this.loadFolderWithMaterials(classModel.id);
-        }),
-        tap(folderWithMaterials => this.updateFolderStats(folderWithMaterials))
+          this.loadFolderWithMaterials(classModel.id);
+        })
       )
       .subscribe();
   }
 
-  private handleEmptyClass() {
-    this.folderMaterials.set([]);
+  private handleEmptyClass(): void {
     this.folderCount.set(0);
     this.materialCount.set(0);
     this.students.set([]);
-    return of([]);
   }
 
   private loadStudents(classId: string): void {
@@ -119,41 +111,25 @@ export class ClassDetailComponent implements OnInit {
   }
 
   private loadFolderWithMaterials(classId: string) {
-    return this.folderManagementService.getClassFolders(classId).pipe(
-      switchMap(folders => {
-        if (!folders || folders.length === 0) return of([]);
-        const requests = folders.map(folder => {
-          const request: GetLessonMaterialsRequest = {
-            status: EntityStatus.Active,
-          };
-          return this.lessonMaterialsService
-            .getLessonMaterialsByFolder(folder.id, request)
-            .pipe(
-              map(materials => ({
-                folder,
-                materials: materials ?? [],
-              }))
-            );
-        });
-        return forkJoin(requests);
-      })
-    );
-  }
+    const request: GetLessonMaterialsRequest = {
+      status: EntityStatus.Active,
+      lessonStatus: LessonMaterialStatus.Approved,
+    };
+    this.classMaterialsService
+      .getClassLessonMaterials(classId, request)
+      .subscribe({
+        next: res => {
+          if (!res) return;
 
-  private updateFolderStats(
-    folderWithMaterials: {
-      folder: any;
-      materials: any[];
-    }[]
-  ): void {
-    const totalFolders = folderWithMaterials.length;
-    const totalMaterials = folderWithMaterials.reduce(
-      (sum, item) => sum + (item.folder.countLessonMaterial ?? 0),
-      0
-    );
+          const folderCount = res.length ?? 0;
+          const totalLessonMaterials = res.reduce(
+            (total, folder) => total + (folder.lessonMaterials?.length ?? 0),
+            0
+          );
 
-    this.folderMaterials.set([...folderWithMaterials]);
-    this.folderCount.set(totalFolders);
-    this.materialCount.set(totalMaterials);
+          this.folderCount.set(folderCount);
+          this.materialCount.set(totalLessonMaterials);
+        },
+      });
   }
 }
