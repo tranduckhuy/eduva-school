@@ -51,7 +51,7 @@
           {{ materialCount() }}
         </p>
       </div>
-      @if (folderWithMaterials()?.length !== 0) {
+      @if (folderWithMaterials().length !== 0) {
         <p-button
           label="Thêm thư mục mới"
           icon="pi pi-plus"
@@ -66,11 +66,14 @@
         @for (folderWithMaterials of folderWithMaterials(); track $index) {
           <p-accordion-panel [value]="$index">
             <p-accordion-header>
-              {{ folderWithMaterials.folder.name }}
+              {{ folderWithMaterials.name }}
             </p-accordion-header>
             <p-accordion-content>
               <ul class="pl-3">
-                @for (material of folderWithMaterials.materials; track $index) {
+                @for (
+                  material of folderWithMaterials.lessonMaterials;
+                  track $index
+                ) {
                   <li class="material-item px-3">
                     <a
                       [routerLink]="['/teacher/view-lesson', material.id]"
@@ -103,7 +106,7 @@
           </p-accordion-panel>
         }
       </p-accordion>
-      @if (folderWithMaterials()?.length === 0) {
+      @if (folderWithMaterials().length === 0) {
         <!-- ? Empty State -->
         <div
           class="flex items-center rounded-md border border-[#dadce0] p-[25px]">

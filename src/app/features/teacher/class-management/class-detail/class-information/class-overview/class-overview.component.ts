@@ -15,16 +15,16 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmationService } from 'primeng/api';
 
-import { ClassManagementService } from '../../../services/class-management.service';
 import { GlobalModalService } from '../../../../../../shared/services/layout/global-modal/global-modal.service';
+import { ClassManagementService } from '../../../services/class-management.service';
+import { ClassMaterialsManagementService } from '../../../services/class-materials-management.service';
 
 import { ContentType } from '../../../../../../shared/models/enum/lesson-material.enum';
+import { FolderOwnerType } from '../../../../../../shared/models/enum/folder-owner-type.enum';
 
 import { AddLessonModalComponent } from '../../../../../../shared/components/add-lesson-modal/add-lesson-modal.component';
 
 import { type ClassModel } from '../../../../../../shared/models/entities/class.model';
-import { type FolderWithMaterials } from '../../class-detail.component';
-import { FolderOwnerType } from '../../../../../../shared/models/enum/folder-owner-type.enum';
 
 @Component({
   selector: 'class-overview',
@@ -42,16 +42,20 @@ import { FolderOwnerType } from '../../../../../../shared/models/enum/folder-own
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClassOverviewComponent {
-  private readonly classManagementService = inject(ClassManagementService);
   private readonly globalModalService = inject(GlobalModalService);
   private readonly confirmationService = inject(ConfirmationService);
+  private readonly classManagementService = inject(ClassManagementService);
+  private readonly classMaterialsService = inject(
+    ClassMaterialsManagementService
+  );
 
   classModel = input<ClassModel | null>();
-  folderWithMaterials = input<FolderWithMaterials[]>();
   folderCount = input<number>(0);
   materialCount = input<number>(0);
 
   classFolderAdded = output();
+
+  folderWithMaterials = this.classMaterialsService.folderWithMaterials;
 
   isCopied = signal<boolean>(false);
   accordionActiveIndex = signal<number>(0);

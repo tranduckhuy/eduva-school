@@ -82,7 +82,6 @@ export class VideoPreviewComponent implements OnInit {
   videoUrl = this.resourcesStateService.videoUrl;
   videoState = this.resourcesStateService.videoState;
 
-  hasFetchedProfileOnce = this.resourcesStateService.hasFetchedProfileOnce;
   currentGeneratedType = this.resourcesStateService.currentGeneratedType;
 
   readonly disableGenerate = computed(() => {
@@ -102,7 +101,6 @@ export class VideoPreviewComponent implements OnInit {
   constructor() {
     effect(
       () => {
-        const hasFetchProfile = this.hasFetchedProfileOnce();
         const generationType = this.generationType();
         const payload = this.jobUpdateProgress();
         const jobStatus = payload?.status;
@@ -111,7 +109,6 @@ export class VideoPreviewComponent implements OnInit {
         if (
           payload &&
           !failureReason &&
-          !hasFetchProfile &&
           jobStatus === JobStatus.Completed &&
           generationType === LessonGenerationType.Video
         ) {
@@ -119,9 +116,6 @@ export class VideoPreviewComponent implements OnInit {
             payload.videoOutputBlobNameUrl
           );
           this.resourcesStateService.setVideoState('generated');
-
-          this.userService.getCurrentProfile().subscribe();
-          this.resourcesStateService.setHasFetchedProfileOnce(true);
 
           this.resourcesStateService.setAiGeneratedMetadata(
             LessonGenerationType.Video,
@@ -277,7 +271,10 @@ export class VideoPreviewComponent implements OnInit {
     this.resourcesStateService.updateIsLoading(true);
     this.aiJobService
       .confirmCreateContent(jobId, request)
-      .pipe(finalize(() => this.resourcesStateService.updateIsLoading(false)))
+      .pipe(
+        switchMap(() => this.userService.getCurrentProfile()),
+        finalize(() => this.resourcesStateService.updateIsLoading(false))
+      )
       .subscribe({
         next: () => {
           this.resourcesStateService.setVideoState('loading');
@@ -321,6 +318,5 @@ export class VideoPreviewComponent implements OnInit {
   private resetAll() {
     this.resourcesStateService.setVideoUrl('');
     this.resourcesStateService.setVideoState('empty');
-    this.resourcesStateService.setHasFetchedProfileOnce(false);
   }
 }

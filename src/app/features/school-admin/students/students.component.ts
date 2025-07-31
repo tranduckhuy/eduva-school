@@ -15,6 +15,7 @@ import { SelectModule } from 'primeng/select';
 import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
 
 import { UserService } from '../../../shared/services/api/user/user.service';
+import { ExportFileService } from '../../../shared/services/api/file/export-file.service';
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
 import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
 
@@ -22,6 +23,7 @@ import { type UserListParams } from '../../../shared/models/api/request/query/us
 import { PAGE_SIZE } from '../../../shared/constants/common.constant';
 
 import { Role } from '../../../shared/models/enum/role.enum';
+import { EntityStatus } from '../../../shared/models/enum/entity-status.enum';
 
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 import { BadgeComponent } from '../../../shared/components/badge/badge.component';
@@ -30,7 +32,8 @@ import { AddStudentModalComponent } from './add-student-modal/add-student-modal.
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 import { ImportAccountModalsComponent } from '../../../shared/components/import-accounts/import-account-modals/import-account-modals.component';
 import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
-import { EntityStatus } from '../../../shared/models/enum/entity-status.enum';
+
+import { type ExportUsersRequest } from '../../../shared/models/api/request/query/export-users-request.model';
 
 interface StatusOption {
   name: string;
@@ -61,6 +64,7 @@ export class StudentsComponent {
   private readonly globalModalService = inject(GlobalModalService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly userService = inject(UserService);
+  private readonly exportFileService = inject(ExportFileService);
   private readonly loadingService = inject(LoadingService);
 
   // Pagination & Sorting signals
@@ -97,6 +101,7 @@ export class StudentsComponent {
 
   // Signals from service
   isLoadingGet = this.loadingService.is('get-users');
+  isLoadingExport = this.loadingService.is('export-users');
   isLoadingArchive = this.loadingService.is('archive-user');
   isLoadingActive = this.loadingService.is('active-user');
 
@@ -197,6 +202,17 @@ export class StudentsComponent {
         });
       },
     });
+  }
+
+  onExportUsers() {
+    const request: ExportUsersRequest = {
+      role: Role.Student,
+      status: this.statusSelect()?.code,
+      searchTerm: this.searchTerm(),
+      sortBy: this.sortField() ?? 'createdAt',
+      sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
+    };
+    this.exportFileService.exportUsers(request).subscribe();
   }
 
   openAddStudentModal() {

@@ -1,5 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 import { Observable, catchError, map, tap, throwError } from 'rxjs';
 
@@ -27,6 +28,7 @@ import { type LessonMaterialApproval } from '../../../models/entities/lesson-mat
   providedIn: 'root',
 })
 export class LessonMaterialsService {
+  private readonly router = inject(Router);
   private readonly requestService = inject(RequestService);
   private readonly toastHandlingService = inject(ToastHandlingService);
 
@@ -281,7 +283,9 @@ export class LessonMaterialsService {
   }
 
   private extractListResponse(res: any): LessonMaterial[] | null {
-    return res.statusCode === StatusCode.SUCCESS && res.data ? res.data : null;
+    return res.statusCode === StatusCode.SUCCESS && res.data
+      ? (res.data as LessonMaterial[])
+      : null;
   }
 
   private extractPagingListResponse(res: any): LessonMaterial[] | null {
@@ -297,23 +301,22 @@ export class LessonMaterialsService {
   private handleError(err: HttpErrorResponse): Observable<null> {
     switch (err.error?.statusCode) {
       case StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND:
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 2000);
         this.toastHandlingService.warn(
           'Thiếu gói đăng ký',
           'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
         );
         break;
       case StatusCode.LESSON_MATERIAL_NOT_ACTIVE:
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 2000);
         this.toastHandlingService.warn(
           'Bài giảng đã bị xóa',
           'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
         );
-        break;
-      case StatusCode.STUDENT_NOT_ENROLLED_IN_CLASS_WITH_MATERIAL:
-        this.toastHandlingService.warn(
-          'Chưa tham gia lớp học',
-          'Bạn chưa tham gia lớp học có chứa tài liệu này.'
-        );
-        window.history.back();
         break;
       default:
         this.toastHandlingService.errorGeneral();

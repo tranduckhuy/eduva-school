@@ -1715,25 +1715,6 @@ describe('LessonMaterialsService', () => {
       );
     });
 
-    it('should handle student not enrolled in class with material error', async () => {
-      const error = new HttpErrorResponse({
-        error: {
-          statusCode: StatusCode.STUDENT_NOT_ENROLLED_IN_CLASS_WITH_MATERIAL,
-        },
-        status: 400,
-      });
-      (requestService.get as any).mockReturnValue(throwError(() => error));
-
-      await expect(
-        lastValueFrom(service.getLessonMaterialById('material1'))
-      ).rejects.toThrow();
-
-      expect(toastHandlingService.warn).toHaveBeenCalledWith(
-        'Chưa tham gia lớp học',
-        'Bạn chưa tham gia lớp học có chứa tài liệu này.'
-      );
-    });
-
     it('should handle school subscription not found error for update', async () => {
       const error = new HttpErrorResponse({
         error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },

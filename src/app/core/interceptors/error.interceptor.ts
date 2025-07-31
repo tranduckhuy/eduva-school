@@ -15,8 +15,42 @@ import { StatusCode } from '../../shared/constants/status-code.constant';
 import { UserRoles } from '../../shared/constants/user-roles.constant';
 import {
   BYPASS_AUTH_ERROR,
+  BYPASS_NOT_FOUND_ERROR,
   BYPASS_PAYMENT_ERROR,
 } from '../../shared/tokens/context/http-context.token';
+
+const isSchoolAdminOrSystemAdmin = (roles: string[] = []) =>
+  roles.includes(UserRoles.SCHOOL_ADMIN) ||
+  roles.includes(UserRoles.SYSTEM_ADMIN);
+
+const clearAndRedirectToLogin = (
+  jwtService: JwtService,
+  userService: UserService,
+  router: Router
+) => {
+  jwtService.clearAll();
+  userService.clearCurrentUser();
+  router.navigateByUrl('/auth/login', { replaceUrl: true });
+};
+
+const showConfirm = (
+  confirmationService: ConfirmationService,
+  config: {
+    header: string;
+    message: string;
+    acceptLabel: string;
+    onAccept: () => void;
+  }
+) => {
+  confirmationService.confirm({
+    header: config.header,
+    message: config.message,
+    closable: false,
+    rejectVisible: false,
+    acceptButtonProps: { label: config.acceptLabel },
+    accept: config.onAccept,
+  });
+};
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
@@ -29,108 +63,76 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const user = userService.currentUser;
   const isByPassAuth = req.context.get(BYPASS_AUTH_ERROR);
   const isByPassPayment = req.context.get(BYPASS_PAYMENT_ERROR);
+  const isByPassNotFound = req.context.get(BYPASS_NOT_FOUND_ERROR);
 
-  const handleServerError = () => {
+  const navigateError = (path: string) => {
     globalModalService.close();
-    router.navigateByUrl('/errors/500');
+    router.navigateByUrl(path);
   };
 
   const handleUnauthorized = () => {
     globalModalService.close();
-    confirmationService.confirm({
+    showConfirm(confirmationService, {
       header: 'Phiên đã hết hạn',
       message: 'Vui lòng đăng nhập lại.',
-      closable: false,
-      rejectVisible: false,
-      acceptButtonProps: { label: 'Đồng ý' },
-      accept: () => {
-        // ? Clear cookie and user profile cache
+      acceptLabel: 'Đồng ý',
+      onAccept: () => {
         authService.clearSession();
-
-        // ? Clear state cache
         Object.keys(localStorage).forEach(key => {
           if (key.startsWith('accordion-open:')) {
             localStorage.removeItem(key);
           }
         });
-
-        // ? Close modal
         globalModalService.close();
-
-        // ? Close Submenus
         window.dispatchEvent(new Event('close-all-submenus'));
-
         router.navigateByUrl('/auth/login', { replaceUrl: true });
       },
     });
   };
 
-  const handleForbidden = () => {
-    globalModalService.close();
-    router.navigateByUrl('/errors/403');
-  };
-
-  const handleMissingSchoolOrSubscription = () => {
+  const handleSchoolActivationOrExpiry = (expired: boolean) => {
     const roles = user()?.roles ?? [];
-    const isAdmin =
-      roles.includes(UserRoles.SCHOOL_ADMIN) ||
-      roles.includes(UserRoles.SYSTEM_ADMIN);
+    const isAdmin = isSchoolAdminOrSystemAdmin(roles);
 
-    confirmationService.confirm({
-      header: 'Trường chưa được kích hoạt',
-      message: isAdmin
+    const header = expired
+      ? 'Gói sử dụng đã hết hạn'
+      : 'Trường chưa được kích hoạt';
+
+    let message: string;
+    let acceptLabel: string;
+    if (expired) {
+      acceptLabel = isAdmin ? 'Gia hạn' : 'Đăng xuất';
+      message = isAdmin
         ? `
-        <p>Trường của bạn hiện chưa có gói sử dụng.</p>
-        <p>Vui lòng <strong>chọn và kích hoạt</strong> gói để tiếp tục sử dụng hệ thống.</p>
-      `
+            <p>Gói sử dụng của trường bạn đã hết hạn.</p>
+            <p>Vui lòng <strong>gia hạn</strong> để tiếp tục sử dụng hệ thống.</p>
+          `
         : `
-        <p>Trường của bạn hiện chưa được kích hoạt.</p>
-        <p>Vui lòng liên hệ với <strong>quản trị viên của trường</strong> để được cấp quyền truy cập.</p>
-      `,
-      acceptButtonProps: { label: isAdmin ? 'Xem các gói' : 'Đăng xuất' },
-      rejectVisible: false,
-      closable: false,
-      accept: () => {
+          <p>Gói sử dụng của trường bạn đã hết hạn.</p>
+          <p>Vui lòng liên hệ với <strong>quản trị viên</strong> để gia hạn và tiếp tục sử dụng hệ thống.</p>
+        `;
+    } else {
+      acceptLabel = isAdmin ? 'Xem các gói' : 'Đăng xuất';
+      message = isAdmin
+        ? `
+            <p>Trường của bạn hiện chưa có gói sử dụng.</p>
+            <p>Vui lòng <strong>chọn và kích hoạt</strong> gói để tiếp tục sử dụng hệ thống.</p>
+          `
+        : `
+          <p>Trường của bạn hiện chưa được kích hoạt.</p>
+          <p>Vui lòng liên hệ với <strong>quản trị viên của trường</strong> để được cấp quyền truy cập.</p>
+        `;
+    }
+
+    showConfirm(confirmationService, {
+      header,
+      message,
+      acceptLabel,
+      onAccept: () => {
         if (isAdmin) {
           router.navigateByUrl('/school-admin/subscription-plans');
         } else {
-          jwtService.clearAll();
-          userService.clearCurrentUser();
-          router.navigateByUrl('/auth/login', { replaceUrl: true });
-        }
-      },
-    });
-  };
-
-  const handleSubscriptionExpired = () => {
-    userService.getCurrentProfile().subscribe();
-
-    const roles = user()?.roles ?? [];
-    const isAdmin =
-      roles.includes(UserRoles.SCHOOL_ADMIN) ||
-      roles.includes(UserRoles.SYSTEM_ADMIN);
-
-    confirmationService.confirm({
-      header: 'Gói sử dụng đã hết hạn',
-      message: isAdmin
-        ? `
-        <p>Gói sử dụng của trường bạn đã hết hạn.</p>
-        <p>Vui lòng <strong>gia hạn</strong> để tiếp tục sử dụng hệ thống.</p>
-      `
-        : `
-        <p>Gói sử dụng của trường bạn đã hết hạn.</p>
-        <p>Vui lòng liên hệ với <strong>quản trị viên</strong> để gia hạn và tiếp tục sử dụng hệ thống.</p>
-      `,
-      acceptButtonProps: { label: isAdmin ? 'Gia hạn' : 'Đăng xuất' },
-      rejectVisible: false,
-      closable: false,
-      accept: () => {
-        if (isAdmin) {
-          router.navigateByUrl('/school-admin/subscription-plans');
-        } else {
-          jwtService.clearAll();
-          userService.clearCurrentUser();
-          router.navigateByUrl('/auth/login', { replaceUrl: true });
+          clearAndRedirectToLogin(jwtService, userService, router);
         }
       },
     });
@@ -138,50 +140,47 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      const isUnauthorized = error.status === 401;
-      const isPaymentRequired = error.status === 402;
-      const isForbidden = error.status === 403;
-      const isNotFound = error.status === 404;
-      const isServerError = error.status === 0 || error.status >= 500;
-
+      const status = error.status;
       const errorStatusCode = error.error?.statusCode;
 
-      // Handle server errors
-      if (isServerError) {
-        handleServerError();
+      if (status === 0 || status >= 500) {
+        navigateError('/errors/500');
         return throwError(() => error);
       }
 
-      if (isUnauthorized && !isByPassAuth) {
+      if (status === 401 && !isByPassAuth) {
         handleUnauthorized();
         return throwError(() => error);
       }
 
-      if (!errorStatusCode) return throwError(() => error);
-
-      if (
-        isPaymentRequired &&
-        !isByPassPayment &&
-        errorStatusCode === StatusCode.SUBSCRIPTION_EXPIRED_WITH_DATA_LOSS_RISK
-      ) {
-        handleSubscriptionExpired();
+      if (!errorStatusCode) {
         return throwError(() => error);
       }
 
-      if (isForbidden && !isByPassAuth) {
+      if (
+        status === 402 &&
+        !isByPassPayment &&
+        errorStatusCode === StatusCode.SUBSCRIPTION_EXPIRED_WITH_DATA_LOSS_RISK
+      ) {
+        handleSchoolActivationOrExpiry(true);
+        return throwError(() => error);
+      }
+
+      if (status === 403 && !isByPassAuth) {
         if (errorStatusCode === StatusCode.SCHOOL_AND_SUBSCRIPTION_REQUIRED) {
-          handleMissingSchoolOrSubscription();
+          handleSchoolActivationOrExpiry(false);
         } else {
-          handleForbidden();
+          navigateError('/errors/403');
         }
         return throwError(() => error);
       }
 
-      if (
-        isNotFound &&
-        errorStatusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND
-      ) {
-        handleMissingSchoolOrSubscription();
+      if (status === 404 && !isByPassNotFound) {
+        if (errorStatusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND) {
+          handleSchoolActivationOrExpiry(false);
+        } else {
+          navigateError('/errors/404');
+        }
         return throwError(() => error);
       }
 

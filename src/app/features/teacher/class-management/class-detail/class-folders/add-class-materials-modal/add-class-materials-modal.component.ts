@@ -6,7 +6,12 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  FormGroup,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 import { ButtonModule } from 'primeng/button';
@@ -32,16 +37,15 @@ import {
   LessonMaterialStatus,
 } from '../../../../../../shared/models/enum/lesson-material.enum';
 
-import { type Folder } from '../../../../../../shared/models/entities/folder.model';
 import { type LessonMaterial } from '../../../../../../shared/models/entities/lesson-material.model';
 import { type GetFoldersRequest } from '../../../../../../shared/models/api/request/query/get-folders-request.model';
 import { type GetLessonMaterialsRequest } from '../../../../../../shared/models/api/request/query/get-lesson-materials-request.model';
-import { type FolderWithMaterials } from '../../class-detail.component';
+import { type GetClassLessonMaterialsResponse } from '../../../../../../shared/models/api/response/query/get-lesson-materials-response.model';
 
 interface AddClassMaterialModalData {
   classId: string;
   targetFolderId: string;
-  folderWithMaterials: FolderWithMaterials[];
+  folderWithMaterials: GetClassLessonMaterialsResponse[];
   addSuccess: () => void;
 }
 
@@ -73,9 +77,7 @@ export class AddClassMaterialsModalComponent implements OnInit {
   readonly isLoadingFolder = this.loadingService.is('get-folders');
   readonly folderList = this.folderService.folderList;
 
-  readonly form = this.fb.group({
-    folder: this.fb.control<Folder | null>(null, Validators.required),
-  });
+  form: FormGroup;
 
   sourceMaterials = signal<LessonMaterial[]>([]);
   targetMaterials = signal<LessonMaterial[]>([]);
@@ -87,6 +89,12 @@ export class AddClassMaterialsModalComponent implements OnInit {
   readonly hasNewTargetMaterials = computed(
     () => this.targetMaterials().length > 0
   );
+
+  constructor() {
+    this.form = this.fb.group({
+      folder: [null, Validators.required],
+    });
+  }
 
   ngOnInit(): void {
     this.loadPersonalFolders();
@@ -207,7 +215,7 @@ export class AddClassMaterialsModalComponent implements OnInit {
   private getExistingMaterialIds(): Set<string> {
     const existingMaterialIds = new Set<string>();
     this.modalData.folderWithMaterials.forEach(folderWithMaterials => {
-      folderWithMaterials.materials.forEach(material => {
+      folderWithMaterials.lessonMaterials.forEach(material => {
         existingMaterialIds.add(material.id);
       });
     });

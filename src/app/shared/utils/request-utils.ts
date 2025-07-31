@@ -3,6 +3,7 @@ import { HttpContext, HttpParams } from '@angular/common/http';
 import {
   BYPASS_AUTH,
   BYPASS_AUTH_ERROR,
+  BYPASS_NOT_FOUND_ERROR,
   BYPASS_PAYMENT_ERROR,
   LOADING_KEY,
   SHOW_LOADING,
@@ -70,6 +71,7 @@ export function buildFormDataFromObject(data: Record<string, any>): FormData {
  *  - `bypassAuth` (default: false): Whether to bypass auth-related interceptors.
  *  - `bypassAuthError` (default: false): Whether to bypass 401 error related interceptors.
  *  - `bypassPaymentError` (default: false): Whether to bypass 402 error related interceptors.
+ *  - `bypassNotFoundError` (default: false): Whether to bypass 404 error related interceptors.
  *  - `showLoading` (default: true): Whether to enable the global loading indicator.
  *  - `loadingKey` (default: 'default'): Whether to check specific global loading indicator.
  *
@@ -80,6 +82,7 @@ export function buildHttpContext(options?: RequestOptions): HttpContext {
     .set(BYPASS_AUTH, options?.bypassAuth === true)
     .set(BYPASS_AUTH_ERROR, options?.bypassAuthError === true)
     .set(BYPASS_PAYMENT_ERROR, options?.bypassPaymentError === true)
+    .set(BYPASS_NOT_FOUND_ERROR, options?.bypassNotFoundError === true)
     .set(SHOW_LOADING, options?.showLoading !== false)
     .set(LOADING_KEY, options?.loadingKey ?? 'default');
 }

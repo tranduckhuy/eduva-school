@@ -87,6 +87,24 @@ export class FolderManagementService {
       );
   }
 
+  getClassFolders(
+    classId: string,
+    request?: GetFoldersRequest
+  ): Observable<Folder[] | null> {
+    return this.requestService
+      .get<GetFoldersResponse>(
+        `${this.BASE_FOLDERS_API_URL}/class/${classId}`,
+        {
+          loadingKey: 'get-folders',
+        }
+      )
+      .pipe(
+        tap(res => this.handleFolderListResponse(res)),
+        map(res => this.extractFolderListFromResponse(res)),
+        catchError(err => this.handleError(err))
+      );
+  }
+
   renameFolder(
     folderId: string,
     request: RenameFolderRequest
@@ -99,21 +117,6 @@ export class FolderManagementService {
         tap(res => this.handleSuccessResponse(res)),
         map(() => null),
         catchError((err: HttpErrorResponse) => this.handleCreateError(err))
-      );
-  }
-
-  getClassFolders(classId: string): Observable<Folder[] | null> {
-    return this.requestService
-      .get<GetFoldersResponse>(
-        `${this.BASE_FOLDERS_API_URL}/class/${classId}`,
-        {
-          loadingKey: 'get-folders',
-        }
-      )
-      .pipe(
-        tap(res => this.handleFolderListResponse(res)),
-        map(res => this.extractFolderListFromResponse(res)),
-        catchError(err => this.handleError(err))
       );
   }
 
