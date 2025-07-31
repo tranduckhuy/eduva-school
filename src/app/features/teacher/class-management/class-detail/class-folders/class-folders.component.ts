@@ -24,7 +24,7 @@ import { AddClassMaterialsModalComponent } from './add-class-materials-modal/add
 import { RenameLessonModalComponent } from '../../../../../shared/components/rename-lesson-modal/rename-lesson-modal.component';
 
 import { type ClassModel } from '../../../../../shared/models/entities/class.model';
-import { type FolderWithMaterials } from '../class-detail.component';
+import { ClassMaterialsManagementService } from '../../services/class-materials-management.service';
 
 @Component({
   selector: 'class-folders',
@@ -35,18 +35,21 @@ import { type FolderWithMaterials } from '../class-detail.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClassFoldersComponent {
-  private readonly folderService = inject(FolderManagementService);
-  private readonly classFolderService = inject(ClassFolderManagementService);
   private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
+  private readonly folderService = inject(FolderManagementService);
+  private readonly classFolderService = inject(ClassFolderManagementService);
+  private readonly classMaterialsService = inject(
+    ClassMaterialsManagementService
+  );
 
   classModel = input<ClassModel | null>();
-  folderWithMaterials = input<FolderWithMaterials[]>();
 
   addFolderMaterials = output<void>();
   renameFolder = output<void>();
   removeFolderMaterials = output<void>();
 
+  folderWithMaterials = this.classMaterialsService.folderWithMaterials;
   readonly isLoadingRemoveFolder = this.loadingService.is(
     'remove-class-folder'
   );

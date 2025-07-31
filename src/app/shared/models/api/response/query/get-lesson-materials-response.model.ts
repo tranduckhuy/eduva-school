@@ -6,3 +6,10 @@ export interface GetPagingLessonMaterialsResponse {
   count: number;
   data: LessonMaterial[];
 }
+
+export interface GetClassLessonMaterialsResponse {
+  id: string;
+  name: string;
+  countLessonMaterials: number;
+  lessonMaterials: LessonMaterial[];
+}

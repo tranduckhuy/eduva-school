@@ -76,10 +76,6 @@ export class ResourcesStateService {
   private readonly audioUrlSignal = signal<string>('');
   readonly audioUrl = this.audioUrlSignal.asReadonly();
 
-  private readonly hasFetchedProfileOnceSignal = signal<boolean>(false);
-  readonly hasFetchedProfileOnce =
-    this.hasFetchedProfileOnceSignal.asReadonly();
-
   private readonly currentGeneratedTypeSignal =
     signal<LessonGenerationType | null>(null);
   readonly currentGeneratedType = this.currentGeneratedTypeSignal.asReadonly();
@@ -205,10 +201,6 @@ export class ResourcesStateService {
     this.audioUrlSignal.set(url);
   }
 
-  setHasFetchedProfileOnce(value: boolean) {
-    this.hasFetchedProfileOnceSignal.set(value);
-  }
-
   setCurrentGeneratedType(type: LessonGenerationType | null) {
     this.currentGeneratedTypeSignal.set(type);
   }
@@ -287,7 +279,6 @@ export class ResourcesStateService {
     this.audioStateSignal.set('empty');
     this.videoUrlSignal.set('');
     this.audioUrlSignal.set('');
-    this.hasFetchedProfileOnceSignal.set(false);
     this.currentGeneratedTypeSignal.set(null);
 
     // ? Reset video player states

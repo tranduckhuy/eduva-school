@@ -30,6 +30,10 @@
         mode="advanced"
         accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         maxFileSize="1000000"
+        invalidFileSizeMessageSummary="Tệp quá lớn."
+        invalidFileSizeMessageDetail="Kích thước tệp vượt quá giới hạn cho phép (200MB)."
+        invalidFileTypeMessageSummary="Định dạng tệp không hợp lệ."
+        invalidFileTypeMessageDetail="Chỉ chấp nhận PDF hoặc DOC."
         (onSelect)="onSelectFile($event)">
         <ng-template #header></ng-template>
         <ng-template #content let-file let-chooseCallback="chooseCallback">

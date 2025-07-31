@@ -65,7 +65,7 @@ export class NewQuestionComponent {
 
   constructor() {
     this.form = this.fb.group({
-      title: ['', Validators.required, noOnlySpacesValidator],
+      title: ['', [Validators.required, noOnlySpacesValidator]],
       content: ['', [Validators.required, noOnlySpacesValidator]],
     });
 

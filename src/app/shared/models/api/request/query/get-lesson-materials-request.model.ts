@@ -36,7 +36,6 @@ export interface GetPendingLessonMaterialsRequest {
 
 export interface GetSharedLessonMaterialsRequest {
   createdByUser?: string;
-  tag?: string;
   contentType?: ContentType;
   entityStatus?: EntityStatus;
   pageIndex?: number;
@@ -45,4 +44,9 @@ export interface GetSharedLessonMaterialsRequest {
   sortDirection?: string;
   searchTerm?: string;
   isPagingEnabled?: boolean;
+}
+
+export interface GetClassLessonMaterialsRequest {
+  status?: EntityStatus;
+  lessonStatus?: LessonMaterialStatus;
 }
