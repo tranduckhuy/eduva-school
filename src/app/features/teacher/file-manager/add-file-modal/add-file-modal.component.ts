@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { finalize, switchMap, throwError } from 'rxjs';
+import { finalize, switchMap } from 'rxjs';
 
 import {
   FileUpload,
