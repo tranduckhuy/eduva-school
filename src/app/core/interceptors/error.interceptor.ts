@@ -99,7 +99,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       : 'Trường chưa được kích hoạt';
 
     let message: string;
+    let acceptLabel: string;
     if (expired) {
+      acceptLabel = isAdmin ? 'Gia hạn' : 'Đăng xuất';
       message = isAdmin
         ? `
             <p>Gói sử dụng của trường bạn đã hết hạn.</p>
@@ -110,6 +112,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           <p>Vui lòng liên hệ với <strong>quản trị viên</strong> để gia hạn và tiếp tục sử dụng hệ thống.</p>
         `;
     } else {
+      acceptLabel = isAdmin ? 'Xem các gói' : 'Đăng xuất';
       message = isAdmin
         ? `
             <p>Trường của bạn hiện chưa có gói sử dụng.</p>
@@ -124,11 +127,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     showConfirm(confirmationService, {
       header,
       message,
-      acceptLabel: isAdmin
-        ? expired
-          ? 'Gia hạn'
-          : 'Xem các gói'
-        : 'Đăng xuất',
+      acceptLabel,
       onAccept: () => {
         if (isAdmin) {
           router.navigateByUrl('/school-admin/subscription-plans');
