@@ -93,28 +93,33 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const handleSchoolActivationOrExpiry = (expired: boolean) => {
     const roles = user()?.roles ?? [];
     const isAdmin = isSchoolAdminOrSystemAdmin(roles);
+
     const header = expired
       ? 'Gói sử dụng đã hết hạn'
       : 'Trường chưa được kích hoạt';
-    const message = expired
-      ? isAdmin
+
+    let message: string;
+    if (expired) {
+      message = isAdmin
         ? `
-          <p>Gói sử dụng của trường bạn đã hết hạn.</p>
-          <p>Vui lòng <strong>gia hạn</strong> để tiếp tục sử dụng hệ thống.</p>
-        `
+            <p>Gói sử dụng của trường bạn đã hết hạn.</p>
+            <p>Vui lòng <strong>gia hạn</strong> để tiếp tục sử dụng hệ thống.</p>
+          `
         : `
           <p>Gói sử dụng của trường bạn đã hết hạn.</p>
           <p>Vui lòng liên hệ với <strong>quản trị viên</strong> để gia hạn và tiếp tục sử dụng hệ thống.</p>
-        `
-      : isAdmin
+        `;
+    } else {
+      message = isAdmin
         ? `
-          <p>Trường của bạn hiện chưa có gói sử dụng.</p>
-          <p>Vui lòng <strong>chọn và kích hoạt</strong> gói để tiếp tục sử dụng hệ thống.</p>
-        `
+            <p>Trường của bạn hiện chưa có gói sử dụng.</p>
+            <p>Vui lòng <strong>chọn và kích hoạt</strong> gói để tiếp tục sử dụng hệ thống.</p>
+          `
         : `
           <p>Trường của bạn hiện chưa được kích hoạt.</p>
           <p>Vui lòng liên hệ với <strong>quản trị viên của trường</strong> để được cấp quyền truy cập.</p>
         `;
+    }
 
     showConfirm(confirmationService, {
       header,
@@ -158,7 +163,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         !isByPassPayment &&
         errorStatusCode === StatusCode.SUBSCRIPTION_EXPIRED_WITH_DATA_LOSS_RISK
       ) {
-        userService.getCurrentProfile().subscribe(); // refresh profile
         handleSchoolActivationOrExpiry(true);
         return throwError(() => error);
       }
