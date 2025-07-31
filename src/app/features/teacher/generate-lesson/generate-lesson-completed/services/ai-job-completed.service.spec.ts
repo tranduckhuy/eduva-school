@@ -13,10 +13,12 @@ import { JobStatus } from '../../../../../shared/models/enum/job-status.enum';
 // Mock RequestService
 class RequestServiceMock {
   get = vi.fn();
+  delete = vi.fn();
 }
 // Mock ToastHandlingService
 class ToastHandlingServiceMock {
   errorGeneral = vi.fn();
+  successGeneral = vi.fn();
 }
 
 describe('AiJobCompletedService', () => {
@@ -72,6 +74,16 @@ describe('AiJobCompletedService', () => {
     data: { data: [], count: 0 },
   };
 
+  const mockDeleteSuccessResponse = {
+    statusCode: StatusCode.SUCCESS,
+    data: null,
+  };
+
+  const mockDeleteFailResponse = {
+    statusCode: 4000,
+    data: null,
+  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -124,5 +136,63 @@ describe('AiJobCompletedService', () => {
     const result = await firstValueFrom(service.getAiJobCompleted(mockRequest));
     expect(service.jobList()).toEqual(mockAiJob);
     expect(service.totalJobs()).toBe(1);
+  });
+
+  describe('removeAiJob', () => {
+    const jobId = 'test-job-id';
+    const deleteRequest = { permanent: true };
+
+    it('removeAiJob: thành công (statusCode = SUCCESS), gọi success toast và trả về null', async () => {
+      requestService.delete.mockReturnValue(of(mockDeleteSuccessResponse));
+      const result = await firstValueFrom(
+        service.removeAiJob(jobId, deleteRequest)
+      );
+      expect(result).toBeNull();
+      expect(requestService.delete).toHaveBeenCalledWith(
+        expect.stringContaining(`/ai-jobs/${jobId}`),
+        deleteRequest
+      );
+      expect(toastService.successGeneral).toHaveBeenCalled();
+      expect(toastService.errorGeneral).not.toHaveBeenCalled();
+    });
+
+    it('removeAiJob: thất bại (statusCode != SUCCESS), gọi error toast và trả về null', async () => {
+      requestService.delete.mockReturnValue(of(mockDeleteFailResponse));
+      const result = await firstValueFrom(service.removeAiJob(jobId));
+      expect(result).toBeNull();
+      expect(requestService.delete).toHaveBeenCalledWith(
+        expect.stringContaining(`/ai-jobs/${jobId}`),
+        undefined
+      );
+      expect(toastService.errorGeneral).toHaveBeenCalled();
+      expect(toastService.successGeneral).not.toHaveBeenCalled();
+    });
+
+    it('removeAiJob: lỗi HTTP, gọi error toast và observable throw', async () => {
+      const httpError = { status: 500 };
+      requestService.delete.mockReturnValue(throwError(() => httpError));
+      await expect(firstValueFrom(service.removeAiJob(jobId))).rejects.toEqual(
+        httpError
+      );
+      expect(toastService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('removeAiJob: gọi với jobId và không có request parameter', async () => {
+      requestService.delete.mockReturnValue(of(mockDeleteSuccessResponse));
+      await firstValueFrom(service.removeAiJob(jobId));
+      expect(requestService.delete).toHaveBeenCalledWith(
+        expect.stringContaining(`/ai-jobs/${jobId}`),
+        undefined
+      );
+    });
+
+    it('removeAiJob: gọi với jobId và có request parameter', async () => {
+      requestService.delete.mockReturnValue(of(mockDeleteSuccessResponse));
+      await firstValueFrom(service.removeAiJob(jobId, deleteRequest));
+      expect(requestService.delete).toHaveBeenCalledWith(
+        expect.stringContaining(`/ai-jobs/${jobId}`),
+        deleteRequest
+      );
+    });
   });
 });

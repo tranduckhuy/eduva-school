@@ -1,0 +1,11 @@
+.bg-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    60deg,
+    rgba(32, 33, 36, 0) 50%,
+    rgba(32, 33, 36, 0.88)
+  );
+  opacity: 0.88;
+}

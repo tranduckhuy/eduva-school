@@ -4,7 +4,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { TooltipModule } from 'primeng/tooltip';
@@ -15,10 +15,12 @@ import { SelectModule } from 'primeng/select';
 import { LeadingZeroPipe } from '../../../shared/pipes/leading-zero.pipe';
 
 import { UserService } from '../../../shared/services/api/user/user.service';
+import { ExportFileService } from '../../../shared/services/api/file/export-file.service';
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
 import { GlobalModalService } from '../../../shared/services/layout/global-modal/global-modal.service';
 
 import { type UserListParams } from '../../../shared/models/api/request/query/user-list-params';
+import { EntityStatus } from '../../../shared/models/enum/entity-status.enum';
 import { PAGE_SIZE } from '../../../shared/constants/common.constant';
 import { Role } from '../../../shared/models/enum/role.enum';
 
@@ -29,7 +31,8 @@ import { AddTeacherModalComponent } from './add-teacher-modal/add-teacher-modal.
 import { TableSkeletonComponent } from '../../../shared/components/skeleton/table-skeleton/table-skeleton.component';
 import { ImportAccountModalsComponent } from '../../../shared/components/import-accounts/import-account-modals/import-account-modals.component';
 import { TableEmptyStateComponent } from '../../../shared/components/table-empty-state/table-empty-state.component';
-import { EntityStatus } from '../../../shared/models/enum/entity-status.enum';
+
+import { type ExportUsersRequest } from '../../../shared/models/api/request/query/export-users-request.model';
 
 interface StatusOption {
   name: string;
@@ -57,10 +60,12 @@ interface StatusOption {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeachersComponent {
+  private readonly router = inject(Router);
   private readonly globalModalService = inject(GlobalModalService);
+  private readonly loadingService = inject(LoadingService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly userService = inject(UserService);
-  private readonly loadingService = inject(LoadingService);
+  private readonly exportFileService = inject(ExportFileService);
 
   // Pagination & Sorting signals
   first = signal<number>(0);
@@ -96,8 +101,10 @@ export class TeachersComponent {
 
   // Signals from service
   isLoadingGet = this.loadingService.is('get-users');
+  isLoadingExport = this.loadingService.is('export-users');
   isLoadingArchive = this.loadingService.is('archive-user');
   isLoadingActive = this.loadingService.is('active-user');
+  isLoadingUpdateRole = this.loadingService.is('update-user-role');
 
   users = this.userService.users;
   currentUser = this.userService.currentUser;
@@ -197,6 +204,46 @@ export class TeachersComponent {
         });
       },
     });
+  }
+
+  openConfirmUpdateUpdateRoleDialog(event: Event, userId: string): void {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message:
+        'Bạn có chắc chắn muốn cấp quyền kiểm duyệt cho người dùng này? Họ sẽ trở thành kiểm duyệt viên.',
+      header: 'Thay đổi vai trò người dùng',
+      icon: 'pi pi-exclamation-triangle',
+      rejectLabel: 'Hủy',
+      rejectButtonProps: {
+        label: 'Hủy',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Xác nhận',
+      },
+      accept: () => {
+        this.userService
+          .updateUserRole(userId, { roles: [Role.ContentModerator] })
+          .subscribe({
+            next: () => {
+              this.router.navigate(['/school-admin/content-moderators']);
+            },
+          });
+      },
+    });
+  }
+
+  onExportUsers() {
+    const request: ExportUsersRequest = {
+      role: Role.Teacher,
+      status: this.statusSelect()?.code,
+      searchTerm: this.searchTerm(),
+      sortBy: this.sortField() ?? 'createdAt',
+      sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
+    };
+
+    this.exportFileService.exportUsers(request).subscribe();
   }
 
   openAddTeacherModal() {

@@ -14,7 +14,6 @@ import { ImageModule } from 'primeng/image';
 import { SubmenuDirective } from '../../../directives/submenu/submenu.directive';
 import { SafeHtmlPipe } from '../../../pipes/safe-html.pipe';
 
-import { UserService } from '../../../services/api/user/user.service';
 import { QuestionService } from '../comment-modal/services/question.service';
 import {
   type RenderBlock,
@@ -32,7 +31,6 @@ import { type Question } from '../../../models/entities/question.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuestionComponent implements OnInit {
-  private readonly userService = inject(UserService);
   private readonly questionService = inject(QuestionService);
   private readonly contentParseService = inject(ContentParserService);
 
@@ -40,8 +38,6 @@ export class QuestionComponent implements OnInit {
 
   editQuestion = output<Question | null>();
   deleteQuestion = output<void>();
-
-  user = this.userService.currentUser;
 
   isOptionsOpen = signal<boolean>(false);
   contentBlocks = signal<RenderBlock[]>([]);

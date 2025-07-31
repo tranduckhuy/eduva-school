@@ -9,7 +9,7 @@
         (click)="closeModal()"></span>
     </header>
 
-    <div class="mt-[25px] w-[1000px] px-[25px] pb-0">
+    <div class="mt-[25px] w-[1000px] px-[25px] pb-0 md:w-[70vw]">
       <p class="mt-2 max-w-full text-xs italic text-primary">
         * Vui lòng chọn thư mục cá nhân và di chuyển bài học mới từ danh sách
         bên trái sang danh sách tài liệu lớp bên phải. Bạn chỉ có thể thêm các
@@ -19,7 +19,7 @@
         <strong>Lưu ý:</strong> Các bài giảng trong thư mục cá nhân đã tồn tại
         trong thư mục của lớp sẽ không hiển thị trong danh sách bên trái.
       </p>
-      <div class="mt-4 xs:w-[300px]">
+      <div class="mt-4">
         <span class="font-bold dark:text-white">Thư mục của cá nhân bạn</span>
         <p-select
           formControlName="folder"
@@ -45,81 +45,69 @@
       </div>
     </div>
 
-    <div class="mt-[25px] px-[25px] pb-0">
-      <div class="w-[1000px] xs:w-[300px]">
-        <div class="flex w-full items-center justify-between">
-          <span class="font-bold dark:text-white">
-            Tài liệu của thư mục cá nhân
-          </span>
-          <span class="text-right font-bold dark:text-white">
-            Tài liệu của thư mục lớp
-          </span>
-        </div>
-        <p-picklist
-          styleClass="mt-3"
-          scrollHeight="18rem"
-          breakpoint="991.98px"
-          [responsive]="true"
-          [showSourceControls]="false"
-          [showTargetControls]="false"
-          [source]="sourceMaterials()"
-          [target]="targetMaterials()"
-          (onMoveToSource)="handleMoveToSource()"
-          (onMoveAllToSource)="handleMoveAllToSource()"
-          (onMoveToTarget)="handleMoveToTarget()"
-          (onMoveAllToTarget)="handleMoveAllToTarget()"
-          (onSourceFilter)="handleSourceFilter($event)"
-          (onTargetFilter)="handleTargetFilter($event)">
-          <ng-template let-material #item>
-            <div
-              class="flex w-full items-center gap-3 p-1"
-              [ngClass]="{
-                'pointer-events-none cursor-default opacity-50':
-                  initialTargetIds().has(material.id),
-              }"
-              [pTooltip]="
-                initialTargetIds().has(material.id)
-                  ? 'Bài học này đã tồn tại sẵn trong lớp và không thể di chuyển về thư mục cá nhân'
-                  : ''
-              ">
-              <span
-                class="icon-wrapper"
-                [ngClass]="getMaterialIconConfig(material.contentType).bgColor">
-                <i
-                  class="material-symbols-outlined text-[20px]"
-                  [ngClass]="
-                    getMaterialIconConfig(material.contentType).textColor
-                  ">
-                  {{ getMaterialIconConfig(material.contentType).icon }}
-                </i>
-              </span>
-              <span class="text-sm font-medium">{{ material.title }}</span>
-            </div>
-          </ng-template>
-          <ng-template pTemplate="emptymessagesource">
-            <div class="px-3 py-2 text-center text-sm text-gray-500">
-              Không có bài giảng nào trong thư mục cá nhân này<br />
-              hoặc tất cả đã tồn tại trong thư mục của lớp.
-            </div>
-          </ng-template>
-          <ng-template #emptyfiltermessagesource>
-            <div class="px-3 py-2 text-center text-sm text-gray-500">
-              Không tìm thấy bài giảng phù hợp với từ khoá.
-            </div>
-          </ng-template>
-          <ng-template #emptymessagetarget>
-            <div class="px-3 py-2 text-center text-sm text-gray-500">
-              Chưa có bài giảng nào.<br />
-              Hãy chuyển tài liệu từ danh sách bên trái sang.
-            </div>
-          </ng-template>
-          <ng-template #emptyfiltermessagetarget>
-            <div class="px-3 py-2 text-center text-sm text-gray-500">
-              Không tìm thấy bài giảng nào khớp với từ khoá.
-            </div>
-          </ng-template>
-        </p-picklist>
+    <div class="mt-[25px] px-[25px] pb-0 xs:mt-8">
+      <div class="flex w-full items-center justify-between xs:hidden">
+        <span class="font-bold dark:text-white">
+          Tài liệu của thư mục cá nhân
+        </span>
+        <span class="text-right font-bold dark:text-white">
+          Tài liệu của thư mục lớp
+        </span>
       </div>
+      <p-picklist
+        styleClass="mt-3"
+        scrollHeight="18rem"
+        breakpoint="991.98px"
+        [responsive]="true"
+        [showSourceControls]="false"
+        [showTargetControls]="false"
+        [source]="sourceMaterials()"
+        [target]="targetMaterials()"
+        (onMoveToSource)="handleMoveToSource()"
+        (onMoveAllToSource)="handleMoveAllToSource()"
+        (onMoveToTarget)="handleMoveToTarget()"
+        (onMoveAllToTarget)="handleMoveAllToTarget()"
+        (onSourceFilter)="handleSourceFilter($event)"
+        (onTargetFilter)="handleTargetFilter($event)">
+        <ng-template let-material #item>
+          <div class="flex w-full items-center gap-3 p-1">
+            <span
+              class="icon-wrapper"
+              [ngClass]="getMaterialIconConfig(material.contentType).bgColor">
+              <i
+                class="material-symbols-outlined text-[20px]"
+                [ngClass]="
+                  getMaterialIconConfig(material.contentType).textColor
+                ">
+                {{ getMaterialIconConfig(material.contentType).icon }}
+              </i>
+            </span>
+            <span class="text-sm font-medium">{{ material.title }}</span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="emptymessagesource">
+          <div class="px-3 py-2 text-center text-sm text-gray-500">
+            Không có bài giảng nào trong thư mục cá nhân này<br />
+            hoặc tất cả đã tồn tại trong thư mục của lớp.
+          </div>
+        </ng-template>
+        <ng-template #emptyfiltermessagesource>
+          <div class="px-3 py-2 text-center text-sm text-gray-500">
+            Không tìm thấy bài giảng phù hợp với từ khoá.
+          </div>
+        </ng-template>
+        <ng-template #emptymessagetarget>
+          <div class="px-3 py-2 text-center text-sm text-gray-500">
+            Chưa có bài giảng nào.<br />
+            Hãy chuyển tài liệu từ danh sách bên trái sang.
+          </div>
+        </ng-template>
+        <ng-template #emptyfiltermessagetarget>
+          <div class="px-3 py-2 text-center text-sm text-gray-500">
+            Không tìm thấy bài giảng nào khớp với từ khoá.
+          </div>
+        </ng-template>
+      </p-picklist>
     </div>
 
     <footer

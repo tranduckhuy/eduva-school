@@ -7,7 +7,6 @@ import { SkeletonModule } from 'primeng/skeleton';
   standalone: true,
   imports: [SkeletonModule],
   templateUrl: './notification-skeleton.component.html',
-  styleUrl: './notification-skeleton.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationSkeletonComponent {

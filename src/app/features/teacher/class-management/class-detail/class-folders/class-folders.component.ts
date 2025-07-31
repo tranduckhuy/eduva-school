@@ -15,6 +15,7 @@ import { SubmenuDirective } from '../../../../../shared/directives/submenu/subme
 
 import { ClassFolderManagementService } from '../../services/class-folder-management.service';
 import { FolderManagementService } from '../../../../../shared/services/api/folder/folder-management.service';
+import { LoadingService } from '../../../../../shared/services/core/loading/loading.service';
 import { GlobalModalService } from '../../../../../shared/services/layout/global-modal/global-modal.service';
 
 import { ContentType } from '../../../../../shared/models/enum/lesson-material.enum';
@@ -23,7 +24,7 @@ import { AddClassMaterialsModalComponent } from './add-class-materials-modal/add
 import { RenameLessonModalComponent } from '../../../../../shared/components/rename-lesson-modal/rename-lesson-modal.component';
 
 import { type ClassModel } from '../../../../../shared/models/entities/class.model';
-import { type FolderWithMaterials } from '../class-detail.component';
+import { ClassMaterialsManagementService } from '../../services/class-materials-management.service';
 
 @Component({
   selector: 'class-folders',
@@ -34,16 +35,27 @@ import { type FolderWithMaterials } from '../class-detail.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClassFoldersComponent {
-  private readonly classFolderService = inject(ClassFolderManagementService);
-  private readonly folderService = inject(FolderManagementService);
+  private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
+  private readonly folderService = inject(FolderManagementService);
+  private readonly classFolderService = inject(ClassFolderManagementService);
+  private readonly classMaterialsService = inject(
+    ClassMaterialsManagementService
+  );
 
   classModel = input<ClassModel | null>();
-  folderWithMaterials = input<FolderWithMaterials[]>();
 
   addFolderMaterials = output<void>();
   renameFolder = output<void>();
   removeFolderMaterials = output<void>();
+
+  folderWithMaterials = this.classMaterialsService.folderWithMaterials;
+  readonly isLoadingRemoveFolder = this.loadingService.is(
+    'remove-class-folder'
+  );
+  readonly isLoadingRemoveMaterials = this.loadingService.is(
+    'remove-materials-class-folder'
+  );
 
   readonly openedMenuFolderId = signal<string | null>(null);
   readonly openedMenuMaterialKey = signal<{
@@ -99,6 +111,7 @@ export class ClassFoldersComponent {
     this.globalModalService.open(AddClassMaterialsModalComponent, {
       classId: this.classModel()?.id,
       targetFolderId: folderId,
+      folderWithMaterials: this.folderWithMaterials(),
       addSuccess: () => this.addFolderMaterials.emit(),
     });
   }

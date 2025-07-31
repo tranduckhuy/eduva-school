@@ -5,9 +5,13 @@ import {
   inject,
   signal,
   computed,
-  DestroyRef,
 } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  FormGroup,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 import { ButtonModule } from 'primeng/button';
@@ -25,8 +29,6 @@ import { ClassFolderManagementService } from '../../../services/class-folder-man
 import { LoadingService } from '../../../../../../shared/services/core/loading/loading.service';
 import { GlobalModalService } from '../../../../../../shared/services/layout/global-modal/global-modal.service';
 
-import { debounceSignal } from '../../../../../../shared/utils/util-functions';
-
 import { MODAL_DATA } from '../../../../../../shared/tokens/injection/modal-data.token';
 import { EntityStatus } from '../../../../../../shared/models/enum/entity-status.enum';
 import { FolderOwnerType } from '../../../../../../shared/models/enum/folder-owner-type.enum';
@@ -35,14 +37,15 @@ import {
   LessonMaterialStatus,
 } from '../../../../../../shared/models/enum/lesson-material.enum';
 
-import { type Folder } from '../../../../../../shared/models/entities/folder.model';
 import { type LessonMaterial } from '../../../../../../shared/models/entities/lesson-material.model';
 import { type GetFoldersRequest } from '../../../../../../shared/models/api/request/query/get-folders-request.model';
 import { type GetLessonMaterialsRequest } from '../../../../../../shared/models/api/request/query/get-lesson-materials-request.model';
+import { type GetClassLessonMaterialsResponse } from '../../../../../../shared/models/api/response/query/get-lesson-materials-response.model';
 
 interface AddClassMaterialModalData {
   classId: string;
   targetFolderId: string;
+  folderWithMaterials: GetClassLessonMaterialsResponse[];
   addSuccess: () => void;
 }
 
@@ -63,7 +66,6 @@ interface AddClassMaterialModalData {
 })
 export class AddClassMaterialsModalComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
-  private readonly destroyRef = inject(DestroyRef);
   private readonly folderService = inject(FolderManagementService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
   private readonly classFolderService = inject(ClassFolderManagementService);
@@ -75,29 +77,27 @@ export class AddClassMaterialsModalComponent implements OnInit {
   readonly isLoadingFolder = this.loadingService.is('get-folders');
   readonly folderList = this.folderService.folderList;
 
-  readonly form = this.fb.group({
-    folder: this.fb.control<Folder | null>(null, Validators.required),
-  });
+  form: FormGroup;
 
   sourceMaterials = signal<LessonMaterial[]>([]);
   targetMaterials = signal<LessonMaterial[]>([]);
-  initialTargetIds = signal<Set<string>>(new Set());
 
   submitted = signal(false);
   sourceFilterText = signal('');
   targetFilterText = signal('');
 
-  readonly hasNewTargetMaterials = computed(() =>
-    this.targetMaterials().some(m => !this.initialTargetIds().has(m.id))
+  readonly hasNewTargetMaterials = computed(
+    () => this.targetMaterials().length > 0
   );
 
   constructor() {
-    this.setupFilterDebounces();
+    this.form = this.fb.group({
+      folder: [null, Validators.required],
+    });
   }
 
   ngOnInit(): void {
     this.loadPersonalFolders();
-    this.loadTargetMaterials(this.modalData.targetFolderId);
   }
 
   get folder() {
@@ -207,37 +207,19 @@ export class AddClassMaterialsModalComponent implements OnInit {
     );
   }
 
-  private setupFilterDebounces() {
-    const sourceCleanup = debounceSignal(
-      this.sourceFilterText,
-      () => {
-        const folder = this.folder?.value;
-        if (folder) {
-          this.loadSourceMaterials(folder.id, this.sourceFilterText());
-        }
-      },
-      300
-    );
-
-    const targetCleanup = debounceSignal(
-      this.targetFilterText,
-      () =>
-        this.loadTargetMaterials(
-          this.modalData.targetFolderId,
-          this.targetFilterText()
-        ),
-      300
-    );
-
-    this.destroyRef.onDestroy(() => {
-      sourceCleanup();
-      targetCleanup();
-    });
-  }
-
   private refreshMaterialSignals() {
     this.targetMaterials.set([...this.targetMaterials()]);
     this.sourceMaterials.set([...this.sourceMaterials()]);
+  }
+
+  private getExistingMaterialIds(): Set<string> {
+    const existingMaterialIds = new Set<string>();
+    this.modalData.folderWithMaterials.forEach(folderWithMaterials => {
+      folderWithMaterials.lessonMaterials.forEach(material => {
+        existingMaterialIds.add(material.id);
+      });
+    });
+    return existingMaterialIds;
   }
 
   private loadPersonalFolders() {
@@ -264,26 +246,10 @@ export class AddClassMaterialsModalComponent implements OnInit {
       .getLessonMaterialsByFolder(folderId, request)
       .subscribe(res => {
         if (!res) return;
-        const filtered = res.filter(m => !this.initialTargetIds().has(m.id));
+
+        const existingMaterialIds = this.getExistingMaterialIds();
+        const filtered = res.filter(m => !existingMaterialIds.has(m.id));
         this.sourceMaterials.set(filtered);
-      });
-  }
-
-  private loadTargetMaterials(folderId: string, searchTerm: string = '') {
-    const request: GetLessonMaterialsRequest = {
-      searchTerm,
-      sortBy: 'createdAt',
-      sortDirection: 'desc',
-      status: EntityStatus.Active,
-    };
-
-    this.lessonMaterialService
-      .getLessonMaterialsByFolder(folderId, request)
-      .subscribe(res => {
-        if (!res) return;
-        const ids = new Set(res.map(m => m.id));
-        this.initialTargetIds.set(ids);
-        this.targetMaterials.set([]);
       });
   }
 }

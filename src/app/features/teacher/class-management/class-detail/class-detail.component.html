@@ -13,10 +13,10 @@
       <p-tabpanel value="information">
         <class-information
           [classModel]="classModel()"
-          [folderWithMaterials]="folderMaterials()"
           [folderCount]="folderCount()"
           [materialCount]="materialCount()"
-          (classFolderAdded)="loadData()" />
+          (classFolderAdded)="loadData()"
+          (classUpdated)="loadData()" />
       </p-tabpanel>
 
       <!-- ? Class Members -->
@@ -31,7 +31,6 @@
       <p-tabpanel value="folders">
         <class-folders
           [classModel]="classModel()"
-          [folderWithMaterials]="folderMaterials()"
           (addFolderMaterials)="loadData()"
           (renameFolder)="loadData()"
           (removeFolderMaterials)="loadData()" />

@@ -14,6 +14,7 @@ import { type EntityListResponse } from '../../../models/api/response/query/enti
 import { BaseResponse } from '../../../models/api/base-response.model';
 import { UserListParams } from '../../../models/api/request/query/user-list-params';
 import { CreateUserRequest } from '../../../models/api/request/command/create-user-request.model';
+import { UpdateRoleRequest } from '../../../models/api/request/command/update-role-request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -165,6 +166,20 @@ export class UserService {
         loadingKey: 'archive-user',
       }),
       'Vô hiệu người dùng thành công!'
+    );
+  }
+
+  /**
+   * Archives a user account
+   * @param id User ID to archive
+   * @returns Observable<void>
+   */
+  updateUserRole(id: string, req: UpdateRoleRequest): Observable<void> {
+    return this.handleModificationRequest(
+      this.requestService.put<void>(`${this.USER_API_URL}/${id}/roles`, req, {
+        loadingKey: 'update-user-role',
+      }),
+      'Thay đổi vai trò người dùng thành công!'
     );
   }
 

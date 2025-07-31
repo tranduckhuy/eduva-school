@@ -1,5 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpContext } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpContext,
+  HttpErrorResponse,
+} from '@angular/common/http';
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
@@ -59,20 +63,10 @@ export class UploadFileService {
       .post<FileStorageResponse>(this.UPLOAD_FILE_TO_STORAGE_API_URL, request)
       .pipe(
         switchMap(res => {
-          if (
-            !res.data ||
-            res.statusCode !== StatusCode.SUCCESS ||
-            res.data.uploadTokens.length !== files.length
-          ) {
-            const error: UploadError = {
-              isBusinessError: true,
-              statusCode: res.statusCode,
-            };
-            return throwError(() => error);
-          }
-
-          const tokens = res.data.uploadTokens;
+          const tokens = res.data?.uploadTokens;
           const failedFiles: string[] = [];
+
+          if (!tokens) return throwError(() => new Error());
 
           // ? Call API by method 'PUT' for upload each file by each BlobUrl to Azure Storage
           const uploadRequests = tokens.map((token, index) =>
@@ -108,51 +102,46 @@ export class UploadFileService {
             })
           );
         }),
-        catchError((err: UploadError) => {
-          if (err?.isBusinessError) {
-            switch (err.statusCode) {
-              case StatusCode.STORAGE_QUOTA_EXCEEDED:
-                this.toastHandlingService.warn(
-                  'Đã đạt giới hạn lưu trữ',
-                  'Vui lòng liên hệ quản trị viên để nâng cấp gói và tiếp tục sử dụng.'
-                );
-                break;
-              case StatusCode.INVALID_FILE_TYPE:
-                this.toastHandlingService.error(
-                  'Loại file không hợp lệ',
-                  'Vui lòng chọn file có định dạng được hỗ trợ.'
-                );
-                break;
-              case StatusCode.FILE_IS_REQUIRED:
-                this.toastHandlingService.error(
-                  'File bắt buộc',
-                  'Vui lòng chọn file để upload.'
-                );
-                break;
-              case StatusCode.INVALID_BLOB_NAME:
-                this.toastHandlingService.error(
-                  'Tên file không hợp lệ',
-                  'Vui lòng đặt tên file phù hợp.'
-                );
-                break;
-              case StatusCode.INVALID_BLOB_URL:
-                this.toastHandlingService.error(
-                  'URL file không hợp lệ',
-                  'Có lỗi xảy ra với đường dẫn file.'
-                );
-                break;
-              case StatusCode.BLOB_NOT_FOUND:
-                this.toastHandlingService.error(
-                  'File không tồn tại',
-                  'File đã bị xóa hoặc không tồn tại.'
-                );
-                break;
-              default:
-                this.toastHandlingService.errorGeneral();
-                break;
-            }
-          } else {
-            this.toastHandlingService.errorGeneral();
+        catchError((err: HttpErrorResponse) => {
+          switch (err.error?.statusCode) {
+            case StatusCode.STORAGE_QUOTA_EXCEEDED:
+              this.toastHandlingService.warn(
+                'Đã đạt giới hạn lưu trữ',
+                'Vui lòng liên hệ quản trị viên để nâng cấp gói và tiếp tục sử dụng.'
+              );
+              break;
+            case StatusCode.INVALID_FILE_TYPE:
+              this.toastHandlingService.error(
+                'Loại file không hợp lệ',
+                'Vui lòng chọn file có định dạng được hỗ trợ.'
+              );
+              break;
+            case StatusCode.FILE_IS_REQUIRED:
+              this.toastHandlingService.error(
+                'File bắt buộc',
+                'Vui lòng chọn file để upload.'
+              );
+              break;
+            case StatusCode.INVALID_BLOB_NAME:
+              this.toastHandlingService.error(
+                'Tên file không hợp lệ',
+                'Vui lòng đặt tên file phù hợp.'
+              );
+              break;
+            case StatusCode.INVALID_BLOB_URL:
+              this.toastHandlingService.error(
+                'URL file không hợp lệ',
+                'Có lỗi xảy ra với đường dẫn file.'
+              );
+              break;
+            case StatusCode.BLOB_NOT_FOUND:
+              this.toastHandlingService.error(
+                'File không tồn tại',
+                'File đã bị xóa hoặc không tồn tại.'
+              );
+              break;
+            default:
+              this.toastHandlingService.errorGeneral();
           }
           return throwError(() => err);
         })

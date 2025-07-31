@@ -48,6 +48,17 @@
           </span>
           <span>Import</span>
         </app-button>
+        <app-button
+          [variant]="'outline'"
+          class="flex items-center"
+          [loading]="isLoadingExport()"
+          (clicked)="onExportUsers()">
+          <span
+            class="material-symbols-outlined relative top-[3px] mr-1 text-lg leading-none">
+            download
+          </span>
+          <span>Export</span>
+        </app-button>
       </div>
     </div>
   </div>
@@ -141,6 +152,21 @@
                     visibility
                   </app-button>
                 </a>
+                <app-button
+                  pTooltip="Trở thành giáo viên"
+                  tooltipPosition="top"
+                  variant="rounded"
+                  size="xs"
+                  class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent"
+                  [loading]="isLoadingUpdateRole()"
+                  (clicked)="
+                    openConfirmUpdateUpdateRoleDialog(
+                      $event,
+                      contentModerator.id
+                    )
+                  ">
+                  sync
+                </app-button>
                 @if (contentModerator.status === 0) {
                   <app-button
                     pTooltip="Vô hiệu hóa"

@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { Observable, catchError, map, of, tap } from 'rxjs';
+import { Observable, catchError, map, tap, throwError } from 'rxjs';
 
 import { environment } from '../../../../../environments/environment';
 
@@ -52,6 +52,28 @@ export class ClassManagementService {
       );
   }
 
+  updateClass(classId: string, request: CreateClassRequest): Observable<null> {
+    return this.requestService
+      .put(`${this.BASE_CLASS_API_URL}/${classId}`, request, {
+        loadingKey: 'update-class-information',
+      })
+      .pipe(
+        tap(res => this.handleSuccess(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  archiveClass(classId: string): Observable<null> {
+    return this.requestService
+      .post<null>(`${this.BASE_CLASS_API_URL}/${classId}/archive`)
+      .pipe(
+        tap(res => this.handleSuccess(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
   getClasses(
     request: GetTeacherClassRequest
   ): Observable<GetTeacherClassResponse | null> {
@@ -60,9 +82,9 @@ export class ClassManagementService {
       .pipe(
         tap(res => this.handleGetTeacherClassesResponse(res)),
         map(res => this.extractTeacherClassesFromResponse(res)),
-        catchError(() => {
+        catchError((err: HttpErrorResponse) => {
           this.toastHandlingService.errorGeneral();
-          return of(null);
+          return throwError(() => err);
         })
       );
   }
@@ -73,9 +95,9 @@ export class ClassManagementService {
       .pipe(
         tap(res => this.handleGetClassResponse(res)),
         map(res => this.extractClassFromResponse(res)),
-        catchError(() => {
+        catchError((err: HttpErrorResponse) => {
           this.toastHandlingService.errorGeneral();
-          return of(null);
+          return throwError(() => err);
         })
       );
   }
@@ -86,9 +108,9 @@ export class ClassManagementService {
       .pipe(
         tap(res => this.handleRefreshCodeResponse(res)),
         map(res => this.extractClassFromResponse(res)),
-        catchError(() => {
+        catchError((err: HttpErrorResponse) => {
           this.toastHandlingService.errorGeneral();
-          return of(null);
+          return throwError(() => err);
         })
       );
   }
@@ -104,9 +126,9 @@ export class ClassManagementService {
       )
       .pipe(
         map(res => this.extractStudentsFromResponse(res)),
-        catchError(() => {
+        catchError((err: HttpErrorResponse) => {
           this.toastHandlingService.errorGeneral();
-          return of(null);
+          return throwError(() => err);
         })
       );
   }
@@ -165,7 +187,7 @@ export class ClassManagementService {
       default:
         this.toastHandlingService.errorGeneral();
     }
-    return of(null);
+    return throwError(() => err);
   }
 
   private handleGetTeacherClassesResponse(res: any): void {
@@ -217,5 +239,18 @@ export class ClassManagementService {
       return students;
     }
     return null;
+  }
+
+  private handleSuccess(res: any): void {
+    if (res.statusCode === StatusCode.SUCCESS) {
+      this.toastHandlingService.successGeneral();
+    } else {
+      this.toastHandlingService.errorGeneral();
+    }
+  }
+
+  private handleError(err: HttpErrorResponse): Observable<null> {
+    this.toastHandlingService.errorGeneral();
+    return throwError(() => err);
   }
 }

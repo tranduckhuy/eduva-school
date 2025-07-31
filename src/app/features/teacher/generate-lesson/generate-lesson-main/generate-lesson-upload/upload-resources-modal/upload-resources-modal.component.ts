@@ -12,6 +12,9 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { GlobalModalService } from '../../../../../../shared/services/layout/global-modal/global-modal.service';
+import { ToastHandlingService } from '../../../../../../shared/services/core/toast/toast-handling.service';
+
+import { ALLOWED_UPLOAD_GENERATE_MIME_TYPES } from '../../../../../../shared/constants/common.constant';
 
 type UploadModalData = {
   onUploaded: (file: File) => void;
@@ -29,6 +32,7 @@ type UploadModalData = {
 })
 export class UploadResourcesModalComponent {
   private readonly modalService = inject(GlobalModalService);
+  private readonly toastHandlingService = inject(ToastHandlingService);
 
   fileUploaded = output<{ fileName: string; lastModified: number }>();
 
@@ -47,6 +51,18 @@ export class UploadResourcesModalComponent {
   onSelectFile(event: FileSelectEvent) {
     const file = event.files?.[0];
     if (file) {
+      const isValidType = ALLOWED_UPLOAD_GENERATE_MIME_TYPES.some(type =>
+        file.type.startsWith(type)
+      );
+
+      if (!isValidType) {
+        this.toastHandlingService.warn(
+          'Cảnh báo',
+          'Tệp bạn tải lên không hợp lệ về định dạng.'
+        );
+        return;
+      }
+
       this.modalData.onUploaded?.(file);
       this.closeModal();
     }

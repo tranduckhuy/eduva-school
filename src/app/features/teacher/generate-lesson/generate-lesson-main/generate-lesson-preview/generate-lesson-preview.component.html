@@ -4,11 +4,14 @@
   <div
     class="flex h-12 items-center justify-between border-b border-[#dde1eb] px-4 lg:hidden">
     <h2 class="text-base font-medium dark:border-[#37383b]">Xem trước</h2>
-    <p-button variant="text" [rounded]="true" (onClick)="openModal()">
-      <ng-template #icon>
-        <span class="pi pi-cog dark:!text-white" style="font-size: 20px"></span>
-      </ng-template>
-    </p-button>
+    <p-button
+      label="Cài đặt"
+      variant="outlined"
+      size="small"
+      icon="pi pi-cog"
+      styleClass="!border-[#dde1eb] !text-[#5f6368] transition-colors ease-in hover:!bg-[#ecf2fc] dark:!text-[#e6e6e6] dark:hover:!bg-dark-400 shadow-transparent !py-1 !px-4"
+      [rounded]="true"
+      (onClick)="openModal()" />
   </div>
 
   <div class="hidden px-4 lg:block">
