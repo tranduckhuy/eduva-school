@@ -246,6 +246,7 @@ export class AudioPreviewPlayerComponent {
 
   onDownloadGeneratedContent() {
     const metadata = this.generatedMetadataMap();
+    
     if (!metadata) return;
 
     this.downloadGeneratedContentService

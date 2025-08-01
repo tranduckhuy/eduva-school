@@ -29,6 +29,7 @@ import { AiSocketService } from '../services/api/ai-socket.service';
 import { ChatMessageComponent } from './chat-message/chat-message.component';
 
 import { type CreateAiJobsRequest } from '../models/request/command/create-ai-jobs-request.model';
+import { JobStatus } from '../../../../../shared/models/enum/job-status.enum';
 
 interface ChatMessage {
   sender: 'user' | 'system';
@@ -110,10 +111,16 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     effect(
       () => {
         const payload = this.jobUpdateProgress();
-        if (!payload) return;
+        const jobStatus = payload?.status;
+        const previewContent = payload?.previewContent;
+        const failureReason = payload?.failureReason;
 
-        const { previewContent, failureReason } = payload;
-        if (previewContent || failureReason) {
+        if (
+          payload &&
+          jobStatus === JobStatus.ContentGenerated &&
+          (previewContent || failureReason) &&
+          !this.hasPreviewContentSuccessfully()
+        ) {
           this.scrollToBottom();
           this.displaySystemAiMessage(payload);
           this.resourcesStateService.updateIsLoading(false);
