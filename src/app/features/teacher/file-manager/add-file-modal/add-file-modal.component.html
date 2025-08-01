@@ -21,7 +21,7 @@
           invalidFileSizeMessageSummary="Tệp quá lớn."
           invalidFileSizeMessageDetail="Kích thước tệp vượt quá giới hạn cho phép (200MB)."
           invalidFileTypeMessageSummary="Định dạng tệp không hợp lệ."
-          invalidFileTypeMessageDetail="Chỉ chấp nhận Video, Audio, PDF hoặc DOC."
+          invalidFileTypeMessageDetail="Chỉ chấp nhận Video, Audio, PDF, DOC hoặc DOCX."
           [multiple]="true"
           [maxFileSize]="maxUploadFileSize"
           (onSelect)="onSelectFile($event)"
@@ -93,7 +93,7 @@
                     (onClick)="chooseCallback()" />
                 </div>
                 <p class="mt-12 text-center text-gray-400">
-                  Các loại file được hỗ trợ: .pdf, .doc, .txt, Video (e.g.
+                  Các loại file được hỗ trợ: .pdf, .doc, .docx Video (e.g.
                   .mp4), Audio (e.g. .mp3)
                 </p>
               </div>
