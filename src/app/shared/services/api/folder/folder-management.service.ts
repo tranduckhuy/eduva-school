@@ -216,9 +216,7 @@ export class FolderManagementService {
   }
 
   private handleRemoveResponse(res: any): void {
-    if (res.statusCode === StatusCode.DELETED) {
-      this.toastHandlingService.successGeneral();
-    } else {
+    if (res.statusCode !== StatusCode.DELETED) {
       this.toastHandlingService.errorGeneral();
     }
   }

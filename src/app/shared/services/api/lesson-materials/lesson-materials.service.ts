@@ -275,9 +275,7 @@ export class LessonMaterialsService {
   }
 
   private handleSuccessResponse(res: any): void {
-    if (res.statusCode === StatusCode.SUCCESS) {
-      this.toastHandlingService.successGeneral();
-    } else {
+    if (res.statusCode !== StatusCode.SUCCESS) {
       this.toastHandlingService.errorGeneral();
     }
   }
