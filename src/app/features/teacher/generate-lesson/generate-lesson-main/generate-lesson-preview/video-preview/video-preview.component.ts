@@ -110,7 +110,8 @@ export class VideoPreviewComponent implements OnInit {
           payload &&
           !failureReason &&
           jobStatus === JobStatus.Completed &&
-          generationType === LessonGenerationType.Video
+          generationType === LessonGenerationType.Video &&
+          this.videoState() !== 'generated'
         ) {
           this.resourcesStateService.setVideoUrl(
             payload.videoOutputBlobNameUrl
@@ -212,7 +213,6 @@ export class VideoPreviewComponent implements OnInit {
       )
       .subscribe({
         next: () => {
-          this.resourcesStateService.clearAiGeneratedMetadata();
           onSuccess();
         },
       });
