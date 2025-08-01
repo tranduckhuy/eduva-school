@@ -198,7 +198,7 @@ export class LessonMaterialsService {
     return this.requestService
       .deleteWithBody(this.BASE_LESSON_MATERIALS_API_URL, request)
       .pipe(
-        tap(res => this.handleSuccessResponse(res)),
+        tap(() => null),
         map(() => null),
         catchError((err: HttpErrorResponse) => this.handleError(err))
       );
@@ -275,7 +275,9 @@ export class LessonMaterialsService {
   }
 
   private handleSuccessResponse(res: any): void {
-    if (res.statusCode !== StatusCode.SUCCESS) {
+    if (res.statusCode === StatusCode.SUCCESS) {
+      this.toastHandlingService.successGeneral();
+    } else {
       this.toastHandlingService.errorGeneral();
     }
   }

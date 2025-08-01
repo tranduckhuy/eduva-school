@@ -134,7 +134,7 @@ export class FolderManagementService {
     return this.requestService
       .deleteWithBody(`${this.BASE_FOLDERS_API_URL}/user`, request)
       .pipe(
-        tap(res => this.handleRemoveResponse(res)),
+        tap(() => null),
         map(() => null),
         catchError(err => this.handleError(err))
       );
@@ -216,7 +216,9 @@ export class FolderManagementService {
   }
 
   private handleRemoveResponse(res: any): void {
-    if (res.statusCode !== StatusCode.DELETED) {
+    if (res.statusCode === StatusCode.DELETED) {
+      this.toastHandlingService.successGeneral();
+    } else {
       this.toastHandlingService.errorGeneral();
     }
   }
