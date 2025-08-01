@@ -110,7 +110,8 @@ export class AudioPreviewComponent implements OnInit {
           payload &&
           !failureReason &&
           jobStatus === JobStatus.Completed &&
-          generationType === LessonGenerationType.Audio
+          generationType === LessonGenerationType.Audio &&
+          this.audioState() !== 'generated'
         ) {
           this.resourcesStateService.setAudioUrl(
             payload.audioOutputBlobNameUrl
@@ -212,7 +213,6 @@ export class AudioPreviewComponent implements OnInit {
       )
       .subscribe({
         next: () => {
-          this.resourcesStateService.clearAiGeneratedMetadata();
           onSuccess();
         },
       });
