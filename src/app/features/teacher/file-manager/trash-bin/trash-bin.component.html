@@ -15,6 +15,7 @@
           severity="danger"
           icon="pi pi-trash"
           label="Dọn sạch thùng rác"
+          [disabled]="trashItems().length === 0"
           (onClick)="onDeleteAllItem()" />
       </div>
     </div>

@@ -60,7 +60,20 @@ export class ClassManagementService {
       .pipe(
         tap(res => this.handleSuccess(res)),
         map(() => null),
-        catchError((err: HttpErrorResponse) => this.handleError(err))
+        catchError((err: HttpErrorResponse) => {
+          if (
+            err.error.statusCode ===
+            StatusCode.CLASS_NAME_ALREADY_EXISTS_FOR_TEACHER
+          ) {
+            this.toastHandlingService.error(
+              'Tên lớp học đã tồn tại',
+              'Vui lòng chọn một tên khác cho lớp học này.'
+            );
+          } else {
+            this.toastHandlingService.errorGeneral();
+          }
+          return throwError(() => err);
+        })
       );
   }
 
