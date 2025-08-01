@@ -324,6 +324,16 @@ export class VideoPreviewPlayerComponent {
       .subscribe();
   }
 
+  onDownloadGeneratedContent() {
+    const metadata = this.generatedMetadataMap();
+
+    if (!metadata) return;
+
+    this.downloadGeneratedContentService
+      .downloadGeneratedContent(metadata[LessonGenerationType.Video].blobName)
+      .subscribe();
+  }
+
   private getVideoElement(): HTMLVideoElement {
     return this.vgApi.getDefaultMedia().elem as HTMLVideoElement;
   }
@@ -348,15 +358,5 @@ export class VideoPreviewPlayerComponent {
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
     onMouseMove(event);
-  }
-
-  onDownloadGeneratedContent() {
-    const metadata = this.generatedMetadataMap();
-
-    if (!metadata) return;
-
-    this.downloadGeneratedContentService
-      .downloadGeneratedContent(metadata[LessonGenerationType.Video].blobName)
-      .subscribe();
   }
 }
