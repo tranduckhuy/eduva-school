@@ -161,21 +161,26 @@ export class NotificationsComponent implements OnInit {
       createdByName,
       performedByName,
     } = payload;
-    if (
-      (notification.type === 'QuestionDeleted' ||
+
+    const usePerformedBy =
+      // QuestionDeleted/CommentDeleted when deleted by other user
+      ((notification.type === 'QuestionDeleted' ||
         notification.type === 'QuestionCommentDeleted') &&
-      createdByUserId !== undefined &&
-      performedByUserId !== undefined &&
-      createdByUserId !== performedByUserId
-    ) {
+        createdByUserId !== performedByUserId) ||
+      // Approval notifications just have performedByAvatar and performedByName
+      notification.type === 'LessonMaterialApproved' ||
+      notification.type === 'LessonMaterialRejected';
+
+    if (usePerformedBy) {
       return {
-        avatar: performedByAvatar,
-        alt: performedByName,
+        avatar: performedByAvatar ?? '',
+        alt: performedByName ?? '',
       };
     }
+
     return {
-      avatar: createdByAvatar,
-      alt: createdByName,
+      avatar: createdByAvatar ?? '',
+      alt: createdByName ?? '',
     };
   }
 
