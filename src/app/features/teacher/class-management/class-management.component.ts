@@ -20,8 +20,9 @@ import { EntityStatus } from '../../../shared/models/enum/entity-status.enum';
 
 import { ClassCardComponent } from './class-card/class-card.component';
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
-import { GetTeacherClassRequest } from './models/request/query/get-teacher-class-request.model';
 import { AddClassModalComponent } from './add-class-modal/add-class-modal.component';
+
+import { type GetTeacherClassRequest } from './models/request/query/get-teacher-class-request.model';
 
 @Component({
   selector: 'app-class-management',
@@ -98,8 +99,7 @@ export class ClassManagementComponent implements OnInit {
 
   openAddClassModal() {
     this.globalModalService.open(AddClassModalComponent, {
-      pageIndex: this.currentPage(),
-      pageSize: this.pageSize(),
+      addClassSuccess: () => this.loadClass(),
     });
   }
 
