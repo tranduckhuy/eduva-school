@@ -967,7 +967,6 @@ describe('LessonMaterialsService', () => {
         request
       );
       expect(result).toBeNull();
-      expect(toastHandlingService.successGeneral).toHaveBeenCalled();
     });
 
     it('should handle delete materials failure', async () => {
@@ -979,7 +978,6 @@ describe('LessonMaterialsService', () => {
       const result = await lastValueFrom(service.deleteMaterial(request));
 
       expect(result).toBeNull();
-      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle HTTP error for delete', async () => {

@@ -157,3 +157,32 @@ export function noSpecialCharactersOrNumbersValidator(
 
   return null;
 }
+
+/**
+ * Validator function to ensure that the input does not contain any special characters.
+ *
+ * This can be used for general form fields (e.g., usernames, IDs) where letters,
+ * numbers, and spaces may be allowed, but special characters like !@#$%^&*() are not.
+ *
+ * @param control - The form control to validate.
+ * @returns ValidationErrors | null - Returns an error object if special characters are found, null otherwise.
+ */
+export function noSpecialCharactersValidator(
+  control: AbstractControl
+): ValidationErrors | null {
+  const value = control.value;
+
+  if (typeof value === 'string' && value.length > 0) {
+    // This regex matches any character that is NOT:
+    // - a letter (including Vietnamese letters with diacritics)
+    // - a number
+    // - a space
+    const specialCharRegex = /[^a-zA-ZÀ-ỹ0-9\s]/;
+
+    if (specialCharRegex.test(value)) {
+      return { noSpecialCharacters: true };
+    }
+  }
+
+  return null;
+}

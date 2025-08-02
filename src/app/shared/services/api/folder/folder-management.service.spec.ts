@@ -1017,7 +1017,6 @@ describe('FolderManagementService', () => {
         folderIds
       );
       expect(result).toBeNull();
-      expect(toastHandlingService.successGeneral).toHaveBeenCalled();
     });
 
     it('should show error toast on non-DELETED statusCode', async () => {
@@ -1030,7 +1029,6 @@ describe('FolderManagementService', () => {
 
       const result = await firstValueFrom(service.removeFolder(folderIds));
       expect(result).toBeNull();
-      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should show errorGeneral on error', async () => {

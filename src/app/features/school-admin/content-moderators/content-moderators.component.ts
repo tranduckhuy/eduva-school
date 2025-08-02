@@ -269,18 +269,11 @@ export class ContentModeratorsComponent {
       searchTerm: this.searchTerm(),
       sortBy: this.sortField() ?? 'createdAt',
       sortDirection: this.sortOrder() === 1 ? 'asc' : 'desc',
-      activeOnly: this.getActiveOnlyStatus(),
+      status: this.statusSelect()?.code,
     };
 
     this.userService.getUsers(params).subscribe({
       error: () => this.shouldStopRequest.set(true),
     });
-  }
-
-  private getActiveOnlyStatus(): boolean | undefined {
-    const statusCode = this.statusSelect()?.code;
-    if (statusCode === 0) return true;
-    if (statusCode === 1) return false;
-    return undefined;
   }
 }

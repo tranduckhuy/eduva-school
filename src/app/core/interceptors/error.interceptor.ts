@@ -176,7 +176,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       if (status === 404 && !isByPassNotFound) {
-        if (errorStatusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND) {
+        if (
+          errorStatusCode === StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND ||
+          errorStatusCode === StatusCode.USER_NOT_EXISTS
+        ) {
           handleSchoolActivationOrExpiry(false);
         } else {
           navigateError('/errors/404');
