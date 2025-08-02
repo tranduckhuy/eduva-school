@@ -91,7 +91,9 @@ export class ClassManagementService {
     request: GetTeacherClassRequest
   ): Observable<GetTeacherClassResponse | null> {
     return this.requestService
-      .get<GetTeacherClassResponse>(this.GET_TEACHER_CLASS_API_URL, request)
+      .get<GetTeacherClassResponse>(this.GET_TEACHER_CLASS_API_URL, request, {
+        loadingKey: 'get-teacher-classes',
+      })
       .pipe(
         tap(res => this.handleGetTeacherClassesResponse(res)),
         map(res => this.extractTeacherClassesFromResponse(res)),
