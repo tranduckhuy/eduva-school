@@ -60,13 +60,26 @@ export class ClassManagementService {
       .pipe(
         tap(res => this.handleSuccess(res)),
         map(() => null),
-        catchError((err: HttpErrorResponse) => this.handleError(err))
+        catchError((err: HttpErrorResponse) => {
+          if (
+            err.error.statusCode ===
+            StatusCode.CLASS_NAME_ALREADY_EXISTS_FOR_TEACHER
+          ) {
+            this.toastHandlingService.error(
+              'Tên lớp học đã tồn tại',
+              'Vui lòng chọn một tên khác cho lớp học này.'
+            );
+          } else {
+            this.toastHandlingService.errorGeneral();
+          }
+          return throwError(() => err);
+        })
       );
   }
 
   archiveClass(classId: string): Observable<null> {
     return this.requestService
-      .post<null>(`${this.BASE_CLASS_API_URL}/${classId}/archive`)
+      .put<null>(`${this.BASE_CLASS_API_URL}/${classId}/archive`)
       .pipe(
         tap(res => this.handleSuccess(res)),
         map(() => null),
@@ -78,7 +91,9 @@ export class ClassManagementService {
     request: GetTeacherClassRequest
   ): Observable<GetTeacherClassResponse | null> {
     return this.requestService
-      .get<GetTeacherClassResponse>(this.GET_TEACHER_CLASS_API_URL, request)
+      .get<GetTeacherClassResponse>(this.GET_TEACHER_CLASS_API_URL, request, {
+        loadingKey: 'get-teacher-classes',
+      })
       .pipe(
         tap(res => this.handleGetTeacherClassesResponse(res)),
         map(res => this.extractTeacherClassesFromResponse(res)),

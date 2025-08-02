@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -7,8 +12,6 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { switchMap } from 'rxjs';
-
 import { ButtonModule } from 'primeng/button';
 
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
@@ -16,16 +19,13 @@ import { GlobalModalService } from '../../../../shared/services/layout/global-mo
 import { ClassManagementService } from '../services/class-management.service';
 import { UploadFileService } from '../../../../shared/services/api/file/upload-file.service';
 
+import { MODAL_DATA } from '../../../../shared/tokens/injection/modal-data.token';
 import { BASE_BG_CLASS_IMAGE_URL } from '../../../../shared/constants/common.constant';
 
-import { MODAL_DATA } from '../../../../shared/tokens/injection/modal-data.token';
-
 import { type CreateClassRequest } from '../models/request/command/create-class-request.model';
-import { type GetTeacherClassRequest } from '../models/request/query/get-teacher-class-request.model';
 
 interface AddClassModalData {
-  pageIndex: number;
-  pageSize: number;
+  addClassSuccess: () => void;
 }
 
 @Component({
@@ -47,6 +47,8 @@ export class AddClassModalComponent {
   form: FormGroup;
 
   isLoading = this.loadingService.isLoading;
+
+  backgroundImageUrl = signal<string>(BASE_BG_CLASS_IMAGE_URL);
 
   constructor() {
     this.form = this.fb.group({
@@ -76,21 +78,18 @@ export class AddClassModalComponent {
     if (this.form.invalid) return;
 
     const request: CreateClassRequest = this.form.value;
-    this.classManagementService
-      .createClass(request)
-      .pipe(
-        switchMap(() => {
-          const request: GetTeacherClassRequest = {
-            pageIndex: this.modalData.pageIndex,
-            pageSize: this.modalData.pageSize,
-          };
-          return this.classManagementService.getClasses(request);
-        })
-      )
-      .subscribe({
-        next: () => this.closeModal(),
-        error: () => this.form.reset(),
-      });
+    this.classManagementService.createClass(request).subscribe({
+      next: () => {
+        this.modalData.addClassSuccess();
+        this.closeModal();
+      },
+      error: () => {
+        this.form.reset();
+        this.form.patchValue({
+          backgroundImageUrl: this.backgroundImageUrl(),
+        });
+      },
+    });
   }
 
   getErrorMessage(controlName: string): string {
@@ -109,8 +108,9 @@ export class AddClassModalComponent {
     const urls = await this.uploadFileService.getBackgroundImageUrls();
     if (urls.length > 0) {
       const randomUrl = urls[Math.floor(Math.random() * urls.length)];
+      this.backgroundImageUrl.set(randomUrl);
       this.form.patchValue({
-        backgroundImageUrl: randomUrl ?? BASE_BG_CLASS_IMAGE_URL,
+        backgroundImageUrl: this.backgroundImageUrl(),
       });
     }
   }

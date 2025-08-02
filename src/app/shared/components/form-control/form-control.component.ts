@@ -28,6 +28,7 @@ import {
   customEmailValidator,
   noOnlySpacesValidator,
   noSpecialCharactersOrNumbersValidator,
+  noSpecialCharactersValidator,
 } from '../../utils/form-validators';
 import { VIETNAM_PHONE_REGEX } from '../../constants/common.constant';
 
@@ -71,6 +72,7 @@ export class FormControlComponent
   pattern = input<string | RegExp | null>(null);
   noSpaces = input<boolean>(false);
   noSpecialCharactersOrNumbers = input<boolean>(false);
+  noSpecialCharacters = input<boolean>(false);
   errorMessages = input<{ [key: string]: string }>({});
   validatePassword = input<boolean>(false);
   confirmPassword = input<string | null>(null);
@@ -193,6 +195,8 @@ export class FormControlComponent
     if (this.noSpaces()) validators.push(noOnlySpacesValidator);
     if (this.noSpecialCharactersOrNumbers())
       validators.push(noSpecialCharactersOrNumbersValidator);
+    if (this.noSpecialCharacters())
+      validators.push(noSpecialCharactersValidator);
     return validators;
   }
 
@@ -209,6 +213,7 @@ export class FormControlComponent
       onlySpaces: 'Trường này không được chỉ chứa khoảng trắng',
       noSpecialCharactersOrNumbers:
         'Trường này không được chứa ký tự đặc biệt hoặc số',
+      noSpecialCharacters: 'Trường này không được chứa ký tự đặc biệt',
       passTooShort: 'Mật khẩu phải có ít nhất 8 ký tự',
       passTooLong: 'Mật khẩu không được vượt quá 18 ký tự',
       missingLowercase: 'Mật khẩu cần ít nhất một chữ cái thường (a-z)',

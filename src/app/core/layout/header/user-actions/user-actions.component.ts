@@ -61,6 +61,7 @@ export class UserActionsComponent implements OnInit {
     });
 
     this.destroyRef.onDestroy(() => {
+      this.notificationService.clearSignal();
       this.notificationSocketService.disconnect();
     });
   }

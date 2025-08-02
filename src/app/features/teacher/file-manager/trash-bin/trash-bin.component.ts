@@ -36,6 +36,7 @@ import { type LessonMaterial } from '../../../../shared/models/entities/lesson-m
 import { type GetFoldersRequest } from '../../../../shared/models/api/request/query/get-folders-request.model';
 import { type GetPersonalLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
 import { type DeleteMaterialRequest } from '../../../../shared/models/api/request/command/delete-material-request.model';
+import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
 
 type TrashItem =
   | { type: 'folder'; data: Folder }
@@ -65,6 +66,7 @@ export class TrashBinComponent {
   private readonly globalModalService = inject(GlobalModalService);
   private readonly folderService = inject(FolderManagementService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
+  private readonly toastService = inject(ToastHandlingService);
 
   isLoading = input<boolean>(false);
 
@@ -155,7 +157,10 @@ export class TrashBinComponent {
           .pipe(catchError(() => of(null)));
 
         forkJoin([deleteFolder$, deleteMaterial$]).subscribe({
-          next: () => this.loadTrashItems(),
+          next: () => {
+            this.toastService.successGeneral();
+            return this.loadTrashItems();
+          },
         });
       },
     });

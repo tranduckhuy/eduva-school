@@ -45,6 +45,8 @@ import { type CreateSchoolRequest } from '../../../shared/models/api/request/com
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SchoolInformationComponent implements OnInit {
+  URI_REGEX = WELL_URI_REGEX;
+
   private readonly fb = inject(FormBuilder);
   private readonly schoolService = inject(SchoolService);
   private readonly loadingService = inject(LoadingService);

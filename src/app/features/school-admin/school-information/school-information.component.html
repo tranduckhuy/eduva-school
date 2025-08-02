@@ -25,6 +25,8 @@
             label="Tên trường"
             placeholder="Nhập tên của trường bạn"
             [submitted]="submitted()"
+            [required]="true"
+            [noSpecialCharacters]="true"
             [readOnly]="!isEdit()">
           </app-form-control>
         </div>
@@ -36,6 +38,8 @@
             label="Email liên hệ"
             placeholder="Nhập địa chỉ email của trường bạn"
             [submitted]="submitted()"
+            [email]="true"
+            [required]="true"
             [readOnly]="!isEdit()">
           </app-form-control>
         </div>
@@ -46,6 +50,11 @@
             label="Số điện thoại"
             placeholder="Nhập số điện thoại của trường bạn"
             [submitted]="submitted()"
+            [phone]="true"
+            [required]="true"
+            [errorMessages]="{
+              pattern: 'Số điện thoại không hợp lệ',
+            }"
             [readOnly]="!isEdit()">
           </app-form-control>
         </div>
@@ -56,6 +65,7 @@
             label="Địa chỉ trường học"
             placeholder="Nhập địa chỉ của trường bạn"
             [submitted]="submitted()"
+            [required]="true"
             [readOnly]="!isEdit()">
           </app-form-control>
         </div>
@@ -66,7 +76,12 @@
             label="Địa chỉ website"
             placeholder="Nhập địa chỉ website của trường bạn"
             [submitted]="submitted()"
-            [readOnly]="!isEdit()">
+            [readOnly]="!isEdit()"
+            [pattern]="URI_REGEX"
+            [errorMessages]="{
+              pattern:
+                'Vui lòng nhập đường dẫn hợp lệ (ví dụ: example.com hoặc https://example.com)',
+            }">
           </app-form-control>
         </div>
       </form>

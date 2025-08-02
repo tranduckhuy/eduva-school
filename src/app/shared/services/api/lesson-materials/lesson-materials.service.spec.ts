@@ -20,6 +20,13 @@ import { ApproveRejectMaterialRequest } from '../../../../features/moderation/mo
 import { LessonMaterialStatus } from '../../../models/enum/lesson-material.enum';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
+// Mock window.dispatchEvent
+const mockDispatchEvent = vi.fn();
+Object.defineProperty(window, 'dispatchEvent', {
+  value: mockDispatchEvent,
+  writable: true,
+});
+
 describe('LessonMaterialsService', () => {
   let service: LessonMaterialsService;
   let requestService: ReturnType<typeof createRequestServiceMock>;
@@ -160,7 +167,7 @@ describe('LessonMaterialsService', () => {
       expect(toastHandlingService.errorGeneral).toHaveBeenCalledWith();
     });
 
-    it('should handle school subscription not found error', async () => {
+    it('should handle school subscription not found error and dispatch close-all-submenus event', async () => {
       const error = new HttpErrorResponse({
         error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
         status: 400,
@@ -175,6 +182,9 @@ describe('LessonMaterialsService', () => {
         expect.stringContaining('/lesson-materials'),
         mockRequest,
         { loadingKey: 'create-lesson-materials' }
+      );
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
       );
       expect(toastHandlingService.warn).toHaveBeenCalledWith(
         'Thiếu gói đăng ký',
@@ -253,7 +263,7 @@ describe('LessonMaterialsService', () => {
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
-    it('should handle school subscription not found error for update', async () => {
+    it('should handle school subscription not found error for update and dispatch close-all-submenus event', async () => {
       const error = new HttpErrorResponse({
         error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
         status: 400,
@@ -264,6 +274,9 @@ describe('LessonMaterialsService', () => {
         lastValueFrom(service.updateLessonMaterial(materialId, mockRequest))
       ).rejects.toThrow();
 
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
       expect(toastHandlingService.warn).toHaveBeenCalledWith(
         'Thiếu gói đăng ký',
         'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
@@ -579,6 +592,28 @@ describe('LessonMaterialsService', () => {
       expect(service.lessonMaterials()).toEqual([mockLessonMaterial]);
       expect(service.totalRecords()).toBe(0);
     });
+
+    it('should handle school subscription not found error for personal materials and dispatch close-all-submenus event', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
+        status: 400,
+      });
+      (requestService.get as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(
+          service.getPersonalLessonMaterials({ pageIndex: 1, pageSize: 10 })
+        )
+      ).rejects.toThrow();
+
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Thiếu gói đăng ký',
+        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+      );
+    });
   });
 
   describe('getSharedLessonMaterials', () => {
@@ -707,6 +742,26 @@ describe('LessonMaterialsService', () => {
       expect(result).toBeNull();
       expect(service.lessonMaterial()).toBeNull();
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle lesson material not active error for get by id and dispatch close-all-submenus event', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_NOT_ACTIVE },
+        status: 400,
+      });
+      (requestService.get as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.getLessonMaterialById(materialId))
+      ).rejects.toThrow();
+
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Bài giảng đã bị xóa',
+        'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
+      );
     });
   });
 
@@ -874,7 +929,7 @@ describe('LessonMaterialsService', () => {
       expect(toastHandlingService.successGeneral).toHaveBeenCalled();
     });
 
-    it('should handle school subscription not found error for approve/reject', async () => {
+    it('should handle school subscription not found error for approve/reject and dispatch close-all-submenus event', async () => {
       const error = new HttpErrorResponse({
         error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
         status: 400,
@@ -885,6 +940,9 @@ describe('LessonMaterialsService', () => {
         lastValueFrom(service.approveRejectMaterial(materialId, mockRequest))
       ).rejects.toThrow();
 
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
       expect(toastHandlingService.warn).toHaveBeenCalledWith(
         'Thiếu gói đăng ký',
         'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
@@ -909,7 +967,6 @@ describe('LessonMaterialsService', () => {
         request
       );
       expect(result).toBeNull();
-      expect(toastHandlingService.successGeneral).toHaveBeenCalled();
     });
 
     it('should handle delete materials failure', async () => {
@@ -921,7 +978,6 @@ describe('LessonMaterialsService', () => {
       const result = await lastValueFrom(service.deleteMaterial(request));
 
       expect(result).toBeNull();
-      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
     it('should handle HTTP error for delete', async () => {
@@ -935,6 +991,30 @@ describe('LessonMaterialsService', () => {
       ).rejects.toThrow();
 
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle school subscription not found error for delete and dispatch close-all-submenus event', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
+        status: 400,
+      });
+      (requestService.deleteWithBody as any).mockReturnValue(
+        throwError(() => error)
+      );
+
+      const deleteRequest = { ids: ['material1'], permanent: true };
+
+      await expect(
+        lastValueFrom(service.deleteMaterial(deleteRequest))
+      ).rejects.toThrow();
+
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Thiếu gói đăng ký',
+        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+      );
     });
   });
 
@@ -980,6 +1060,26 @@ describe('LessonMaterialsService', () => {
       ).rejects.toThrow();
 
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle school subscription not found error for restore and dispatch close-all-submenus event', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
+        status: 400,
+      });
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.restoreMaterial('folder1', ['material1']))
+      ).rejects.toThrow();
+
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Thiếu gói đăng ký',
+        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+      );
     });
   });
 
@@ -1342,6 +1442,26 @@ describe('LessonMaterialsService', () => {
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
+    it('should handle lesson material not active error and dispatch close-all-submenus event', async () => {
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_NOT_ACTIVE },
+        status: 400,
+      });
+      (requestService.get as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        lastValueFrom(service.getLessonMaterialById('material1'))
+      ).rejects.toThrow();
+
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
+      expect(toastHandlingService.warn).toHaveBeenCalledWith(
+        'Bài giảng đã bị xóa',
+        'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
+      );
+    });
+
     it('should handle lesson material already approved error', async () => {
       const error = new HttpErrorResponse({
         error: { statusCode: StatusCode.LESSON_MATERIAL_ALREADY_APPROVED },
@@ -1679,7 +1799,7 @@ describe('LessonMaterialsService', () => {
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
-    it('should handle school subscription not found error for personal materials', async () => {
+    it('should handle school subscription not found error and dispatch close-all-submenus event', async () => {
       const error = new HttpErrorResponse({
         error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
         status: 400,
@@ -1687,114 +1807,12 @@ describe('LessonMaterialsService', () => {
       (requestService.get as any).mockReturnValue(throwError(() => error));
 
       await expect(
-        lastValueFrom(
-          service.getPersonalLessonMaterials({ pageIndex: 1, pageSize: 10 })
-        )
+        lastValueFrom(service.getLessonMaterialsByFolder('folder1'))
       ).rejects.toThrow();
 
-      expect(toastHandlingService.warn).toHaveBeenCalledWith(
-        'Thiếu gói đăng ký',
-        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
       );
-    });
-
-    it('should handle lesson material not active error for get by id', async () => {
-      const error = new HttpErrorResponse({
-        error: { statusCode: StatusCode.LESSON_MATERIAL_NOT_ACTIVE },
-        status: 400,
-      });
-      (requestService.get as any).mockReturnValue(throwError(() => error));
-
-      await expect(
-        lastValueFrom(service.getLessonMaterialById('material1'))
-      ).rejects.toThrow();
-
-      expect(toastHandlingService.warn).toHaveBeenCalledWith(
-        'Bài giảng đã bị xóa',
-        'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
-      );
-    });
-
-    it('should handle school subscription not found error for update', async () => {
-      const error = new HttpErrorResponse({
-        error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
-        status: 400,
-      });
-      (requestService.put as any).mockReturnValue(throwError(() => error));
-
-      const updateRequest: UpdateLessonMaterialRequest = {
-        id: 'material1',
-        title: 'Updated Material',
-        description: 'Updated Description',
-        visibility: 1,
-      };
-
-      await expect(
-        lastValueFrom(service.updateLessonMaterial('material1', updateRequest))
-      ).rejects.toThrow();
-
-      expect(toastHandlingService.warn).toHaveBeenCalledWith(
-        'Thiếu gói đăng ký',
-        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
-      );
-    });
-
-    it('should handle school subscription not found error for delete', async () => {
-      const error = new HttpErrorResponse({
-        error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
-        status: 400,
-      });
-      (requestService.deleteWithBody as any).mockReturnValue(
-        throwError(() => error)
-      );
-
-      const deleteRequest = { ids: ['material1'], permanent: true };
-
-      await expect(
-        lastValueFrom(service.deleteMaterial(deleteRequest))
-      ).rejects.toThrow();
-
-      expect(toastHandlingService.warn).toHaveBeenCalledWith(
-        'Thiếu gói đăng ký',
-        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
-      );
-    });
-
-    it('should handle school subscription not found error for restore', async () => {
-      const error = new HttpErrorResponse({
-        error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
-        status: 400,
-      });
-      (requestService.put as any).mockReturnValue(throwError(() => error));
-
-      await expect(
-        lastValueFrom(service.restoreMaterial('folder1', ['material1']))
-      ).rejects.toThrow();
-
-      expect(toastHandlingService.warn).toHaveBeenCalledWith(
-        'Thiếu gói đăng ký',
-        'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
-      );
-    });
-
-    it('should handle school subscription not found error for approve/reject', async () => {
-      const error = new HttpErrorResponse({
-        error: { statusCode: StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND },
-        status: 400,
-      });
-      (requestService.put as any).mockReturnValue(throwError(() => error));
-
-      const approveRequest: ApproveRejectMaterialRequest = {
-        status: LessonMaterialStatus.Approved,
-        feedback: 'Good content',
-      };
-
-      await expect(
-        lastValueFrom(
-          service.approveRejectMaterial('material1', approveRequest)
-        )
-      ).rejects.toThrow();
-
       expect(toastHandlingService.warn).toHaveBeenCalledWith(
         'Thiếu gói đăng ký',
         'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'

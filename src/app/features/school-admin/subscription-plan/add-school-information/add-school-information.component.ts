@@ -28,7 +28,7 @@ import { PaymentService } from '../../../../shared/services/api/payment/payment.
 import {
   customEmailValidator,
   normalizeUrl,
-  noSpecialCharactersOrNumbersValidator,
+  noSpecialCharactersValidator,
 } from '../../../../shared/utils/form-validators';
 import {
   VIETNAM_PHONE_REGEX,
@@ -84,7 +84,7 @@ export class AddSchoolInformationComponent implements OnInit {
 
   constructor() {
     this.form = this.fb.group({
-      name: ['', Validators.required, noSpecialCharactersOrNumbersValidator],
+      name: ['', Validators.required, noSpecialCharactersValidator],
       contactEmail: ['', [Validators.required, customEmailValidator]],
       contactPhone: [
         '',

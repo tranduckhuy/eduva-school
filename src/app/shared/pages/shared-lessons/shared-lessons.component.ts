@@ -31,12 +31,12 @@ import {
 import { SearchInputComponent } from '../../components/search-input/search-input.component';
 import { TableEmptyStateComponent } from '../../components/table-empty-state/table-empty-state.component';
 import { TableSkeletonComponent } from '../../components/skeleton/table-skeleton/table-skeleton.component';
-
 import { UserRoles } from '../../constants/user-roles.constant';
-
 import { type LessonMaterial } from '../../models/entities/lesson-material.model';
 import { type GetSharedLessonMaterialsRequest } from '../../models/api/request/query/get-lesson-materials-request.model';
 import { EntityStatus } from '../../models/enum/entity-status.enum';
+import { GlobalModalService } from '../../services/layout/global-modal/global-modal.service';
+import { ShareClassMaterialModalComponent } from './share-class-material-modal/share-class-material-modal.component';
 
 @Component({
   selector: 'app-lessons',
@@ -62,6 +62,7 @@ export class SharedLessonsComponent {
   private readonly userService = inject(UserService);
   private readonly lessonMaterialsService = inject(LessonMaterialsService);
   private readonly loadingService = inject(LoadingService);
+  private readonly globalModalService = inject(GlobalModalService);
 
   user = this.userService.currentUser;
   materials = this.lessonMaterialsService.lessonMaterials;
@@ -111,6 +112,12 @@ export class SharedLessonsComponent {
     this.firstRecordIndex.set(0);
 
     this.loadMaterials();
+  }
+
+  onOpenShareModal(materialId: string): void {
+    this.globalModalService.open(ShareClassMaterialModalComponent, {
+      materialId,
+    });
   }
 
   getMaterialIcon(material: LessonMaterial): string {
