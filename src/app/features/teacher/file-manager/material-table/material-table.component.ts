@@ -91,6 +91,8 @@ export class MaterialTableComponent implements OnInit {
     'Hành động',
   ]);
 
+  readonly LessonMaterialVisibility = LessonMaterialVisibility;
+
   ngOnInit(): void {
     this.activatedRoute.queryParamMap.subscribe(params => {
       const page = Number(params.get('page'));
@@ -121,46 +123,43 @@ export class MaterialTableComponent implements OnInit {
   }
 
   onUpdateVisibility(materialId: string, status: LessonMaterialStatus) {
-    if (status !== LessonMaterialStatus.Approved) {
-      this.confirmationService.confirm({
-        header: 'Chia sẻ tài liệu?',
-        message: `
-          Tài liệu này chưa được phê duyệt nên sẽ không hiển thị trong danh sách tài liệu chia sẻ của trường cho đến khi được phê duyệt.
-          <br />
-          Bạn có chắc chắn muốn tiếp tục chia sẻ?
-        `,
-        icon: 'pi pi-info-circle',
-        rejectButtonProps: {
-          label: 'Không, quay lại',
-          severity: 'secondary',
-          outlined: true,
-        },
-        acceptButtonProps: {
-          label: 'Có, vẫn chia sẻ',
-        },
-        accept: () => {
-          const request: UpdateLessonMaterialRequest = {
-            id: materialId,
-            visibility: LessonMaterialVisibility.School,
-          };
-          this.lessonMaterialsService
-            .updateLessonMaterial(materialId, request)
-            .subscribe({
-              next: () => this.onSearch(),
-            });
-        },
-      });
-    } else {
-      const request: UpdateLessonMaterialRequest = {
-        id: materialId,
-        visibility: LessonMaterialVisibility.School,
-      };
-      this.lessonMaterialsService
-        .updateLessonMaterial(materialId, request)
-        .subscribe({
-          next: () => this.onSearch(),
-        });
-    }
+    this.confirmationService.confirm({
+      header: 'Chia sẻ tài liệu?',
+      message:
+        status !== LessonMaterialStatus.Approved
+          ? `
+            Tài liệu này chưa được phê duyệt nên sẽ không hiển thị trong danh sách tài liệu chia sẻ của trường cho đến khi được phê duyệt.
+            <br />
+            <strong>Một khi bạn chia sẻ, hành động này <u>không thể hoàn tác</u>.</strong>
+            <br />
+            Bạn có chắc chắn muốn tiếp tục chia sẻ?
+          `
+          : `
+            Bạn có chắc chắn muốn chia sẻ tài liệu này?
+            <br />
+            <strong>Một khi bạn chia sẻ, hành động này <u>không thể hoàn tác</u>.</strong>
+          `,
+      icon: 'pi pi-info-circle',
+      rejectButtonProps: {
+        label: 'Không, quay lại',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Có, chia sẻ',
+      },
+      accept: () => {
+        const request: UpdateLessonMaterialRequest = {
+          id: materialId,
+          visibility: LessonMaterialVisibility.School,
+        };
+        this.lessonMaterialsService
+          .updateLessonMaterial(materialId, request)
+          .subscribe({
+            next: () => this.onSearch(),
+          });
+      },
+    });
   }
 
   onDeleteMaterial(materialId: string) {

@@ -301,18 +301,30 @@ export class LessonMaterialsService {
   private handleError(err: HttpErrorResponse): Observable<null> {
     switch (err.error?.statusCode) {
       case StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND:
+        // ? Redirect to home page
         setTimeout(() => {
           this.router.navigate(['/']);
         }, 2000);
+
+        // ? Close Submenus
+        window.dispatchEvent(new Event('close-all-submenus'));
+
+        // ? Show toast
         this.toastHandlingService.warn(
           'Thiếu gói đăng ký',
           'Trường học của bạn hiện chưa đăng ký gói sử dụng hệ thống.'
         );
         break;
       case StatusCode.LESSON_MATERIAL_NOT_ACTIVE:
+        // ? Redirect to home page
         setTimeout(() => {
           this.router.navigate(['/']);
         }, 2000);
+
+        // ? Close Submenus
+        window.dispatchEvent(new Event('close-all-submenus'));
+
+        // ? Show toast
         this.toastHandlingService.warn(
           'Bài giảng đã bị xóa',
           'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'

@@ -39,6 +39,13 @@ const errorResponse = new HttpErrorResponse({
   statusText: 'Server Error',
 });
 
+// Mock window.dispatchEvent
+const mockDispatchEvent = vi.fn();
+Object.defineProperty(window, 'dispatchEvent', {
+  value: mockDispatchEvent,
+  writable: true,
+});
+
 // Helper to create a QuestionService with DI context
 function setup({
   get = vi.fn(),
@@ -47,6 +54,7 @@ function setup({
   del = vi.fn(),
   successGeneral = vi.fn(),
   errorGeneral = vi.fn(),
+  warn = vi.fn(),
 } = {}) {
   TestBed.configureTestingModule({
     providers: [
@@ -54,7 +62,7 @@ function setup({
       { provide: RequestService, useValue: { get, post, put, delete: del } },
       {
         provide: ToastHandlingService,
-        useValue: { successGeneral, errorGeneral },
+        useValue: { successGeneral, errorGeneral, warn },
       },
     ],
   });
@@ -109,6 +117,50 @@ describe('QuestionService', () => {
       ).rejects.toBe(errorResponse);
       expect(errorGeneral).toHaveBeenCalled();
     });
+    it('should handle LESSON_MATERIAL_NOT_ACTIVE error and dispatch close-all-submenus event', async () => {
+      const warn = vi.fn();
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_NOT_ACTIVE },
+        status: 400,
+      });
+      const { service } = setup({
+        get: vi.fn().mockReturnValue(throwError(() => error)),
+        warn,
+      });
+      await expect(
+        firstValueFrom(service.getLessonQuestions('matId', { pageIndex: 1 }))
+      ).rejects.toBe(error);
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
+      expect(warn).toHaveBeenCalledWith(
+        'Bài giảng đã bị xóa',
+        'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
+      );
+    });
+    it('should handle STUDENT_NOT_ENROLLED_IN_CLASS_WITH_MATERIAL error and dispatch close-all-submenus event', async () => {
+      const warn = vi.fn();
+      const error = new HttpErrorResponse({
+        error: {
+          statusCode: StatusCode.STUDENT_NOT_ENROLLED_IN_CLASS_WITH_MATERIAL,
+        },
+        status: 400,
+      });
+      const { service } = setup({
+        get: vi.fn().mockReturnValue(throwError(() => error)),
+        warn,
+      });
+      await expect(
+        firstValueFrom(service.getLessonQuestions('matId', { pageIndex: 1 }))
+      ).rejects.toBe(error);
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
+      expect(warn).toHaveBeenCalledWith(
+        'Không thể truy cập bài giảng',
+        'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
+      );
+    });
   });
 
   describe('getMyQuestions', () => {
@@ -145,6 +197,50 @@ describe('QuestionService', () => {
       ).rejects.toBe(errorResponse);
       expect(errorGeneral).toHaveBeenCalled();
     });
+    it('should handle LESSON_MATERIAL_NOT_ACTIVE error and dispatch close-all-submenus event', async () => {
+      const warn = vi.fn();
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_NOT_ACTIVE },
+        status: 400,
+      });
+      const { service } = setup({
+        get: vi.fn().mockReturnValue(throwError(() => error)),
+        warn,
+      });
+      await expect(
+        lastValueFrom(service.getMyQuestions({ pageIndex: 1 }))
+      ).rejects.toBe(error);
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
+      expect(warn).toHaveBeenCalledWith(
+        'Bài giảng đã bị xóa',
+        'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
+      );
+    });
+    it('should handle STUDENT_NOT_ENROLLED_IN_CLASS_WITH_MATERIAL error and dispatch close-all-submenus event', async () => {
+      const warn = vi.fn();
+      const error = new HttpErrorResponse({
+        error: {
+          statusCode: StatusCode.STUDENT_NOT_ENROLLED_IN_CLASS_WITH_MATERIAL,
+        },
+        status: 400,
+      });
+      const { service } = setup({
+        get: vi.fn().mockReturnValue(throwError(() => error)),
+        warn,
+      });
+      await expect(
+        lastValueFrom(service.getMyQuestions({ pageIndex: 1 }))
+      ).rejects.toBe(error);
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
+      expect(warn).toHaveBeenCalledWith(
+        'Không thể truy cập bài giảng',
+        'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
+      );
+    });
   });
 
   describe('getQuestionById', () => {
@@ -176,6 +272,45 @@ describe('QuestionService', () => {
         errorResponse
       );
       expect(errorGeneral).toHaveBeenCalled();
+    });
+    it('should handle QUESTION_NOT_FOUND error and show warn message', async () => {
+      const warn = vi.fn();
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.QUESTION_NOT_FOUND },
+        status: 404,
+      });
+      const { service } = setup({
+        get: vi.fn().mockReturnValue(throwError(() => error)),
+        warn,
+      });
+      await expect(firstValueFrom(service.getQuestionById('q1'))).rejects.toBe(
+        error
+      );
+      expect(warn).toHaveBeenCalledWith(
+        'Câu hỏi không tồn tại',
+        'Câu hỏi đã bị người đăng xóa hoặc không tồn tại.'
+      );
+    });
+    it('should handle LESSON_MATERIAL_NOT_ACTIVE error and dispatch close-all-submenus event', async () => {
+      const warn = vi.fn();
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_NOT_ACTIVE },
+        status: 400,
+      });
+      const { service } = setup({
+        get: vi.fn().mockReturnValue(throwError(() => error)),
+        warn,
+      });
+      await expect(firstValueFrom(service.getQuestionById('q1'))).rejects.toBe(
+        error
+      );
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
+      expect(warn).toHaveBeenCalledWith(
+        'Bài giảng đã bị xóa',
+        'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
+      );
     });
   });
 
@@ -232,6 +367,33 @@ describe('QuestionService', () => {
         )
       ).rejects.toBe(errorResponse);
       expect(errorGeneral).toHaveBeenCalled();
+    });
+    it('should handle LESSON_MATERIAL_NOT_ACTIVE error and dispatch close-all-submenus event', async () => {
+      const warn = vi.fn();
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_NOT_ACTIVE },
+        status: 400,
+      });
+      const { service } = setup({
+        post: vi.fn().mockReturnValue(throwError(() => error)),
+        warn,
+      });
+      await expect(
+        firstValueFrom(
+          service.createQuestion({
+            lessonMaterialId: 'l1',
+            title: 't',
+            content: 'c',
+          })
+        )
+      ).rejects.toBe(error);
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
+      expect(warn).toHaveBeenCalledWith(
+        'Bài giảng đã bị xóa',
+        'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
+      );
     });
     it('should handle edge case: missing fields', async () => {
       const successGeneral = vi.fn();
@@ -298,6 +460,29 @@ describe('QuestionService', () => {
       ).rejects.toBe(errorResponse);
       expect(errorGeneral).toHaveBeenCalled();
     });
+    it('should handle LESSON_MATERIAL_NOT_ACTIVE error and dispatch close-all-submenus event', async () => {
+      const warn = vi.fn();
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_NOT_ACTIVE },
+        status: 400,
+      });
+      const { service } = setup({
+        put: vi.fn().mockReturnValue(throwError(() => error)),
+        warn,
+      });
+      await expect(
+        lastValueFrom(
+          service.updateQuestion('q1', { title: 't', content: 'c' })
+        )
+      ).rejects.toBe(error);
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
+      expect(warn).toHaveBeenCalledWith(
+        'Bài giảng đã bị xóa',
+        'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
+      );
+    });
     it('should handle edge case: empty update', async () => {
       const successGeneral = vi.fn();
       const { service } = setup({
@@ -348,6 +533,27 @@ describe('QuestionService', () => {
         errorResponse
       );
       expect(errorGeneral).toHaveBeenCalled();
+    });
+    it('should handle LESSON_MATERIAL_NOT_ACTIVE error and dispatch close-all-submenus event', async () => {
+      const warn = vi.fn();
+      const error = new HttpErrorResponse({
+        error: { statusCode: StatusCode.LESSON_MATERIAL_NOT_ACTIVE },
+        status: 400,
+      });
+      const { service } = setup({
+        del: vi.fn().mockReturnValue(throwError(() => error)),
+        warn,
+      });
+      await expect(firstValueFrom(service.deleteQuestion('q1'))).rejects.toBe(
+        error
+      );
+      expect(mockDispatchEvent).toHaveBeenCalledWith(
+        new Event('close-all-submenus')
+      );
+      expect(warn).toHaveBeenCalledWith(
+        'Bài giảng đã bị xóa',
+        'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
+      );
     });
     it('should handle edge case: already deleted', async () => {
       const errorGeneral = vi.fn();

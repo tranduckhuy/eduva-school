@@ -117,6 +117,13 @@ export class NotificationService {
     this.notificationsSignal.set(updated);
   }
 
+  clearSignal() {
+    this.notificationsSignal.set([]);
+    this.totalNotificationSignal.set(0);
+    this.unreadCountSignal.set(0);
+    this.hasLoadedSignal.set(false);
+  }
+
   // ---------------------------
   //  Private Helper Functions
   // ---------------------------
