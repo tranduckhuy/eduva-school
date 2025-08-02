@@ -79,7 +79,7 @@ export class ClassManagementService {
 
   archiveClass(classId: string): Observable<null> {
     return this.requestService
-      .post<null>(`${this.BASE_CLASS_API_URL}/${classId}/archive`)
+      .put<null>(`${this.BASE_CLASS_API_URL}/${classId}/archive`)
       .pipe(
         tap(res => this.handleSuccess(res)),
         map(() => null),
