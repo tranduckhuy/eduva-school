@@ -531,31 +531,31 @@ describe('ClassManagementService', () => {
     const classId = 'class-123';
 
     beforeEach(() => {
-      (requestService as any).post = vi.fn();
+      (requestService as any).put = vi.fn();
     });
 
-    it('should call post with correct parameters and show success toast on SUCCESS', async () => {
-      (requestService.post as any).mockReturnValue(
+    it('should call put with correct parameters and show success toast on SUCCESS', async () => {
+      (requestService.put as any).mockReturnValue(
         of({ statusCode: StatusCode.SUCCESS })
       );
 
       const result = await service.archiveClass(classId).toPromise();
       expect(result).toBeNull();
-      expect(requestService.post).toHaveBeenCalledWith(
+      expect(requestService.put).toHaveBeenCalledWith(
         `${service['BASE_CLASS_API_URL']}/${classId}/archive`
       );
       expect(toastHandlingService.successGeneral).toHaveBeenCalledOnce();
       expect(toastHandlingService.errorGeneral).not.toHaveBeenCalled();
     });
 
-    it('should call post and show error toast on non-SUCCESS statusCode', async () => {
-      (requestService.post as any).mockReturnValue(
+    it('should call put and show error toast on non-SUCCESS statusCode', async () => {
+      (requestService.put as any).mockReturnValue(
         of({ statusCode: StatusCode.SYSTEM_ERROR })
       );
 
       const result = await service.archiveClass(classId).toPromise();
       expect(result).toBeNull();
-      expect(requestService.post).toHaveBeenCalledWith(
+      expect(requestService.put).toHaveBeenCalledWith(
         `${service['BASE_CLASS_API_URL']}/${classId}/archive`
       );
       expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
@@ -569,13 +569,13 @@ describe('ClassManagementService', () => {
         error: { statusCode: StatusCode.SYSTEM_ERROR },
       });
 
-      (requestService.post as any).mockReturnValue(throwError(() => error));
+      (requestService.put as any).mockReturnValue(throwError(() => error));
 
       try {
         await service.archiveClass(classId).toPromise();
       } catch (err) {
         expect(err).toBe(error);
-        expect(requestService.post).toHaveBeenCalledWith(
+        expect(requestService.put).toHaveBeenCalledWith(
           `${service['BASE_CLASS_API_URL']}/${classId}/archive`
         );
         expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
@@ -583,13 +583,13 @@ describe('ClassManagementService', () => {
     });
 
     it('should work correctly with empty classId', async () => {
-      (requestService.post as any).mockReturnValue(
+      (requestService.put as any).mockReturnValue(
         of({ statusCode: StatusCode.SUCCESS })
       );
 
       const result = await service.archiveClass('').toPromise();
       expect(result).toBeNull();
-      expect(requestService.post).toHaveBeenCalledWith(
+      expect(requestService.put).toHaveBeenCalledWith(
         `${service['BASE_CLASS_API_URL']}//archive`
       );
       expect(toastHandlingService.successGeneral).toHaveBeenCalledOnce();
@@ -597,7 +597,7 @@ describe('ClassManagementService', () => {
 
     it('should handle network error and show error toast', async () => {
       const networkError = new Error('Network error');
-      (requestService.post as any).mockReturnValue(
+      (requestService.put as any).mockReturnValue(
         throwError(() => networkError)
       );
 
@@ -605,7 +605,7 @@ describe('ClassManagementService', () => {
         await service.archiveClass(classId).toPromise();
       } catch (err) {
         expect(err).toBe(networkError);
-        expect(requestService.post).toHaveBeenCalledWith(
+        expect(requestService.put).toHaveBeenCalledWith(
           `${service['BASE_CLASS_API_URL']}/${classId}/archive`
         );
         expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
