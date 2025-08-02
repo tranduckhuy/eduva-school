@@ -148,7 +148,7 @@ export class NavbarComponent implements OnInit {
     const schoolMissing = this.schoolMissing();
 
     const dashboardLink = isAdmin ? '/school-admin' : '/teacher';
-    const profileLink = isAdmin
+    const settingsLink = isAdmin
       ? '/school-admin/settings/account-settings'
       : '/teacher/settings/account-settings';
 
@@ -176,7 +176,7 @@ export class NavbarComponent implements OnInit {
       {
         section: 'Khác',
         navItems: [
-          this.buildNavItem('Cài đặt', 'settings', profileLink),
+          this.buildNavItem('Cài đặt', 'settings', settingsLink),
           {
             label: 'Đăng xuất',
             icon: 'logout',
