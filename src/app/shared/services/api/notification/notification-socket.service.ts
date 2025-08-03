@@ -87,9 +87,11 @@ export class NotificationSocketService {
     type: string,
     payload: T
   ): NotificationModel<T> {
+    // ? Prioritize userNotificationId from payload if available
     const id = this.hasUserNotificationId(payload)
       ? payload.userNotificationId
       : crypto.randomUUID();
+
     return {
       id: id,
       type,

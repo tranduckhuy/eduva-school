@@ -135,6 +135,7 @@ export class NotificationsComponent implements OnInit {
     this.notificationService.markNotificationAsRead(notification.id).subscribe({
       next: () => {
         this.notificationService.optimisticMarkAsRead(notification.id);
+        this.clickOutside.emit();
         this.redirectBasedOnNotification(notification);
       },
     });
@@ -313,6 +314,7 @@ export class NotificationsComponent implements OnInit {
         );
         break;
       }
+
       case 'QuestionCommented':
       case 'QuestionCommentUpdated':
       case 'QuestionCommentDeleted': {
@@ -330,6 +332,7 @@ export class NotificationsComponent implements OnInit {
         );
         break;
       }
+
       case 'LessonMaterialApproved':
       case 'LessonMaterialRejected': {
         const payload =
@@ -340,9 +343,9 @@ export class NotificationsComponent implements OnInit {
         ]);
         break;
       }
-      default: {
+
+      default:
         break;
-      }
     }
   }
 }
