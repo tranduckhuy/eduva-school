@@ -152,7 +152,11 @@ export class LessonMaterialsService {
   getLessonMaterialById(materialId: string): Observable<LessonMaterial | null> {
     return this.requestService
       .get<LessonMaterial>(
-        `${this.BASE_LESSON_MATERIALS_API_URL}/${materialId}`
+        `${this.BASE_LESSON_MATERIALS_API_URL}/${materialId}`,
+        undefined,
+        {
+          loadingKey: 'get-material-by-id',
+        }
       )
       .pipe(
         tap(res => this.handleDetailResponse(res)),
@@ -165,9 +169,13 @@ export class LessonMaterialsService {
     materialId: string
   ): Observable<LessonMaterialApproval[] | null> {
     return this.requestService
-      .get<
-        LessonMaterialApproval[]
-      >(`${this.BASE_LESSON_MATERIALS_API_URL}/${materialId}/approvals`)
+      .get<LessonMaterialApproval[]>(
+        `${this.BASE_LESSON_MATERIALS_API_URL}/${materialId}/approvals`,
+        undefined,
+        {
+          loadingKey: 'get-material-approval-by-id',
+        }
+      )
       .pipe(
         tap(res => this.handleApprovalDetailResponse(res)),
         map(res => this.extractDetailResponse<LessonMaterialApproval[]>(res)),

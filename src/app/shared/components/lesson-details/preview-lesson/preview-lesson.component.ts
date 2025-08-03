@@ -89,9 +89,9 @@ export class PreviewLessonComponent implements OnInit {
   materialId = input.required<string>();
 
   user = this.userService.currentUser;
-  isLoading = this.loadingService.isLoading;
   lessonMaterial = this.lessonMaterialService.lessonMaterial;
   lessonMaterialApproval = this.lessonMaterialService.lessonMaterialApproval;
+  isLoading = this.loadingService.is('get-material-by-id');
 
   questionIdFromNotification = signal<string>('');
 
@@ -106,6 +106,8 @@ export class PreviewLessonComponent implements OnInit {
   contentBlocks = signal<RenderBlock[]>([]);
 
   isCommentModalOpen = false;
+  isInitialized = signal<boolean>(false);
+  previousMaterialId = signal<string>('');
 
   // ? Computed Properties
   showCommentButton = computed(() => {
@@ -151,12 +153,25 @@ export class PreviewLessonComponent implements OnInit {
       },
       { allowSignalWrites: true }
     );
+
+    effect(
+      () => {
+        const materialId = this.materialId();
+        const isInitialized = this.isInitialized();
+        const previousMaterialId = this.previousMaterialId();
+
+        if (materialId && isInitialized && materialId !== previousMaterialId) {
+          this.previousMaterialId.set(materialId);
+          this.loadDetailData();
+        }
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   ngOnInit(): void {
+    this.isInitialized.set(true);
     this.handleRouteQueryParams();
-
-    this.loadDetailData();
   }
 
   get approvalRelativeDate(): string {
@@ -185,6 +200,12 @@ export class PreviewLessonComponent implements OnInit {
   }
 
   private loadDetailData() {
+    // Reset states when loading new lesson
+    this.contentBlocks.set([]);
+    this.isShowingFeedback.set(false);
+    this.isApprovedLesson.set(false);
+    this.questionIdFromNotification.set('');
+
     this.lessonMaterialService
       .getLessonMaterialById(this.materialId())
       .subscribe({
