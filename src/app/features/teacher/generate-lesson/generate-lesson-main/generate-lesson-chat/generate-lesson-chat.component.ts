@@ -18,8 +18,6 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { finalize } from 'rxjs';
-
 import { TextareaModule } from 'primeng/textarea';
 import { ButtonModule } from 'primeng/button';
 import { CarouselModule } from 'primeng/carousel';
