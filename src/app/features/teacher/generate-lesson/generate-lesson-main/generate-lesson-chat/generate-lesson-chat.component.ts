@@ -26,10 +26,11 @@ import { ResourcesStateService } from '../services/utils/resources-state.service
 import { AiJobsService } from '../services/api/ai-jobs.service';
 import { AiSocketService } from '../services/api/ai-socket.service';
 
+import { JobStatus } from '../../../../../shared/models/enum/job-status.enum';
+
 import { ChatMessageComponent } from './chat-message/chat-message.component';
 
-import { type CreateAiJobsRequest } from '../models/request/command/create-ai-jobs-request.model';
-import { JobStatus } from '../../../../../shared/models/enum/job-status.enum';
+import { type CreateAiJobRequest } from '../models/request/command/create-ai-job-request.model';
 
 interface ChatMessage {
   sender: 'user' | 'system';
@@ -76,8 +77,11 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   readonly totalUploaded = this.resourcesStateService.totalSources;
   readonly totalChecked = this.resourcesStateService.totalCheckedSources;
   readonly isLoading = this.resourcesStateService.isLoading;
+  readonly isFirstJob = this.resourcesStateService.isFirstJob;
   readonly hasPreviewContentSuccessfully =
     this.resourcesStateService.hasPreviewContentSuccessfully;
+  readonly hasGeneratedSuccessfully =
+    this.resourcesStateService.hasGeneratedSuccessfully;
 
   messages = this.resourcesStateService.messages;
   showScrollButton = this.resourcesStateService.showScrollButton;
@@ -86,7 +90,8 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     return (
       this.isLoading() ||
       this.totalChecked() === 0 ||
-      this.hasPreviewContentSuccessfully()
+      this.hasPreviewContentSuccessfully() ||
+      this.hasGeneratedSuccessfully()
     );
   });
 
@@ -124,7 +129,6 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
           this.scrollToBottom();
           this.displaySystemAiMessage(payload);
           this.resourcesStateService.updateIsLoading(false);
-          this.resourcesStateService.markGeneratedPreviewContentSuccess();
         }
       },
       { allowSignalWrites: true }
@@ -172,7 +176,13 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       { sender: 'user', content },
     ]);
 
-    this.createAiJob();
+    const isFirstJob = this.isFirstJob();
+    if (isFirstJob) {
+      this.createAiJob();
+    } else {
+      this.updateAiJob();
+    }
+
     this.form.reset();
   }
 
@@ -188,7 +198,13 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
 
     this.form.patchValue({ topic: content });
 
-    this.createAiJob();
+    const isFirstJob = this.isFirstJob();
+    if (isFirstJob) {
+      this.createAiJob();
+    } else {
+      this.updateAiJob();
+    }
+
     this.form.reset();
   }
 
@@ -231,21 +247,53 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const request: CreateAiJobsRequest = {
+    const request: CreateAiJobRequest = {
       file: this.checkedFiles(),
       topic,
     };
 
-    this.aiJobService.createAiJobs(request).subscribe({
+    this.aiJobService.createAiJob(request).subscribe({
       next: res => {
         if (!res?.jobId) {
           this.resourcesStateService.updateIsLoading(false);
           return;
         }
 
+        this.resourcesStateService.setIsFirstJob(false);
         this.aiSocketService.resetSignal();
         this.aiSocketService.connect(res.jobId);
       },
+      error: () => {
+        this.scrollToBottom();
+        this.resourcesStateService.updateIsLoading(false);
+      },
+    });
+  }
+
+  private updateAiJob(): void {
+    this.scrollToBottom();
+    this.resourcesStateService.updateIsLoading(true);
+    this.resourcesStateService.resetGeneratedStatus();
+    this.resourcesStateService.resetGeneratedPreviewContentStatus();
+
+    this.resourcesStateService.updateMessages(prev => [
+      ...prev,
+      { sender: 'system', content: '', isLoading: true },
+    ]);
+
+    const jobId = this.aiJobService.jobId();
+    const topic = this.topic?.value.trim();
+    if (!jobId || !topic) {
+      this.resourcesStateService.updateIsLoading(false);
+      return;
+    }
+
+    const request: CreateAiJobRequest = {
+      file: this.checkedFiles(),
+      topic,
+    };
+
+    this.aiJobService.updateAiJob(jobId, request).subscribe({
       error: () => {
         this.scrollToBottom();
         this.resourcesStateService.updateIsLoading(false);
@@ -259,6 +307,8 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     videoCost,
     failureReason,
   }: AiResponseMessage): void {
+    this.resourcesStateService.updateIsLoading(false);
+
     const content = failureReason
       ? this.renderFailureMessage(failureReason)
       : this.renderSuccessMessage(previewContent, audioCost, videoCost);
@@ -289,7 +339,10 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       <div class="text-red-500 font-medium">
         <p>😢 <strong>Rất tiếc!</strong> Quá trình tạo nội dung không thành công.</p>
         <p>Lý do: <em>${reason}</em></p>
-        <p>Vui lòng kiểm tra lại dữ liệu và thử lại sau.</p>
+        <p>Bạn có thể <strong>nhập yêu cầu khác</strong> và thử lại để tạo nội dung mới.</p>
+        <p class="mt-2 text-sm text-primary">
+          💡 <em>Gợi ý: Hãy thử thay đổi cách mô tả chủ đề hoặc kiểm tra lại tài liệu đã upload.</em>
+        </p>
       </div>
     `;
   }
@@ -388,6 +441,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   }
 
   private resetAll() {
+    this.resourcesStateService.setIsFirstJob(true);
     this.resourcesStateService.setMessages([]);
   }
 }

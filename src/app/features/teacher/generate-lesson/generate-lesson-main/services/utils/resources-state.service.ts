@@ -123,6 +123,9 @@ export class ResourcesStateService {
   private readonly showScrollButtonSignal = signal<boolean>(false);
   readonly showScrollButton = this.showScrollButtonSignal.asReadonly();
 
+  private readonly isFirstJobSignal = signal<boolean>(true);
+  readonly isFirstJob = this.isFirstJobSignal.asReadonly();
+
   // ? Computed
   readonly checkedFiles = computed(() =>
     this.sourceListSignal()
@@ -265,6 +268,10 @@ export class ResourcesStateService {
     this.showScrollButtonSignal.set(show);
   }
 
+  setIsFirstJob(isFirst: boolean) {
+    this.isFirstJobSignal.set(isFirst);
+  }
+
   resetAll(): void {
     this.sourceListSignal.set([]);
     this.isLoadingSignal.set(false);
@@ -301,5 +308,6 @@ export class ResourcesStateService {
     // ? Reset chat states
     this.messagesSignal.set([]);
     this.showScrollButtonSignal.set(false);
+    this.isFirstJobSignal.set(true);
   }
 }

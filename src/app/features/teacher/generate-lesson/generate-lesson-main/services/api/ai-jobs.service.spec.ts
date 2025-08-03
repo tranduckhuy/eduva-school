@@ -1,19 +1,24 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpClient } from '@angular/common/http';
+
+import { of, throwError, lastValueFrom } from 'rxjs';
+
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { AiJobsService } from './ai-jobs.service';
+
 import { RequestService } from '../../../../../../shared/services/core/request/request.service';
 import { ToastHandlingService } from '../../../../../../shared/services/core/toast/toast-handling.service';
+import { AiJobsService } from './ai-jobs.service';
+
 import { StatusCode } from '../../../../../../shared/constants/status-code.constant';
+
 import { LessonGenerationType } from '../../../../../../shared/models/enum/lesson-generation-type.enum';
-import { of, throwError, lastValueFrom } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../../../../environments/environment';
 
 // Mock RequestService
 const requestServiceMock = {
   postWithFormData: vi.fn(),
   post: vi.fn(),
   get: vi.fn(),
+  put: vi.fn(),
 };
 
 // Mock ToastHandlingService
@@ -57,28 +62,28 @@ describe('AiJobsService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should set jobId signal and return data on createAiJobs success', async () => {
+  it('should set jobId signal and return data on createAiJob success', async () => {
     const mockReq = { file: [], topic: 'abc' };
     const mockRes = {
       statusCode: StatusCode.SUCCESS,
       data: { jobId: 'jid', status: 1 },
     };
     requestServiceMock.postWithFormData.mockReturnValueOnce(of(mockRes));
-    const res = await lastValueFrom(service.createAiJobs(mockReq));
+    const res = await lastValueFrom(service.createAiJob(mockReq));
     expect(res).toEqual({ jobId: 'jid', status: 1 });
     expect(service.jobId()).toBe('jid');
   });
 
-  it('should return null if createAiJobs not success', async () => {
+  it('should return null if createAiJob not success', async () => {
     const mockReq = { file: [], topic: 'abc' };
     const mockRes = { statusCode: 4000, data: null };
     requestServiceMock.postWithFormData.mockReturnValueOnce(of(mockRes));
-    const res = await lastValueFrom(service.createAiJobs(mockReq));
+    const res = await lastValueFrom(service.createAiJob(mockReq));
     expect(res).toBeNull();
     expect(service.generationType()).toBe(LessonGenerationType.Audio);
   });
 
-  it('should call warn and throw if INSUFFICIENT_USER_CREDIT on createAiJobs', async () => {
+  it('should call warn and throw if INSUFFICIENT_USER_CREDIT on createAiJob', async () => {
     const mockReq = { file: [], topic: 'abc' };
     const error = {
       error: { statusCode: StatusCode.INSUFFICIENT_USER_CREDIT },
@@ -86,7 +91,7 @@ describe('AiJobsService', () => {
     requestServiceMock.postWithFormData.mockReturnValueOnce(
       throwError(() => error)
     );
-    await expect(lastValueFrom(service.createAiJobs(mockReq))).rejects.toBe(
+    await expect(lastValueFrom(service.createAiJob(mockReq))).rejects.toBe(
       error
     );
     expect(toastHandlingServiceMock.warn).toHaveBeenCalled();
@@ -202,5 +207,65 @@ describe('AiJobsService', () => {
   it('should have default jobId and generationType signals', () => {
     expect(service.jobId()).toBe('');
     expect(service.generationType()).toBe(LessonGenerationType.Audio);
+  });
+
+  it('should update AI job successfully', async () => {
+    const aiJobId = 'job-123';
+    const mockReq = { file: [], topic: 'updated topic' };
+    const mockRes = { statusCode: StatusCode.SUCCESS };
+    requestServiceMock.put.mockReturnValueOnce(of(mockRes));
+
+    const res = await lastValueFrom(service.updateAiJob(aiJobId, mockReq));
+
+    expect(res).toBeNull();
+    expect(requestServiceMock.put).toHaveBeenCalledWith(
+      'http://mock-api/ai-jobs/job-123',
+      mockReq
+    );
+  });
+
+  it('should handle update AI job error and call warn for INSUFFICIENT_USER_CREDIT', async () => {
+    const aiJobId = 'job-123';
+    const mockReq = { file: [], topic: 'updated topic' };
+    const error = {
+      error: { statusCode: StatusCode.INSUFFICIENT_USER_CREDIT },
+    };
+    requestServiceMock.put.mockReturnValueOnce(throwError(() => error));
+
+    await expect(
+      lastValueFrom(service.updateAiJob(aiJobId, mockReq))
+    ).rejects.toBe(error);
+    expect(toastHandlingServiceMock.warn).toHaveBeenCalledWith(
+      'Thiếu Ecoin',
+      'Bạn hiện không đủ Ecoin để thực hiện yêu cầu này. Vui lòng nạp thêm Ecoin để tiếp tục sử dụng dịch vụ.'
+    );
+  });
+
+  it('should handle update AI job with other errors without calling warn', async () => {
+    const aiJobId = 'job-123';
+    const mockReq = { file: [], topic: 'updated topic' };
+    const error = {
+      error: { statusCode: StatusCode.MODEL_INVALID },
+    };
+    requestServiceMock.put.mockReturnValueOnce(throwError(() => error));
+
+    await expect(
+      lastValueFrom(service.updateAiJob(aiJobId, mockReq))
+    ).rejects.toBe(error);
+    expect(toastHandlingServiceMock.warn).not.toHaveBeenCalled();
+  });
+
+  it('should handle update AI job with network error', async () => {
+    const aiJobId = 'job-123';
+    const mockReq = { file: [], topic: 'updated topic' };
+    const error = { status: 0, message: 'Network error' };
+    requestServiceMock.put.mockReturnValueOnce(throwError(() => error));
+
+    await expect(
+      lastValueFrom(service.updateAiJob(aiJobId, mockReq))
+    ).rejects.toThrow(
+      "Cannot read properties of undefined (reading 'statusCode')"
+    );
+    expect(toastHandlingServiceMock.warn).not.toHaveBeenCalled();
   });
 });
