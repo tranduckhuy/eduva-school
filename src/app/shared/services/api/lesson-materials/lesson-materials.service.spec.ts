@@ -699,7 +699,9 @@ describe('LessonMaterialsService', () => {
       );
 
       expect(requestService.get).toHaveBeenCalledWith(
-        expect.stringContaining(`/lesson-materials/${materialId}`)
+        expect.stringContaining(`/lesson-materials/${materialId}`),
+        undefined,
+        { loadingKey: 'get-material-by-id' }
       );
       expect(result).toEqual(mockLessonMaterial);
       expect(service.lessonMaterial()).toEqual(mockLessonMaterial);
@@ -713,6 +715,11 @@ describe('LessonMaterialsService', () => {
         service.getLessonMaterialById(materialId)
       );
 
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/lesson-materials/${materialId}`),
+        undefined,
+        { loadingKey: 'get-material-by-id' }
+      );
       expect(result).toBeNull();
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
@@ -725,6 +732,11 @@ describe('LessonMaterialsService', () => {
         lastValueFrom(service.getLessonMaterialById(materialId))
       ).rejects.toThrow();
 
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/lesson-materials/${materialId}`),
+        undefined,
+        { loadingKey: 'get-material-by-id' }
+      );
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });
 
@@ -739,6 +751,11 @@ describe('LessonMaterialsService', () => {
         service.getLessonMaterialById(materialId)
       );
 
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/lesson-materials/${materialId}`),
+        undefined,
+        { loadingKey: 'get-material-by-id' }
+      );
       expect(result).toBeNull();
       expect(service.lessonMaterial()).toBeNull();
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
@@ -755,6 +772,11 @@ describe('LessonMaterialsService', () => {
         lastValueFrom(service.getLessonMaterialById(materialId))
       ).rejects.toThrow();
 
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/lesson-materials/${materialId}`),
+        undefined,
+        { loadingKey: 'get-material-by-id' }
+      );
       expect(mockDispatchEvent).toHaveBeenCalledWith(
         new Event('close-all-submenus')
       );
@@ -794,7 +816,9 @@ describe('LessonMaterialsService', () => {
       );
 
       expect(requestService.get).toHaveBeenCalledWith(
-        expect.stringContaining(`/lesson-materials/${materialId}/approvals`)
+        expect.stringContaining(`/lesson-materials/${materialId}/approvals`),
+        undefined,
+        { loadingKey: 'get-material-approval-by-id' }
       );
       expect(result).toEqual([mockApproval]);
       expect(service.lessonMaterialApproval()).toEqual(mockApproval); // signal lấy phần tử đầu tiên
@@ -811,6 +835,11 @@ describe('LessonMaterialsService', () => {
         service.getLessonMaterialApprovalById(materialId)
       );
 
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/lesson-materials/${materialId}/approvals`),
+        undefined,
+        { loadingKey: 'get-material-approval-by-id' }
+      );
       expect(result).toEqual([]);
       expect(service.lessonMaterialApproval()).toBeNull();
     });
@@ -823,6 +852,11 @@ describe('LessonMaterialsService', () => {
         service.getLessonMaterialApprovalById(materialId)
       );
 
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/lesson-materials/${materialId}/approvals`),
+        undefined,
+        { loadingKey: 'get-material-approval-by-id' }
+      );
       expect(result).toBeNull();
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
       expect(service.lessonMaterialApproval()).toBeNull();
@@ -836,6 +870,11 @@ describe('LessonMaterialsService', () => {
         lastValueFrom(service.getLessonMaterialApprovalById(materialId))
       ).rejects.toThrow();
 
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/lesson-materials/${materialId}/approvals`),
+        undefined,
+        { loadingKey: 'get-material-approval-by-id' }
+      );
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
       expect(service.lessonMaterialApproval()).toBeNull();
     });
@@ -851,6 +890,11 @@ describe('LessonMaterialsService', () => {
         service.getLessonMaterialApprovalById(materialId)
       );
 
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/lesson-materials/${materialId}/approvals`),
+        undefined,
+        { loadingKey: 'get-material-approval-by-id' }
+      );
       expect(result).toBeNull();
       expect(service.lessonMaterialApproval()).toBeNull();
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
@@ -1351,7 +1395,9 @@ describe('LessonMaterialsService', () => {
 
       service.getLessonMaterialById('test-id');
       expect(requestService.get).toHaveBeenCalledWith(
-        expect.stringContaining('/lesson-materials/test-id')
+        expect.stringContaining('/lesson-materials/test-id'),
+        undefined,
+        { loadingKey: 'get-material-by-id' }
       );
 
       const mockRequest: CreateLessonMaterialsRequest = {

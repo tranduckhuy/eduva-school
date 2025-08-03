@@ -98,9 +98,14 @@ export class NotificationService {
     const current = this.notificationsSignal();
     const currentTotal = this.totalNotificationSignal();
     const currentUnreadCount = this.unreadCountSignal();
-    this.notificationsSignal.set([notification, ...current]);
-    this.totalNotificationSignal.set(currentTotal + 1);
-    this.unreadCountSignal.set(currentUnreadCount + 1);
+
+    // ? Check if notification already exists to avoid duplicates
+    const exists = current.some(n => n.id === notification.id);
+    if (!exists) {
+      this.notificationsSignal.set([notification, ...current]);
+      this.totalNotificationSignal.set(currentTotal + 1);
+      this.unreadCountSignal.set(currentUnreadCount + 1);
+    }
   }
 
   optimisticMarkAsRead(notificationId: string) {
@@ -150,7 +155,14 @@ export class NotificationService {
       });
 
       this.notificationsSignal.update(old => {
-        const merged = [...old, ...typedList];
+        // ? Create a map of existing notifications by ID for quick lookup
+        const existingIds = new Set(old.map(n => n.id));
+
+        // ? Filter out notifications that already exist
+        const newNotifications = typedList.filter(n => !existingIds.has(n.id));
+
+        // ? Merge new notifications with existing ones
+        const merged = [...old, ...newNotifications];
 
         return merged.sort((a, b) => {
           const dateA = new Date(a.createdAt).getTime();

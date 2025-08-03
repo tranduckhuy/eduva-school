@@ -17,8 +17,8 @@ import { LessonGenerationType } from '../../../../../../shared/models/enum/lesso
 import { BYPASS_AUTH } from '../../../../../../shared/tokens/context/http-context.token';
 
 import { type AiJob } from '../../../../../../shared/models/entities/ai-job.model';
-import { type CreateAiJobsRequest } from '../../models/request/command/create-ai-jobs-request.model';
-import { type CreateAiJobsResponse } from '../../models/response/command/create-ai-jobs-response.model';
+import { type CreateAiJobRequest } from '../../models/request/command/create-ai-job-request.model';
+import { type CreateAiJobResponse } from '../../models/response/command/create-ai-job-response.model';
 import { type ConfirmCreateContent } from '../../models/request/command/confirm-create-content-request.model';
 
 @Injectable({
@@ -43,21 +43,27 @@ export class AiJobsService {
   );
   generationType = this.generationTypeSignal.asReadonly();
 
-  createAiJobs(
-    request: CreateAiJobsRequest
-  ): Observable<CreateAiJobsResponse | null> {
+  createAiJob(
+    request: CreateAiJobRequest
+  ): Observable<CreateAiJobResponse | null> {
     return this.requestService
-      .postWithFormData<CreateAiJobsResponse>(
-        this.BASE_AI_JOBS_API_URL,
-        request
-      )
+      .postWithFormData<CreateAiJobResponse>(this.BASE_AI_JOBS_API_URL, request)
       .pipe(
         tap(res => {
           if (res.statusCode === StatusCode.SUCCESS && res.data) {
             this.jobIdSignal.set(res.data.jobId);
           }
         }),
-        map(res => this.extractData<CreateAiJobsResponse>(res)),
+        map(res => this.extractData<CreateAiJobResponse>(res)),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  updateAiJob(aiJobId: string, request: CreateAiJobRequest): Observable<null> {
+    return this.requestService
+      .put(`${this.BASE_AI_JOBS_API_URL}/${aiJobId}`, request)
+      .pipe(
+        map(() => null),
         catchError((err: HttpErrorResponse) => this.handleError(err))
       );
   }
