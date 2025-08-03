@@ -37,11 +37,11 @@ export const errorRoutes: Routes = [
               ),
           },
           {
-            path: 'subscription-expired',
+            path: '429',
             loadComponent: () =>
               import(
-                './subscription-expired/subscription-expired.component'
-              ).then(mod => mod.SubscriptionExpiredComponent),
+                './too-many-request-error/too-many-request-error.component'
+              ).then(mod => mod.TooManyRequestErrorComponent),
           },
         ],
       },
