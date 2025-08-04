@@ -79,7 +79,21 @@ export class ClassManagementService {
 
   archiveClass(classId: string): Observable<null> {
     return this.requestService
-      .put<null>(`${this.BASE_CLASS_API_URL}/${classId}/archive`)
+      .put(`${this.BASE_CLASS_API_URL}/${classId}/archive`, undefined, {
+        loadingKey: 'archive-class',
+      })
+      .pipe(
+        tap(res => this.handleSuccess(res)),
+        map(() => null),
+        catchError((err: HttpErrorResponse) => this.handleError(err))
+      );
+  }
+
+  restoreClass(classId: string): Observable<null> {
+    return this.requestService
+      .put(`${this.BASE_CLASS_API_URL}/${classId}/restore`, undefined, {
+        loadingKey: 'restore-class',
+      })
       .pipe(
         tap(res => this.handleSuccess(res)),
         map(() => null),

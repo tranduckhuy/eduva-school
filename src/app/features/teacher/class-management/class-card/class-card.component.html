@@ -31,7 +31,7 @@
       </p-button>
       @if (openedMenuId() === classModel().id) {
         <div
-          class="absolute right-0 top-[40px] z-[1] flex w-auto min-w-[160px] max-w-[200px] origin-top-right animate-scaleIn flex-col overflow-hidden rounded bg-[#f0f4f9] dark:bg-dark-400 sm:left-auto sm:right-0 sm:origin-top-right"
+          class="absolute right-0 top-[40px] z-[1] flex w-auto min-w-[180px] max-w-[200px] origin-top-right animate-scaleIn flex-col overflow-hidden rounded bg-[#f0f4f9] dark:bg-dark-400 sm:left-auto sm:right-0 sm:origin-top-right"
           clickOutsideSubmenu
           (clickOutside)="toggleMenu(classModel().id)">
           <button
@@ -58,15 +58,28 @@
               'pointer-events-none cursor-default opacity-60 hover:!bg-[#f0f4f9]':
                 isLoadingArchive(),
             }"
-            (click)="onArchiveClass(classModel().id)">
+            (click)="
+              classModel().status === EntityStatus.Active
+                ? onArchiveClass(classModel().id)
+                : onRestoreClass(classModel().id)
+            ">
             <span
               style="font-size: 14px"
               class="pi"
               [ngClass]="{
-                'pi-trash': !isLoadingArchive(),
-                'pi-spin pi-spinner': isLoadingArchive(),
+                'pi-cloud-download':
+                  !isLoadingArchive() &&
+                  classModel().status === EntityStatus.Active,
+                'pi-refresh':
+                  !isLoadingArchive() &&
+                  classModel().status === EntityStatus.Archived,
+                'pi-spin pi-spinner': isLoadingArchive() || isLoadingRestore(),
               }"></span>
-            <span>Xóa lớp học</span>
+            <span>{{
+              classModel().status === EntityStatus.Active
+                ? 'Lưu trữ lớp học'
+                : 'Khôi phục lớp học'
+            }}</span>
           </button>
         </div>
       }

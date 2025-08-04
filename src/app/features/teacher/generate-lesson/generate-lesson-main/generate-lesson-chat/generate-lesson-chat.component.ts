@@ -165,7 +165,13 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   }
 
   submitMessage(): void {
-    if (this.form.invalid || this.isLoading()) return;
+    if (
+      this.form.invalid ||
+      this.isLoading() ||
+      this.hasPreviewContentSuccessfully() ||
+      this.hasGeneratedSuccessfully()
+    )
+      return;
 
     const content = this.topic?.value.trim();
     if (!content) return;
@@ -187,7 +193,12 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   }
 
   handleChipClick(title: string): void {
-    if (this.isLoading()) return;
+    if (
+      this.isLoading() ||
+      this.hasPreviewContentSuccessfully() ||
+      this.hasGeneratedSuccessfully()
+    )
+      return;
 
     const content = `Tạo bài giảng về ${title}`;
     this.resourcesStateService.updateHasInteracted(true);
