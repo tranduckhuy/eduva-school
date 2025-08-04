@@ -1,21 +1,25 @@
 import { TestBed } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
+
+import { of, throwError } from 'rxjs';
+
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 import { ClassManagementService } from './class-management.service';
 import { RequestService } from '../../../../shared/services/core/request/request.service';
 import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
+
 import { StatusCode } from '../../../../shared/constants/status-code.constant';
-import { type ClassModel } from '../../../../shared/models/entities/class.model';
 import { EntityStatus } from '../../../../shared/models/enum/entity-status.enum';
+
+import { type ClassModel } from '../../../../shared/models/entities/class.model';
 import { type GetTeacherClassRequest } from '../models/request/query/get-teacher-class-request.model';
 import { type GetTeacherClassResponse } from '../models/response/query/get-teacher-class-response.model';
 import { type CreateClassRequest } from '../models/request/command/create-class-request.model';
 import { type GetStudentsClassRequest } from '../models/request/query/get-students-class-request.model';
 import {
   type GetStudentsClassResponse,
-  StudentClassResponse,
+  type StudentClassResponse,
 } from '../models/response/query/get-students-class-response.model';
 
 // Mock environment
@@ -542,7 +546,11 @@ describe('ClassManagementService', () => {
       const result = await service.archiveClass(classId).toPromise();
       expect(result).toBeNull();
       expect(requestService.put).toHaveBeenCalledWith(
-        `${service['BASE_CLASS_API_URL']}/${classId}/archive`
+        `${service['BASE_CLASS_API_URL']}/${classId}/archive`,
+        undefined,
+        {
+          loadingKey: 'archive-class',
+        }
       );
       expect(toastHandlingService.successGeneral).toHaveBeenCalledOnce();
       expect(toastHandlingService.errorGeneral).not.toHaveBeenCalled();
@@ -556,7 +564,11 @@ describe('ClassManagementService', () => {
       const result = await service.archiveClass(classId).toPromise();
       expect(result).toBeNull();
       expect(requestService.put).toHaveBeenCalledWith(
-        `${service['BASE_CLASS_API_URL']}/${classId}/archive`
+        `${service['BASE_CLASS_API_URL']}/${classId}/archive`,
+        undefined,
+        {
+          loadingKey: 'archive-class',
+        }
       );
       expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
       expect(toastHandlingService.successGeneral).not.toHaveBeenCalled();
@@ -576,7 +588,11 @@ describe('ClassManagementService', () => {
       } catch (err) {
         expect(err).toBe(error);
         expect(requestService.put).toHaveBeenCalledWith(
-          `${service['BASE_CLASS_API_URL']}/${classId}/archive`
+          `${service['BASE_CLASS_API_URL']}/${classId}/archive`,
+          undefined,
+          {
+            loadingKey: 'archive-class',
+          }
         );
         expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
       }
@@ -590,7 +606,11 @@ describe('ClassManagementService', () => {
       const result = await service.archiveClass('').toPromise();
       expect(result).toBeNull();
       expect(requestService.put).toHaveBeenCalledWith(
-        `${service['BASE_CLASS_API_URL']}//archive`
+        `${service['BASE_CLASS_API_URL']}//archive`,
+        undefined,
+        {
+          loadingKey: 'archive-class',
+        }
       );
       expect(toastHandlingService.successGeneral).toHaveBeenCalledOnce();
     });
@@ -606,7 +626,117 @@ describe('ClassManagementService', () => {
       } catch (err) {
         expect(err).toBe(networkError);
         expect(requestService.put).toHaveBeenCalledWith(
-          `${service['BASE_CLASS_API_URL']}/${classId}/archive`
+          `${service['BASE_CLASS_API_URL']}/${classId}/archive`,
+          undefined,
+          {
+            loadingKey: 'archive-class',
+          }
+        );
+        expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
+      }
+    });
+  });
+
+  describe('restoreClass', () => {
+    const classId = 'class-123';
+
+    beforeEach(() => {
+      (requestService as any).put = vi.fn();
+    });
+
+    it('should call put with correct parameters and show success toast on SUCCESS', async () => {
+      (requestService.put as any).mockReturnValue(
+        of({ statusCode: StatusCode.SUCCESS })
+      );
+
+      const result = await service.restoreClass(classId).toPromise();
+      expect(result).toBeNull();
+      expect(requestService.put).toHaveBeenCalledWith(
+        `${service['BASE_CLASS_API_URL']}/${classId}/restore`,
+        undefined,
+        {
+          loadingKey: 'restore-class',
+        }
+      );
+      expect(toastHandlingService.successGeneral).toHaveBeenCalledOnce();
+      expect(toastHandlingService.errorGeneral).not.toHaveBeenCalled();
+    });
+
+    it('should call put and show error toast on non-SUCCESS statusCode', async () => {
+      (requestService.put as any).mockReturnValue(
+        of({ statusCode: StatusCode.SYSTEM_ERROR })
+      );
+
+      const result = await service.restoreClass(classId).toPromise();
+      expect(result).toBeNull();
+      expect(requestService.put).toHaveBeenCalledWith(
+        `${service['BASE_CLASS_API_URL']}/${classId}/restore`,
+        undefined,
+        {
+          loadingKey: 'restore-class',
+        }
+      );
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
+      expect(toastHandlingService.successGeneral).not.toHaveBeenCalled();
+    });
+
+    it('should handle HttpErrorResponse and show error toast', async () => {
+      const error = new HttpErrorResponse({
+        status: 500,
+        statusText: 'Internal Server Error',
+        error: { statusCode: StatusCode.SYSTEM_ERROR },
+      });
+
+      (requestService.put as any).mockReturnValue(throwError(() => error));
+
+      try {
+        await service.restoreClass(classId).toPromise();
+      } catch (err) {
+        expect(err).toBe(error);
+        expect(requestService.put).toHaveBeenCalledWith(
+          `${service['BASE_CLASS_API_URL']}/${classId}/restore`,
+          undefined,
+          {
+            loadingKey: 'restore-class',
+          }
+        );
+        expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
+      }
+    });
+
+    it('should work correctly with empty classId', async () => {
+      (requestService.put as any).mockReturnValue(
+        of({ statusCode: StatusCode.SUCCESS })
+      );
+
+      const result = await service.restoreClass('').toPromise();
+      expect(result).toBeNull();
+      expect(requestService.put).toHaveBeenCalledWith(
+        `${service['BASE_CLASS_API_URL']}//restore`,
+        undefined,
+        {
+          loadingKey: 'restore-class',
+        }
+      );
+      expect(toastHandlingService.successGeneral).toHaveBeenCalledOnce();
+    });
+
+    it('should handle network error and show error toast', async () => {
+      const networkError = new Error('Network error');
+      (requestService.put as any).mockReturnValue(
+        throwError(() => networkError)
+      );
+
+      try {
+        await service.restoreClass(classId).toPromise();
+      } catch (err) {
+        expect(err).toBe(networkError);
+        expect(requestService.put).toHaveBeenCalledWith(
+          `${service['BASE_CLASS_API_URL']}/${classId}/restore`,
+          undefined,
+          {
+            loadingKey: 'restore-class',
+          }
         );
         expect(toastHandlingService.errorGeneral).toHaveBeenCalledOnce();
       }

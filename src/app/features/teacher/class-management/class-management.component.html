@@ -12,7 +12,20 @@
     </div>
 
     @if (classes().length > 0) {
-      <div class="mt-8">
+      <div class="mt-8 flex gap-2">
+        <p-button
+          label="Đang hoạt động"
+          size="small"
+          [variant]="activeTab() === 'active' ? undefined : 'outlined'"
+          (onClick)="onTabChange('active')" />
+        <p-button
+          label="Đã lưu trữ"
+          size="small"
+          [variant]="activeTab() === 'archived' ? undefined : 'outlined'"
+          (onClick)="onTabChange('archived')" />
+      </div>
+
+      <div class="mt-4">
         <div
           class="e-row e-row-cols-5 e-row-cols-xxxl-4 e-row-cols-lg-3 e-row-cols-md-2 e-row-cols-xs-1 e-gx-3 e-gy-5">
           @for (class of classes(); track class.id) {
@@ -22,6 +35,7 @@
                 [currentPage]="currentPage()"
                 [pageSize]="pageSize()"
                 (classArchived)="onSearch()"
+                (classRestore)="onSearch()"
                 (classUpdated)="onSearch()" />
             </div>
           }
@@ -48,14 +62,18 @@
           {{
             isSearching()
               ? 'Không tìm thấy lớp học phù hợp'
-              : 'Bạn chưa có lớp học nào'
+              : activeTab() === 'active'
+                ? 'Bạn chưa có lớp học nào đang hoạt động'
+                : 'Bạn chưa có lớp học nào đã lưu trữ'
           }}
         </h3>
         <p class="mt-2 italic text-gray-500 dark:text-gray-300">
           {{
             isSearching()
               ? 'Vui lòng thử với tên lớp học khác.'
-              : 'Hãy tạo lớp học đầu tiên để bắt đầu giảng dạy và quản lý học sinh của bạn.'
+              : activeTab() === 'active'
+                ? 'Hãy tạo lớp học đầu tiên để bắt đầu giảng dạy và quản lý học sinh của bạn.'
+                : 'Các lớp học đã lưu trữ sẽ xuất hiện ở đây.'
           }}
         </p>
       </div>
