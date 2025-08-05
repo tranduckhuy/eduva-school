@@ -20,11 +20,11 @@ import { SliderModule } from 'primeng/slider';
 import { SubmenuDirective } from '../../../../../../../shared/directives/submenu/submenu.directive';
 
 import { ResourcesStateService } from '../../../services/utils/resources-state.service';
-import { GenerateSettingsSelectionService } from '../../services/generate-settings-selection.service';
+import { GenerateSettingsSelectionService } from '../../../services/utils/generate-settings-selection.service';
 import { LoadingService } from '../../../../../../../shared/services/core/loading/loading.service';
 import { LessonMaterialsService } from '../../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
 import { AiJobsService } from '../../../services/api/ai-jobs.service';
-import { DownloadGeneratedContentService } from '../../services/download-generated-content.service';
+import { DownloadGeneratedContentService } from '../../../services/api/download-generated-content.service';
 
 import { LessonGenerationType } from '../../../../../../../shared/models/enum/lesson-generation-type.enum';
 
@@ -246,7 +246,7 @@ export class AudioPreviewPlayerComponent {
 
   onDownloadGeneratedContent() {
     const metadata = this.generatedMetadataMap();
-    
+
     if (!metadata) return;
 
     this.downloadGeneratedContentService

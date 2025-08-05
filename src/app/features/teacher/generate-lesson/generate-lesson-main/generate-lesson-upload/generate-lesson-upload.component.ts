@@ -53,12 +53,24 @@ export class GenerateLessonUploadComponent implements OnInit {
     this.resourcesStateService.hasGeneratedSuccessfully;
   readonly sourceList = this.resourcesStateService.sourceList;
   readonly currentCount = this.resourcesStateService.totalSources;
-  readonly maxCount = 5;
+  readonly totalFileSize = this.resourcesStateService.totalFileSize;
+  readonly maxCount = this.resourcesStateService.maxFileCount;
+  readonly maxFileSize = this.resourcesStateService.maxFileSize;
+
+  readonly isFileCountLimitReached = computed(
+    () => this.currentCount() >= this.maxCount
+  );
+  readonly isFileSizeLimitReached = computed(
+    () => this.totalFileSize() >= this.maxFileSize
+  );
+  readonly isAnyLimitReached = computed(
+    () => this.isFileCountLimitReached() || this.isFileSizeLimitReached()
+  );
 
   disableUploadButton = computed(
     () =>
       this.isLoading() ||
-      this.currentCount() >= 5 ||
+      this.isAnyLimitReached() ||
       this.hasGeneratedSuccessfully()
   );
 
@@ -137,7 +149,7 @@ export class GenerateLessonUploadComponent implements OnInit {
   }
 
   openUploadModal() {
-    if (this.currentCount() >= this.maxCount) return;
+    if (this.isAnyLimitReached()) return;
 
     const handleUploadedFile = (file: File) => {
       const fileExt = file.name.split('.').pop()?.toLowerCase() ?? 'docx';
@@ -167,8 +179,18 @@ export class GenerateLessonUploadComponent implements OnInit {
       onUploaded: handleUploadedFile,
       current: this.currentCount(),
       max: this.maxCount,
+      currentSize: this.totalFileSize(),
+      maxSize: this.maxFileSize,
     });
   }
+
+  formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
 
   private markFileAsUploadedAfterDelay(fileId: string) {
     setTimeout(() => {

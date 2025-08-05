@@ -167,6 +167,13 @@ export class PreviewLessonComponent implements OnInit {
       },
       { allowSignalWrites: true }
     );
+
+    // ? Effect to close image previews when drawer closes
+    effect(() => {
+      if (!this.isCommentModalOpen) {
+        this.closeAllImagePreviews();
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -270,5 +277,19 @@ export class PreviewLessonComponent implements OnInit {
     this.contentBlocks.set(
       this.contentParseService.convertHtmlToBlocks(content)
     );
+  }
+
+  // ? Method to close all image previews
+  private closeAllImagePreviews(): void {
+    // Close all PrimeNG image preview overlays
+    const imagePreviews = document.querySelectorAll('.p-image-toolbar');
+    imagePreviews.forEach(preview => {
+      const closeButton = preview.querySelector(
+        '.p-image-close-button'
+      ) as HTMLElement;
+      if (closeButton) {
+        closeButton.click();
+      }
+    });
   }
 }

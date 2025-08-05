@@ -29,11 +29,16 @@
       <p-fileupload
         mode="advanced"
         accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        maxFileSize="1000000"
+        [maxFileSize]="dynamicMaxFileSize()"
         invalidFileSizeMessageSummary="Tệp quá lớn."
-        invalidFileSizeMessageDetail="Kích thước tệp vượt quá giới hạn cho phép (200MB)."
+        [invalidFileSizeMessageDetail]="
+          'Kích thước tệp vượt quá giới hạn cho phép (' +
+          formatFileSize(dynamicMaxFileSize()) +
+          ').'
+        "
         invalidFileTypeMessageSummary="Định dạng tệp không hợp lệ."
         invalidFileTypeMessageDetail="Chỉ chấp nhận PDF hoặc DOC."
+        [disabled]="isUploadDisabled()"
         (onSelect)="onSelectFile($event)">
         <ng-template #header></ng-template>
         <ng-template #content let-file let-chooseCallback="chooseCallback">
@@ -53,6 +58,7 @@
                 icon="pi pi-upload"
                 size="small"
                 styleClass="mt-3"
+                [disabled]="isUploadDisabled()"
                 (onClick)="chooseCallback()" />
               <p class="mt-12 text-gray-400">
                 Các loại file được hỗ trợ: .pdf, .doc, .docx
@@ -68,13 +74,23 @@
       <p class="dark:text-white">Giới hạn tài liệu</p>
       <div class="relative top-[1px] grow">
         <p-progressbar
-          [pTooltip]="(current / max).toString() + ' tài liệu'"
-          [value]="(current / max) * 100"
+          [pTooltip]="progressTooltip()"
+          [value]="progressValue()"
           tooltipPosition="bottom"
           showValue="false"
           styleClass="!h-2"></p-progressbar>
       </div>
-      <p class="dark:text-white">{{ current }} / {{ max }}</p>
+      <div class="flex items-center gap-2">
+        <p class="dark:text-white">{{ current }}/{{ max }}</p>
+        <span
+          class="dark:bg-primary-900 rounded-full bg-primary-100 px-2 py-1 text-xs text-primary dark:text-primary-300"
+          [pTooltip]="
+            'Dung lượng còn lại: ' + formatFileSize(dynamicMaxFileSize())
+          "
+          tooltipPosition="bottom">
+          {{ formatFileSize(dynamicMaxFileSize()) }}
+        </span>
+      </div>
     </div>
   </div>
 </div>
