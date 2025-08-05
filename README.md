@@ -4,7 +4,7 @@
     <img src="public/images/logo.png" alt="EDUVA Logo" width="200"/>
   </a>
   <br/>
-  <strong>A comprehensive educational platform for schools, teachers, and students</strong>
+  <strong>EDUVA - A comprehensive educational platform for schools, teachers, and students</strong>
 </div>
 
 ## 📋 Table of Contents
