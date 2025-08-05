@@ -22,7 +22,7 @@
 
 ## About Project
 
-Eduva School is a modern, comprehensive educational management platform designed to streamline the learning experience for schools, teachers, and students. Built with Angular 18 and modern web technologies, it provides a robust, scalable solution for educational institutions.
+EDUVA is a modern, comprehensive educational management platform designed to streamline the learning experience for schools, teachers, and students. Built with Angular 18 and modern web technologies, it provides a robust, scalable solution for educational institutions.
 
 ### Key Features:
 
@@ -145,6 +145,13 @@ Eduva School is a modern, comprehensive educational management platform designed
 - **Quality Control**: Ensure educational content meets standards
 - **Moderation Tools**: Advanced tools for content management
 
+### For Students
+
+- **Watch Lessons**: View and learn from educational content
+- **Ask Questions**: Submit questions about lessons and topics
+- **Comment on Questions**: Participate in discussions by commenting on questions
+- **Profile Management**: Update and manage personal profile information
+
 ## 🔧 Available Scripts
 
 ```bash
@@ -225,5 +232,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
   <p>Made with ❤️ for better education</p>
-  <p>© 2025 Eduva School. All rights reserved.</p>
+  <p>© 2025 EDUVA. All rights reserved.</p>
 </div>
