@@ -51,6 +51,7 @@ export class ClassManagementComponent implements OnInit {
   currentPage = signal(1);
   pageSize = signal(PAGE_SIZE);
   searchTerm = signal('');
+  activeTab = signal<'active' | 'archived'>('active');
 
   first = signal<number>(0);
   rows = signal<number>(PAGE_SIZE);
@@ -97,13 +98,31 @@ export class ClassManagementComponent implements OnInit {
     this.loadClass();
   }
 
+  onTabChange(tab: 'active' | 'archived') {
+    this.activeTab.set(tab);
+    this.currentPage.set(1);
+    this.first.set(0);
+    this.searchTerm.set('');
+    this.isSearching.set(false);
+
+    this.loadClass();
+  }
+
   openAddClassModal() {
     this.globalModalService.open(AddClassModalComponent, {
-      addClassSuccess: () => this.loadClass(),
+      addClassSuccess: () => {
+        this.activeTab.set('active');
+        this.onSearch();
+      },
     });
   }
 
   private loadClass() {
+    const status =
+      this.activeTab() === 'active'
+        ? EntityStatus.Active
+        : EntityStatus.Archived;
+
     const request: GetTeacherClassRequest = {
       pageIndex: this.currentPage(),
       pageSize: this.pageSize(),
@@ -111,7 +130,7 @@ export class ClassManagementComponent implements OnInit {
       sortBy: 'lastModifiedAt',
       sortDirection: 'desc',
       isPagingEnabled: true,
-      status: EntityStatus.Active,
+      status: status,
     };
     this.classManagementService.getClasses(request).subscribe();
   }

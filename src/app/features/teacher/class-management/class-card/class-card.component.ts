@@ -19,6 +19,7 @@ import { LoadingService } from '../../../../shared/services/core/loading/loading
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 
 import { PAGE_SIZE } from '../../../../shared/constants/common.constant';
+import { EntityStatus } from '../../../../shared/models/enum/entity-status.enum';
 
 import { UpdateClassModalComponent } from '../class-detail/class-information/update-class-modal/update-class-modal.component';
 
@@ -48,13 +49,17 @@ export class ClassCardComponent {
   currentPage = input<number>(1);
   pageSize = input<number>(PAGE_SIZE);
 
-  classArchived = output<void>();
   classUpdated = output<void>();
+  classArchived = output<void>();
+  classRestore = output<void>();
 
   readonly isLoadingArchive = this.loadingService.is('archive-class');
+  readonly isLoadingRestore = this.loadingService.is('restore-class');
 
   readonly openedMenuId = signal<string>('');
   readonly isCopied = signal<boolean>(false);
+
+  readonly EntityStatus = EntityStatus;
 
   openEditClassModal() {
     this.globalModalService.open(UpdateClassModalComponent, {
@@ -70,9 +75,13 @@ export class ClassCardComponent {
 
   onArchiveClass(classId: string) {
     this.classService.archiveClass(classId).subscribe({
-      next: () => {
-        this.classArchived.emit();
-      },
+      next: () => this.classArchived.emit(),
+    });
+  }
+
+  onRestoreClass(classId: string) {
+    this.classService.restoreClass(classId).subscribe({
+      next: () => this.classRestore.emit(),
     });
   }
 
