@@ -163,7 +163,7 @@ export class AudioPreviewPlayerComponent {
       this.duration.set(Math.floor(audioEl.duration));
 
       const metadata = this.generatedMetadataMap();
-      if (metadata && metadata[LessonGenerationType.Audio]) {
+      if (metadata?.[LessonGenerationType.Audio]) {
         this.audioName.set(metadata[LessonGenerationType.Audio].title);
       } else {
         const src = audioEl.currentSrc || audioEl.src;
