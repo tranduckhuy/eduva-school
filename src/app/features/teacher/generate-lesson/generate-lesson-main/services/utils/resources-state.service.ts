@@ -147,7 +147,7 @@ export class ResourcesStateService {
   readonly totalFileSize = computed(() => {
     return this.sourceListSignal()
       .filter(item => item.file)
-      .reduce((total, item) => total + (item.file?.size || 0), 0);
+      .reduce((total, item) => total + (item.file?.size ?? 0), 0);
   });
 
   readonly maxFileCount = MAX_GENERATE_LESSON_FILE_COUNT;
