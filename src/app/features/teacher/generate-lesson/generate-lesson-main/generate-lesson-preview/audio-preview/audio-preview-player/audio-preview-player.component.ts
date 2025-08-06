@@ -162,11 +162,15 @@ export class AudioPreviewPlayerComponent {
     if (audioEl) {
       this.duration.set(Math.floor(audioEl.duration));
 
-      const src = audioEl.currentSrc || audioEl.src;
-      const fileName = src.split('/').pop() ?? '';
-      const nameWithoutExtension = fileName.replace(/\.[^/.]+$/, '');
-
-      this.audioName.set(nameWithoutExtension);
+      const metadata = this.generatedMetadataMap();
+      if (metadata && metadata[LessonGenerationType.Audio]) {
+        this.audioName.set(metadata[LessonGenerationType.Audio].title);
+      } else {
+        const src = audioEl.currentSrc || audioEl.src;
+        const fileName = src.split('/').pop() ?? '';
+        const nameWithoutExtension = fileName.replace(/\.[^/.]+$/, '');
+        this.audioName.set(nameWithoutExtension);
+      }
     }
   }
 

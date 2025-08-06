@@ -121,7 +121,7 @@ export class VideoPreviewComponent implements OnInit {
           this.resourcesStateService.setAiGeneratedMetadata(
             LessonGenerationType.Video,
             {
-              title: this.generateAutoTitle(),
+              title: payload.title,
               contentType: ContentType.Video,
               duration: Math.round(payload.actualDurationSeconds) ?? 0,
               fileSize: 1,
@@ -148,19 +148,23 @@ export class VideoPreviewComponent implements OnInit {
     const job = this.job();
     if (!job) return;
 
-    this.resourcesStateService.setVideoState('generated');
-    this.resourcesStateService.setVideoUrl(job.videoOutputBlobName);
-    this.resourcesStateService.markGeneratedSuccess();
-    this.resourcesStateService.setAiGeneratedMetadata(
-      LessonGenerationType.Video,
-      {
-        title: job.topic,
-        contentType: ContentType.Video,
-        duration: 0,
-        fileSize: 1,
-        blobName: job.videoOutputBlobName,
-      }
-    );
+    if (job.videoOutputBlobName) {
+      this.resourcesStateService.setVideoState('generated');
+      this.resourcesStateService.setVideoUrl(job.videoOutputBlobName);
+      this.resourcesStateService.markGeneratedSuccess();
+      this.resourcesStateService.setAiGeneratedMetadata(
+        LessonGenerationType.Video,
+        {
+          title: job.topic,
+          contentType: ContentType.Video,
+          duration: 0,
+          fileSize: 1,
+          blobName: job.videoOutputBlobName,
+        }
+      );
+    } else {
+      this.resourcesStateService.setVideoState('no-content');
+    }
   }
 
   // ? Confirm Generate
@@ -216,17 +220,6 @@ export class VideoPreviewComponent implements OnInit {
           onSuccess();
         },
       });
-  }
-
-  private generateAutoTitle() {
-    const now = new Date();
-    const timestamp = now
-      .toISOString()
-      .replace(/[-:.TZ]/g, '')
-      .slice(0, 14);
-
-    const prefix = 'Video AI tạo';
-    return `${prefix}_${timestamp}`;
   }
 
   private handleConfirmGenerate(

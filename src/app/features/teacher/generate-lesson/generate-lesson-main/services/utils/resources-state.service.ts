@@ -31,7 +31,7 @@ export type SourceItem = {
   file?: File;
 };
 
-export type ContentState = 'empty' | 'loading' | 'generated';
+export type ContentState = 'empty' | 'loading' | 'generated' | 'no-content';
 
 @Injectable({
   providedIn: 'root',
@@ -54,6 +54,9 @@ export class ResourcesStateService {
   private readonly hasGeneratedSuccessfullySignal = signal(false);
   readonly hasGeneratedSuccessfully =
     this.hasGeneratedSuccessfullySignal.asReadonly();
+
+  private readonly hasProcessedResponseSignal = signal(false);
+  readonly hasProcessedResponse = this.hasProcessedResponseSignal.asReadonly();
 
   private readonly generatedTypeSignal = signal<LessonGenerationType | null>(
     null
@@ -181,6 +184,14 @@ export class ResourcesStateService {
     this.hasGeneratedSuccessfullySignal.set(false);
   }
 
+  markProcessedResponse() {
+    this.hasProcessedResponseSignal.set(true);
+  }
+
+  resetProcessedResponse() {
+    this.hasProcessedResponseSignal.set(false);
+  }
+
   setGeneratedType(type: LessonGenerationType) {
     this.generatedTypeSignal.set(type);
   }
@@ -291,6 +302,7 @@ export class ResourcesStateService {
     this.hasInteractedSignal.set(false);
     this.hasPreviewContentSignal.set(false);
     this.hasGeneratedSuccessfullySignal.set(false);
+    this.hasProcessedResponseSignal.set(false);
     this.generatedTypeSignal.set(null);
     this.aiGeneratedMetadataMapSignal.set(null);
 

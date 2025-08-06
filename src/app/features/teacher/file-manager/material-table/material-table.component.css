@@ -60,3 +60,31 @@
 ::ng-deep .dark .p-paginator-current {
   color: var(--color-gray-500) !important;
 }
+
+.ai-content-glow {
+  position: relative;
+  background: linear-gradient(45deg, #8b5cf6, #ec4899, #8b5cf6);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ai-gradient 2.5s ease-in-out infinite;
+}
+
+::ng-deep .dark .ai-content-glow {
+  background: linear-gradient(45deg, #a78bfa, #f472b6, #a78bfa);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes ai-gradient {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}

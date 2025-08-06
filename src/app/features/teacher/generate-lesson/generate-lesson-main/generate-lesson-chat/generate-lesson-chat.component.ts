@@ -29,8 +29,12 @@ import { AiSocketService } from '../services/api/ai-socket.service';
 import { JobStatus } from '../../../../../shared/models/enum/job-status.enum';
 
 import { ChatMessageComponent } from './chat-message/chat-message.component';
-
 import { type CreateAiJobRequest } from '../models/request/command/create-ai-job-request.model';
+import {
+  renderFailureMessage,
+  renderSuccessMessage,
+  renderReadOnlySuccessMessage,
+} from './chat-message.helper';
 
 interface ChatMessage {
   sender: 'user' | 'system';
@@ -42,6 +46,7 @@ interface AiResponseMessage {
   previewContent?: string;
   audioCost?: number;
   videoCost?: number;
+  estimatedDurationMinutes?: number;
   failureReason?: string | null;
 }
 
@@ -62,7 +67,6 @@ interface AiResponseMessage {
 })
 export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   private readonly scrollContainer = viewChild<ElementRef>('scrollContainer');
-
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
   private readonly resourcesStateService = inject(ResourcesStateService);
@@ -70,9 +74,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   private readonly aiSocketService = inject(AiSocketService);
 
   readonly job = this.aiJobService.job;
-
   readonly jobUpdateProgress = this.aiSocketService.jobUpdateProgress;
-
   readonly checkedFiles = this.resourcesStateService.checkedFiles;
   readonly totalUploaded = this.resourcesStateService.totalSources;
   readonly totalChecked = this.resourcesStateService.totalCheckedSources;
@@ -82,18 +84,10 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     this.resourcesStateService.hasPreviewContentSuccessfully;
   readonly hasGeneratedSuccessfully =
     this.resourcesStateService.hasGeneratedSuccessfully;
-
+  readonly hasProcessedResponse =
+    this.resourcesStateService.hasProcessedResponse;
   messages = this.resourcesStateService.messages;
   showScrollButton = this.resourcesStateService.showScrollButton;
-
-  disabledSendButton = computed(() => {
-    return (
-      this.isLoading() ||
-      this.totalChecked() === 0 ||
-      this.hasPreviewContentSuccessfully() ||
-      this.hasGeneratedSuccessfully()
-    );
-  });
 
   form: FormGroup = this.fb.group({
     topic: ['', Validators.required],
@@ -112,40 +106,27 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     { breakpoint: '575px', numVisible: 1, numScroll: 1 },
   ];
 
+  readonly disabledSendButton = computed(
+    () =>
+      this.isLoading() ||
+      this.totalChecked() === 0 ||
+      this.hasPreviewContentSuccessfully() ||
+      this.hasGeneratedSuccessfully()
+  );
+
   constructor() {
-    effect(
-      () => {
-        const payload = this.jobUpdateProgress();
-        const jobStatus = payload?.status;
-        const previewContent = payload?.previewContent;
-        const failureReason = payload?.failureReason;
-
-        if (
-          payload &&
-          jobStatus === JobStatus.ContentGenerated &&
-          (previewContent || failureReason) &&
-          !this.hasPreviewContentSuccessfully()
-        ) {
-          this.scrollToBottom();
-          this.displaySystemAiMessage(payload);
-          this.resourcesStateService.updateIsLoading(false);
-        }
-      },
-      { allowSignalWrites: true }
-    );
-
+    effect(this.handleJobUpdateEffect.bind(this), { allowSignalWrites: true });
     this.destroyRef.onDestroy(() => this.resetAll());
   }
 
   ngOnInit(): void {
     const job = this.job();
-
     if (!job) return;
-
     this.scrollToBottom();
     this.restoreMessagesFromJob(job);
-
-    this.resourcesStateService.markGeneratedSuccess();
+    if (!job.failureReason) {
+      this.resourcesStateService.markGeneratedSuccess();
+    }
     this.resourcesStateService.updateHasInteracted(true);
   }
 
@@ -165,57 +146,22 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   }
 
   submitMessage(): void {
-    if (
-      this.form.invalid ||
-      this.isLoading() ||
-      this.hasPreviewContentSuccessfully() ||
-      this.hasGeneratedSuccessfully()
-    )
-      return;
+    if (this.shouldBlockSend()) return;
 
     const content = this.topic?.value.trim();
     if (!content) return;
-
-    this.resourcesStateService.updateHasInteracted(true);
-    this.resourcesStateService.updateMessages(prev => [
-      ...prev,
-      { sender: 'user', content },
-    ]);
-
-    const isFirstJob = this.isFirstJob();
-    if (isFirstJob) {
-      this.createAiJob();
-    } else {
-      this.updateAiJob();
-    }
-
+    this.addUserMessage(content);
+    this.handleJobSend();
     this.form.reset();
   }
 
   handleChipClick(title: string): void {
-    if (
-      this.isLoading() ||
-      this.hasPreviewContentSuccessfully() ||
-      this.hasGeneratedSuccessfully()
-    )
-      return;
+    if (this.shouldBlockSend()) return;
 
     const content = `Tạo bài giảng về ${title}`;
-    this.resourcesStateService.updateHasInteracted(true);
-    this.resourcesStateService.updateMessages(prev => [
-      ...prev,
-      { sender: 'user', content },
-    ]);
-
+    this.addUserMessage(content);
     this.form.patchValue({ topic: content });
-
-    const isFirstJob = this.isFirstJob();
-    if (isFirstJob) {
-      this.createAiJob();
-    } else {
-      this.updateAiJob();
-    }
-
+    this.handleJobSend();
     this.form.reset();
   }
 
@@ -229,6 +175,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       this.isLoading()
     )
       return;
+
     this.submitMessage();
   }
 
@@ -241,16 +188,53 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private createAiJob(): void {
-    this.scrollToBottom();
-    this.resourcesStateService.updateIsLoading(true);
-    this.resourcesStateService.resetGeneratedStatus();
-    this.resourcesStateService.resetGeneratedPreviewContentStatus();
+  private handleJobUpdateEffect() {
+    const payload = this.jobUpdateProgress();
+    const jobStatus = payload?.status;
+    const previewContent = payload?.previewContent;
+    const failureReason = payload?.failureReason;
 
+    if (
+      payload &&
+      jobStatus === JobStatus.ContentGenerated &&
+      (previewContent || failureReason) &&
+      !this.hasProcessedResponse() &&
+      !this.messages().some(m => m.sender === 'system' && !m.isLoading)
+    ) {
+      this.scrollToBottom();
+      this.displaySystemAiMessage(payload);
+      this.resourcesStateService.updateIsLoading(false);
+    }
+  }
+
+  private shouldBlockSend(): boolean {
+    return (
+      this.form.invalid ||
+      this.isLoading() ||
+      this.hasPreviewContentSuccessfully() ||
+      this.hasGeneratedSuccessfully()
+    );
+  }
+
+  private addUserMessage(content: string) {
+    this.resourcesStateService.updateHasInteracted(true);
     this.resourcesStateService.updateMessages(prev => [
       ...prev,
-      { sender: 'system', content: '', isLoading: true },
+      { sender: 'user', content },
     ]);
+  }
+
+  private handleJobSend() {
+    const isFirstJob = this.isFirstJob();
+    if (isFirstJob) {
+      this.createAiJob();
+    } else {
+      this.updateAiJob();
+    }
+  }
+
+  private createAiJob(): void {
+    this.prepareForJobSend();
 
     const topic = this.topic?.value.trim();
     if (!topic) {
@@ -262,7 +246,6 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       file: this.checkedFiles(),
       topic,
     };
-
     this.aiJobService.createAiJob(request).subscribe({
       next: res => {
         if (!res?.jobId) {
@@ -282,15 +265,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   }
 
   private updateAiJob(): void {
-    this.scrollToBottom();
-    this.resourcesStateService.updateIsLoading(true);
-    this.resourcesStateService.resetGeneratedStatus();
-    this.resourcesStateService.resetGeneratedPreviewContentStatus();
-
-    this.resourcesStateService.updateMessages(prev => [
-      ...prev,
-      { sender: 'system', content: '', isLoading: true },
-    ]);
+    this.prepareForJobSend();
 
     const jobId = this.aiJobService.jobId();
     const topic = this.topic?.value.trim();
@@ -303,7 +278,6 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       file: this.checkedFiles(),
       topic,
     };
-
     this.aiJobService.updateAiJob(jobId, request).subscribe({
       error: () => {
         this.scrollToBottom();
@@ -316,116 +290,43 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     previewContent,
     audioCost,
     videoCost,
+    estimatedDurationMinutes,
     failureReason,
   }: AiResponseMessage): void {
     this.resourcesStateService.updateIsLoading(false);
 
     const content = failureReason
-      ? this.renderFailureMessage(failureReason)
-      : this.renderSuccessMessage(previewContent, audioCost, videoCost);
+      ? renderFailureMessage(failureReason)
+      : renderSuccessMessage(
+          previewContent,
+          audioCost,
+          videoCost,
+          estimatedDurationMinutes,
+          this.formatEstimatedDuration.bind(this)
+        );
 
     this.resourcesStateService.updateMessages(prev => {
       const updated = [...prev];
       const idx = updated.findIndex(m => m.sender === 'system' && m.isLoading);
-
       const newMessage: ChatMessage = {
         sender: 'system',
         content,
         isLoading: false,
       };
 
-      if (idx !== -1) updated[idx] = newMessage;
-      else updated.push(newMessage);
+      if (idx !== -1) {
+        updated[idx] = newMessage;
+      } else {
+        updated.push(newMessage);
+      }
 
       return updated;
     });
 
+    this.resourcesStateService.markProcessedResponse();
     if (!failureReason) {
       this.resourcesStateService.markGeneratedPreviewContentSuccess();
     }
-  }
-
-  private renderFailureMessage(reason: string): string {
-    return `
-      <div class="text-red-500 font-medium">
-        <p>😢 <strong>Rất tiếc!</strong> Quá trình tạo nội dung không thành công.</p>
-        <p>Lý do: <em>${reason}</em></p>
-        <p>Bạn có thể <strong>nhập yêu cầu khác</strong> và thử lại để tạo nội dung mới.</p>
-        <p class="mt-2 text-sm text-primary">
-          💡 <em>Gợi ý: Hãy thử thay đổi cách mô tả chủ đề hoặc kiểm tra lại tài liệu đã upload.</em>
-        </p>
-      </div>
-    `;
-  }
-
-  private renderSuccessMessage(
-    previewContent?: string,
-    audioCost?: number,
-    videoCost?: number
-  ): string {
-    const previewBlock = previewContent
-      ? `
-        <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-700 text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-3">
-          ${previewContent}...
-        </div>
-      `
-      : '';
-
-    return `
-      <div class="mb-3">
-        <h4 class="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
-          🎓 Nội dung bài giảng đã sẵn sàng!
-        </h4>
-
-        <p class="mb-2 text-gray-700 dark:text-gray-300">
-          Đây là <strong>bản nháp gợi ý</strong> dựa trên chủ đề bạn đã cung cấp. Bạn có thể chỉnh sửa, bổ sung hoặc phát triển thêm để tạo nên một bài giảng hấp dẫn và truyền cảm hứng cho người học.
-        </p>
-        <p class="mb-2 text-gray-700 dark:text-gray-300">
-          Sau khi bạn tạo nội dung chính thức, phần bản nháp này sẽ <strong>không được lưu trữ</strong>. Nội dung hoàn tất sẽ được lưu trữ trong hệ thống để bạn có thể thao tác với nội dung đã tạo ra.
-        </p>
-
-        ${previewBlock}
-
-        <div class="mb-2 text-sm text-gray-600 dark:text-gray-400 italic">
-          <p>🎧 Tạo bản ghi âm (audio): <strong>${audioCost}</strong> Ecoin</p>
-          <p>🎞️ Tạo video minh hoạ (có giọng đọc + hình ảnh): <strong>${videoCost}</strong> Ecoin</p>
-        </div>
-
-        <p class="mb-2 text-gray-700 dark:text-gray-300">
-          Nếu bạn đồng ý với chi phí hiển thị ở trên, hãy tiếp tục bằng cách nhấn nút <strong>"Tạo nội dung"</strong> ở phần bên phải để bắt đầu tạo nội dung chính thức.
-        </p>
-
-        <p class="mb-2 text-gray-700 dark:text-gray-300">
-          <strong>EDUVA</strong> xin chân thành cảm ơn bạn đã tin tưởng sử dụng hệ thống!
-        </p>
-
-        <p class="mt-3 text-xs text-primary">
-          * Lưu ý: Chi phí chỉ được tính khi bạn thực hiện tạo sản phẩm chính thức.
-        </p>
-      </div>
-    `;
-  }
-
-  private renderReadOnlySuccessMessage(): string {
-    return `
-      <div class="mb-3">
-        <h4 class="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-100">
-          ✅ Nội dung bài giảng đã được tạo thành công!
-        </h4>
-
-        <p class="mb-2 text-gray-700 dark:text-gray-300">
-          Bạn có thể <strong>xem trước hoặc tải xuống</strong> nội dung này ở phần bên phải.
-        </p>
-
-        <p class="mb-2 text-gray-700 dark:text-gray-300">
-          Nếu bạn muốn tạo nội dung mới, vui lòng quay lại trang quản lý và bắt đầu lại với một yêu cầu khác.
-        </p>
-
-        <p class="mt-3 text-xs text-primary">
-          * Lưu ý: Bạn không thể chỉnh sửa hoặc tạo lại nội dung này tại bước này.
-        </p>
-      </div>
-    `;
   }
 
   private restoreMessagesFromJob(job: {
@@ -439,20 +340,55 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       sender: 'user',
       content: job.topic,
     };
-
     const systemMessage: ChatMessage = {
       sender: 'system',
       content: job.failureReason
-        ? this.renderFailureMessage(job.failureReason)
-        : this.renderReadOnlySuccessMessage(),
+        ? renderFailureMessage(job.failureReason)
+        : renderReadOnlySuccessMessage(),
       isLoading: false,
     };
 
     this.resourcesStateService.setMessages([userMessage, systemMessage]);
+    // ? State that prevent double response message of job even when generate failed
+    this.resourcesStateService.markProcessedResponse();
+
+    if (!job.failureReason) {
+      this.resourcesStateService.markGeneratedPreviewContentSuccess();
+    }
+  }
+
+  private prepareForJobSend() {
+    this.scrollToBottom();
+
+    this.resourcesStateService.updateIsLoading(true);
+    this.resourcesStateService.resetGeneratedStatus();
+    this.resourcesStateService.resetGeneratedPreviewContentStatus();
+    this.resourcesStateService.resetProcessedResponse();
+    this.resourcesStateService.updateMessages(prev => [
+      ...prev,
+      { sender: 'system', content: '', isLoading: true },
+    ]);
+  }
+
+  private formatEstimatedDuration(minutes: number): string {
+    if (!minutes || minutes <= 0) return '';
+    const totalMinutes = Math.floor(minutes);
+    const seconds = Math.round((minutes - totalMinutes) * 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const remainingMinutes = totalMinutes % 60;
+
+    let result = '';
+
+    if (hours > 0) result += `${hours} tiếng `;
+    if (remainingMinutes > 0) result += `${remainingMinutes} phút `;
+    if (seconds > 0) result += `${seconds} giây`;
+
+    return result.trim();
   }
 
   private resetAll() {
     this.resourcesStateService.setIsFirstJob(true);
     this.resourcesStateService.setMessages([]);
+    this.resourcesStateService.resetProcessedResponse();
   }
 }

@@ -4,7 +4,7 @@
     <div class="rounded-2xl border p-2">
       <div class="flex items-center gap-2">
         <div
-          class="flex size-14 items-center justify-center rounded-full bg-[#ebf1fd] dark:bg-dark-400">
+          class="flex size-14 shrink-0 items-center justify-center rounded-full bg-[#ebf1fd] dark:bg-dark-400">
           <span class="material-symbols-rounded select-none dark:text-white">
             autoplay
           </span>
@@ -61,5 +61,29 @@
     @if (videoUrl()) {
       <video-preview-player [videoUrl]="videoUrl()" />
     }
+  }
+
+  @case ('no-content') {
+    <!-- ? No Content State -->
+    <div class="rounded-2xl border p-2">
+      <div class="flex items-center gap-2">
+        <div
+          class="flex size-14 shrink-0 items-center justify-center rounded-full bg-[#fef2f2] dark:bg-red-900/20">
+          <span
+            class="material-symbols-rounded select-none text-red-500 dark:text-red-400">
+            videocam_off
+          </span>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-semibold dark:text-white">
+            Không có Video được tạo
+          </span>
+          <span class="text-gray-500 dark:text-gray-300">
+            Phiên tạo nội dung này chưa thực hiện tạo Video hoặc quá trình tạo
+            không thành công.
+          </span>
+        </div>
+      </div>
+    </div>
   }
 }

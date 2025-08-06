@@ -121,7 +121,7 @@ export class AudioPreviewComponent implements OnInit {
           this.resourcesStateService.setAiGeneratedMetadata(
             LessonGenerationType.Audio,
             {
-              title: this.generateAutoTitle(),
+              title: payload.title,
               contentType: ContentType.Audio,
               duration: Math.round(payload.actualDurationSeconds) ?? 0,
               fileSize: 1,
@@ -148,19 +148,23 @@ export class AudioPreviewComponent implements OnInit {
     const job = this.job();
     if (!job) return;
 
-    this.resourcesStateService.setAudioState('generated');
-    this.resourcesStateService.setAudioUrl(job.audioOutputBlobName);
-    this.resourcesStateService.markGeneratedSuccess();
-    this.resourcesStateService.setAiGeneratedMetadata(
-      LessonGenerationType.Audio,
-      {
-        title: job.topic,
-        contentType: ContentType.Audio,
-        duration: 0,
-        fileSize: 1,
-        blobName: job.audioOutputBlobName,
-      }
-    );
+    if (job.audioOutputBlobName) {
+      this.resourcesStateService.setAudioState('generated');
+      this.resourcesStateService.setAudioUrl(job.audioOutputBlobName);
+      this.resourcesStateService.markGeneratedSuccess();
+      this.resourcesStateService.setAiGeneratedMetadata(
+        LessonGenerationType.Audio,
+        {
+          title: job.topic,
+          contentType: ContentType.Audio,
+          duration: 0,
+          fileSize: 1,
+          blobName: job.audioOutputBlobName,
+        }
+      );
+    } else {
+      this.resourcesStateService.setAudioState('no-content');
+    }
   }
 
   // ? Confirm Generate
@@ -216,17 +220,6 @@ export class AudioPreviewComponent implements OnInit {
           onSuccess();
         },
       });
-  }
-
-  private generateAutoTitle() {
-    const now = new Date();
-    const timestamp = now
-      .toISOString()
-      .replace(/[-:.TZ]/g, '')
-      .slice(0, 14);
-
-    const prefix = 'Audio AI tạo';
-    return `${prefix}_${timestamp}`;
   }
 
   private handleConfirmGenerate(
