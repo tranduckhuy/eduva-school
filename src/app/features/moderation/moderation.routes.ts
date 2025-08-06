@@ -10,6 +10,11 @@ export const moderationRoutes: Routes = [
     children: [
       {
         path: '',
+        data: {
+          title: 'Kiểm duyệt nội dung',
+          heading: 'Kiểm duyệt nội dung',
+          breadcrumb: 'Kiểm duyệt nội dung',
+        },
         loadComponent: () =>
           import('./moderate-lessons/moderate-lessons.component').then(
             mod => mod.ModerateLessonsComponent
@@ -17,6 +22,11 @@ export const moderationRoutes: Routes = [
       },
       {
         path: 'view-lesson/:materialId',
+        data: {
+          title: 'Chi tiết bài giảng',
+          heading: 'Chi tiết bài giảng',
+          breadcrumb: 'Chi tiết bài giảng',
+        },
         loadComponent: () =>
           import(
             '../../shared/components/lesson-details/preview-lesson/preview-lesson.component'
