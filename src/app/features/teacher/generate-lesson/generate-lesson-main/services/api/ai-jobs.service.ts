@@ -139,6 +139,8 @@ export class AiJobsService {
         'Thiếu Ecoin',
         'Bạn hiện không đủ Ecoin để thực hiện yêu cầu này. Vui lòng nạp thêm Ecoin để tiếp tục sử dụng dịch vụ.'
       );
+    } else {
+      this.toastHandlingService.errorGeneral();
     }
     return throwError(() => err);
   }

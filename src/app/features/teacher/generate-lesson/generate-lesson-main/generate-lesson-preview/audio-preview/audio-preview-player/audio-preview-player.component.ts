@@ -20,11 +20,11 @@ import { SliderModule } from 'primeng/slider';
 import { SubmenuDirective } from '../../../../../../../shared/directives/submenu/submenu.directive';
 
 import { ResourcesStateService } from '../../../services/utils/resources-state.service';
-import { GenerateSettingsSelectionService } from '../../services/generate-settings-selection.service';
+import { GenerateSettingsSelectionService } from '../../../services/utils/generate-settings-selection.service';
 import { LoadingService } from '../../../../../../../shared/services/core/loading/loading.service';
 import { LessonMaterialsService } from '../../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
 import { AiJobsService } from '../../../services/api/ai-jobs.service';
-import { DownloadGeneratedContentService } from '../../services/download-generated-content.service';
+import { DownloadGeneratedContentService } from '../../../services/api/download-generated-content.service';
 
 import { LessonGenerationType } from '../../../../../../../shared/models/enum/lesson-generation-type.enum';
 
@@ -162,11 +162,15 @@ export class AudioPreviewPlayerComponent {
     if (audioEl) {
       this.duration.set(Math.floor(audioEl.duration));
 
-      const src = audioEl.currentSrc || audioEl.src;
-      const fileName = src.split('/').pop() ?? '';
-      const nameWithoutExtension = fileName.replace(/\.[^/.]+$/, '');
-
-      this.audioName.set(nameWithoutExtension);
+      const metadata = this.generatedMetadataMap();
+      if (metadata?.[LessonGenerationType.Audio]) {
+        this.audioName.set(metadata[LessonGenerationType.Audio].title);
+      } else {
+        const src = audioEl.currentSrc || audioEl.src;
+        const fileName = src.split('/').pop() ?? '';
+        const nameWithoutExtension = fileName.replace(/\.[^/.]+$/, '');
+        this.audioName.set(nameWithoutExtension);
+      }
     }
   }
 
@@ -246,7 +250,7 @@ export class AudioPreviewPlayerComponent {
 
   onDownloadGeneratedContent() {
     const metadata = this.generatedMetadataMap();
-    
+
     if (!metadata) return;
 
     this.downloadGeneratedContentService

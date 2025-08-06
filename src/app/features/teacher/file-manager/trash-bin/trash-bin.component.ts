@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 
-import { catchError, forkJoin, of } from 'rxjs';
+import { forkJoin, catchError, finalize, throwError } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -17,6 +17,7 @@ import { ConfirmationService } from 'primeng/api';
 import { BytesToReadablePipe } from '../../../../shared/pipes/byte-to-readable.pipe';
 
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
+import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
 import { FolderManagementService } from '../../../../shared/services/api/folder/folder-management.service';
 import { LessonMaterialsService } from '../../../../shared/services/api/lesson-materials/lesson-materials.service';
 
@@ -36,7 +37,6 @@ import { type LessonMaterial } from '../../../../shared/models/entities/lesson-m
 import { type GetFoldersRequest } from '../../../../shared/models/api/request/query/get-folders-request.model';
 import { type GetPersonalLessonMaterialsRequest } from '../../../../shared/models/api/request/query/get-lesson-materials-request.model';
 import { type DeleteMaterialRequest } from '../../../../shared/models/api/request/command/delete-material-request.model';
-import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
 
 type TrashItem =
   | { type: 'folder'; data: Folder }
@@ -64,9 +64,9 @@ type TrashItem =
 export class TrashBinComponent {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly globalModalService = inject(GlobalModalService);
+  private readonly toastService = inject(ToastHandlingService);
   private readonly folderService = inject(FolderManagementService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
-  private readonly toastService = inject(ToastHandlingService);
 
   isLoading = input<boolean>(false);
 
@@ -150,18 +150,18 @@ export class TrashBinComponent {
       accept: () => {
         const deleteFolder$ = this.folderService
           .removeFolder([])
-          .pipe(catchError(() => of(null)));
+          .pipe(catchError(err => throwError(() => err)));
 
         const deleteMaterial$ = this.lessonMaterialService
           .deleteMaterial({ ids: [], permanent: true })
-          .pipe(catchError(() => of(null)));
+          .pipe(catchError(err => throwError(() => err)));
 
-        forkJoin([deleteFolder$, deleteMaterial$]).subscribe({
-          next: () => {
-            this.toastService.successGeneral();
-            return this.loadTrashItems();
-          },
-        });
+        forkJoin([deleteFolder$, deleteMaterial$])
+          .pipe(finalize(() => this.loadTrashItems()))
+          .subscribe({
+            next: () => this.toastService.successGeneral(),
+            error: () => this.toastService.errorGeneral(),
+          });
       },
     });
   }

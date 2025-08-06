@@ -2,6 +2,8 @@
 export const MAX_IMPORT_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 export const MAX_UPLOAD_FILE_SIZE = 200 * 1024 * 1024; // 200MB
 export const MAX_TOTAL_UPLOAD_FILE_SIZE = 500 * 1024 * 1024; // 500MB
+export const MAX_GENERATE_LESSON_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+export const MAX_GENERATE_LESSON_FILE_COUNT = 5;
 export const ALLOWED_IMPORT_EXTENSIONS = ['xlsx', 'xls', 'csv'];
 export const ALLOWED_UPLOAD_MIME_TYPES = [
   'video/',

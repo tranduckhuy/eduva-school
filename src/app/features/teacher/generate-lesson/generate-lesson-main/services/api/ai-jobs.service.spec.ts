@@ -24,6 +24,7 @@ const requestServiceMock = {
 // Mock ToastHandlingService
 const toastHandlingServiceMock = {
   warn: vi.fn(),
+  errorGeneral: vi.fn(),
 };
 
 // Mock HttpClient

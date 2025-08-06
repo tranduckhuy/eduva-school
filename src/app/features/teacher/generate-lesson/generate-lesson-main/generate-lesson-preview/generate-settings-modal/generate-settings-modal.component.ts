@@ -13,14 +13,14 @@ import { SelectModule } from 'primeng/select';
 import { GlobalModalService } from '../../../../../../shared/services/layout/global-modal/global-modal.service';
 import { LoadingService } from '../../../../../../shared/services/core/loading/loading.service';
 import { FolderManagementService } from '../../../../../../shared/services/api/folder/folder-management.service';
-
-import { EntityStatus } from '../../../../../../shared/models/enum/entity-status.enum';
-
 import {
   GenerateSettingsSelectionService,
   type VoiceOption,
   type LanguageOption,
-} from '../services/generate-settings-selection.service';
+} from '../../services/utils/generate-settings-selection.service';
+
+import { EntityStatus } from '../../../../../../shared/models/enum/entity-status.enum';
+
 import { type GetFoldersRequest } from '../../../../../../shared/models/api/request/query/get-folders-request.model';
 
 @Component({

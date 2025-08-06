@@ -160,7 +160,6 @@ export function convertImgToPImage(html: string): string {
     pImage.setAttribute('src', img.getAttribute('src') ?? '');
     pImage.setAttribute('alt', img.getAttribute('alt') ?? '');
     pImage.setAttribute('width', figureWidth);
-    pImage.setAttribute('preview', 'true');
 
     // ? Wrap p-image tag with p tag for DOM Sanitization
     const wrapperP = document.createElement('p');
