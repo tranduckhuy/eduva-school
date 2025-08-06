@@ -102,6 +102,14 @@ export class AudioPreviewPlayerComponent {
         audioEl.playbackRate = rate;
       }
     });
+
+    // Update audio name when metadata changes
+    effect(() => {
+      const metadata = this.generatedMetadataMap();
+      if (metadata?.[LessonGenerationType.Audio]?.title) {
+        this.audioName.set(metadata[LessonGenerationType.Audio].title);
+      }
+    });
   }
 
   get volumeIcon() {
@@ -162,11 +170,17 @@ export class AudioPreviewPlayerComponent {
     if (audioEl) {
       this.duration.set(Math.floor(audioEl.duration));
 
-      const src = audioEl.currentSrc || audioEl.src;
-      const fileName = src.split('/').pop() ?? '';
-      const nameWithoutExtension = fileName.replace(/\.[^/.]+$/, '');
-
-      this.audioName.set(nameWithoutExtension);
+      // Get title from metadata instead of URL
+      const metadata = this.generatedMetadataMap();
+      if (metadata?.[LessonGenerationType.Audio]?.title) {
+        this.audioName.set(metadata[LessonGenerationType.Audio].title);
+      } else {
+        // Fallback to filename if metadata is not available
+        const src = audioEl.currentSrc || audioEl.src;
+        const fileName = src.split('/').pop() ?? '';
+        const nameWithoutExtension = fileName.replace(/\.[^/.]+$/, '');
+        this.audioName.set(nameWithoutExtension);
+      }
     }
   }
 

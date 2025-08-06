@@ -78,18 +78,36 @@
                         '/teacher/file-manager/my-drive/material-detail',
                         material.id,
                       ]"
-                      class="group flex items-center gap-2">
-                      <i
-                        class="material-symbols-outlined"
-                        [ngClass]="getMaterialIconColor(material)">
-                        {{ getMaterialIcon(material) }}
-                      </i>
-                      <span
-                        [pTooltip]="material.title"
-                        tooltipPosition="bottom"
-                        class="line line-clamp-2 transition-colors group-hover:text-primary">
-                        {{ material.title }}
-                      </span>
+                      class="group flex items-center gap-3">
+                      <div class="flex items-center gap-2">
+                        <i
+                          class="material-symbols-outlined"
+                          [ngClass]="getMaterialIconColor(material)">
+                          {{ getMaterialIcon(material) }}
+                        </i>
+                      </div>
+                      <div class="flex flex-col gap-1">
+                        <span
+                          [pTooltip]="material.title"
+                          tooltipPosition="bottom"
+                          class="line line-clamp-2 transition-colors group-hover:text-primary"
+                          [ngClass]="
+                            material.isAIContent
+                              ? 'ai-content-glow font-medium'
+                              : ''
+                          ">
+                          {{ material.title }}
+                        </span>
+                        @if (material.isAIContent) {
+                          <span
+                            class="flex items-center gap-1 text-xs font-medium text-purple-600 dark:text-purple-400">
+                            <i class="material-symbols-outlined text-[14px]"
+                              >auto_awesome</i
+                            >
+                            Được tạo bởi AI
+                          </span>
+                        }
+                      </div>
                     </a>
                   </td>
                   <td>{{ material.createdByName }}</td>

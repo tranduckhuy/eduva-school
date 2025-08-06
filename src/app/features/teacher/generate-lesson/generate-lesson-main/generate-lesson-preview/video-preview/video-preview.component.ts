@@ -185,15 +185,15 @@ export class VideoPreviewComponent implements OnInit {
     );
 
     this.aiJobService
-      .getFileSizeByBlobNameUrl(metadata[LessonGenerationType.Audio].blobName)
+      .getFileSizeByBlobNameUrl(metadata[LessonGenerationType.Video].blobName)
       .pipe(
         switchMap(fileSize => {
           const cleanBlobName =
-            metadata[LessonGenerationType.Audio].blobName.split('?')[0];
+            metadata[LessonGenerationType.Video].blobName.split('?')[0];
           const material: CreateLessonMaterialRequest = {
-            title: metadata[LessonGenerationType.Audio].title,
-            contentType: metadata[LessonGenerationType.Audio].contentType,
-            duration: metadata[LessonGenerationType.Audio].duration,
+            title: metadata[LessonGenerationType.Video].title,
+            contentType: metadata[LessonGenerationType.Video].contentType,
+            duration: metadata[LessonGenerationType.Video].duration,
             fileSize: fileSize,
             isAIContent: true,
             sourceUrl: cleanBlobName,
@@ -220,9 +220,9 @@ export class VideoPreviewComponent implements OnInit {
 
   private truncateTitle(title: string, maxLength: number = 100): string {
     if (!title) return this.generateAutoTitle();
-    
+
     if (title.length <= maxLength) return title;
-    
+
     return title.substring(0, maxLength).trim() + '...';
   }
 

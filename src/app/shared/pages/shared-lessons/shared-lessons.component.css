@@ -75,3 +75,51 @@
 ::ng-deep .dark .p-select-option:hover {
   background-color: var(--color-bg-secondary) !important;
 }
+
+/* AI Content Styling */
+::ng-deep .ai-content-glow {
+  position: relative;
+  background: linear-gradient(45deg, #8b5cf6, #ec4899, #8b5cf6);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ai-gradient 3s ease-in-out infinite;
+}
+
+@keyframes ai-gradient {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* AI Badge Animation */
+::ng-deep .ai-badge {
+  animation: ai-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ai-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.8);
+  }
+}
+
+/* Dark mode adjustments for AI content */
+::ng-deep .dark .ai-content-glow {
+  background: linear-gradient(45deg, #a78bfa, #f472b6, #a78bfa);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ai-gradient 3s ease-in-out infinite;
+}

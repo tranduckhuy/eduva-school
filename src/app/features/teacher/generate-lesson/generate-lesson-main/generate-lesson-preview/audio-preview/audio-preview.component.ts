@@ -118,6 +118,7 @@ export class AudioPreviewComponent implements OnInit {
           );
           this.resourcesStateService.setAudioState('generated');
 
+          console.log('Audio generated successfully:', payload);
           this.resourcesStateService.setAiGeneratedMetadata(
             LessonGenerationType.Audio,
             {
@@ -220,9 +221,9 @@ export class AudioPreviewComponent implements OnInit {
 
   private truncateTitle(title: string, maxLength: number = 100): string {
     if (!title) return this.generateAutoTitle();
-    
+
     if (title.length <= maxLength) return title;
-    
+
     return title.substring(0, maxLength).trim() + '...';
   }
 
