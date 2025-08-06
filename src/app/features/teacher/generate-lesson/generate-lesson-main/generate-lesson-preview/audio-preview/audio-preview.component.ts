@@ -121,7 +121,7 @@ export class AudioPreviewComponent implements OnInit {
           this.resourcesStateService.setAiGeneratedMetadata(
             LessonGenerationType.Audio,
             {
-              title: this.generateAutoTitle(),
+              title: this.truncateTitle(payload.title),
               contentType: ContentType.Audio,
               duration: Math.round(payload.actualDurationSeconds) ?? 0,
               fileSize: 1,
@@ -154,7 +154,7 @@ export class AudioPreviewComponent implements OnInit {
     this.resourcesStateService.setAiGeneratedMetadata(
       LessonGenerationType.Audio,
       {
-        title: job.topic,
+        title: this.truncateTitle(job.topic),
         contentType: ContentType.Audio,
         duration: 0,
         fileSize: 1,
@@ -216,6 +216,14 @@ export class AudioPreviewComponent implements OnInit {
           onSuccess();
         },
       });
+  }
+
+  private truncateTitle(title: string, maxLength: number = 100): string {
+    if (!title) return this.generateAutoTitle();
+    
+    if (title.length <= maxLength) return title;
+    
+    return title.substring(0, maxLength).trim() + '...';
   }
 
   private generateAutoTitle() {

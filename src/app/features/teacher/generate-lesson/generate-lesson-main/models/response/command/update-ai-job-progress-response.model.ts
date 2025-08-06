@@ -3,6 +3,7 @@ import { JobStatus } from '../../../../../../../shared/models/enum/job-status.en
 export interface UpdateAiJobProgressResponse {
   jobId: string;
   status: JobStatus;
+  title: string;
   wordCount: number;
   estimatedDurationMinutes: number;
   actualDurationSeconds: number;

@@ -121,7 +121,7 @@ export class VideoPreviewComponent implements OnInit {
           this.resourcesStateService.setAiGeneratedMetadata(
             LessonGenerationType.Video,
             {
-              title: this.generateAutoTitle(),
+              title: this.truncateTitle(payload.title),
               contentType: ContentType.Video,
               duration: Math.round(payload.actualDurationSeconds) ?? 0,
               fileSize: 1,
@@ -154,7 +154,7 @@ export class VideoPreviewComponent implements OnInit {
     this.resourcesStateService.setAiGeneratedMetadata(
       LessonGenerationType.Video,
       {
-        title: job.topic,
+        title: this.truncateTitle(job.topic),
         contentType: ContentType.Video,
         duration: 0,
         fileSize: 1,
@@ -216,6 +216,14 @@ export class VideoPreviewComponent implements OnInit {
           onSuccess();
         },
       });
+  }
+
+  private truncateTitle(title: string, maxLength: number = 100): string {
+    if (!title) return this.generateAutoTitle();
+    
+    if (title.length <= maxLength) return title;
+    
+    return title.substring(0, maxLength).trim() + '...';
   }
 
   private generateAutoTitle() {
