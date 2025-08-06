@@ -45,6 +45,15 @@ interface AiResponseMessage {
   failureReason?: string | null;
 }
 
+// Constants for error messages
+const ERROR_MESSAGES = {
+  CREATE_JOB_FAILED: 'Không thể tạo job. Vui lòng thử lại sau.',
+  CREATE_CONTENT_ERROR:
+    'Có lỗi xảy ra trong quá trình tạo nội dung. Vui lòng thử lại sau.',
+  UPDATE_CONTENT_ERROR:
+    'Có lỗi xảy ra trong quá trình cập nhật nội dung. Vui lòng thử lại sau.',
+} as const;
+
 @Component({
   selector: 'generate-lesson-chat',
   standalone: true,
@@ -247,10 +256,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     this.resourcesStateService.resetGeneratedStatus();
     this.resourcesStateService.resetGeneratedPreviewContentStatus();
 
-    this.resourcesStateService.updateMessages(prev => [
-      ...prev,
-      { sender: 'system', content: '', isLoading: true },
-    ]);
+    this.addLoadingMessage();
 
     const topic = this.topic?.value.trim();
     if (!topic) {
@@ -266,7 +272,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     this.aiJobService.createAiJob(request).subscribe({
       next: res => {
         if (!res?.jobId) {
-          this.resourcesStateService.updateIsLoading(false);
+          this.handleJobError(ERROR_MESSAGES.CREATE_JOB_FAILED);
           return;
         }
 
@@ -275,8 +281,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
         this.aiSocketService.connect(res.jobId);
       },
       error: () => {
-        this.scrollToBottom();
-        this.resourcesStateService.updateIsLoading(false);
+        this.handleJobError(ERROR_MESSAGES.CREATE_CONTENT_ERROR);
       },
     });
   }
@@ -287,10 +292,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     this.resourcesStateService.resetGeneratedStatus();
     this.resourcesStateService.resetGeneratedPreviewContentStatus();
 
-    this.resourcesStateService.updateMessages(prev => [
-      ...prev,
-      { sender: 'system', content: '', isLoading: true },
-    ]);
+    this.addLoadingMessage();
 
     const jobId = this.aiJobService.jobId();
     const topic = this.topic?.value.trim();
@@ -306,8 +308,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
 
     this.aiJobService.updateAiJob(jobId, request).subscribe({
       error: () => {
-        this.scrollToBottom();
-        this.resourcesStateService.updateIsLoading(false);
+        this.handleJobError(ERROR_MESSAGES.UPDATE_CONTENT_ERROR);
       },
     });
   }
@@ -324,21 +325,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       ? this.renderFailureMessage(failureReason)
       : this.renderSuccessMessage(previewContent, audioCost, videoCost);
 
-    this.resourcesStateService.updateMessages(prev => {
-      const updated = [...prev];
-      const idx = updated.findIndex(m => m.sender === 'system' && m.isLoading);
-
-      const newMessage: ChatMessage = {
-        sender: 'system',
-        content,
-        isLoading: false,
-      };
-
-      if (idx !== -1) updated[idx] = newMessage;
-      else updated.push(newMessage);
-
-      return updated;
-    });
+    this.updateOrAddSystemMessage(content);
 
     if (!failureReason) {
       this.resourcesStateService.markGeneratedPreviewContentSuccess();
@@ -454,5 +441,53 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   private resetAll() {
     this.resourcesStateService.setIsFirstJob(true);
     this.resourcesStateService.setMessages([]);
+  }
+
+  private handleJobError(errorMessage: string): void {
+    this.scrollToBottom();
+    this.resourcesStateService.updateIsLoading(false);
+    this.updateOrAddSystemMessage(this.renderFailureMessage(errorMessage));
+  }
+
+  private updateOrAddSystemMessage(content: string): void {
+    this.resourcesStateService.updateMessages(prev => {
+      const updated = [...prev];
+
+      // Find loading message or last system message to replace
+      let targetIndex = updated.findIndex(
+        m => m.sender === 'system' && m.isLoading
+      );
+
+      if (targetIndex === -1) {
+        // Find last system message to replace
+        for (let i = updated.length - 1; i >= 0; i--) {
+          if (updated[i].sender === 'system') {
+            targetIndex = i;
+            break;
+          }
+        }
+      }
+
+      const newMessage: ChatMessage = {
+        sender: 'system',
+        content,
+        isLoading: false,
+      };
+
+      if (targetIndex !== -1) {
+        updated[targetIndex] = newMessage;
+      } else {
+        updated.push(newMessage);
+      }
+
+      return updated;
+    });
+  }
+
+  private addLoadingMessage(): void {
+    this.resourcesStateService.updateMessages(prev => [
+      ...prev,
+      { sender: 'system', content: '', isLoading: true },
+    ]);
   }
 }
