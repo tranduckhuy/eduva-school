@@ -15,7 +15,7 @@ import { ProgressSpinner } from 'primeng/progressspinner';
 import { ConfirmationService } from 'primeng/api';
 
 import { ResourcesStateService } from '../../services/utils/resources-state.service';
-import { GenerateSettingsSelectionService } from '../services/generate-settings-selection.service';
+import { GenerateSettingsSelectionService } from '../../services/utils/generate-settings-selection.service';
 import { ToastHandlingService } from '../../../../../../shared/services/core/toast/toast-handling.service';
 import { UserService } from '../../../../../../shared/services/api/user/user.service';
 import { AiJobsService } from '../../services/api/ai-jobs.service';

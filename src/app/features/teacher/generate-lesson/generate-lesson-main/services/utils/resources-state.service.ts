@@ -3,6 +3,10 @@ import { Injectable, signal, computed } from '@angular/core';
 import { type ContentType } from '../../../../../../shared/models/enum/lesson-material.enum';
 
 import { type LessonGenerationType } from '../../../../../../shared/models/enum/lesson-generation-type.enum';
+import {
+  MAX_GENERATE_LESSON_FILE_SIZE,
+  MAX_GENERATE_LESSON_FILE_COUNT,
+} from '../../../../../../shared/constants/common.constant';
 
 export interface ChatMessage {
   sender: 'user' | 'system';
@@ -139,6 +143,15 @@ export class ResourcesStateService {
     () =>
       this.sourceListSignal().filter(i => i.checked && !i.isUploading).length
   );
+
+  readonly totalFileSize = computed(() => {
+    return this.sourceListSignal()
+      .filter(item => item.file)
+      .reduce((total, item) => total + (item.file?.size || 0), 0);
+  });
+
+  readonly maxFileCount = MAX_GENERATE_LESSON_FILE_COUNT;
+  readonly maxFileSize = MAX_GENERATE_LESSON_FILE_SIZE;
 
   updateSourceList(updateFn: (items: SourceItem[]) => SourceItem[]) {
     this.sourceListSignal.update(updateFn);
