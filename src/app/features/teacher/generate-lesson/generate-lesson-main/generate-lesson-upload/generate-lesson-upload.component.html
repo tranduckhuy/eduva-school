@@ -17,12 +17,14 @@
       <div class="flex items-center gap-2">
         <span
           class="pi"
-          [ngClass]="currentCount() < 5 ? 'pi-plus' : 'pi-ban'"></span>
+          [ngClass]="!isAnyLimitReached() ? 'pi-plus' : 'pi-ban'"></span>
         <span class="select-none">
           {{
-            currentCount() < 5
+            !isAnyLimitReached()
               ? 'Thêm tài liệu mới'
-              : 'Đã đạt số lượng tối đa (5 tài liệu)'
+              : isFileCountLimitReached()
+                ? 'Đã đạt số lượng tối đa (5 tài liệu)'
+                : 'Đã đạt dung lượng tối đa (10MB)'
           }}
         </span>
       </div>
@@ -123,7 +125,7 @@
               </strong>
             </p>
             <p class="mt-1 text-center text-[#585b60] dark:text-white">
-              Hiện bạn chưa tải lên tài liệu nào. Nhấn vào nút “Thêm tài liệu”
+              Hiện bạn chưa tải lên tài liệu nào. Nhấn vào nút "Thêm tài liệu"
               phía trên để chọn tệp PDF hoặc DOC từ thiết bị của bạn.
             </p>
           </div>

@@ -3,6 +3,11 @@
   height: 100%;
 }
 
+::ng-deep .p-image-mask .p-image-original {
+  max-width: 90vw !important;
+  max-height: 80vh !important;
+}
+
 .loader {
   width: 25px;
   height: 25px;

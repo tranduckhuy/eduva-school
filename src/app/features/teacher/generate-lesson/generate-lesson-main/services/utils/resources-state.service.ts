@@ -3,6 +3,10 @@ import { Injectable, signal, computed } from '@angular/core';
 import { type ContentType } from '../../../../../../shared/models/enum/lesson-material.enum';
 
 import { type LessonGenerationType } from '../../../../../../shared/models/enum/lesson-generation-type.enum';
+import {
+  MAX_GENERATE_LESSON_FILE_SIZE,
+  MAX_GENERATE_LESSON_FILE_COUNT,
+} from '../../../../../../shared/constants/common.constant';
 
 export interface ChatMessage {
   sender: 'user' | 'system';
@@ -27,7 +31,7 @@ export type SourceItem = {
   file?: File;
 };
 
-export type ContentState = 'empty' | 'loading' | 'generated';
+export type ContentState = 'empty' | 'loading' | 'generated' | 'no-content';
 
 @Injectable({
   providedIn: 'root',
@@ -50,6 +54,9 @@ export class ResourcesStateService {
   private readonly hasGeneratedSuccessfullySignal = signal(false);
   readonly hasGeneratedSuccessfully =
     this.hasGeneratedSuccessfullySignal.asReadonly();
+
+  private readonly hasProcessedResponseSignal = signal(false);
+  readonly hasProcessedResponse = this.hasProcessedResponseSignal.asReadonly();
 
   private readonly generatedTypeSignal = signal<LessonGenerationType | null>(
     null
@@ -140,6 +147,15 @@ export class ResourcesStateService {
       this.sourceListSignal().filter(i => i.checked && !i.isUploading).length
   );
 
+  readonly totalFileSize = computed(() => {
+    return this.sourceListSignal()
+      .filter(item => item.file)
+      .reduce((total, item) => total + (item.file?.size ?? 0), 0);
+  });
+
+  readonly maxFileCount = MAX_GENERATE_LESSON_FILE_COUNT;
+  readonly maxFileSize = MAX_GENERATE_LESSON_FILE_SIZE;
+
   updateSourceList(updateFn: (items: SourceItem[]) => SourceItem[]) {
     this.sourceListSignal.update(updateFn);
   }
@@ -166,6 +182,14 @@ export class ResourcesStateService {
 
   resetGeneratedStatus() {
     this.hasGeneratedSuccessfullySignal.set(false);
+  }
+
+  markProcessedResponse() {
+    this.hasProcessedResponseSignal.set(true);
+  }
+
+  resetProcessedResponse() {
+    this.hasProcessedResponseSignal.set(false);
   }
 
   setGeneratedType(type: LessonGenerationType) {
@@ -278,6 +302,7 @@ export class ResourcesStateService {
     this.hasInteractedSignal.set(false);
     this.hasPreviewContentSignal.set(false);
     this.hasGeneratedSuccessfullySignal.set(false);
+    this.hasProcessedResponseSignal.set(false);
     this.generatedTypeSignal.set(null);
     this.aiGeneratedMetadataMapSignal.set(null);
 
