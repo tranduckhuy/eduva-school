@@ -11,20 +11,20 @@
         (onClick)="openAddClassModal()" />
     </div>
 
-    @if (classes().length > 0) {
-      <div class="mt-8 flex gap-2">
-        <p-button
-          label="Đang hoạt động"
-          size="small"
-          [variant]="activeTab() === 'active' ? undefined : 'outlined'"
-          (onClick)="onTabChange('active')" />
-        <p-button
-          label="Đã lưu trữ"
-          size="small"
-          [variant]="activeTab() === 'archived' ? undefined : 'outlined'"
-          (onClick)="onTabChange('archived')" />
-      </div>
+    <div class="mt-8 flex gap-2">
+      <p-button
+        label="Đang hoạt động"
+        size="small"
+        [variant]="activeTab() === 'active' ? undefined : 'outlined'"
+        (onClick)="onTabChange('active')" />
+      <p-button
+        label="Đã lưu trữ"
+        size="small"
+        [variant]="activeTab() === 'archived' ? undefined : 'outlined'"
+        (onClick)="onTabChange('archived')" />
+    </div>
 
+    @if (classes().length > 0) {
       <div class="mt-4">
         <div
           class="e-row e-row-cols-5 e-row-cols-xxxl-4 e-row-cols-lg-3 e-row-cols-md-2 e-row-cols-xs-1 e-gx-3 e-gy-5">

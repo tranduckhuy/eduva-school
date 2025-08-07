@@ -19,6 +19,7 @@ import { GlobalModalService } from '../../../../../../shared/services/layout/glo
 import { ClassManagementService } from '../../../services/class-management.service';
 import { ClassMaterialsManagementService } from '../../../services/class-materials-management.service';
 
+import { EntityStatus } from '../../../../../../shared/models/enum/entity-status.enum';
 import { ContentType } from '../../../../../../shared/models/enum/lesson-material.enum';
 import { FolderOwnerType } from '../../../../../../shared/models/enum/folder-owner-type.enum';
 
@@ -59,6 +60,8 @@ export class ClassOverviewComponent {
 
   isCopied = signal<boolean>(false);
   accordionActiveIndex = signal<number>(0);
+
+  readonly EntityStatus = EntityStatus;
 
   confirmRefresh(event: Event) {
     this.confirmationService.confirm({
