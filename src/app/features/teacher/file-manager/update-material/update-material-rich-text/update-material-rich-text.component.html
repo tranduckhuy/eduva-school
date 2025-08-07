@@ -3,8 +3,14 @@
   [config]="config"
   [data]="editorContent()"
   [ngClass]="{
-    invalid: invalid(),
+    invalid: invalid() || isImageLimitExceeded(),
   }"
   (ready)="onEditorReady($event)"
   tagName="textarea"
   style="width: 100%"></ckeditor>
+
+@if (isImageLimitExceeded()) {
+  <div class="mt-2 font-medium leading-normal text-[#f33a58]">
+    Bạn chỉ có thể thêm tối đa 3 ảnh. Vui lòng xóa bớt ảnh để tiếp tục.
+  </div>
+}

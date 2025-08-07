@@ -71,7 +71,7 @@
 
 :host ckeditor.invalid,
 :host ckeditor:focus-within.invalid {
-  outline: 1.5px solid #f33a58;
+  outline: 1.5px solid #f33a58 !important;
 }
 
 :host ::ng-deep .ck.ck-editor__top .ck-sticky-panel .ck-sticky-panel__content,
