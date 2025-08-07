@@ -61,6 +61,7 @@ export class UserCommentTextboxComponent implements OnInit {
 
   commentValue = signal<string>('');
   invalid = signal<boolean>(false);
+  richTextInvalid = signal<boolean>(false);
 
   constructor() {
     this.form = this.fb.group({
@@ -91,8 +92,9 @@ export class UserCommentTextboxComponent implements OnInit {
     this.form.markAllAsTouched();
 
     const content = this.content?.value.trim();
+    const isRichTextInvalid = this.richTextInvalid();
 
-    if (this.form.invalid || !content) {
+    if (this.form.invalid || isRichTextInvalid) {
       this.invalid.set(true);
       return;
     }
@@ -141,11 +143,25 @@ export class UserCommentTextboxComponent implements OnInit {
 
   getContent(content: string) {
     this.content?.patchValue(content);
+    this.content?.markAsTouched();
+
+    const isContentValid = !this.content?.errors;
+    this.invalid.set(!isContentValid);
+  }
+
+  onRichTextInvalidChange(isInvalid: boolean) {
+    this.richTextInvalid.set(isInvalid);
   }
 
   getErrorMessage(controlName: string): string {
     const control = this.form.get(controlName);
-    if (control?.hasError('required')) return 'Trường này không được để trống';
+
+    if (control?.hasError('required')) {
+      if (controlName === 'content')
+        return 'Nội dung không được để trống hoặc chỉ chứa khoảng trắng';
+      return 'Trường này không được để trống';
+    }
+
     return '';
   }
 

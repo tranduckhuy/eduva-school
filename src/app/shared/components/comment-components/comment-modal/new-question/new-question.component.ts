@@ -60,6 +60,7 @@ export class NewQuestionComponent {
 
   content = signal<string>('');
   invalid = signal<boolean>(false);
+  richTextInvalid = signal<boolean>(false);
 
   readonly isEditMode = computed(() => !!this.questionToEdit());
 
@@ -90,13 +91,25 @@ export class NewQuestionComponent {
 
   getContent(content: string) {
     this.form.get('content')?.patchValue(content);
+    this.contentControl?.markAsTouched();
+
+    const isContentValid = !this.contentControl?.errors;
+    this.invalid.set(!isContentValid);
+  }
+
+  onRichTextInvalidChange(isInvalid: boolean) {
+    this.richTextInvalid.set(isInvalid);
   }
 
   getErrorMessage(controlName: string): string {
     const control = this.form.get(controlName);
-    if (control?.hasError('required')) return 'Trường này không được để trống';
-    if (control?.hasError('onlySpaces'))
-      return 'Trường này không được chỉ chứa khoảng trắng';
+
+    if (control?.hasError('required')) {
+      if (controlName === 'content')
+        return 'Nội dung không được để trống hoặc chỉ chứa khoảng trắng';
+      return 'Trường này không được để trống';
+    }
+
     return '';
   }
 
@@ -105,8 +118,9 @@ export class NewQuestionComponent {
     const lessonMaterialId = this.materialId();
     const title = this.title?.value;
     const content = this.contentControl?.value.trim();
+    const isRichTextInvalid = this.richTextInvalid();
 
-    if (this.form.invalid || !title || !content) {
+    if (this.form.invalid || !title || !content || isRichTextInvalid) {
       this.invalid.set(true);
       return;
     }

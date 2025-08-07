@@ -22,7 +22,8 @@
           <update-material-rich-text
             placeholder="Tóm tắt kiến thức trọng tâm, mục tiêu bài học hoặc lưu ý dành cho học sinh..."
             [editorValue]="descriptionValue()"
-            (valueChange)="getDescriptionValue($event)" />
+            (valueChange)="getDescriptionValue($event)"
+            (invalidChange)="onRichTextInvalidChange($event)" />
         </div>
 
         <div class="mt-5 flex w-full items-center justify-end gap-2">
@@ -39,7 +40,7 @@
             icon="pi pi-save"
             label="Lưu thông tin"
             [loading]="isLoading()"
-            [disabled]="form.invalid || isLoading()" />
+            [disabled]="form.invalid || isLoading() || richTextInvalid()" />
         </div>
       </form>
     </div>

@@ -59,11 +59,13 @@ export class UpdateMaterialRichTextComponent {
   invalid = input<boolean>();
 
   valueChange = output<string>();
+  invalidChange = output<boolean>();
   placeholder = input<string>('Nhập nội dung...');
   isAutoFocus = input<boolean>(false);
   isHeightTextBox = input<boolean>(false);
 
   editorContent = signal<string>('');
+  isImageLimitExceeded = signal<boolean>(false);
 
   editorInstance: any;
   editor = ClassicEditor;
@@ -75,6 +77,14 @@ export class UpdateMaterialRichTextComponent {
         const raw = this.editorValue();
         const parsed = raw ? convertPImageToFigureImg(raw) : '';
         this.editorContent.set(parsed);
+      },
+      { allowSignalWrites: true }
+    );
+
+    effect(
+      () => {
+        const isInvalid = this.invalid() || this.isImageLimitExceeded();
+        this.invalidChange.emit(isInvalid);
       },
       { allowSignalWrites: true }
     );
@@ -161,6 +171,15 @@ export class UpdateMaterialRichTextComponent {
     editor.model.document.on('change:data', () => {
       const rawHtml = editor.getData();
       const cleaned = convertImgToPImage(rawHtml);
+
+      // ? Check image count
+      const imageCount = this.countImages(rawHtml);
+      const isExceeded = imageCount > 3;
+      this.isImageLimitExceeded.set(isExceeded);
+
+      // ? Emit invalid state
+      this.invalidChange.emit(this.invalid() || isExceeded);
+
       this.valueChange.emit(cleaned);
     });
 
@@ -176,5 +195,10 @@ export class UpdateMaterialRichTextComponent {
         });
       }, 0);
     }
+  }
+
+  private countImages(html: string): number {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.querySelectorAll('figure.image').length;
   }
 }
