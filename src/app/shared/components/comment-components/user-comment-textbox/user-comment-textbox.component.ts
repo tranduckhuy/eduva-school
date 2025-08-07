@@ -61,6 +61,7 @@ export class UserCommentTextboxComponent implements OnInit {
 
   commentValue = signal<string>('');
   invalid = signal<boolean>(false);
+  richTextInvalid = signal<boolean>(false);
 
   constructor() {
     this.form = this.fb.group({
@@ -91,8 +92,9 @@ export class UserCommentTextboxComponent implements OnInit {
     this.form.markAllAsTouched();
 
     const content = this.content?.value.trim();
+    const isRichTextInvalid = this.richTextInvalid();
 
-    if (this.form.invalid || !content) {
+    if (this.form.invalid || !content || isRichTextInvalid) {
       this.invalid.set(true);
       return;
     }
@@ -141,6 +143,10 @@ export class UserCommentTextboxComponent implements OnInit {
 
   getContent(content: string) {
     this.content?.patchValue(content);
+  }
+
+  onRichTextInvalidChange(isInvalid: boolean) {
+    this.richTextInvalid.set(isInvalid);
   }
 
   getErrorMessage(controlName: string): string {

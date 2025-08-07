@@ -56,8 +56,10 @@ export class RichTextEditorComponent {
   isHeightTextBox = input<boolean>(false);
 
   valueChange = output<string>();
+  invalidChange = output<boolean>();
 
   editorContent = signal<string>('');
+  isImageLimitExceeded = signal<boolean>(false);
 
   editorInstance: any;
   editor = ClassicEditor;
@@ -69,6 +71,14 @@ export class RichTextEditorComponent {
         const raw = this.editorValue();
         const parsed = raw ? convertPImageToFigureImg(raw) : '';
         this.editorContent.set(parsed);
+      },
+      { allowSignalWrites: true }
+    );
+
+    effect(
+      () => {
+        const isInvalid = this.invalid() || this.isImageLimitExceeded();
+        this.invalidChange.emit(isInvalid);
       },
       { allowSignalWrites: true }
     );
@@ -135,6 +145,15 @@ export class RichTextEditorComponent {
     editor.model.document.on('change:data', () => {
       const rawHtml = editor.getData();
       const cleaned = convertImgToPImage(rawHtml);
+
+      // ? Check image count
+      const imageCount = this.countImages(rawHtml);
+      const isExceeded = imageCount > 1;
+      this.isImageLimitExceeded.set(isExceeded);
+
+      // ? Emit invalid state
+      this.invalidChange.emit(this.invalid() || isExceeded);
+
       this.valueChange.emit(cleaned);
     });
 
@@ -150,5 +169,10 @@ export class RichTextEditorComponent {
         });
       }, 0);
     }
+  }
+
+  private countImages(html: string): number {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.querySelectorAll('figure.image').length;
   }
 }

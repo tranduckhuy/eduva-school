@@ -55,6 +55,7 @@ export class UpdateMaterialComponent implements OnInit {
 
   descriptionValue = signal<string>('');
   submitted = signal<boolean>(false);
+  richTextInvalid = signal<boolean>(false);
 
   form: FormGroup;
 
@@ -98,13 +99,18 @@ export class UpdateMaterialComponent implements OnInit {
     this.description?.patchValue(value);
   }
 
+  onRichTextInvalidChange(isInvalid: boolean) {
+    this.richTextInvalid.set(isInvalid);
+  }
+
   onSubmit() {
     this.submitted.set(true);
     this.form.markAllAsTouched();
 
     const lessonMaterial = this.lessonMaterial();
+    const isRichTextInvalid = this.richTextInvalid();
 
-    if (this.form.invalid || !lessonMaterial) return;
+    if (this.form.invalid || !lessonMaterial || isRichTextInvalid) return;
 
     const materialId = lessonMaterial.id;
     const request: UpdateLessonMaterialRequest = {
