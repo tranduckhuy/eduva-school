@@ -91,6 +91,10 @@ export class NewQuestionComponent {
 
   getContent(content: string) {
     this.form.get('content')?.patchValue(content);
+    this.contentControl?.markAsTouched();
+
+    const isContentValid = !this.contentControl?.errors;
+    this.invalid.set(!isContentValid);
   }
 
   onRichTextInvalidChange(isInvalid: boolean) {
@@ -99,9 +103,13 @@ export class NewQuestionComponent {
 
   getErrorMessage(controlName: string): string {
     const control = this.form.get(controlName);
-    if (control?.hasError('required')) return 'Trường này không được để trống';
-    if (control?.hasError('onlySpaces'))
-      return 'Trường này không được chỉ chứa khoảng trắng';
+
+    if (control?.hasError('required')) {
+      if (controlName === 'content')
+        return 'Nội dung không được để trống hoặc chỉ chứa khoảng trắng';
+      return 'Trường này không được để trống';
+    }
+
     return '';
   }
 
