@@ -10,6 +10,8 @@ import { ButtonModule } from 'primeng/button';
 
 import { GlobalModalService } from '../../../../../shared/services/layout/global-modal/global-modal.service';
 
+import { EntityStatus } from '../../../../../shared/models/enum/entity-status.enum';
+
 import { ClassOverviewComponent } from './class-overview/class-overview.component';
 import { UpdateClassModalComponent } from './update-class-modal/update-class-modal.component';
 
@@ -32,6 +34,8 @@ export class ClassInformationComponent {
 
   classUpdated = output();
   classFolderAdded = output();
+
+  readonly EntityStatus = EntityStatus;
 
   openEditClassModal() {
     this.globalModalService.open(UpdateClassModalComponent, {

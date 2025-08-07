@@ -157,6 +157,21 @@ export class QuestionService {
           'Bài giảng đã bị giáo viên sở hữu chuyển vào thùng rác hoặc xóa.'
         );
         break;
+      case StatusCode.STUDENT_NOT_IN_SCHOOL_CLASS:
+        // ? Redirect to home page
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 2000);
+
+        // ? Close Submenus
+        window.dispatchEvent(new Event('close-all-submenus'));
+
+        // ? Show toast
+        this.toastHandlingService.warn(
+          'Lớp học đã bị xóa',
+          'Lớp học đã bị giáo viên sở hữu lưu trữ hoặc xóa.'
+        );
+        break;
       case StatusCode.STUDENT_NOT_ENROLLED_IN_CLASS_WITH_MATERIAL:
         // ? Redirect to home page
         setTimeout(() => {

@@ -8,14 +8,16 @@
           <p class="font-semibold xl:text-[13px] lg:text-sm md:text-[13px]">
             Mã lớp học
           </p>
-          <p-button
-            variant="text"
-            styleClass="opacity-70 hover:opacity-100 transition-opacity duration-200 xl:!w-[30px] lg:!w-12 md:!w-10"
-            (onClick)="confirmRefresh($event)">
-            <ng-template #icon>
-              <span class="pi pi-refresh" style="font-size: 16px"></span>
-            </ng-template>
-          </p-button>
+          @if (classModel()?.status === EntityStatus.Active) {
+            <p-button
+              variant="text"
+              styleClass="opacity-70 hover:opacity-100 transition-opacity duration-200 xl:!w-[30px] lg:!w-12 md:!w-10"
+              (onClick)="confirmRefresh($event)">
+              <ng-template #icon>
+                <span class="pi pi-refresh" style="font-size: 16px"></span>
+              </ng-template>
+            </p-button>
+          }
         </div>
         <div class="flex items-center gap-1">
           <p
@@ -51,7 +53,10 @@
           {{ materialCount() }}
         </p>
       </div>
-      @if (folderWithMaterials().length !== 0) {
+      @if (
+        folderWithMaterials().length !== 0 &&
+        classModel()?.status === EntityStatus.Active
+      ) {
         <p-button
           label="Thêm thư mục mới"
           icon="pi pi-plus"
@@ -125,12 +130,14 @@
               dạng PDF.
             </p>
             <div class="flex justify-end">
-              <p-button
-                label="Thêm thư mục mới"
-                icon="pi pi-plus"
-                variant="outlined"
-                size="small"
-                (onClick)="openAddFolderModal()" />
+              @if (classModel()?.status === EntityStatus.Active) {
+                <p-button
+                  label="Thêm thư mục mới"
+                  icon="pi pi-plus"
+                  variant="outlined"
+                  size="small"
+                  (onClick)="openAddFolderModal()" />
+              }
             </div>
           </div>
         </div>
