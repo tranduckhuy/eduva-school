@@ -134,7 +134,6 @@ export class FolderManagementService {
     return this.requestService
       .deleteWithBody(`${this.BASE_FOLDERS_API_URL}/user`, request)
       .pipe(
-        tap(res => this.handleSuccessResponse(res)),
         map(() => null),
         catchError(err => this.handleError(err))
       );

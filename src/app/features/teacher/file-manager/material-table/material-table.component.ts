@@ -16,6 +16,7 @@ import { ConfirmationService } from 'primeng/api';
 import { BytesToReadablePipe } from '../../../../shared/pipes/byte-to-readable.pipe';
 
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
+import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 import { LessonMaterialsService } from '../../../../shared/services/api/lesson-materials/lesson-materials.service';
 
@@ -66,6 +67,7 @@ export class MaterialTableComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly loadingService = inject(LoadingService);
+  private readonly toastService = inject(ToastHandlingService);
   private readonly globalModalService = inject(GlobalModalService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly lessonMaterialsService = inject(LessonMaterialsService);
@@ -183,7 +185,10 @@ export class MaterialTableComponent implements OnInit {
           permanent: false,
         };
         this.lessonMaterialsService.deleteMaterial(request).subscribe({
-          next: () => this.onSearch(),
+          next: () => {
+            this.toastService.successGeneral();
+            this.onSearch();
+          },
         });
       },
     });
