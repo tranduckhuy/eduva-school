@@ -20,10 +20,12 @@ import { GlobalModalService } from '../../../../shared/services/layout/global-mo
 import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
 import { UserService } from '../../../../shared/services/api/user/user.service';
 import { UploadFileService } from '../../../../shared/services/api/file/upload-file.service';
+import { FileStorageService } from '../services/file-storage.service';
 import { LessonMaterialsService } from '../../../../shared/services/api/lesson-materials/lesson-materials.service';
 
 import { MODAL_DATA } from '../../../../shared/tokens/injection/modal-data.token';
 
+import { ContentType } from '../../../../shared/models/enum/lesson-material.enum';
 import {
   MAX_UPLOAD_FILE_SIZE,
   MAX_TOTAL_UPLOAD_FILE_SIZE,
@@ -37,8 +39,6 @@ import {
   type CreateLessonMaterialRequest,
   type CreateLessonMaterialsRequest,
 } from '../../../../shared/models/api/request/command/create-lesson-material-request.model';
-import { FileStorageService } from '../services/file-storage.service';
-import { ContentType } from '../../../../shared/models/enum/lesson-material.enum';
 
 type FileMetadata = {
   blobName: string;

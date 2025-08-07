@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 
-import { forkJoin, catchError, finalize, throwError } from 'rxjs';
+import { forkJoin, catchError, finalize, throwError, switchMap } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -18,6 +18,7 @@ import { BytesToReadablePipe } from '../../../../shared/pipes/byte-to-readable.p
 
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
+import { FileStorageService } from '../services/file-storage.service';
 import { FolderManagementService } from '../../../../shared/services/api/folder/folder-management.service';
 import { LessonMaterialsService } from '../../../../shared/services/api/lesson-materials/lesson-materials.service';
 
@@ -65,6 +66,7 @@ export class TrashBinComponent {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly globalModalService = inject(GlobalModalService);
   private readonly toastService = inject(ToastHandlingService);
+  private readonly fileStorageService = inject(FileStorageService);
   private readonly folderService = inject(FolderManagementService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
 
@@ -157,7 +159,10 @@ export class TrashBinComponent {
           .pipe(catchError(err => throwError(() => err)));
 
         forkJoin([deleteFolder$, deleteMaterial$])
-          .pipe(finalize(() => this.loadTrashItems()))
+          .pipe(
+            switchMap(() => this.fileStorageService.getFileStorageQuota()),
+            finalize(() => this.loadTrashItems())
+          )
           .subscribe({
             next: () => this.toastService.successGeneral(),
             error: () => this.toastService.errorGeneral(),
@@ -253,7 +258,10 @@ export class TrashBinComponent {
 
   private handleDeleteFolder(ids: string[]): void {
     this.folderService.removeFolder(ids).subscribe({
-      next: () => this.loadTrashItems(),
+      next: () => {
+        this.toastService.successGeneral();
+        this.loadTrashItems();
+      },
     });
   }
 
@@ -263,9 +271,15 @@ export class TrashBinComponent {
       permanent: true,
     };
 
-    this.lessonMaterialService.deleteMaterial(request).subscribe({
-      next: () => this.loadTrashItems(),
-    });
+    this.lessonMaterialService
+      .deleteMaterial(request)
+      .pipe(switchMap(() => this.fileStorageService.getFileStorageQuota()))
+      .subscribe({
+        next: () => {
+          this.toastService.successGeneral();
+          this.loadTrashItems();
+        },
+      });
   }
 
   private confirmDelete({
