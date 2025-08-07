@@ -4,6 +4,7 @@
   [data]="editorContent()"
   [ngClass]="{
     invalid: invalid() || isImageLimitExceeded(),
+    'height-textbox': isHeightTextBox(),
   }"
   (ready)="onEditorReady($event)"
   tagName="textarea"

@@ -94,7 +94,7 @@ export class UserCommentTextboxComponent implements OnInit {
     const content = this.content?.value.trim();
     const isRichTextInvalid = this.richTextInvalid();
 
-    if (this.form.invalid || !content || isRichTextInvalid) {
+    if (this.form.invalid || isRichTextInvalid) {
       this.invalid.set(true);
       return;
     }
