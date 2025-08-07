@@ -44,17 +44,19 @@
           </div>
         </div>
         <div class="relative">
-          <p-button
-            variant="text"
-            styleClass="group"
-            [rounded]="true"
-            (onClick)="toggleMenuMemberItem(student.id)">
-            <ng-template #icon>
-              <span
-                class="pi pi-ellipsis-v !opacity-60 transition-opacity group-hover:!opacity-100"
-                style="font-size: 16px"></span>
-            </ng-template>
-          </p-button>
+          @if (classModel()?.status === EntityStatus.Active) {
+            <p-button
+              variant="text"
+              styleClass="group"
+              [rounded]="true"
+              (onClick)="toggleMenuMemberItem(student.id)">
+              <ng-template #icon>
+                <span
+                  class="pi pi-ellipsis-v !opacity-60 transition-opacity group-hover:!opacity-100"
+                  style="font-size: 16px"></span>
+              </ng-template>
+            </p-button>
+          }
           @if (openedMenuMemberId() === student.id) {
             <div
               class="absolute left-0 top-[40px] z-[1] flex min-w-[150px] max-w-[280px] origin-top-left animate-scaleIn flex-col overflow-hidden rounded bg-[#f0f4f9] dark:bg-dark-400 sm:left-auto sm:right-0 sm:origin-top-right"

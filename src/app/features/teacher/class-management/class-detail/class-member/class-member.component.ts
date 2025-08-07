@@ -14,6 +14,8 @@ import { SubmenuDirective } from '../../../../../shared/directives/submenu/subme
 
 import { ClassStudentManagementService } from '../../services/class-student-management.service';
 
+import { EntityStatus } from '../../../../../shared/models/enum/entity-status.enum';
+
 import { type ClassModel } from '../../../../../shared/models/entities/class.model';
 import { type StudentClassResponse } from '../../models/response/query/get-students-class-response.model';
 
@@ -34,6 +36,8 @@ export class ClassMemberComponent {
   removeStudent = output<void>();
 
   readonly openedMenuMemberId = signal<string | null>(null);
+
+  readonly EntityStatus = EntityStatus;
 
   onRemoveStudent(id: string) {
     const classId = this.classModel()?.id;

@@ -32,16 +32,18 @@
               {{ folderWithMaterials.name }}
             </p>
             <div class="relative">
-              <p-button
-                variant="text"
-                [rounded]="true"
-                (onClick)="toggleMenuFolderItem(folderWithMaterials.id)">
-                <ng-template #icon>
-                  <span
-                    class="pi pi-ellipsis-v !opacity-60 transition-opacity group-hover:!opacity-100"
-                    style="font-size: 16px"></span>
-                </ng-template>
-              </p-button>
+              @if (classModel()?.status === EntityStatus.Active) {
+                <p-button
+                  variant="text"
+                  [rounded]="true"
+                  (onClick)="toggleMenuFolderItem(folderWithMaterials.id)">
+                  <ng-template #icon>
+                    <span
+                      class="pi pi-ellipsis-v !opacity-60 transition-opacity group-hover:!opacity-100"
+                      style="font-size: 16px"></span>
+                  </ng-template>
+                </p-button>
+              }
               @if (openedMenuFolderId() === folderWithMaterials.id) {
                 <div
                   class="absolute left-0 top-[40px] z-[1] flex min-w-[180px] max-w-[280px] origin-top-left animate-scaleIn flex-col overflow-hidden rounded bg-[#f0f4f9] dark:bg-dark-400 sm:left-auto sm:right-0 sm:origin-top-right"
@@ -127,22 +129,24 @@
                   <span class="line-clamp-2">{{ material.title }}</span>
                 </a>
                 <div class="relative">
-                  <p-button
-                    variant="text"
-                    styleClass="group"
-                    [rounded]="true"
-                    (onClick)="
-                      toggleMenuMaterialItem(
-                        folderWithMaterials.id,
-                        material.id
-                      )
-                    ">
-                    <ng-template #icon>
-                      <span
-                        class="pi pi-ellipsis-v !opacity-60 transition-opacity group-hover:!opacity-100"
-                        style="font-size: 16px"></span>
-                    </ng-template>
-                  </p-button>
+                  @if (classModel()?.status === EntityStatus.Active) {
+                    <p-button
+                      variant="text"
+                      styleClass="group"
+                      [rounded]="true"
+                      (onClick)="
+                        toggleMenuMaterialItem(
+                          folderWithMaterials.id,
+                          material.id
+                        )
+                      ">
+                      <ng-template #icon>
+                        <span
+                          class="pi pi-ellipsis-v !opacity-60 transition-opacity group-hover:!opacity-100"
+                          style="font-size: 16px"></span>
+                      </ng-template>
+                    </p-button>
+                  }
                   @if (
                     isMenuMaterialOpened(folderWithMaterials.id, material.id)
                   ) {

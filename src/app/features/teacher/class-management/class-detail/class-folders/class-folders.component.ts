@@ -14,17 +14,18 @@ import { ButtonModule } from 'primeng/button';
 import { SubmenuDirective } from '../../../../../shared/directives/submenu/submenu.directive';
 
 import { ClassFolderManagementService } from '../../services/class-folder-management.service';
+import { ClassMaterialsManagementService } from '../../services/class-materials-management.service';
 import { FolderManagementService } from '../../../../../shared/services/api/folder/folder-management.service';
 import { LoadingService } from '../../../../../shared/services/core/loading/loading.service';
 import { GlobalModalService } from '../../../../../shared/services/layout/global-modal/global-modal.service';
 
+import { EntityStatus } from '../../../../../shared/models/enum/entity-status.enum';
 import { ContentType } from '../../../../../shared/models/enum/lesson-material.enum';
 
 import { AddClassMaterialsModalComponent } from './add-class-materials-modal/add-class-materials-modal.component';
 import { RenameLessonModalComponent } from '../../../../../shared/components/rename-lesson-modal/rename-lesson-modal.component';
 
 import { type ClassModel } from '../../../../../shared/models/entities/class.model';
-import { ClassMaterialsManagementService } from '../../services/class-materials-management.service';
 
 @Component({
   selector: 'class-folders',
@@ -62,6 +63,8 @@ export class ClassFoldersComponent {
     folderId: string;
     materialId: string;
   } | null>(null);
+
+  readonly EntityStatus = EntityStatus;
 
   onRenameFolder(folderId: string, folderName: string) {
     this.globalModalService.open(RenameLessonModalComponent, {
