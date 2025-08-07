@@ -48,7 +48,11 @@
         [editorValue]="content()"
         (valueChange)="getContent($event)"
         (invalidChange)="onRichTextInvalidChange($event)" />
-      @if (invalid()) {
+      @if (
+        (contentControl?.invalid &&
+          (contentControl?.touched || contentControl?.dirty)) ||
+        invalid()
+      ) {
         <div class="mt-3 font-medium leading-normal text-[#f33a58]">
           {{ getErrorMessage('content') }}
         </div>
