@@ -12,6 +12,11 @@ export const authRoutes: Routes = [
       ),
     children: [
       {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'login',
+      },
+      {
         path: 'login',
         canMatch: [redirectAuthenticatedGuard],
         data: {
