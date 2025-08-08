@@ -83,3 +83,20 @@ export function renderReadOnlySuccessMessage(): string {
     </div>
   `;
 }
+
+export function renderProvidedInformationError(): string {
+  return `
+    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-3">
+      <div class="flex items-center space-x-2">
+        <div class="flex-shrink-0">
+          <span class="pi pi-exclamation-circle text-red-500 text-lg"></span>
+        </div>
+        <div class="flex-1">
+          <p class="text-red-500 font-medium">
+            Yêu cầu quá dài, vui lòng chỉnh sửa và thử lại.
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
+}

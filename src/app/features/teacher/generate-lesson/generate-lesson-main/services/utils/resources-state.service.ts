@@ -58,6 +58,10 @@ export class ResourcesStateService {
   private readonly hasProcessedResponseSignal = signal(false);
   readonly hasProcessedResponse = this.hasProcessedResponseSignal.asReadonly();
 
+  private readonly hasProvidedInformationErrorSignal = signal(false);
+  readonly hasProvidedInformationError =
+    this.hasProvidedInformationErrorSignal.asReadonly();
+
   private readonly generatedTypeSignal = signal<LessonGenerationType | null>(
     null
   );
@@ -192,6 +196,14 @@ export class ResourcesStateService {
     this.hasProcessedResponseSignal.set(false);
   }
 
+  setProvidedInformationError(hasError: boolean) {
+    this.hasProvidedInformationErrorSignal.set(hasError);
+  }
+
+  resetProvidedInformationError() {
+    this.hasProvidedInformationErrorSignal.set(false);
+  }
+
   setGeneratedType(type: LessonGenerationType) {
     this.generatedTypeSignal.set(type);
   }
@@ -303,6 +315,7 @@ export class ResourcesStateService {
     this.hasPreviewContentSignal.set(false);
     this.hasGeneratedSuccessfullySignal.set(false);
     this.hasProcessedResponseSignal.set(false);
+    this.hasProvidedInformationErrorSignal.set(false);
     this.generatedTypeSignal.set(null);
     this.aiGeneratedMetadataMapSignal.set(null);
 
