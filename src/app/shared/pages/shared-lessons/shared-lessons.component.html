@@ -44,11 +44,26 @@
                   [ngClass]="getMaterialIconColor(material)">
                   {{ getMaterialIcon(material) }}
                 </i>
-                <span
-                  [pTooltip]="material.title"
-                  tooltipPosition="bottom"
-                  class="line-clamp-1 break-all transition-colors group-hover:text-primary">
-                  {{ material.title }}
+                <span class="flex flex-col gap-1">
+                  <span
+                    [pTooltip]="material.title"
+                    tooltipPosition="bottom"
+                    class="line-clamp-2 transition-colors group-hover:text-primary"
+                    [ngClass]="{
+                      'ai-content-glow !line-clamp-1 font-medium':
+                        material.isAIContent,
+                    }">
+                    {{ material.title }}
+                  </span>
+                  @if (material.isAIContent) {
+                    <span
+                      class="ai-content-glow flex items-center gap-1 text-sm">
+                      <i class="material-symbols-outlined text-sm">
+                        auto_awesome
+                      </i>
+                      Được tạo bởi AI
+                    </span>
+                  }
                 </span>
               </a>
             </td>
@@ -57,7 +72,7 @@
               {{ material.createdAt | date: "dd 'thg' MM, YYYY 'lúc' HH:mm" }}
             </td>
             <td class="!text-center">
-              {{ material.fileSize | bytesToReadable: 'MB' : 2 }}
+              {{ material.fileSize | bytesToReadable: 'auto' : 2 }}
             </td>
             <td class="!text-center">
               <div class="flex items-center justify-center">
