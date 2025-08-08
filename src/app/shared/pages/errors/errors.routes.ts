@@ -16,6 +16,11 @@ export const errorRoutes: Routes = [
           ),
         children: [
           {
+            path: '',
+            pathMatch: 'full',
+            redirectTo: '404',
+          },
+          {
             path: '500',
             loadComponent: () =>
               import('./internal-error/internal-error.component').then(
@@ -42,6 +47,13 @@ export const errorRoutes: Routes = [
               import(
                 './too-many-request-error/too-many-request-error.component'
               ).then(mod => mod.TooManyRequestErrorComponent),
+          },
+          {
+            path: 'coming-soon',
+            loadComponent: () =>
+              import('./coming-soon/coming-soon.component').then(
+                mod => mod.ComingSoonComponent
+              ),
           },
         ],
       },

@@ -18,8 +18,8 @@ import { AuthLayoutComponent } from '../../auth-layout/auth-layout.component';
 
 import { type VerifyOtpRequest } from '../../models/request/verify-otp-request.model';
 import {
+  type ResendOtpRequest,
   ResendOtpPurpose,
-  ResendOtpRequest,
 } from '../../models/request/resend-otp-request.model';
 
 @Component({

@@ -142,6 +142,7 @@ export class AiJobsService {
     } else {
       this.toastHandlingService.errorGeneral();
     }
+
     return throwError(() => err);
   }
 }

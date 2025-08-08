@@ -68,11 +68,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     router.navigateByUrl('/errors/404');
   };
 
-  const handleTooManyRequest = () => {
-    globalModalService.close();
-    router.navigateByUrl('/errors/429');
-  };
-
   const handleUnauthorized = () => {
     globalModalService.close();
     confirmationService.confirm({
@@ -86,6 +81,28 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         router.navigateByUrl('/auth/login', { replaceUrl: true });
       },
     });
+  };
+
+  const handleTooManyRequest = (error: HttpErrorResponse) => {
+    globalModalService.close();
+
+    let waitTimeMinutes = 1;
+
+    const requestUrl = error.url || '';
+
+    if (requestUrl.includes('/auth')) {
+      waitTimeMinutes = 10;
+    } else if (requestUrl.includes('/ai-jobs')) {
+      waitTimeMinutes = 1;
+    }
+
+    if (waitTimeMinutes <= 0) {
+      waitTimeMinutes = 1;
+    } else if (waitTimeMinutes > 1440) {
+      waitTimeMinutes = 60;
+    }
+
+    router.navigateByUrl(`/errors/429?waitTime=${waitTimeMinutes}`);
   };
 
   const createSubscriptionConfirmation = (
@@ -145,13 +162,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     // Server errors
     if (status === 0 || status >= 500) {
       handleServerError();
-      return;
     }
 
     // Unauthorized
     if (status === 401 && !isByPassAuth) {
       handleUnauthorized();
-      return;
     }
 
     // No status code to process
@@ -166,7 +181,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       errorStatusCode === StatusCode.SUBSCRIPTION_EXPIRED_WITH_DATA_LOSS_RISK
     ) {
       handleSubscriptionExpired();
-      return;
     }
 
     // Forbidden
@@ -176,7 +190,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       } else {
         handleForbidden();
       }
-      return;
     }
 
     // Not found
@@ -190,7 +203,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
     // Too many request
     if (status === 429) {
-      handleTooManyRequest();
+      handleTooManyRequest(error);
     }
   };
 

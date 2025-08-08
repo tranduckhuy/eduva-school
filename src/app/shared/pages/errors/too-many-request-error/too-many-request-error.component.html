@@ -6,10 +6,16 @@
   <div class="font-medium">
     <p>Bạn đã gửi quá nhiều yêu cầu trong một khoảng thời gian ngắn.</p>
     <p class="mt-2">
-      Vui lòng chờ một chút và thử lại sau. Hệ thống sẽ tự động khôi phục sau
-      vài phút.
+      Vui lòng chờ một chút và thử lại sau. Hệ thống sẽ tự động khôi phục sau:
     </p>
   </div>
+
+  <div class="text-center">
+    <div class="text-gradient font-mono text-[80px] font-bold sm:text-[60px]">
+      {{ displayRemainingTime() }}
+    </div>
+  </div>
+
   <div class="mt-5 flex w-full items-center justify-center">
     <a
       routerLink="/auth/login"

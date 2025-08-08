@@ -27,6 +27,7 @@ import { AiJobsService } from '../services/api/ai-jobs.service';
 import { AiSocketService } from '../services/api/ai-socket.service';
 
 import { JobStatus } from '../../../../../shared/models/enum/job-status.enum';
+import { StatusCode } from '../../../../../shared/constants/status-code.constant';
 
 import { ChatMessageComponent } from './chat-message/chat-message.component';
 import { type CreateAiJobRequest } from '../models/request/command/create-ai-job-request.model';
@@ -34,6 +35,7 @@ import {
   renderFailureMessage,
   renderSuccessMessage,
   renderReadOnlySuccessMessage,
+  renderProvidedInformationError,
 } from './chat-message.helper';
 
 interface ChatMessage {
@@ -86,6 +88,8 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     this.resourcesStateService.hasGeneratedSuccessfully;
   readonly hasProcessedResponse =
     this.resourcesStateService.hasProcessedResponse;
+  readonly hasProvidedInformationError =
+    this.resourcesStateService.hasProvidedInformationError;
   messages = this.resourcesStateService.messages;
   showScrollButton = this.resourcesStateService.showScrollButton;
 
@@ -150,17 +154,19 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
 
     const content = this.topic?.value.trim();
     if (!content) return;
+
     this.addUserMessage(content);
     this.handleJobSend();
     this.form.reset();
   }
 
   handleChipClick(title: string): void {
+    const content = `Tạo bài giảng về ${title}`;
+    this.form.patchValue({ topic: content });
+
     if (this.shouldBlockSend()) return;
 
-    const content = `Tạo bài giảng về ${title}`;
     this.addUserMessage(content);
-    this.form.patchValue({ topic: content });
     this.handleJobSend();
     this.form.reset();
   }
@@ -168,13 +174,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   onEnterKey(event: Event): void {
     event.preventDefault();
     const keyboardEvent = event as KeyboardEvent;
-    if (
-      keyboardEvent.shiftKey ||
-      this.form.invalid ||
-      this.totalChecked() === 0 ||
-      this.isLoading()
-    )
-      return;
+    if (keyboardEvent.shiftKey || this.shouldBlockSend()) return;
 
     this.submitMessage();
   }
@@ -257,9 +257,15 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
         this.aiSocketService.resetSignal();
         this.aiSocketService.connect(res.jobId);
       },
-      error: () => {
+      error: (err: any) => {
         this.scrollToBottom();
         this.resourcesStateService.updateIsLoading(false);
+
+        if (
+          err?.error?.statusCode === StatusCode.PROVIDED_INFORMATION_IS_INVALID
+        ) {
+          this.handleProvidedInformationError();
+        }
       },
     });
   }
@@ -279,11 +285,42 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       topic,
     };
     this.aiJobService.updateAiJob(jobId, request).subscribe({
-      error: () => {
+      error: (err: any) => {
         this.scrollToBottom();
         this.resourcesStateService.updateIsLoading(false);
+
+        if (
+          err?.error?.statusCode === StatusCode.PROVIDED_INFORMATION_IS_INVALID
+        ) {
+          this.handleProvidedInformationError();
+        }
       },
     });
+  }
+
+  private handleProvidedInformationError(): void {
+    this.resourcesStateService.setProvidedInformationError(true);
+
+    const errorMessage: ChatMessage = {
+      sender: 'system',
+      content: renderProvidedInformationError(),
+      isLoading: false,
+    };
+
+    this.resourcesStateService.updateMessages(prev => {
+      const updated = [...prev];
+      const idx = updated.findIndex(m => m.sender === 'system' && m.isLoading);
+
+      if (idx !== -1) {
+        updated[idx] = errorMessage;
+      } else {
+        updated.push(errorMessage);
+      }
+
+      return updated;
+    });
+
+    this.resourcesStateService.markProcessedResponse();
   }
 
   private displaySystemAiMessage({
@@ -364,6 +401,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     this.resourcesStateService.resetGeneratedStatus();
     this.resourcesStateService.resetGeneratedPreviewContentStatus();
     this.resourcesStateService.resetProcessedResponse();
+    this.resourcesStateService.resetProvidedInformationError();
     this.resourcesStateService.updateMessages(prev => [
       ...prev,
       { sender: 'system', content: '', isLoading: true },
@@ -390,5 +428,6 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     this.resourcesStateService.setIsFirstJob(true);
     this.resourcesStateService.setMessages([]);
     this.resourcesStateService.resetProcessedResponse();
+    this.resourcesStateService.resetProvidedInformationError();
   }
 }
