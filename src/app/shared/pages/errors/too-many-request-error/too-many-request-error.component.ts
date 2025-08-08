@@ -19,8 +19,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TooManyRequestErrorComponent {
-  private activatedRoute = inject(ActivatedRoute);
-  private destroyRef = inject(DestroyRef);
+  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
 
   waitTimeMinutes = signal<number>(1);
   remainingSeconds = signal<number>(0);

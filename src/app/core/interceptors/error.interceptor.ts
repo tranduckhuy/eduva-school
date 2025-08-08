@@ -88,12 +88,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
     let waitTimeMinutes = 1;
 
-    const requestUrl = error.url || '';
+    const requestUrl = error.url ?? '';
 
     if (requestUrl.includes('/auth')) {
       waitTimeMinutes = 10;
-    } else if (requestUrl.includes('/ai-jobs')) {
-      waitTimeMinutes = 1;
     }
 
     if (waitTimeMinutes <= 0) {
