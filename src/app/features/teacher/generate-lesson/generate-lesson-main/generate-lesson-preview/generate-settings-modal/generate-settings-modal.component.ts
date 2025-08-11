@@ -101,7 +101,7 @@ export class GenerateSettingsModalComponent implements OnInit {
     const request: GetFoldersRequest = {
       sortBy: 'createdAt',
       sortDirection: 'desc',
-      isPagingEnabled: true,
+      isPagingEnabled: false,
       status: EntityStatus.Active,
     };
     this.folderService.getPersonalFolders(request).subscribe();

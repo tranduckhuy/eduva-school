@@ -1,17 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { HttpErrorResponse } from '@angular/common/http';
 
 import { UserService } from './user.service';
 import { RequestService } from '../../core/request/request.service';
 import { ToastHandlingService } from '../../core/toast/toast-handling.service';
+
 import { StatusCode } from '../../../constants/status-code.constant';
-import { type User } from '../../../models/entities/user.model';
 import { UserRoles } from '../../../constants/user-roles.constant';
+
+import { type User } from '../../../models/entities/user.model';
+import { type UserListParams } from '../../../models/api/request/query/user-list-params';
 import { type UpdateProfileRequest } from '../../../pages/settings-page/personal-information/models/update-profile-request.model';
 import { type EntityListResponse } from '../../../models/api/response/query/entity-list-response.model';
-import { type UserListParams } from '../../../models/api/request/query/user-list-params';
 
 describe('UserService', () => {
   let service: UserService;
@@ -65,11 +66,13 @@ describe('UserService', () => {
       get: vi.fn(),
       put: vi.fn(),
       post: vi.fn(),
+      delete: vi.fn(),
     } as any;
     toastHandlingService = {
       errorGeneral: vi.fn(),
       error: vi.fn(),
       success: vi.fn(),
+      successGeneral: vi.fn(),
     } as any;
     TestBed.configureTestingModule({
       providers: [
@@ -371,6 +374,61 @@ describe('UserService', () => {
         service.createUser(mockCreateUserRequest as any).subscribe(result => {
           expect(result).toBe(false);
           expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+          resolve();
+        });
+      });
+    });
+  });
+
+  describe('deleteUser', () => {
+    it('should show success toast and return null on success', async () => {
+      (requestService.delete as any) = vi
+        .fn()
+        .mockReturnValue(of({ statusCode: StatusCode.SUCCESS }));
+      await new Promise<void>(resolve => {
+        service.deleteUser('1').subscribe(result => {
+          expect(result).toBeNull();
+          expect(toastHandlingService.successGeneral).toHaveBeenCalled();
+          resolve();
+        });
+      });
+    });
+
+    it('should show errorGeneral and return null on non-success', async () => {
+      (requestService.delete as any) = vi
+        .fn()
+        .mockReturnValue(of({ statusCode: StatusCode.SYSTEM_ERROR }));
+      await new Promise<void>(resolve => {
+        service.deleteUser('1').subscribe(result => {
+          expect(result).toBeNull();
+          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+          resolve();
+        });
+      });
+    });
+
+    it('should show errorGeneral and throw error on network error', async () => {
+      (requestService.delete as any) = vi
+        .fn()
+        .mockReturnValue(throwError(() => new Error('Network error')));
+      await new Promise<void>(resolve => {
+        service.deleteUser('1').subscribe({
+          error: () => {
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+            resolve();
+          },
+        });
+      });
+    });
+
+    it('should call requestService.delete with correct URL', async () => {
+      (requestService.delete as any) = vi
+        .fn()
+        .mockReturnValue(of({ statusCode: StatusCode.SUCCESS }));
+
+      await new Promise<void>(resolve => {
+        service.deleteUser('123').subscribe(() => {
+          expect(requestService.delete).toHaveBeenCalledWith('/users/123');
           resolve();
         });
       });

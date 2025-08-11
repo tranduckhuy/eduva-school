@@ -134,13 +134,21 @@ export class AiJobsService {
   }
 
   private handleError(err: HttpErrorResponse): Observable<null> {
-    if (err.error.statusCode === StatusCode.INSUFFICIENT_USER_CREDIT) {
-      this.toastHandlingService.warn(
-        'Thiếu Ecoin',
-        'Bạn hiện không đủ Ecoin để thực hiện yêu cầu này. Vui lòng nạp thêm Ecoin để tiếp tục sử dụng dịch vụ.'
-      );
-    } else {
-      this.toastHandlingService.errorGeneral();
+    const errorStatusCode = err.error?.statusCode;
+
+    switch (errorStatusCode) {
+      case StatusCode.INSUFFICIENT_USER_CREDIT:
+        this.toastHandlingService.warn(
+          'Thiếu Ecoin',
+          'Bạn hiện không đủ Ecoin để thực hiện yêu cầu này. Vui lòng nạp thêm Ecoin để tiếp tục sử dụng dịch vụ.'
+        );
+        break;
+
+      case StatusCode.PROVIDED_INFORMATION_IS_INVALID:
+        break;
+
+      default:
+        this.toastHandlingService.errorGeneral();
     }
 
     return throwError(() => err);

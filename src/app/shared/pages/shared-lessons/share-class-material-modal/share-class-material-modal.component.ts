@@ -16,15 +16,18 @@ import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { UserService } from '../../../services/api/user/user.service';
 import { FolderManagementService } from '../../../services/api/folder/folder-management.service';
+import { ClassManagementService } from '../../../../features/teacher/class-management/services/class-management.service';
 import { ClassFolderManagementService } from '../../../../features/teacher/class-management/services/class-folder-management.service';
 import { LoadingService } from '../../../services/core/loading/loading.service';
 import { GlobalModalService } from '../../../services/layout/global-modal/global-modal.service';
-import { ClassManagementService } from '../../../../features/teacher/class-management/services/class-management.service';
+
 import { EntityStatus } from '../../../models/enum/entity-status.enum';
-import { GetTeacherClassRequest } from '../../../../features/teacher/class-management/models/request/query/get-teacher-class-request.model';
-import { UserService } from '../../../services/api/user/user.service';
 import { MODAL_DATA } from '../../../tokens/injection/modal-data.token';
+
+import { type GetTeacherClassRequest } from '../../../../features/teacher/class-management/models/request/query/get-teacher-class-request.model';
+import { type GetFoldersRequest } from '../../../models/api/request/query/get-folders-request.model';
 
 @Component({
   selector: 'app-share-class-material-modal',
@@ -42,20 +45,20 @@ import { MODAL_DATA } from '../../../tokens/injection/modal-data.token';
 })
 export class ShareClassMaterialModalComponent {
   private readonly fb = inject(FormBuilder);
+  private readonly userService = inject(UserService);
+  private readonly classService = inject(ClassManagementService);
   private readonly folderService = inject(FolderManagementService);
   private readonly classFolderService = inject(ClassFolderManagementService);
   private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
-  private readonly classService = inject(ClassManagementService);
-  private readonly userService = inject(UserService);
   readonly modalData = inject(MODAL_DATA);
 
+  readonly user = this.userService.currentUser;
+  readonly classes = this.classService.classes;
+  readonly folderList = this.folderService.folderList;
   readonly isLoadingAddMaterials = this.loadingService.is('add-materials');
   readonly isLoadingFolder = this.loadingService.is('get-folders');
   readonly isLoadingClasses = this.loadingService.is('get-teacher-classes');
-  readonly folderList = this.folderService.folderList;
-  readonly currentUser = this.userService.currentUser;
-  readonly classes = this.classService.classes;
 
   form: FormGroup;
 
@@ -113,12 +116,16 @@ export class ShareClassMaterialModalComponent {
   }
 
   loadClassFolders(classId: string) {
-    this.folderService.getClassFolders(classId).subscribe();
+    const request: GetFoldersRequest = {
+      sortBy: 'lastModifiedAt',
+      sortDirection: 'desc',
+    };
+    this.folderService.getClassFolders(classId, request).subscribe();
   }
 
   private loadPersonalClasses() {
     const request: GetTeacherClassRequest = {
-      teacherId: this.currentUser()?.id,
+      teacherId: this.user()?.id,
       status: EntityStatus.Active,
       sortBy: 'createdAt',
       sortDirection: 'desc',

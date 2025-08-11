@@ -62,13 +62,11 @@
         <button
           class="flex h-10 items-center gap-2 rounded-bl rounded-br px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
           tooltipPosition="bottom"
-          [pTooltip]="
-            !this.folderId() ? 'Vui lòng chọn thư mục trước khi lưu' : ''
-          "
+          [pTooltip]="tooltipMessage()"
           [ngClass]="{
             'pointer-events-none': isLoadingCreateMaterial(),
             'cursor-default opacity-60 hover:!bg-[#f0f4f9]':
-              !folderId() || isLoadingCreateMaterial(),
+              !folderId() || isLoadingCreateMaterial() || isAudioSaved(),
           }"
           (click)="onSaveGeneratedContent()">
           <span

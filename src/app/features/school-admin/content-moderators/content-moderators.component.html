@@ -158,12 +158,8 @@
                   variant="rounded"
                   size="xs"
                   class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent"
-                  [loading]="isLoadingUpdateRole()"
                   (clicked)="
-                    openConfirmUpdateUpdateRoleDialog(
-                      $event,
-                      contentModerator.id
-                    )
+                    openConfirmUpdateRoleDialog($event, contentModerator.id)
                   ">
                   sync
                 </app-button>
@@ -174,7 +170,6 @@
                     variant="rounded"
                     size="xs"
                     class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-danger shadow-none hover:bg-transparent"
-                    [loading]="isLoadingArchive()"
                     (clicked)="
                       openConfirmArchiveDialog($event, contentModerator.id)
                     ">
@@ -187,11 +182,21 @@
                     variant="rounded"
                     size="xs"
                     class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-success shadow-none hover:bg-transparent"
-                    [loading]="isLoadingActive()"
                     (clicked)="
                       openConfirmActiveDialog($event, contentModerator.id)
                     ">
                     unarchive
+                  </app-button>
+                  <app-button
+                    pTooltip="Xóa tài khoản"
+                    tooltipPosition="top"
+                    variant="rounded"
+                    size="xs"
+                    class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-danger shadow-none hover:bg-transparent"
+                    (clicked)="
+                      openConfirmDeleteUser($event, contentModerator.id)
+                    ">
+                    delete
                   </app-button>
                 }
               </div>

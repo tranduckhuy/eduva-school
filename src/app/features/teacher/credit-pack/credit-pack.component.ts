@@ -77,6 +77,7 @@ export class CreditPackComponent implements OnInit {
 
   loadCreditPacks() {
     const request: GetCreditPacksRequest = {
+      activeOnly: true,
       sortBy: 'price',
     };
     this.creditPackService.getCreditPacks(request).subscribe();
