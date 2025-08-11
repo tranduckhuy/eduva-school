@@ -128,6 +128,8 @@ export class AudioPreviewComponent implements OnInit {
               blobName: payload.audioOutputBlobNameUrl,
             }
           );
+
+          this.resourcesStateService.updateIsLoading(false);
         }
       },
       { allowSignalWrites: true }
@@ -179,8 +181,9 @@ export class AudioPreviewComponent implements OnInit {
   private handleSaveGeneratedContent(onSuccess: () => void) {
     const folderId = this.folderId();
     const metadata = this.aiGeneratedMetadataMap();
+    const currentGeneratedType = this.currentGeneratedType();
 
-    if (!folderId || !metadata) return;
+    if (!folderId || !metadata || !currentGeneratedType) return;
 
     this.resourcesStateService.updateIsLoading(true);
     this.toastHandlingService.info(
@@ -188,16 +191,19 @@ export class AudioPreviewComponent implements OnInit {
       'Hệ thống đang lưu nội dung đã tạo trước khi bắt đầu tạo mới. Vui lòng chờ trong giây lát...'
     );
 
+    // ? When in audio preview, we need to save the other content type (not audio)
+    const contentTypeToSave = LessonGenerationType.Video;
+
     this.aiJobService
-      .getFileSizeByBlobNameUrl(metadata[LessonGenerationType.Video].blobName)
+      .getFileSizeByBlobNameUrl(metadata[contentTypeToSave].blobName)
       .pipe(
         switchMap(fileSize => {
           const cleanBlobName =
-            metadata[LessonGenerationType.Video].blobName.split('?')[0];
+            metadata[contentTypeToSave].blobName.split('?')[0];
           const material: CreateLessonMaterialRequest = {
-            title: metadata[LessonGenerationType.Video].title,
-            contentType: metadata[LessonGenerationType.Video].contentType,
-            duration: metadata[LessonGenerationType.Video].duration,
+            title: metadata[contentTypeToSave].title,
+            contentType: metadata[contentTypeToSave].contentType,
+            duration: metadata[contentTypeToSave].duration,
             fileSize: fileSize,
             isAIContent: true,
             sourceUrl: cleanBlobName,
@@ -217,6 +223,8 @@ export class AudioPreviewComponent implements OnInit {
       )
       .subscribe({
         next: () => {
+          // ? Mark the content type that was saved through modal
+          this.resourcesStateService.addSavedContentType(contentTypeToSave);
           onSuccess();
         },
       });
@@ -230,7 +238,18 @@ export class AudioPreviewComponent implements OnInit {
 
     if (currentGenerated === type) return;
 
+    // ? If have any type generated then popup confirmation for user decide to save content or not
     if (currentGenerated !== null && currentGenerated !== type) {
+      // ? Check if the current generated content has already been saved
+      const isCurrentContentSaved =
+        this.resourcesStateService.isContentTypeSaved(currentGenerated);
+
+      // ? If content is already saved, no need to show confirmation modal
+      if (isCurrentContentSaved) {
+        this.confirmGenerationRequest(type);
+        return;
+      }
+
       this.confirmOverwrite(
         () => {
           saveBeforeContinue();
@@ -242,6 +261,7 @@ export class AudioPreviewComponent implements OnInit {
       return;
     }
 
+    // ? If do not have any type generated then confirm right away
     this.confirmGenerationRequest(type);
   }
 
@@ -262,12 +282,10 @@ export class AudioPreviewComponent implements OnInit {
     this.resourcesStateService.updateIsLoading(true);
     this.aiJobService
       .confirmCreateContent(jobId, request)
-      .pipe(
-        switchMap(() => this.userService.getCurrentProfile()),
-        finalize(() => this.resourcesStateService.updateIsLoading(false))
-      )
+      .pipe(switchMap(() => this.userService.getCurrentProfile()))
       .subscribe({
         next: () => {
+          // ? Don't reset saved content types here, only when actually starting generation
           this.resourcesStateService.setAudioState('loading');
           this.resourcesStateService.setGeneratedType(type);
         },
@@ -282,6 +300,11 @@ export class AudioPreviewComponent implements OnInit {
         Nếu tiếp tục tạo mới dưới định dạng <strong>Audio</strong>, nội dung hiện tại sẽ <span class="text-[#f87171] font-medium">bị thay thế</span>.
         <br/><br/>
         Vui lòng lưu lại nếu bạn muốn giữ nội dung đã tạo.
+        ${
+          !this.folderId()
+            ? '<br/><br/><span class="text-xs text-[#f87171]">* Bạn cần chọn thư mục trước khi có thể lưu nội dung</span>'
+            : ''
+        }
       `,
       closable: true,
       closeOnEscape: true,
@@ -304,5 +327,6 @@ export class AudioPreviewComponent implements OnInit {
   private resetAll() {
     this.resourcesStateService.setAudioUrl('');
     this.resourcesStateService.setAudioState('empty');
+    this.resourcesStateService.resetSavedContentTypes();
   }
 }

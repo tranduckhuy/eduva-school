@@ -6,9 +6,11 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { FolderManagementService } from './folder-management.service';
 import { RequestService } from '../../core/request/request.service';
 import { ToastHandlingService } from '../../core/toast/toast-handling.service';
+
 import { StatusCode } from '../../../constants/status-code.constant';
-import { type Folder } from '../../../models/entities/folder.model';
 import { FolderOwnerType } from '../../../models/enum/folder-owner-type.enum';
+
+import { type Folder } from '../../../models/entities/folder.model';
 import { type CreateFolderRequest } from '../../../models/api/request/command/create-folder-request.model';
 import { type GetFoldersRequest } from '../../../models/api/request/query/get-folders-request.model';
 import { type GetFoldersResponse } from '../../../models/api/response/query/get-folders-response.model';
@@ -384,6 +386,28 @@ describe('FolderManagementService', () => {
       expect(service.folderList()).toEqual([mockFolder, mockFolder2]);
       expect(requestService.get).toHaveBeenCalledWith(
         expect.stringContaining(`/folders/class/${classId}`),
+        undefined,
+        { loadingKey: 'get-folders' }
+      );
+    });
+
+    it('should get class folders with request parameters successfully', async () => {
+      const successResponse = {
+        statusCode: StatusCode.SUCCESS,
+        data: [mockFolder],
+      };
+
+      (requestService.get as any).mockReturnValue(of(successResponse));
+
+      const result = await firstValueFrom(
+        service.getClassFolders(classId, mockGetFoldersRequest)
+      );
+
+      expect(result).toEqual([mockFolder]);
+      expect(service.folderList()).toEqual([mockFolder]);
+      expect(requestService.get).toHaveBeenCalledWith(
+        expect.stringContaining(`/folders/class/${classId}`),
+        mockGetFoldersRequest,
         { loadingKey: 'get-folders' }
       );
     });
@@ -428,6 +452,19 @@ describe('FolderManagementService', () => {
 
       await expect(
         firstValueFrom(service.getClassFolders(classId))
+      ).rejects.toBe(error);
+      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+    });
+
+    it('should handle error with request parameters and call errorGeneral', async () => {
+      const error = new HttpErrorResponse({
+        error: new Error('Network error'),
+      });
+
+      (requestService.get as any).mockReturnValue(throwError(() => error));
+
+      await expect(
+        firstValueFrom(service.getClassFolders(classId, mockGetFoldersRequest))
       ).rejects.toBe(error);
       expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
     });

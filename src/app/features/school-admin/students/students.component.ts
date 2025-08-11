@@ -204,6 +204,31 @@ export class StudentsComponent {
     });
   }
 
+  openConfirmDeleteUser(event: Event, userId: string): void {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      header: 'Xóa tài khoản',
+      message:
+        'Xác nhận xóa tài khoản này? Sau khi xóa, bạn sẽ không thể hoàn tác.',
+      icon: 'pi pi-exclamation-triangle',
+      rejectLabel: 'Hủy',
+      rejectButtonProps: {
+        label: 'Hủy',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Xóa tài khoản',
+        severity: 'danger',
+      },
+      accept: () => {
+        this.userService.deleteUser(userId).subscribe({
+          next: () => this.loadData(),
+        });
+      },
+    });
+  }
+
   onExportUsers() {
     const request: ExportUsersRequest = {
       role: Role.Student,
