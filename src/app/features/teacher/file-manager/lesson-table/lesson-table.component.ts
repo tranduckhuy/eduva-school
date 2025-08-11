@@ -169,6 +169,7 @@ export class LessonTableComponent implements OnInit {
       status: EntityStatus.Active,
       sortBy: 'lastModifiedAt',
       sortDirection: 'desc',
+      isPagingEnabled: true,
     };
 
     this.folderService.getPersonalFolders(request).subscribe({

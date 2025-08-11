@@ -125,8 +125,10 @@
       tooltipPosition="bottom"
       [rounded]="true"
       [fluid]="true"
-      [pTooltip]="!this.folderId() ? 'Vui lòng chọn thư mục trước khi lưu' : ''"
-      [disabled]="!this.folderId() || isLoadingCreateMaterial()"
+      [pTooltip]="tooltipMessage()"
+      [disabled]="
+        !this.folderId() || isLoadingCreateMaterial() || isVideoSaved()
+      "
       [loading]="isLoadingCreateMaterial()"
       (onClick)="onSaveGeneratedContent()" />
   }

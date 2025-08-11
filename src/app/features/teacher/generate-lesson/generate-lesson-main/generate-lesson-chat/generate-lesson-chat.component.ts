@@ -120,6 +120,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
 
   constructor() {
     effect(this.handleJobUpdateEffect.bind(this), { allowSignalWrites: true });
+
     this.destroyRef.onDestroy(() => this.resetAll());
   }
 
@@ -198,8 +199,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       payload &&
       jobStatus === JobStatus.ContentGenerated &&
       (previewContent || failureReason) &&
-      !this.hasProcessedResponse() &&
-      !this.messages().some(m => m.sender === 'system' && !m.isLoading)
+      !this.hasProcessedResponse()
     ) {
       this.scrollToBottom();
       this.displaySystemAiMessage(payload);

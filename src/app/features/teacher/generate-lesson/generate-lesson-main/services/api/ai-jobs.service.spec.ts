@@ -95,7 +95,40 @@ describe('AiJobsService', () => {
     await expect(lastValueFrom(service.createAiJob(mockReq))).rejects.toBe(
       error
     );
-    expect(toastHandlingServiceMock.warn).toHaveBeenCalled();
+    expect(toastHandlingServiceMock.warn).toHaveBeenCalledWith(
+      'Thiếu Ecoin',
+      'Bạn hiện không đủ Ecoin để thực hiện yêu cầu này. Vui lòng nạp thêm Ecoin để tiếp tục sử dụng dịch vụ.'
+    );
+  });
+
+  it('should handle PROVIDED_INFORMATION_IS_INVALID error without calling warn or errorGeneral on createAiJob', async () => {
+    const mockReq = { file: [], topic: 'abc' };
+    const error = {
+      error: { statusCode: StatusCode.PROVIDED_INFORMATION_IS_INVALID },
+    };
+    requestServiceMock.postWithFormData.mockReturnValueOnce(
+      throwError(() => error)
+    );
+    await expect(lastValueFrom(service.createAiJob(mockReq))).rejects.toBe(
+      error
+    );
+    expect(toastHandlingServiceMock.warn).not.toHaveBeenCalled();
+    expect(toastHandlingServiceMock.errorGeneral).not.toHaveBeenCalled();
+  });
+
+  it('should call errorGeneral and throw for other errors on createAiJob', async () => {
+    const mockReq = { file: [], topic: 'abc' };
+    const error = {
+      error: { statusCode: StatusCode.MODEL_INVALID },
+    };
+    requestServiceMock.postWithFormData.mockReturnValueOnce(
+      throwError(() => error)
+    );
+    await expect(lastValueFrom(service.createAiJob(mockReq))).rejects.toBe(
+      error
+    );
+    expect(toastHandlingServiceMock.warn).not.toHaveBeenCalled();
+    expect(toastHandlingServiceMock.errorGeneral).toHaveBeenCalled();
   });
 
   it('should set generationType signal on confirmCreateContent success', async () => {
@@ -124,7 +157,44 @@ describe('AiJobsService', () => {
     await expect(
       lastValueFrom(service.confirmCreateContent(jobId, req))
     ).rejects.toBe(error);
-    expect(toastHandlingServiceMock.warn).toHaveBeenCalled();
+    expect(toastHandlingServiceMock.warn).toHaveBeenCalledWith(
+      'Thiếu Ecoin',
+      'Bạn hiện không đủ Ecoin để thực hiện yêu cầu này. Vui lòng nạp thêm Ecoin để tiếp tục sử dụng dịch vụ.'
+    );
+  });
+
+  it('should handle PROVIDED_INFORMATION_IS_INVALID error without calling warn or errorGeneral on confirmCreateContent', async () => {
+    const jobId = 'jid';
+    const req = {
+      type: LessonGenerationType.Audio,
+      voiceConfig: { language_code: 'en', name: 'a', speaking_rate: 1 },
+    };
+    const error = {
+      error: { statusCode: StatusCode.PROVIDED_INFORMATION_IS_INVALID },
+    };
+    requestServiceMock.post.mockReturnValueOnce(throwError(() => error));
+    await expect(
+      lastValueFrom(service.confirmCreateContent(jobId, req))
+    ).rejects.toBe(error);
+    expect(toastHandlingServiceMock.warn).not.toHaveBeenCalled();
+    expect(toastHandlingServiceMock.errorGeneral).not.toHaveBeenCalled();
+  });
+
+  it('should call errorGeneral and throw for other errors on confirmCreateContent', async () => {
+    const jobId = 'jid';
+    const req = {
+      type: LessonGenerationType.Audio,
+      voiceConfig: { language_code: 'en', name: 'a', speaking_rate: 1 },
+    };
+    const error = {
+      error: { statusCode: StatusCode.MODEL_INVALID },
+    };
+    requestServiceMock.post.mockReturnValueOnce(throwError(() => error));
+    await expect(
+      lastValueFrom(service.confirmCreateContent(jobId, req))
+    ).rejects.toBe(error);
+    expect(toastHandlingServiceMock.warn).not.toHaveBeenCalled();
+    expect(toastHandlingServiceMock.errorGeneral).toHaveBeenCalled();
   });
 
   it('should get job by id and set job signal on success', async () => {
@@ -157,7 +227,36 @@ describe('AiJobsService', () => {
       .fn()
       .mockReturnValueOnce(throwError(() => error));
     await expect(lastValueFrom(service.getJobById(jobId))).rejects.toBe(error);
-    expect(toastHandlingServiceMock.warn).toHaveBeenCalled();
+    expect(toastHandlingServiceMock.warn).toHaveBeenCalledWith(
+      'Thiếu Ecoin',
+      'Bạn hiện không đủ Ecoin để thực hiện yêu cầu này. Vui lòng nạp thêm Ecoin để tiếp tục sử dụng dịch vụ.'
+    );
+  });
+
+  it('should handle PROVIDED_INFORMATION_IS_INVALID error without calling warn or errorGeneral on getJobById', async () => {
+    const jobId = 'jid';
+    const error = {
+      error: { statusCode: StatusCode.PROVIDED_INFORMATION_IS_INVALID },
+    };
+    requestServiceMock.get = vi
+      .fn()
+      .mockReturnValueOnce(throwError(() => error));
+    await expect(lastValueFrom(service.getJobById(jobId))).rejects.toBe(error);
+    expect(toastHandlingServiceMock.warn).not.toHaveBeenCalled();
+    expect(toastHandlingServiceMock.errorGeneral).not.toHaveBeenCalled();
+  });
+
+  it('should call errorGeneral and throw for other errors on getJobById', async () => {
+    const jobId = 'jid';
+    const error = {
+      error: { statusCode: StatusCode.MODEL_INVALID },
+    };
+    requestServiceMock.get = vi
+      .fn()
+      .mockReturnValueOnce(throwError(() => error));
+    await expect(lastValueFrom(service.getJobById(jobId))).rejects.toBe(error);
+    expect(toastHandlingServiceMock.warn).not.toHaveBeenCalled();
+    expect(toastHandlingServiceMock.errorGeneral).toHaveBeenCalled();
   });
 
   it('should get file size by blob name url with Content-Length', async () => {
@@ -187,6 +286,7 @@ describe('AiJobsService', () => {
     await expect(
       lastValueFrom(service.getFileSizeByBlobNameUrl(url))
     ).rejects.toBe(error);
+    // Note: getFileSizeByBlobNameUrl doesn't use handleError, it directly throws the error
   });
 
   it('should clear job signal', () => {
@@ -242,7 +342,22 @@ describe('AiJobsService', () => {
     );
   });
 
-  it('should handle update AI job with other errors without calling warn', async () => {
+  it('should handle update AI job with PROVIDED_INFORMATION_IS_INVALID error without calling warn or errorGeneral', async () => {
+    const aiJobId = 'job-123';
+    const mockReq = { file: [], topic: 'updated topic' };
+    const error = {
+      error: { statusCode: StatusCode.PROVIDED_INFORMATION_IS_INVALID },
+    };
+    requestServiceMock.put.mockReturnValueOnce(throwError(() => error));
+
+    await expect(
+      lastValueFrom(service.updateAiJob(aiJobId, mockReq))
+    ).rejects.toBe(error);
+    expect(toastHandlingServiceMock.warn).not.toHaveBeenCalled();
+    expect(toastHandlingServiceMock.errorGeneral).not.toHaveBeenCalled();
+  });
+
+  it('should handle update AI job with other errors and call errorGeneral', async () => {
     const aiJobId = 'job-123';
     const mockReq = { file: [], topic: 'updated topic' };
     const error = {
@@ -254,9 +369,10 @@ describe('AiJobsService', () => {
       lastValueFrom(service.updateAiJob(aiJobId, mockReq))
     ).rejects.toBe(error);
     expect(toastHandlingServiceMock.warn).not.toHaveBeenCalled();
+    expect(toastHandlingServiceMock.errorGeneral).toHaveBeenCalled();
   });
 
-  it('should handle update AI job with network error', async () => {
+  it('should handle update AI job with network error and call errorGeneral', async () => {
     const aiJobId = 'job-123';
     const mockReq = { file: [], topic: 'updated topic' };
     const error = { status: 0, message: 'Network error' };
@@ -264,9 +380,8 @@ describe('AiJobsService', () => {
 
     await expect(
       lastValueFrom(service.updateAiJob(aiJobId, mockReq))
-    ).rejects.toThrow(
-      "Cannot read properties of undefined (reading 'statusCode')"
-    );
+    ).rejects.toBe(error);
     expect(toastHandlingServiceMock.warn).not.toHaveBeenCalled();
+    expect(toastHandlingServiceMock.errorGeneral).toHaveBeenCalled();
   });
 });

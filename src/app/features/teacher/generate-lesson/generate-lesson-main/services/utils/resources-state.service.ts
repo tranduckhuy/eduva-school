@@ -91,6 +91,11 @@ export class ResourcesStateService {
     signal<LessonGenerationType | null>(null);
   readonly currentGeneratedType = this.currentGeneratedTypeSignal.asReadonly();
 
+  private readonly savedContentTypesSignal = signal<Set<LessonGenerationType>>(
+    new Set()
+  );
+  readonly savedContentTypes = this.savedContentTypesSignal.asReadonly();
+
   // ? Video Player State
   private readonly videoCurrentTimeSignal = signal<number>(0);
   readonly videoCurrentTime = this.videoCurrentTimeSignal.asReadonly();
@@ -244,6 +249,24 @@ export class ResourcesStateService {
     this.currentGeneratedTypeSignal.set(type);
   }
 
+  addSavedContentType(type: LessonGenerationType) {
+    this.savedContentTypesSignal.update(set => new Set([...set, type]));
+  }
+
+  removeSavedContentType(type: LessonGenerationType) {
+    this.savedContentTypesSignal.update(
+      set => new Set([...set].filter(t => t !== type))
+    );
+  }
+
+  isContentTypeSaved(type: LessonGenerationType): boolean {
+    return this.savedContentTypesSignal().has(type);
+  }
+
+  resetSavedContentTypes(): void {
+    this.savedContentTypesSignal.set(new Set());
+  }
+
   // ? Video Player State Methods
   setVideoCurrentTime(time: number) {
     this.videoCurrentTimeSignal.set(time);
@@ -318,6 +341,7 @@ export class ResourcesStateService {
     this.hasProvidedInformationErrorSignal.set(false);
     this.generatedTypeSignal.set(null);
     this.aiGeneratedMetadataMapSignal.set(null);
+    this.savedContentTypesSignal.set(new Set());
 
     // ? Reset preview states
     this.videoStateSignal.set('empty');

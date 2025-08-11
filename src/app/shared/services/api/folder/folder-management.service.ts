@@ -94,6 +94,7 @@ export class FolderManagementService {
     return this.requestService
       .get<GetFoldersResponse>(
         `${this.BASE_FOLDERS_API_URL}/class/${classId}`,
+        request,
         {
           loadingKey: 'get-folders',
         }

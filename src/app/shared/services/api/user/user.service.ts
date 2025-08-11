@@ -9,12 +9,12 @@ import { ToastHandlingService } from '../../core/toast/toast-handling.service';
 import { StatusCode } from '../../../constants/status-code.constant';
 
 import { type User } from '../../../models/entities/user.model';
+import { type BaseResponse } from '../../../models/api/base-response.model';
+import { type UserListParams } from '../../../models/api/request/query/user-list-params';
 import { type UpdateProfileRequest } from '../../../pages/settings-page/personal-information/models/update-profile-request.model';
 import { type EntityListResponse } from '../../../models/api/response/query/entity-list-response.model';
-import { BaseResponse } from '../../../models/api/base-response.model';
-import { UserListParams } from '../../../models/api/request/query/user-list-params';
-import { CreateUserRequest } from '../../../models/api/request/command/create-user-request.model';
-import { UpdateRoleRequest } from '../../../models/api/request/command/update-role-request.model';
+import { type CreateUserRequest } from '../../../models/api/request/command/create-user-request.model';
+import { type UpdateRoleRequest } from '../../../models/api/request/command/update-role-request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -126,6 +126,14 @@ export class UserService {
       );
   }
 
+  deleteUser(userId: string): Observable<null> {
+    return this.requestService.delete(`${this.USER_API_URL}/${userId}`).pipe(
+      tap(res => this.handleSuccessResponse(res)),
+      map(() => null),
+      catchError((err: HttpErrorResponse) => this.handleErrorResponse(err))
+    );
+  }
+
   /**
    * Fetches user details by ID
    * @param id User ID
@@ -224,6 +232,14 @@ export class UserService {
       return res.data;
     }
     return null;
+  }
+
+  private handleSuccessResponse(res: any): void {
+    if (res.statusCode === StatusCode.SUCCESS) {
+      this.toastHandlingService.successGeneral();
+    } else {
+      this.toastHandlingService.errorGeneral();
+    }
   }
 
   private handleErrorResponse(err: HttpErrorResponse): Observable<null> {

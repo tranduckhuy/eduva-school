@@ -128,6 +128,8 @@ export class VideoPreviewComponent implements OnInit {
               blobName: payload.videoOutputBlobNameUrl,
             }
           );
+
+          this.resourcesStateService.updateIsLoading(false);
         }
       },
       { allowSignalWrites: true }
@@ -162,6 +164,10 @@ export class VideoPreviewComponent implements OnInit {
           blobName: job.videoOutputBlobName,
         }
       );
+      // ? Mark video as already saved if it exists from job
+      this.resourcesStateService.addSavedContentType(
+        LessonGenerationType.Video
+      );
     } else {
       this.resourcesStateService.setVideoState('no-content');
     }
@@ -179,8 +185,9 @@ export class VideoPreviewComponent implements OnInit {
   private handleSaveGeneratedContent(onSuccess: () => void) {
     const folderId = this.folderId();
     const metadata = this.aiGeneratedMetadataMap();
+    const currentGeneratedType = this.currentGeneratedType();
 
-    if (!folderId || !metadata) return;
+    if (!folderId || !metadata || !currentGeneratedType) return;
 
     this.resourcesStateService.updateIsLoading(true);
     this.toastHandlingService.info(
@@ -188,16 +195,19 @@ export class VideoPreviewComponent implements OnInit {
       'Hệ thống đang lưu nội dung đã tạo trước khi bắt đầu tạo mới. Vui lòng chờ trong giây lát...'
     );
 
+    // ? When in video preview, we need to save the other content type (not video)
+    const contentTypeToSave = LessonGenerationType.Audio;
+
     this.aiJobService
-      .getFileSizeByBlobNameUrl(metadata[LessonGenerationType.Audio].blobName)
+      .getFileSizeByBlobNameUrl(metadata[contentTypeToSave].blobName)
       .pipe(
         switchMap(fileSize => {
           const cleanBlobName =
-            metadata[LessonGenerationType.Audio].blobName.split('?')[0];
+            metadata[contentTypeToSave].blobName.split('?')[0];
           const material: CreateLessonMaterialRequest = {
-            title: metadata[LessonGenerationType.Audio].title,
-            contentType: metadata[LessonGenerationType.Audio].contentType,
-            duration: metadata[LessonGenerationType.Audio].duration,
+            title: metadata[contentTypeToSave].title,
+            contentType: metadata[contentTypeToSave].contentType,
+            duration: metadata[contentTypeToSave].duration,
             fileSize: fileSize,
             isAIContent: true,
             sourceUrl: cleanBlobName,
@@ -217,6 +227,8 @@ export class VideoPreviewComponent implements OnInit {
       )
       .subscribe({
         next: () => {
+          // ? Mark the content type that was saved through modal
+          this.resourcesStateService.addSavedContentType(contentTypeToSave);
           onSuccess();
         },
       });
@@ -232,6 +244,16 @@ export class VideoPreviewComponent implements OnInit {
 
     // ? If have any type generated then popup confirmation for user decide to save content or not
     if (currentGenerated !== null && currentGenerated !== type) {
+      // ? Check if the current generated content has already been saved
+      const isCurrentContentSaved =
+        this.resourcesStateService.isContentTypeSaved(currentGenerated);
+
+      // ? If content is already saved, no need to show confirmation modal
+      if (isCurrentContentSaved) {
+        this.confirmGenerationRequest(type);
+        return;
+      }
+
       this.confirmOverwrite(
         () => {
           saveBeforeContinue();
@@ -264,12 +286,10 @@ export class VideoPreviewComponent implements OnInit {
     this.resourcesStateService.updateIsLoading(true);
     this.aiJobService
       .confirmCreateContent(jobId, request)
-      .pipe(
-        switchMap(() => this.userService.getCurrentProfile()),
-        finalize(() => this.resourcesStateService.updateIsLoading(false))
-      )
+      .pipe(switchMap(() => this.userService.getCurrentProfile()))
       .subscribe({
         next: () => {
+          // ? Don't reset saved content types here, only when actually starting generation
           this.resourcesStateService.setVideoState('loading');
           this.resourcesStateService.setGeneratedType(type);
         },
@@ -311,5 +331,6 @@ export class VideoPreviewComponent implements OnInit {
   private resetAll() {
     this.resourcesStateService.setVideoUrl('');
     this.resourcesStateService.setVideoState('empty');
+    this.resourcesStateService.resetSavedContentTypes();
   }
 }

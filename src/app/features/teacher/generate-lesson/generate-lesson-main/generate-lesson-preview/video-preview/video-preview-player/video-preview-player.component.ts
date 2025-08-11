@@ -2,10 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  viewChild,
   inject,
   input,
   signal,
-  viewChild,
+  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -98,6 +99,22 @@ export class VideoPreviewPlayerComponent {
   lastVolumeLevel = signal<number>(1);
   isSettingsMenuOpen = signal(false);
   currentSettingsMenu = signal<'home' | 'subtitle' | 'speed'>('home');
+
+  // ? Check if video is already saved
+  isVideoSaved = computed(() =>
+    this.resourceStateService.isContentTypeSaved(LessonGenerationType.Video)
+  );
+
+  // ? Computed tooltip message
+  tooltipMessage = computed(() => {
+    if (!this.folderId()) {
+      return 'Vui lòng chọn thư mục trước khi lưu';
+    }
+    if (this.isVideoSaved()) {
+      return 'Video đã được lưu';
+    }
+    return '';
+  });
 
   onPlayerReady(api: VgApiService) {
     this.vgApi = api;
@@ -321,7 +338,17 @@ export class VideoPreviewPlayerComponent {
           );
         })
       )
-      .subscribe();
+      .subscribe({
+        next: () => {
+          // ? Mark video as saved
+          this.resourceStateService.addSavedContentType(
+            LessonGenerationType.Video
+          );
+        },
+        error: () => {
+          // ? Handle error if needed
+        },
+      });
   }
 
   onDownloadGeneratedContent() {

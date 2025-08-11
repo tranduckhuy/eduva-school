@@ -7,6 +7,7 @@ import {
   inject,
   input,
   signal,
+  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -79,6 +80,22 @@ export class AudioPreviewPlayerComponent {
   audioState = signal<'empty' | 'loading' | 'generated'>('empty');
   isPlaying = signal<boolean>(false);
   openedMenu = signal<boolean>(false);
+
+  // ? Check if audio is already saved
+  isAudioSaved = computed(() =>
+    this.resourceStateService.isContentTypeSaved(LessonGenerationType.Audio)
+  );
+
+  // ? Computed tooltip message
+  tooltipMessage = computed(() => {
+    if (!this.folderId()) {
+      return 'Vui lòng chọn thư mục trước khi lưu';
+    }
+    if (this.isAudioSaved()) {
+      return 'Audio đã được lưu';
+    }
+    return '';
+  });
 
   private previousVolume = 100;
   readonly availableRates = [0.5, 0.8, 1.0, 1.2, 1.5, 2.0];
@@ -245,7 +262,17 @@ export class AudioPreviewPlayerComponent {
           );
         })
       )
-      .subscribe();
+      .subscribe({
+        next: () => {
+          // ? Mark audio as saved
+          this.resourceStateService.addSavedContentType(
+            LessonGenerationType.Audio
+          );
+        },
+        error: () => {
+          // ? Handle error if needed
+        },
+      });
   }
 
   onDownloadGeneratedContent() {
