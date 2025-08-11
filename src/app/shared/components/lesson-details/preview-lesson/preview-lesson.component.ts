@@ -22,6 +22,7 @@ import { SafeHtmlPipe } from '../../../pipes/safe-html.pipe';
 
 import { UserService } from '../../../services/api/user/user.service';
 import { LessonMaterialsService } from '../../../services/api/lesson-materials/lesson-materials.service';
+import { DownloadLessonMaterialService } from '../services/download-lesson-material.service';
 import { LoadingService } from '../../../services/core/loading/loading.service';
 import { GlobalModalService } from '../../../../shared/services/layout/global-modal/global-modal.service';
 import {
@@ -81,6 +82,9 @@ export class PreviewLessonComponent implements OnInit {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly userService = inject(UserService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
+  private readonly downloadMaterialService = inject(
+    DownloadLessonMaterialService
+  );
   private readonly loadingService = inject(LoadingService);
   private readonly globalModalService = inject(GlobalModalService);
   private readonly contentParseService = inject(ContentParserService);
@@ -91,7 +95,8 @@ export class PreviewLessonComponent implements OnInit {
   user = this.userService.currentUser;
   lessonMaterial = this.lessonMaterialService.lessonMaterial;
   lessonMaterialApproval = this.lessonMaterialService.lessonMaterialApproval;
-  isLoading = this.loadingService.is('get-material-by-id');
+  isLoadingGetDetail = this.loadingService.is('get-material-by-id');
+  isLoadingDownload = this.loadingService.is('download-lesson-material');
 
   questionIdFromNotification = signal<string>('');
 
@@ -204,6 +209,12 @@ export class PreviewLessonComponent implements OnInit {
 
   refuseLesson() {
     this.openModerateReasonModal(false);
+  }
+
+  downloadLesson(materialBlobUrl: string) {
+    this.downloadMaterialService
+      .downloadLessonMaterial(materialBlobUrl)
+      .subscribe();
   }
 
   private loadDetailData() {

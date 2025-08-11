@@ -12,11 +12,11 @@
       'aspect-[2/1] sm:aspect-auto sm:h-[70vh]':
         lessonMaterial()?.contentType === 2,
     }">
-    @if (isLoading()) {
+    @if (isLoadingGetDetail()) {
       <div class="loading-spinner animate-spin"></div>
     }
 
-    @if (lessonMaterial() && !isLoading()) {
+    @if (lessonMaterial() && !isLoadingGetDetail()) {
       <!-- Viewer -->
       @switch (lessonMaterial()?.contentType) {
         @case (0) {
@@ -39,15 +39,26 @@
   </div>
 
   <!-- Info -->
-  @if (isLoading() && !lessonMaterial()) {
+  @if (isLoadingGetDetail() && !lessonMaterial()) {
     <app-preview-lesson-skeleton />
   } @else {
     <div class="mt-5 flex items-center justify-between sm:flex-wrap">
       <h3 class="font-nold text-2xl sm:text-lg">
         {{ lessonMaterial()?.title }}
       </h3>
-      @if (isSchoolAdminOrMod() && isMaterialPending() && showActionButton()) {
-        <div class="flex items-center gap-3 sm:mt-4">
+
+      <div class="flex items-center gap-3 sm:mt-4">
+        <p-button
+          label="Tải bài học"
+          icon="pi pi-download"
+          variant="outlined"
+          size="small"
+          [loading]="isLoadingDownload()"
+          [disabled]="isLoadingDownload()"
+          (onClick)="downloadLesson(lessonMaterial()!.sourceUrl)" />
+        @if (
+          isSchoolAdminOrMod() && isMaterialPending() && showActionButton()
+        ) {
           <p-button
             label="Duyệt"
             icon="pi pi-check"
@@ -61,8 +72,8 @@
             size="small"
             severity="danger"
             (onClick)="refuseLesson()" />
-        </div>
-      }
+        }
+      </div>
     </div>
 
     <p class="mt-2 dark:text-white">
