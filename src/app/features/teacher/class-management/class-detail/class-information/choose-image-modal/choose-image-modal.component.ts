@@ -61,7 +61,8 @@ export class ChooseImageModalComponent implements OnInit {
   private async loadBackgroundImageUrls(): Promise<void> {
     this.isLoading.set(true);
     try {
-      const urls = await this.uploadFileService.getBackgroundImageUrls();
+      const urls =
+        await this.uploadFileService.getPublicUrls('classroom-images');
 
       // ? Sort URLs to put current image first if it exists
       const sortedUrls = this.sortUrlsWithCurrentFirst(urls);
