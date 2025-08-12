@@ -84,6 +84,10 @@ export class SharedLessonsComponent {
     'Hành động',
   ]);
 
+  isSchoolAdmin = computed(() =>
+    this.user()?.roles.includes(UserRoles.SCHOOL_ADMIN)
+  );
+
   viewLessonLink = computed(() =>
     this.user()?.roles.includes(UserRoles.SCHOOL_ADMIN)
       ? '/school-admin/view-lesson'

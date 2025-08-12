@@ -74,6 +74,7 @@ describe('DashboardService', () => {
           billingCycle: BillingCycle.Monthly,
           startDate: '2023-01-01',
           endDate: '2023-12-31',
+          amountPaid: 100000,
         },
       },
       lessonActivity: [
