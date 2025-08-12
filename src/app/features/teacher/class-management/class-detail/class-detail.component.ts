@@ -106,7 +106,7 @@ export class ClassDetailComponent implements OnInit {
 
   private loadStudents(classId: string): void {
     this.classManagementService
-      .getStudentsClass(classId)
+      .getStudentsClass(classId, { isPagingEnabled: false })
       .subscribe(students => this.students.set(students ?? []));
   }
 
