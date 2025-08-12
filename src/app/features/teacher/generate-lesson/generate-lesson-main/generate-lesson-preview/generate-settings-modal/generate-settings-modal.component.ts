@@ -1,10 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   inject,
   signal,
-  DestroyRef,
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -20,19 +20,31 @@ import {
   type VoiceOption,
   type LanguageOption,
 } from '../../services/utils/generate-settings-selection.service';
+import { VoicePreviewComponent } from './voice-preview/voice-preview.component';
 
 import { EntityStatus } from '../../../../../../shared/models/enum/entity-status.enum';
 import { type GetFoldersRequest } from '../../../../../../shared/models/api/request/query/get-folders-request.model';
 
 // ? Type definitions for voice and language management
-type VoiceType = 'female-deep' | 'male-deep' | 'female-north' | 'female-south';
+type VoiceType =
+  | 'female-deep'
+  | 'male-deep'
+  | 'female-north'
+  | 'female-south'
+  | 'male-north'
+  | 'male-south';
 type LanguageCode = 'vi-VN' | 'en-US';
 type VoiceMapping = Record<LanguageCode, Record<VoiceType, string>>;
 
 @Component({
   selector: 'app-generate-settings-modal',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonModule, SelectModule],
+  imports: [
+    ReactiveFormsModule,
+    ButtonModule,
+    SelectModule,
+    VoicePreviewComponent,
+  ],
   templateUrl: './generate-settings-modal.component.html',
   styleUrl: './generate-settings-modal.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,13 +52,13 @@ type VoiceMapping = Record<LanguageCode, Record<VoiceType, string>>;
 export class GenerateSettingsModalComponent implements OnInit {
   // ? Dependency injections
   private readonly fb = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly globalModalService = inject(GlobalModalService);
   private readonly loadingService = inject(LoadingService);
   private readonly settingsSelectionService = inject(
     GenerateSettingsSelectionService
   );
   private readonly folderService = inject(FolderManagementService);
-  private readonly destroyRef = inject(DestroyRef);
 
   // ? External data signals
   readonly folderList = this.folderService.folderList;
@@ -68,23 +80,29 @@ export class GenerateSettingsModalComponent implements OnInit {
   private readonly voiceConfigs = signal<
     Array<{ name: string; type: VoiceType }>
   >([
-    { name: 'Nữ trầm', type: 'female-deep' },
     { name: 'Nam trầm', type: 'male-deep' },
+    { name: 'Nữ trầm', type: 'female-deep' },
+    { name: 'Nam miền bắc', type: 'male-north' },
     { name: 'Nữ miền bắc', type: 'female-north' },
+    { name: 'Nam miền nam', type: 'male-south' },
     { name: 'Nữ miền nam', type: 'female-south' },
   ]);
 
   // ? Voice mapping for different languages
   private readonly voiceMapping = signal<VoiceMapping>({
     'vi-VN': {
-      'female-deep': 'vi-VN-Chirp3-HD-Despina',
       'male-deep': 'vi-VN-Chirp3-HD-Enceladus',
+      'male-north': 'vi-VN-Chirp3-HD-Zubenelgenubi',
+      'male-south': 'vi-VN-Chirp3-HD-Algieba',
+      'female-deep': 'vi-VN-Chirp3-HD-Despina',
       'female-north': 'vi-VN-Chirp3-HD-Gacrux',
       'female-south': 'vi-VN-Chirp3-HD-Zephyr',
     },
     'en-US': {
-      'female-deep': 'en-US-Chirp3-HD-Despina',
       'male-deep': 'en-US-Chirp3-HD-Enceladus',
+      'male-north': 'en-US-Chirp3-HD-Zubenelgenubi',
+      'male-south': 'en-US-Chirp3-HD-Algieba',
+      'female-deep': 'en-US-Chirp3-HD-Despina',
       'female-north': 'en-US-Chirp3-HD-Gacrux',
       'female-south': 'en-US-Chirp3-HD-Zephyr',
     },
@@ -105,6 +123,7 @@ export class GenerateSettingsModalComponent implements OnInit {
   constructor() {
     this.initializeVoiceOptions();
     this.setupLanguageChangeListener();
+    this.setupVoiceChangeListener();
   }
 
   ngOnInit(): void {
@@ -145,9 +164,25 @@ export class GenerateSettingsModalComponent implements OnInit {
       });
   }
 
+  private setupVoiceChangeListener(): void {
+    this.form
+      .get('voice')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(newVoice => {
+        if (newVoice) {
+          this.handleVoiceChange();
+        }
+      });
+  }
+
   private handleLanguageChange(newLanguage: LanguageCode): void {
     this.updateVoiceForLanguage(newLanguage);
     this.updateVoiceOptions(newLanguage);
+  }
+
+  private handleVoiceChange(): void {
+    // ? Reset voice preview state when voice changes
+    this.settingsSelectionService.setVoicePreviewState('idle');
   }
 
   private updateVoiceOptions(language: LanguageCode): void {

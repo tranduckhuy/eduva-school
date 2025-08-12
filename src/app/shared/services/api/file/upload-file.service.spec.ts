@@ -504,8 +504,8 @@ describe('UploadFileService', () => {
     });
   });
 
-  describe('getBackgroundImageUrls', () => {
-    it('should return background image URLs successfully', async () => {
+  describe('getPublicUrls', () => {
+    it('should return public URLs successfully without folder path', async () => {
       const mockFiles = [{ name: 'image1.jpg' }, { name: 'image2.png' }];
       const mockPublicUrls = [
         'https://test.supabase.co/storage/v1/object/public/classroom-images/image1.jpg',
@@ -520,13 +520,42 @@ describe('UploadFileService', () => {
         .mockReturnValueOnce({ data: { publicUrl: mockPublicUrls[0] } })
         .mockReturnValueOnce({ data: { publicUrl: mockPublicUrls[1] } });
 
-      const result = await service.getBackgroundImageUrls();
+      const result = await service.getPublicUrls('classroom-images');
 
       expect(result).toEqual(mockPublicUrls);
       expect(mockSupabaseClient.storage.from).toHaveBeenCalledWith(
         'classroom-images'
       );
-      expect(mockSupabaseClient.storage.list).toHaveBeenCalled();
+      expect(mockSupabaseClient.storage.list).toHaveBeenCalledWith(undefined);
+    });
+
+    it('should return public URLs successfully with folder path', async () => {
+      const mockFiles = [{ name: 'image1.jpg' }, { name: 'image2.png' }];
+      const mockPublicUrls = [
+        'https://test.supabase.co/storage/v1/object/public/classroom-images/backgrounds/image1.jpg',
+        'https://test.supabase.co/storage/v1/object/public/classroom-images/backgrounds/image2.png',
+      ];
+
+      mockSupabaseClient.storage.list.mockResolvedValue({
+        data: mockFiles,
+        error: null,
+      });
+      mockSupabaseClient.storage.getPublicUrl
+        .mockReturnValueOnce({ data: { publicUrl: mockPublicUrls[0] } })
+        .mockReturnValueOnce({ data: { publicUrl: mockPublicUrls[1] } });
+
+      const result = await service.getPublicUrls(
+        'classroom-images',
+        'backgrounds'
+      );
+
+      expect(result).toEqual(mockPublicUrls);
+      expect(mockSupabaseClient.storage.from).toHaveBeenCalledWith(
+        'classroom-images'
+      );
+      expect(mockSupabaseClient.storage.list).toHaveBeenCalledWith(
+        'backgrounds'
+      );
     });
 
     it('should return empty array if list fails with error', async () => {
@@ -535,7 +564,7 @@ describe('UploadFileService', () => {
         error: { message: 'List failed' },
       });
 
-      const result = await service.getBackgroundImageUrls();
+      const result = await service.getPublicUrls('classroom-images');
 
       expect(result).toEqual([]);
     });
@@ -546,7 +575,7 @@ describe('UploadFileService', () => {
         error: null,
       });
 
-      const result = await service.getBackgroundImageUrls();
+      const result = await service.getPublicUrls('classroom-images');
 
       expect(result).toEqual([]);
     });
@@ -557,9 +586,155 @@ describe('UploadFileService', () => {
         error: null,
       });
 
-      const result = await service.getBackgroundImageUrls();
+      const result = await service.getPublicUrls('classroom-images');
 
       expect(result).toEqual([]);
+    });
+
+    it('should handle getPublicUrl returning null publicUrl', async () => {
+      const mockFiles = [{ name: 'image1.jpg' }];
+
+      mockSupabaseClient.storage.list.mockResolvedValue({
+        data: mockFiles,
+        error: null,
+      });
+      mockSupabaseClient.storage.getPublicUrl.mockReturnValue({
+        data: { publicUrl: null },
+      });
+
+      const result = await service.getPublicUrls('classroom-images');
+
+      expect(result).toEqual([null]);
+    });
+  });
+
+  describe('getPublicUrl', () => {
+    it('should return public URL successfully for file in folder', async () => {
+      const mockPublicUrl =
+        'https://test.supabase.co/storage/v1/object/public/classroom-images/backgrounds/image1.jpg';
+
+      mockSupabaseClient.storage.getPublicUrl.mockReturnValue({
+        data: { publicUrl: mockPublicUrl },
+      });
+
+      const result = await service.getPublicUrlFromFolder(
+        'classroom-images',
+        'backgrounds',
+        'image1.jpg'
+      );
+
+      expect(result).toBe(mockPublicUrl);
+      expect(mockSupabaseClient.storage.from).toHaveBeenCalledWith(
+        'classroom-images'
+      );
+      expect(mockSupabaseClient.storage.getPublicUrl).toHaveBeenCalledWith(
+        'backgrounds/image1.jpg'
+      );
+    });
+
+    it('should return public URL successfully for file in root bucket', async () => {
+      const mockPublicUrl =
+        'https://test.supabase.co/storage/v1/object/public/classroom-images/image1.jpg';
+
+      mockSupabaseClient.storage.getPublicUrl.mockReturnValue({
+        data: { publicUrl: mockPublicUrl },
+      });
+
+      const result = await service.getPublicUrlFromFolder(
+        'classroom-images',
+        '',
+        'image1.jpg'
+      );
+
+      expect(result).toBe(mockPublicUrl);
+      expect(mockSupabaseClient.storage.from).toHaveBeenCalledWith(
+        'classroom-images'
+      );
+      expect(mockSupabaseClient.storage.getPublicUrl).toHaveBeenCalledWith(
+        '/image1.jpg'
+      );
+    });
+
+    it('should return null if getPublicUrl returns no data', async () => {
+      mockSupabaseClient.storage.getPublicUrl.mockReturnValue({
+        data: null,
+      });
+
+      const result = await service.getPublicUrlFromFolder(
+        'classroom-images',
+        'backgrounds',
+        'image1.jpg'
+      );
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null if getPublicUrl returns null publicUrl', async () => {
+      mockSupabaseClient.storage.getPublicUrl.mockReturnValue({
+        data: { publicUrl: null },
+      });
+
+      const result = await service.getPublicUrlFromFolder(
+        'classroom-images',
+        'backgrounds',
+        'image1.jpg'
+      );
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null if getPublicUrl throws error', async () => {
+      mockSupabaseClient.storage.getPublicUrl.mockImplementation(() => {
+        throw new Error('Unexpected error');
+      });
+
+      const result = await service.getPublicUrlFromFolder(
+        'classroom-images',
+        'backgrounds',
+        'image1.jpg'
+      );
+
+      expect(result).toBeNull();
+    });
+
+    it('should handle empty folder path correctly', async () => {
+      const mockPublicUrl =
+        'https://test.supabase.co/storage/v1/object/public/classroom-images/image1.jpg';
+
+      mockSupabaseClient.storage.getPublicUrl.mockReturnValue({
+        data: { publicUrl: mockPublicUrl },
+      });
+
+      const result = await service.getPublicUrlFromFolder(
+        'classroom-images',
+        '',
+        'image1.jpg'
+      );
+
+      expect(result).toBe(mockPublicUrl);
+      expect(mockSupabaseClient.storage.getPublicUrl).toHaveBeenCalledWith(
+        '/image1.jpg'
+      );
+    });
+
+    it('should handle special characters in file names', async () => {
+      const mockPublicUrl =
+        'https://test.supabase.co/storage/v1/object/public/classroom-images/backgrounds/image%201.jpg';
+
+      mockSupabaseClient.storage.getPublicUrl.mockReturnValue({
+        data: { publicUrl: mockPublicUrl },
+      });
+
+      const result = await service.getPublicUrlFromFolder(
+        'classroom-images',
+        'backgrounds',
+        'image 1.jpg'
+      );
+
+      expect(result).toBe(mockPublicUrl);
+      expect(mockSupabaseClient.storage.getPublicUrl).toHaveBeenCalledWith(
+        'backgrounds/image 1.jpg'
+      );
     });
   });
 

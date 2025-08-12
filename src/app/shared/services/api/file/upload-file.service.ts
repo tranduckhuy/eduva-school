@@ -22,19 +22,12 @@ import { environment } from '../../../../../environments/environment';
 import { RequestService } from '../../../../shared/services/core/request/request.service';
 import { ToastHandlingService } from '../../../../shared/services/core/toast/toast-handling.service';
 
-import {
-  StatusCode,
-  type StatusCodeType,
-} from '../../../../shared/constants/status-code.constant';
+import { StatusCode } from '../../../../shared/constants/status-code.constant';
 import { BYPASS_AUTH } from '../../../tokens/context/http-context.token';
 
 import { type FileStorageRequest } from '../../../models/api/request/command/file-storage-request.model';
 import { type FileStorageResponse } from '../../../models/api/response/command/file-storage-response.model';
 
-type UploadError = {
-  isBusinessError: true;
-  statusCode: StatusCodeType;
-};
 @Injectable({
   providedIn: 'root',
 })
@@ -172,18 +165,38 @@ export class UploadFileService {
     }
   }
 
-  async getBackgroundImageUrls(): Promise<string[]> {
+  async getPublicUrls(
+    bucketName: string,
+    folderPath?: string
+  ): Promise<string[]> {
     const { data, error } = await this.supabaseClient.storage
-      .from('classroom-images')
-      .list();
+      .from(bucketName)
+      .list(folderPath);
 
     if (error || !data) return [];
 
     return data.map(
       file =>
         this.supabaseClient.storage
-          .from('classroom-images')
-          .getPublicUrl(file.name).data.publicUrl
+          .from(bucketName)
+          .getPublicUrl(folderPath ? `${folderPath}/${file.name}` : file.name)
+          .data.publicUrl
     );
+  }
+
+  async getPublicUrlFromFolder(
+    bucketName: string,
+    folderPath: string,
+    fileName: string
+  ): Promise<string | null> {
+    try {
+      const { data } = this.supabaseClient.storage
+        .from(bucketName)
+        .getPublicUrl(`${folderPath}/${fileName}`);
+
+      return data?.publicUrl || null;
+    } catch {
+      return null;
+    }
   }
 }

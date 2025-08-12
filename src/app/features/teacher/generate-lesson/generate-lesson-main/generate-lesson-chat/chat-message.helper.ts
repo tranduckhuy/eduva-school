@@ -44,7 +44,7 @@ export function renderSuccessMessage(
       <div class="mb-2 text-sm text-gray-600 dark:text-gray-400 italic">
         <p>🎧 Tạo bản ghi âm (audio): <strong>${audioCost}</strong> Ecoin</p>
         <p>🎞️ Tạo video minh hoạ (có giọng đọc + hình ảnh): <strong>${videoCost}</strong> Ecoin</p>
-        ${estimatedDurationMinutes && formatEstimatedDuration ? `<p>⏱️ Thời gian dự kiến hoàn thành: <strong>${formatEstimatedDuration(estimatedDurationMinutes)}</strong></p>` : ''}
+        ${estimatedDurationMinutes && formatEstimatedDuration ? `<p>⏱️ Thời lượng dự kiến của nội dung: <strong>${formatEstimatedDuration(estimatedDurationMinutes)}</strong></p>` : ''}
       </div>
 
       <p class="mb-2 text-gray-700 dark:text-gray-300">

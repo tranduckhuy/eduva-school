@@ -11,6 +11,8 @@ export type LanguageOption = {
   value: string;
 };
 
+export type VoicePreviewState = 'idle' | 'loading' | 'playing' | 'paused' | 'replay';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -26,6 +28,10 @@ export class GenerateSettingsSelectionService {
 
   private readonly selectedFolderIdSignal = signal<string | null>(null);
   selectedFolderId = this.selectedFolderIdSignal.asReadonly();
+
+  // ? Voice preview state management
+  private readonly voicePreviewStateSignal = signal<VoicePreviewState>('idle');
+  voicePreviewState = this.voicePreviewStateSignal.asReadonly();
 
   setSpeedRate(rate: number) {
     this.selectedRateSignal.set(rate);
@@ -43,10 +49,16 @@ export class GenerateSettingsSelectionService {
     this.selectedFolderIdSignal.set(folderId ?? null);
   }
 
+  // ? Voice preview state methods
+  setVoicePreviewState(state: VoicePreviewState) {
+    this.voicePreviewStateSignal.set(state);
+  }
+
   reset() {
     this.selectedRateSignal.set(null);
     this.selectedVoiceSignal.set(null);
     this.selectedLanguageSignal.set(null);
     this.selectedFolderIdSignal.set(null);
+    this.voicePreviewStateSignal.set('idle');
   }
 }

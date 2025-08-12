@@ -1,0 +1,8 @@
+<p-button
+  size="small"
+  [icon]="previewButtonIcon()"
+  [label]="previewButtonLabel()"
+  [severity]="previewButtonSeverity()"
+  [loading]="voicePreviewState() === 'loading'"
+  [disabled]="voicePreviewState() === 'loading'"
+  (onClick)="handleButtonClick()" />
