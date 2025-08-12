@@ -221,7 +221,12 @@ export class ClassManagementService {
 
   private handleGetTeacherClassesResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS && res.data) {
-      const classes = res.data.data;
+      let classes;
+      if (res.data.data) {
+        classes = res.data.data;
+      } else {
+        classes = res.data;
+      }
       this.classesSignal.set(classes);
       this.totalClassSignal.set(res.data.count);
     } else {
