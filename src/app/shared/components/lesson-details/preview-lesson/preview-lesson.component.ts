@@ -211,9 +211,9 @@ export class PreviewLessonComponent implements OnInit {
     this.openModerateReasonModal(false);
   }
 
-  downloadLesson(materialBlobUrl: string) {
+  downloadLesson(materialBlobUrl: string, materialTitle: string) {
     this.downloadMaterialService
-      .downloadLessonMaterial(materialBlobUrl)
+      .downloadLessonMaterial(materialBlobUrl, materialTitle)
       .subscribe();
   }
 

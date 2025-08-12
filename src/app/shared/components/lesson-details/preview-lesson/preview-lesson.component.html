@@ -55,7 +55,9 @@
           size="small"
           [loading]="isLoadingDownload()"
           [disabled]="isLoadingDownload()"
-          (onClick)="downloadLesson(lessonMaterial()!.sourceUrl)" />
+          (onClick)="
+            downloadLesson(lessonMaterial()!.sourceUrl, lessonMaterial()!.title)
+          " />
         @if (
           isSchoolAdminOrMod() && isMaterialPending() && showActionButton()
         ) {
