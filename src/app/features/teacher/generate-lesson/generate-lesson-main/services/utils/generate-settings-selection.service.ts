@@ -4,8 +4,6 @@ export type VoiceOption = {
   name: string;
   value: string;
   language_code: string;
-  gender: string;
-  natural_sample_rate: number;
 };
 
 export type LanguageOption = {
@@ -41,8 +39,8 @@ export class GenerateSettingsSelectionService {
     this.selectedLanguageSignal.set(code);
   }
 
-  setFolderId(folderId: string) {
-    this.selectedFolderIdSignal.set(folderId);
+  setFolderId(folderId?: string | null) {
+    this.selectedFolderIdSignal.set(folderId ?? null);
   }
 
   reset() {

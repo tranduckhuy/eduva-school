@@ -159,7 +159,6 @@ export class UploadFileService {
         .upload(fileName, file, { cacheControl: '3600', upsert: true });
 
       if (error || !data) {
-        console.error(`Upload error in bucket ${bucket}:`, error);
         return null;
       }
 
@@ -168,8 +167,7 @@ export class UploadFileService {
         .getPublicUrl(data.path);
 
       return publicData?.publicUrl || null;
-    } catch (err) {
-      console.error('Unexpected error:', err);
+    } catch {
       return null;
     }
   }
