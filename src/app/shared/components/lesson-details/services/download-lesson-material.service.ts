@@ -6,10 +6,7 @@ import { Observable, tap, catchError, throwError } from 'rxjs';
 import { RequestService } from '../../../services/core/request/request.service';
 import { ToastHandlingService } from '../../../services/core/toast/toast-handling.service';
 
-import {
-  getFileName,
-  triggerBlobDownload,
-} from '../../../utils/util-functions';
+import { triggerBlobDownload } from '../../../utils/util-functions';
 
 @Injectable({
   providedIn: 'root',
