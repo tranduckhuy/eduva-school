@@ -269,7 +269,12 @@ export class ClassManagementService {
 
   private extractStudentsFromResponse(res: any): StudentClassResponse[] | null {
     if (res.statusCode === StatusCode.SUCCESS && res.data) {
-      const students = res.data.data as StudentClassResponse[];
+      let students;
+      if (res.data.data) {
+        students = res.data.data as StudentClassResponse[];
+      } else {
+        students = res.data;
+      }
       return students;
     }
     return null;
