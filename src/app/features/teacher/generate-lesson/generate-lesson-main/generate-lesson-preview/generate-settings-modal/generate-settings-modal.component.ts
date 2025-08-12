@@ -149,7 +149,7 @@ export class GenerateSettingsModalComponent implements OnInit {
   }
 
   private initializeVoiceOptions(): void {
-    const initialLanguage = (this.language() as LanguageCode) || 'vi-VN';
+    const initialLanguage = (this.language() as LanguageCode) ?? 'vi-VN';
     this.updateVoiceOptions(initialLanguage);
   }
 
@@ -191,7 +191,7 @@ export class GenerateSettingsModalComponent implements OnInit {
 
     const options = configs.map(config => ({
       name: config.name,
-      value: mapping[language]?.[config.type] || '',
+      value: mapping[language]?.[config.type] ?? '',
       language_code: language,
       type: config.type,
     }));
@@ -233,7 +233,7 @@ export class GenerateSettingsModalComponent implements OnInit {
   }
 
   private synchronizeFormWithService(): void {
-    const currentLanguage = (this.language() as LanguageCode) || 'vi-VN';
+    const currentLanguage = (this.language() as LanguageCode) ?? 'vi-VN';
     const currentVoice = this.voice();
 
     // ? Update voice options to match current language
@@ -248,7 +248,7 @@ export class GenerateSettingsModalComponent implements OnInit {
     this.form.patchValue(
       {
         language: currentLanguage,
-        voice: this.form.get('voice')?.value || currentVoice,
+        voice: this.form.get('voice')?.value ?? currentVoice,
       },
       { emitEvent: false }
     );
