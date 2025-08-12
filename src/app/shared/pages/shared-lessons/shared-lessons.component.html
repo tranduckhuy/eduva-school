@@ -93,15 +93,17 @@
                     visibility
                   </app-button>
                 </a>
-                <app-button
-                  pTooltip="Chia sẻ bài học"
-                  tooltipPosition="bottom"
-                  variant="rounded"
-                  size="xs"
-                  (click)="onOpenShareModal(material.id)"
-                  class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
-                  share
-                </app-button>
+                @if (!isSchoolAdmin()) {
+                  <app-button
+                    pTooltip="Chia sẻ bài học"
+                    tooltipPosition="bottom"
+                    variant="rounded"
+                    size="xs"
+                    (click)="onOpenShareModal(material.id)"
+                    class="material-symbols-outlined flex items-center justify-center border-none bg-transparent text-lg !text-primary shadow-none hover:bg-transparent">
+                    share
+                  </app-button>
+                }
               </div>
             </td>
           </tr>

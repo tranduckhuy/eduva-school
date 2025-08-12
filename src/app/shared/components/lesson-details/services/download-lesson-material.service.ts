@@ -18,7 +18,10 @@ export class DownloadLessonMaterialService {
   private readonly requestService = inject(RequestService);
   private readonly toastHandlingService = inject(ToastHandlingService);
 
-  downloadLessonMaterial(url: string): Observable<HttpResponse<Blob>> {
+  downloadLessonMaterial(
+    url: string,
+    fileName: string
+  ): Observable<HttpResponse<Blob>> {
     return this.requestService
       .getFile(url, undefined, {
         bypassAuth: true,
@@ -26,7 +29,7 @@ export class DownloadLessonMaterialService {
       })
       .pipe(
         tap(res => {
-          this.handleDownloadResponse(res);
+          this.handleDownloadResponse(fileName, res);
         }),
         catchError((err: HttpErrorResponse) => this.handleDownloadError(err))
       );
@@ -36,10 +39,12 @@ export class DownloadLessonMaterialService {
   //  Private Helper Functions
   // ---------------------------
 
-  private handleDownloadResponse(res: HttpResponse<Blob>): void {
+  private handleDownloadResponse(
+    fileName: string,
+    res: HttpResponse<Blob>
+  ): void {
     if (res.body && res.body?.size > 0) {
       this.toastHandlingService.successGeneral();
-      const fileName = getFileName(res);
       triggerBlobDownload(fileName, res.body);
     } else {
       this.toastHandlingService.errorGeneral();
