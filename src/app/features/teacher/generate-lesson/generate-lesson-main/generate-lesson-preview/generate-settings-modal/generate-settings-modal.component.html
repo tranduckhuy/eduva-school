@@ -141,6 +141,12 @@
         </div>
       </div>
 
+      <div class="mt-3">
+        <voice-preview
+          [voice]="form.get('voice')?.value || ''"
+          [language]="form.get('language')?.value || ''" />
+      </div>
+
       <!-- ? Folder -->
       <div class="mt-5 flex flex-col">
         <span class="text-base font-semibold dark:text-white">

@@ -105,7 +105,7 @@ export class AddClassModalComponent {
   }
 
   private async setRandomBackground() {
-    const urls = await this.uploadFileService.getBackgroundImageUrls();
+    const urls = await this.uploadFileService.getPublicUrls('classroom-images');
     if (urls.length > 0) {
       const randomUrl = urls[Math.floor(Math.random() * urls.length)];
       this.backgroundImageUrl.set(randomUrl);
