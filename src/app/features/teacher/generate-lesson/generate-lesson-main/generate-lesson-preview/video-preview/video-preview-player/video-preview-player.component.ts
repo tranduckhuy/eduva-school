@@ -309,8 +309,9 @@ export class VideoPreviewPlayerComponent {
   onSaveGeneratedContent() {
     const folderId = this.folderId();
     const metadata = this.generatedMetadataMap();
+    const isVideoSaved = this.isVideoSaved();
 
-    if (!folderId || !metadata) return;
+    if (!folderId || !metadata || isVideoSaved) return;
 
     this.aiJobService
       .getFileSizeByBlobNameUrl(metadata[LessonGenerationType.Video].blobName)
