@@ -230,11 +230,11 @@ export class VoicePreviewComponent {
     });
   }
 
-  private handleAudioEnded(): void {
+  private readonly handleAudioEnded = (): void => {
     this.settingsSelectionService.setVoicePreviewState('replay');
-  }
+  };
 
-  private handleAudioError(): void {
+  private readonly handleAudioError = (): void => {
     this.settingsSelectionService.setVoicePreviewState('idle');
-  }
+  };
 }
