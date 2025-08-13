@@ -5,6 +5,7 @@ import {
   inject,
   input,
   computed,
+  effect,
 } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
@@ -77,6 +78,7 @@ export class VoicePreviewComponent {
 
   constructor() {
     this.setupCleanup();
+    this.setupVoicePreviewStateListener();
   }
 
   async handleButtonClick(): Promise<void> {
@@ -121,8 +123,13 @@ export class VoicePreviewComponent {
         return;
       }
 
-      // ? Create or update audio element
-      this.createAudioElement(audioUrl);
+      // ? Create or update audio element (create if null after reset)
+      if (!this.audioElement) {
+        this.createAudioElement(audioUrl);
+      } else {
+        this.audioElement.src = audioUrl;
+      }
+
       await this.audioElement!.play();
 
       // ? Set to playing state
@@ -133,8 +140,10 @@ export class VoicePreviewComponent {
   }
 
   // ? Method to handle voice/language changes from parent
+  // ? This method is called automatically when voice preview state changes to 'idle'
+  // ? which happens when either voice or language changes in the parent component
   async handleVoiceChange(): Promise<void> {
-    // ? Reset audio element and state when voice changes
+    // ? Reset audio element and state when voice or language changes
     this.resetAudioState();
 
     const currentVoice = this.voice();
@@ -213,7 +222,6 @@ export class VoicePreviewComponent {
       this.audioElement.src = '';
       this.audioElement = null;
     }
-    this.settingsSelectionService.setVoicePreviewState('idle');
   }
 
   private setupCleanup(): void {
@@ -227,6 +235,16 @@ export class VoicePreviewComponent {
 
       // ? Reset audio state
       this.resetAudioState();
+    });
+  }
+
+  private setupVoicePreviewStateListener(): void {
+    // ? Use effect to listen for voice preview state changes
+    effect(() => {
+      const state = this.voicePreviewState();
+      if (state === 'idle') {
+        this.handleVoiceChange();
+      }
     });
   }
 
