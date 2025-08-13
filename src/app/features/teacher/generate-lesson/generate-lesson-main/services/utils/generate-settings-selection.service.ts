@@ -1,17 +1,23 @@
 import { Injectable, signal } from '@angular/core';
 
-export type VoiceOption = {
-  name: string;
-  value: string;
-  language_code: string;
-};
-
 export type LanguageOption = {
   name: string;
   value: string;
 };
 
-export type VoicePreviewState = 'idle' | 'loading' | 'playing' | 'paused' | 'replay';
+export type VoiceOption = {
+  name: string;
+  value: string;
+  language_code: string;
+  type: string;
+};
+
+export type VoicePreviewState =
+  | 'idle'
+  | 'loading'
+  | 'playing'
+  | 'paused'
+  | 'replay';
 
 @Injectable({
   providedIn: 'root',

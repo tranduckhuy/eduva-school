@@ -20,21 +20,14 @@ import {
   type VoiceOption,
   type LanguageOption,
 } from '../../services/utils/generate-settings-selection.service';
-import { VoicePreviewComponent } from './voice-preview/voice-preview.component';
+
+import { VoiceConfigHelper, type LanguageCode } from './voice-config.helper';
 
 import { EntityStatus } from '../../../../../../shared/models/enum/entity-status.enum';
-import { type GetFoldersRequest } from '../../../../../../shared/models/api/request/query/get-folders-request.model';
 
-// ? Type definitions for voice and language management
-type VoiceType =
-  | 'female-deep'
-  | 'male-deep'
-  | 'female-north'
-  | 'female-south'
-  | 'male-north'
-  | 'male-south';
-type LanguageCode = 'vi-VN' | 'en-US';
-type VoiceMapping = Record<LanguageCode, Record<VoiceType, string>>;
+import { VoicePreviewComponent } from './voice-preview/voice-preview.component';
+
+import { type GetFoldersRequest } from '../../../../../../shared/models/api/request/query/get-folders-request.model';
 
 @Component({
   selector: 'app-generate-settings-modal',
@@ -70,43 +63,13 @@ export class GenerateSettingsModalComponent implements OnInit {
   readonly language = this.settingsSelectionService.selectedLanguage;
   readonly folderId = this.settingsSelectionService.selectedFolderId;
 
-  // ? Language selection options
-  readonly languageOptions = signal<LanguageOption[]>([
-    { name: 'Tiếng Việt', value: 'vi-VN' },
-    { name: 'Tiếng Anh', value: 'en-US' },
-  ]);
-
-  // ? Voice configuration with Vietnamese display names
-  private readonly voiceConfigs = signal<
-    Array<{ name: string; type: VoiceType }>
-  >([
-    { name: 'Nam trầm', type: 'male-deep' },
-    { name: 'Nữ trầm', type: 'female-deep' },
-    { name: 'Nam miền bắc', type: 'male-north' },
-    { name: 'Nữ miền bắc', type: 'female-north' },
-    { name: 'Nam miền nam', type: 'male-south' },
-    { name: 'Nữ miền nam', type: 'female-south' },
-  ]);
-
-  // ? Voice mapping for different languages
-  private readonly voiceMapping = signal<VoiceMapping>({
-    'vi-VN': {
-      'male-deep': 'vi-VN-Chirp3-HD-Enceladus',
-      'male-north': 'vi-VN-Chirp3-HD-Zubenelgenubi',
-      'male-south': 'vi-VN-Chirp3-HD-Algieba',
-      'female-deep': 'vi-VN-Chirp3-HD-Despina',
-      'female-north': 'vi-VN-Chirp3-HD-Gacrux',
-      'female-south': 'vi-VN-Chirp3-HD-Zephyr',
-    },
-    'en-US': {
-      'male-deep': 'en-US-Chirp3-HD-Enceladus',
-      'male-north': 'en-US-Chirp3-HD-Zubenelgenubi',
-      'male-south': 'en-US-Chirp3-HD-Algieba',
-      'female-deep': 'en-US-Chirp3-HD-Despina',
-      'female-north': 'en-US-Chirp3-HD-Gacrux',
-      'female-south': 'en-US-Chirp3-HD-Zephyr',
-    },
-  });
+  // ? Language selection options - now using centralized config
+  readonly languageOptions = signal<LanguageOption[]>(
+    VoiceConfigHelper.getLanguageCodes().map(code => ({
+      name: VoiceConfigHelper.getLanguageDisplayName(code),
+      value: code,
+    }))
+  );
 
   // ? Voice options for the current language
   private readonly voiceOptionsSignal = signal<VoiceOption[]>([]);
@@ -178,6 +141,9 @@ export class GenerateSettingsModalComponent implements OnInit {
   private handleLanguageChange(newLanguage: LanguageCode): void {
     this.updateVoiceForLanguage(newLanguage);
     this.updateVoiceOptions(newLanguage);
+
+    // ? Reset voice preview state when language changes
+    this.settingsSelectionService.setVoicePreviewState('idle');
   }
 
   private handleVoiceChange(): void {
@@ -186,16 +152,8 @@ export class GenerateSettingsModalComponent implements OnInit {
   }
 
   private updateVoiceOptions(language: LanguageCode): void {
-    const configs = this.voiceConfigs();
-    const mapping = this.voiceMapping();
-
-    const options = configs.map(config => ({
-      name: config.name,
-      value: mapping[language]?.[config.type] ?? '',
-      language_code: language,
-      type: config.type,
-    }));
-
+    // ? Now using centralized helper
+    const options = VoiceConfigHelper.getVoiceOptionsForLanguage(language);
     this.voiceOptionsSignal.set(options);
   }
 
@@ -203,33 +161,18 @@ export class GenerateSettingsModalComponent implements OnInit {
     const currentVoice = this.form.get('voice')?.value;
     if (!currentVoice) return;
 
-    const mapping = this.voiceMapping();
-    const newLanguageMapping = mapping[newLanguage];
-    if (!newLanguageMapping) return;
-
-    // ? Find the current voice type by matching with any language mapping
-    const currentVoiceType = this.findVoiceType(currentVoice, mapping);
+    // ? Find the current voice type using centralized helper
+    const currentVoiceType = VoiceConfigHelper.findVoiceType(currentVoice);
     if (!currentVoiceType) return;
 
     // ? Update voice to the same type in the new language
-    const newVoiceValue = newLanguageMapping[currentVoiceType];
+    const newVoiceValue = VoiceConfigHelper.getVoiceValue(
+      currentVoiceType,
+      newLanguage
+    );
     if (newVoiceValue) {
       this.form.patchValue({ voice: newVoiceValue }, { emitEvent: false });
     }
-  }
-
-  private findVoiceType(
-    voiceValue: string,
-    mapping: VoiceMapping
-  ): VoiceType | undefined {
-    for (const langMapping of Object.values(mapping)) {
-      for (const [type, value] of Object.entries(langMapping)) {
-        if (value === voiceValue) {
-          return type as VoiceType;
-        }
-      }
-    }
-    return undefined;
   }
 
   private synchronizeFormWithService(): void {
