@@ -211,6 +211,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     return (
       this.form.invalid ||
       this.isLoading() ||
+      this.totalChecked() === 0 ||
       this.hasPreviewContentSuccessfully() ||
       this.hasGeneratedSuccessfully()
     );
@@ -332,6 +333,10 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   }: AiResponseMessage): void {
     this.resourcesStateService.updateIsLoading(false);
 
+    if (failureReason) {
+      this.resourcesStateService.resetGeneratedPreviewContentStatus();
+    }
+
     const content = failureReason
       ? renderFailureMessage(failureReason)
       : renderSuccessMessage(
@@ -361,7 +366,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     });
 
     this.resourcesStateService.markProcessedResponse();
-    if (!failureReason) {
+    if (!failureReason && previewContent) {
       this.resourcesStateService.markGeneratedPreviewContentSuccess();
     }
   }

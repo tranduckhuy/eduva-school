@@ -233,8 +233,9 @@ export class AudioPreviewPlayerComponent {
   onSaveGeneratedContent() {
     const folderId = this.folderId();
     const metadata = this.generatedMetadataMap();
+    const isAudiSaved = this.isAudioSaved();
 
-    if (!folderId || !metadata) return;
+    if (!folderId || !metadata || isAudiSaved) return;
 
     this.aiJobService
       .getFileSizeByBlobNameUrl(metadata[LessonGenerationType.Audio].blobName)
