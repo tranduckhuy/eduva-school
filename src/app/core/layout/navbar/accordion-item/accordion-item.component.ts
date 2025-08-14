@@ -58,13 +58,6 @@ export class AccordionItemComponent {
     }
   }
 
-  onNavClick(event: MouseEvent) {
-    if (this.isDisabled()) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-  }
-
   private getStorageKey(): string {
     return `accordion-open:${this.label()}`;
   }

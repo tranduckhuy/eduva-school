@@ -5,7 +5,6 @@
     <a
       [routerLink]="!isDisabled() ? link() : null"
       [tabindex]="isDisabled() ? -1 : 0"
-      (click)="onNavClick($event)"
       class="accordion-button flex w-full select-none items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors ease-linear">
       <i
         class="material-symbols-rounded text-[22px] leading-none text-gray-500 dark:text-dark-100">
@@ -68,8 +67,7 @@
               class="submenu-link flex w-full select-none items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors duration-200 ease-linear"
               [class.active]="item.active"
               [routerLink]="!item.isDisabled ? item.link : null"
-              [tabindex]="isDisabled() ? -1 : 0"
-              (click)="onNavClick($event)">
+              [tabindex]="isDisabled() ? -1 : 0">
               <i class="material-symbols-rounded" style="font-size: 12px">
                 radio_button_unchecked
               </i>
