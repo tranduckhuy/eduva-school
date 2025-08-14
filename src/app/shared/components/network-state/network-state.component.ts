@@ -39,7 +39,7 @@ export class NetworkStateComponent {
           severity: isOnline ? 'success' : 'secondary',
           summary: isOnline ? 'Đã kết nối lại' : 'Mất kết nối',
           detail: isOnline ? 'Đã khôi phục kết nối Internet' : 'Bạn đã offline',
-          life: 3000,
+          life: 6000,
         });
 
         this.lastOnline = isOnline;
