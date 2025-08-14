@@ -46,6 +46,7 @@ interface ChatMessage {
 
 interface AiResponseMessage {
   previewContent?: string;
+  language?: string;
   audioCost?: number;
   videoCost?: number;
   estimatedDurationMinutes?: number;
@@ -326,6 +327,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
 
   private displaySystemAiMessage({
     previewContent,
+    language,
     audioCost,
     videoCost,
     estimatedDurationMinutes,
@@ -341,6 +343,7 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
       ? renderFailureMessage(failureReason)
       : renderSuccessMessage(
           previewContent,
+          language,
           audioCost,
           videoCost,
           estimatedDurationMinutes,
