@@ -203,15 +203,15 @@ export class AuthService {
     switch (statusCode) {
       case StatusCode.USER_NOT_EXISTS:
       case StatusCode.INVALID_CREDENTIALS:
-        this.toastHandlingService.error(
+        this.toastHandlingService.warn(
           'Đăng nhập thất bại',
           'Tên đăng nhập hoặc mật khẩu chưa chính xác.'
         );
         break;
 
       case StatusCode.USER_NOT_CONFIRMED:
-        this.toastHandlingService.error(
-          'Đăng nhập thất bại',
+        this.toastHandlingService.info(
+          'Xác minh tài khoản',
           'Tài khoản của bạn chưa được xác minh. Vui lòng kiểm tra email để hoàn tất xác minh.'
         );
         this.resendConfirmEmail(email);
