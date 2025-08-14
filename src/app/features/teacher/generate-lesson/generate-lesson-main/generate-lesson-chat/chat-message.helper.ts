@@ -13,6 +13,7 @@ export function renderFailureMessage(reason: string): string {
 
 export function renderSuccessMessage(
   previewContent?: string,
+  language?: string,
   audioCost?: number,
   videoCost?: number,
   estimatedDurationMinutes?: number,
@@ -45,6 +46,7 @@ export function renderSuccessMessage(
         <p>🎧 Tạo bản ghi âm (audio): <strong>${audioCost}</strong> Ecoin</p>
         <p>🎞️ Tạo video minh hoạ (có giọng đọc + hình ảnh): <strong>${videoCost}</strong> Ecoin</p>
         ${estimatedDurationMinutes && formatEstimatedDuration ? `<p>⏱️ Thời lượng dự kiến của nội dung: <strong>${formatEstimatedDuration(estimatedDurationMinutes)}</strong></p>` : ''}
+        ${language ? `<p>🌐 Ngôn ngữ đọc: <strong>${language}</strong></p>` : ''}
       </div>
 
       <p class="mb-2 text-gray-700 dark:text-gray-300">

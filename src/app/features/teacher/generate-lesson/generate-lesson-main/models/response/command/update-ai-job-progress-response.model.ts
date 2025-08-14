@@ -4,6 +4,7 @@ export interface UpdateAiJobProgressResponse {
   jobId: string;
   status: JobStatus;
   title: string;
+  language: string;
   estimatedDurationMinutes: number;
   actualDurationSeconds: number;
   previewContent: string;
