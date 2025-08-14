@@ -46,7 +46,19 @@ export function renderSuccessMessage(
         <p>🎧 Tạo bản ghi âm (audio): <strong>${audioCost}</strong> Ecoin</p>
         <p>🎞️ Tạo video minh hoạ (có giọng đọc + hình ảnh): <strong>${videoCost}</strong> Ecoin</p>
         ${estimatedDurationMinutes && formatEstimatedDuration ? `<p>⏱️ Thời lượng dự kiến của nội dung: <strong>${formatEstimatedDuration(estimatedDurationMinutes)}</strong></p>` : ''}
-        ${language ? `<p>🌐 Ngôn ngữ đọc: <strong>${language}</strong></p>` : ''}
+        ${
+          language
+            ? `
+              <p>
+                🌐 Ngôn ngữ đọc: <strong>${language}</strong>
+              </p>
+              <p class="mt-1 text-xs not-italic text-amber-700 dark:text-amber-200 flex items-start gap-1">
+                <span aria-hidden="true">💡</span>
+                <span>Để giọng đọc tự nhiên và mạch lạc hơn, bạn nên cài đặt ngôn ngữ đọc <strong>phù hợp với ngôn ngữ đọc của nội dung</strong>.</span>
+              </p>
+            `
+            : ''
+        }
       </div>
 
       <p class="mb-2 text-gray-700 dark:text-gray-300">
