@@ -89,6 +89,19 @@ export class PaymentService {
       );
   }
 
+  refreshTokenAfterConfirm(): Observable<void> {
+    const accessToken = this.jwtService.getAccessToken();
+    const refreshToken = this.jwtService.getRefreshToken();
+    if (accessToken && refreshToken) {
+      const request: RefreshTokenRequest = {
+        accessToken,
+        refreshToken,
+      };
+      return this.authService.refreshToken(request).pipe(map(() => void 0));
+    }
+    return of(void 0);
+  }
+
   protected redirectToUrl(url: string) {
     window.location.href = url;
   }
@@ -155,7 +168,6 @@ export class PaymentService {
         'Thanh toán thành công',
         'Cảm ơn bạn đã tin tưởng sử dụng hệ thống EDUVA. Chúc bạn có trải nghiệm dạy và học thật hiệu quả!'
       );
-      this.refreshTokenAfterConfirm();
     } else {
       this.toastHandlingService.errorGeneral();
     }
@@ -192,17 +204,5 @@ export class PaymentService {
       return res.data as T;
     }
     return null;
-  }
-
-  private refreshTokenAfterConfirm() {
-    const accessToken = this.jwtService.getAccessToken();
-    const refreshToken = this.jwtService.getRefreshToken();
-    if (accessToken && refreshToken) {
-      const request: RefreshTokenRequest = {
-        accessToken,
-        refreshToken,
-      };
-      this.authService.refreshToken(request).subscribe();
-    }
   }
 }
