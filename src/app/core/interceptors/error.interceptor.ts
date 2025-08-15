@@ -94,19 +94,19 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     adminAction: string,
     userAction: string
   ) => {
+    globalModalService.close();
+
     const admin = isAdmin();
+
     confirmationService.confirm({
       header,
       message: admin ? message : message.replace(adminAction, userAction),
-      acceptButtonProps: { label: admin ? adminAction : 'Đăng xuất' },
+      acceptButtonProps: { label: admin ? adminAction : 'Đồng ý' },
       rejectVisible: false,
       closable: false,
       accept: () => {
         if (admin) {
           router.navigateByUrl('/school-admin/subscription-plans');
-        } else {
-          clearSessionData();
-          router.navigateByUrl('/auth/login', { replaceUrl: true });
         }
       },
     });
@@ -168,10 +168,17 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
     // Forbidden
     if (status === 403 && !isByPassAuth) {
-      if (errorStatusCode === StatusCode.SCHOOL_AND_SUBSCRIPTION_REQUIRED) {
-        handleMissingSchoolOrSubscription();
-      } else {
-        handleForbidden();
+      switch (errorStatusCode) {
+        case StatusCode.SCHOOL_AND_SUBSCRIPTION_REQUIRED:
+          handleMissingSchoolOrSubscription();
+          break;
+
+        case StatusCode.SUBSCRIPTION_INVALID:
+          handleSubscriptionExpired();
+          break;
+
+        default:
+          handleForbidden();
       }
     }
 

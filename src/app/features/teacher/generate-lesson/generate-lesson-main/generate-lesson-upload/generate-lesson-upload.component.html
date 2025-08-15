@@ -105,6 +105,11 @@
               (clickOutside)="toggleMenu(item.id)">
               <button
                 class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
+                [ngClass]="{
+                  'pointer-events-none': disableCheckboxItem()[item.id],
+                  'cursor-default opacity-60 hover:!bg-[#f0f4f9]':
+                    disableCheckboxItem()[item.id],
+                }"
                 (click)="removeItem(item.id)">
                 <span class="pi pi-trash"></span>
                 <span>Xóa tài liệu</span>

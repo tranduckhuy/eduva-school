@@ -73,13 +73,6 @@ export class DashboardComponent implements OnInit {
 
   schoolMissing = computed(() => !this.currentUser()?.school);
 
-  planExpired = computed(() => {
-    const subscription = this.currentUser()?.userSubscriptionResponse;
-    const isActive = subscription?.isSubscriptionActive;
-    const endDate = subscription?.subscriptionEndDate;
-    return !isActive || (endDate && new Date(endDate) < new Date());
-  });
-
   studentsStatCard = computed<StatCard>(() => {
     const data = this.dashboardData();
     return {
@@ -190,9 +183,8 @@ export class DashboardComponent implements OnInit {
   private loadData() {
     const user = this.currentUser();
     const hasSchool = !this.schoolMissing();
-    const isPlanValid = !this.planExpired();
 
-    if (!user || !hasSchool || !isPlanValid) return;
+    if (!user || !hasSchool) return;
 
     const request: DashboardRequest = {
       lessonActivityPeriod: this.currentLessonCreationPeriod(),

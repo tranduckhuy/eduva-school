@@ -6,13 +6,17 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+
+import { finalize, forkJoin, map, of, switchMap, take } from 'rxjs';
 
 import { UserService } from '../../../shared/services/api/user/user.service';
 import { PaymentService } from '../../../shared/services/api/payment/payment.service';
 import { LoadingService } from '../../../shared/services/core/loading/loading.service';
 import { DashboardService } from '../../../shared/services/api/dashboard/dashboard.service';
+
+import { clearQueryParams } from '../../../shared/utils/util-functions';
 
 import { PeriodType } from '../../../shared/models/enum/period-type.enum';
 
@@ -62,6 +66,7 @@ interface SubItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent implements OnInit {
+  private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly userService = inject(UserService);
   private readonly paymentService = inject(PaymentService);
@@ -77,13 +82,6 @@ export class DashboardComponent implements OnInit {
   readonly currentLessonStatusPeriod = signal<PeriodType>(PeriodType.Week);
 
   readonly schoolMissing = computed(() => !this.currentUser()?.school);
-
-  readonly planExpired = computed(() => {
-    const subscription = this.currentUser()?.userSubscriptionResponse;
-    const isActive = subscription?.isSubscriptionActive;
-    const endDate = subscription?.subscriptionEndDate;
-    return !isActive || (endDate && new Date(endDate) < new Date());
-  });
 
   readonly usersStatCard = computed<StatCard>(() => {
     const data = this.dashboardSchoolAdminData();
@@ -167,7 +165,6 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.handleRouteQueryParams();
-    this.loadData();
   }
 
   onLessonCreationPeriodChange(period: PeriodType) {
@@ -183,9 +180,8 @@ export class DashboardComponent implements OnInit {
   private loadData() {
     const user = this.currentUser();
     const hasSchool = !this.schoolMissing();
-    const isPlanValid = !this.planExpired();
 
-    if (!user || !hasSchool || !isPlanValid) return;
+    if (!user || !hasSchool) return;
 
     const request: DashboardRequest = {
       lessonActivityPeriod: this.currentLessonCreationPeriod(),
@@ -195,21 +191,52 @@ export class DashboardComponent implements OnInit {
   }
 
   private handleRouteQueryParams() {
-    this.activatedRoute.queryParams.subscribe(params => {
-      const { code, id, status, orderCode } = params;
-      if (code && id && status && orderCode) {
-        const confirmRequest: ConfirmPaymentReturnRequest = {
-          code,
-          id,
-          status,
-          orderCode: +orderCode,
-        };
-        this.paymentService.confirmPaymentReturn(confirmRequest).subscribe({
-          complete: () => {
-            this.userService.getCurrentProfile().subscribe();
-          },
-        });
-      }
-    });
+    this.activatedRoute.queryParams
+      .pipe(
+        take(1),
+        map(params => {
+          const { code, id, status, orderCode } = params ?? {};
+          if (!code || !id || !status || !orderCode) return null;
+          const req: ConfirmPaymentReturnRequest = {
+            code,
+            id,
+            status,
+            orderCode: +orderCode,
+          };
+          return req;
+        }),
+        switchMap(req => {
+          if (!req) {
+            this.loadData();
+            return of(null);
+          }
+
+          return this.paymentService.confirmPaymentReturn(req).pipe(
+            switchMap(() => {
+              return this.paymentService.refreshTokenAfterConfirm();
+            }),
+            switchMap(() => {
+              const dashboardReq: DashboardRequest = {
+                lessonActivityPeriod: this.currentLessonCreationPeriod(),
+                lessonStatusPeriod: this.currentLessonStatusPeriod(),
+              };
+              return forkJoin([
+                this.dashboardService.getDashboardSchoolAdminData(dashboardReq),
+                this.userService.getCurrentProfile(),
+              ]);
+            })
+          );
+        }),
+        finalize(() => {
+          clearQueryParams(this.router, this.activatedRoute, [
+            'code',
+            'id',
+            'cancel',
+            'status',
+            'orderCode',
+          ]);
+        })
+      )
+      .subscribe();
   }
 }
