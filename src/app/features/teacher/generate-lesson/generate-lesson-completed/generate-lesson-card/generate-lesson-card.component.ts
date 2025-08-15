@@ -10,6 +10,7 @@ import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
+import { ConfirmationService } from 'primeng/api';
 
 import { SubmenuDirective } from '../../../../../shared/directives/submenu/submenu.directive';
 
@@ -28,6 +29,7 @@ import { type AiJob } from '../../../../../shared/models/entities/ai-job.model';
 export class GenerateLessonCardComponent {
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
+  private readonly confirmationService = inject(ConfirmationService);
 
   job = input.required<AiJob>();
 
@@ -42,7 +44,24 @@ export class GenerateLessonCardComponent {
   }
 
   onRemoveJob(jobId: string) {
-    this.removeJob.emit(jobId);
+    this.confirmationService.confirm({
+      header: 'Xóa phiên tạo nội dung?',
+      message:
+        'Phiên tạo nội dung này sẽ bị xóa vĩnh viễn. Bạn có chắc chắn muốn tiếp tục?',
+      icon: 'pi pi-info-circle',
+      rejectButtonProps: {
+        label: 'Không, giữ lại',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Có, xóa vĩnh viễn',
+        severity: 'danger',
+      },
+      accept: () => {
+        this.removeJob.emit(jobId);
+      },
+    });
   }
 
   toggleMenuJob(jobId: string) {

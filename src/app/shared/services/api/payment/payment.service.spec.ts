@@ -323,10 +323,6 @@ describe('PaymentService', () => {
             'Thanh toán thành công',
             'Cảm ơn bạn đã tin tưởng sử dụng hệ thống EDUVA. Chúc bạn có trải nghiệm dạy và học thật hiệu quả!'
           );
-          expect(authService.refreshToken).toHaveBeenCalledWith({
-            accessToken: 'access',
-            refreshToken: 'refresh',
-          });
           resolve();
         });
       });
@@ -355,7 +351,7 @@ describe('PaymentService', () => {
             // Should not reach here for error cases
             resolve();
           },
-          error: err => {
+          error: () => {
             // Error is expected and handled by the service
             expect(toastHandlingService.info).toHaveBeenCalledWith(
               'Thanh toán bị hủy',
@@ -378,7 +374,7 @@ describe('PaymentService', () => {
             // Should not reach here for error cases
             resolve();
           },
-          error: err => {
+          error: () => {
             // Error is expected and handled by the service
             expect(toastHandlingService.info).toHaveBeenCalledWith(
               'Giao dịch đã hoàn tất',

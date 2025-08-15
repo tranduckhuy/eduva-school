@@ -310,7 +310,7 @@ export class ExportInvoicePdfComponent {
     pdf.text(
       this.datePipe.transform(
         isCredit ? creditDetail?.createdAt : subscriptionDetail?.startDate,
-        "dd 'thg' MM, YYYY 'lúc' HH:mm"
+        "dd 'thg' MM, YYYY"
       ) ?? '',
       rightColX,
       nextSectionY + 7
@@ -320,7 +320,7 @@ export class ExportInvoicePdfComponent {
       pdf.text(
         this.datePipe.transform(
           isCredit ? creditDetail?.createdAt : subscriptionDetail?.endDate,
-          "dd 'thg' MM, YYYY 'lúc' HH:mm"
+          "dd 'thg' MM, YYYY"
         ) ?? '',
         rightColX,
         nextSectionY + 22

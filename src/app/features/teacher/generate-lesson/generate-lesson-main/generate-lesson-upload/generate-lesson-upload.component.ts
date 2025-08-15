@@ -51,6 +51,8 @@ export class GenerateLessonUploadComponent implements OnInit {
   readonly isLoading = this.resourcesStateService.isLoading;
   readonly hasGeneratedSuccessfully =
     this.resourcesStateService.hasGeneratedSuccessfully;
+  readonly hasPreviewContentSuccessfully =
+    this.resourcesStateService.hasPreviewContentSuccessfully;
   readonly sourceList = this.resourcesStateService.sourceList;
   readonly currentCount = this.resourcesStateService.totalSources;
   readonly totalFileSize = this.resourcesStateService.totalFileSize;
@@ -71,6 +73,7 @@ export class GenerateLessonUploadComponent implements OnInit {
     () =>
       this.isLoading() ||
       this.isAnyLimitReached() ||
+      this.hasPreviewContentSuccessfully() ||
       this.hasGeneratedSuccessfully()
   );
 
@@ -81,6 +84,7 @@ export class GenerateLessonUploadComponent implements OnInit {
     return (
       hasUploading ||
       this.isLoading() ||
+      this.hasPreviewContentSuccessfully() ||
       this.hasGeneratedSuccessfully() ||
       this.sourceList().length <= 0
     );
@@ -90,11 +94,12 @@ export class GenerateLessonUploadComponent implements OnInit {
     const list = this.sourceList();
     const loading = this.isLoading();
     const generated = this.hasGeneratedSuccessfully();
+    const preview = this.hasPreviewContentSuccessfully();
 
     const result: Record<string, boolean> = {};
 
     for (const item of list) {
-      result[item.id] = item.isUploading || loading || generated;
+      result[item.id] = item.isUploading || loading || preview || generated;
     }
 
     return result;
