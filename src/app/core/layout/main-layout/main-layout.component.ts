@@ -78,6 +78,10 @@ import { GlobalModalHostComponent } from '../../../shared/components/global-moda
 
     <p-toast />
     <p-confirmdialog [baseZIndex]="1000" [closeOnEscape]="true" />
+    <p-confirmdialog
+      key="subscription-expired"
+      [baseZIndex]="1000"
+      [closeOnEscape]="true" />
     <p-scrolltop
       icon="pi pi-arrow-up"
       [buttonProps]="{ raised: true, rounded: true }" />

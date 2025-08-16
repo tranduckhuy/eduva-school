@@ -47,6 +47,15 @@ interface SubItem {
   value: number;
 }
 
+interface SubscriptionDisplayInfo {
+  hasSubscription: boolean;
+  displayText: string;
+  amountPaid: number;
+  price: number;
+  startDate: string | null;
+  endDate: string | null;
+}
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -153,13 +162,74 @@ export class DashboardComponent implements OnInit {
   });
 
   readonly subscriptionStatCard = computed<StatCard>(() => {
-    const data = this.dashboardSchoolAdminData();
+    const displayInfo = this.subscriptionDisplayInfo();
     return {
       title: 'Gói đăng ký',
       description: 'Gói đăng ký hiện tại',
-      value: data?.systemOverview.currentSubscription.name ?? 'Chưa có gói',
+      value: displayInfo.displayText,
       icon: 'request_quote',
       iconColor: 'text-warning',
+    };
+  });
+
+  readonly subscriptionDisplayInfo = computed<SubscriptionDisplayInfo>(() => {
+    const data = this.dashboardSchoolAdminData();
+    const subscription = data?.systemOverview.currentSubscription;
+
+    if (!subscription) {
+      return {
+        hasSubscription: false,
+        displayText: 'Chưa có gói',
+        amountPaid: 0,
+        price: 0,
+        startDate: null,
+        endDate: null,
+      };
+    }
+
+    const amountPaid = subscription.amountPaid ?? 0;
+    const price = subscription.price ?? 0;
+    const startDate = subscription.startDate;
+    const endDate = subscription.endDate;
+
+    if (amountPaid <= 0 || price <= 0) {
+      return {
+        hasSubscription: false,
+        displayText: 'Chưa có gói',
+        amountPaid: 0,
+        price: 0,
+        startDate: null,
+        endDate: null,
+      };
+    }
+
+    const isValidDate = (dateString: string | null | undefined): boolean => {
+      if (!dateString) return false;
+      const date = new Date(dateString);
+      return date.getFullYear() > 1 && date.getTime() > 0;
+    };
+
+    const hasValidStartDate = isValidDate(startDate);
+    const hasValidEndDate = isValidDate(endDate);
+
+    if (!hasValidStartDate || !hasValidEndDate) {
+      return {
+        hasSubscription: false,
+        displayText: 'Chưa có gói',
+        amountPaid: 0,
+        price: 0,
+        startDate: null,
+        endDate: null,
+      };
+    }
+
+    return {
+      hasSubscription: true,
+      displayText: subscription.name,
+      amountPaid,
+      price,
+      startDate,
+      endDate,
     };
   });
 

@@ -31,6 +31,10 @@ import { ScrollTopModule } from 'primeng/scrolltop';
 
     <p-toast />
     <p-confirmDialog [baseZIndex]="1000" [closeOnEscape]="true" />
+    <p-confirmdialog
+      key="subscription-expired"
+      [baseZIndex]="1000"
+      [closeOnEscape]="true" />
     <p-scrolltop
       icon="pi pi-arrow-up"
       [buttonProps]="{ raised: true, rounded: true }" />

@@ -187,7 +187,13 @@ export class VideoPreviewComponent implements OnInit {
     const metadata = this.aiGeneratedMetadataMap();
     const currentGeneratedType = this.currentGeneratedType();
 
-    if (!folderId || !metadata || !currentGeneratedType) return;
+    if (
+      !folderId ||
+      !metadata ||
+      currentGeneratedType === null ||
+      currentGeneratedType === undefined
+    )
+      return;
 
     this.resourcesStateService.updateIsLoading(true);
     this.toastHandlingService.info(

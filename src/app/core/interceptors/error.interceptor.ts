@@ -90,17 +90,18 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   const createSubscriptionConfirmation = (
     header: string,
-    message: string,
-    adminAction: string,
-    userAction: string
+    adminMessage: string,
+    userMessage: string,
+    adminAction: string
   ) => {
     globalModalService.close();
 
     const admin = isAdmin();
 
     confirmationService.confirm({
+      key: 'subscription-expired',
       header,
-      message: admin ? message : message.replace(adminAction, userAction),
+      message: admin ? adminMessage : userMessage,
       acceptButtonProps: { label: admin ? adminAction : 'Đồng ý' },
       rejectVisible: false,
       closable: false,
@@ -119,22 +120,26 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         <p>Trường của bạn hiện chưa có gói sử dụng.</p>
         <p>Vui lòng <strong>chọn và kích hoạt</strong> gói để tiếp tục sử dụng hệ thống.</p>
       `,
-      'Xem các gói',
-      'liên hệ với <strong>quản trị viên của trường</strong> để được cấp quyền truy cập'
+      `
+        <p>Trường của bạn hiện chưa có gói sử dụng.</p>
+        <p>Vui lòng liên hệ với <strong>quản trị viên của trường</strong> để được cấp quyền truy cập.</p>
+      `,
+      'Xem các gói'
     );
   };
 
   const handleSubscriptionExpired = () => {
-    userService.getCurrentProfile().subscribe();
-
     createSubscriptionConfirmation(
       'Gói sử dụng đã hết hạn',
       `
         <p>Gói sử dụng của trường bạn đã hết hạn.</p>
         <p>Vui lòng <strong>gia hạn</strong> để tiếp tục sử dụng hệ thống.</p>
       `,
-      'Gia hạn',
-      'liên hệ với <strong>quản trị viên</strong> để gia hạn và tiếp tục sử dụng hệ thống'
+      `
+        <p>Gói sử dụng của trường bạn đã hết hạn.</p>
+        <p>Vui lòng liên hệ với <strong>quản trị viên</strong> để gia hạn và tiếp tục sử dụng hệ thống.</p>
+      `,
+      'Gia hạn'
     );
   };
 
