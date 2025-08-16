@@ -46,7 +46,11 @@
         </div>
       </div>
       <div
-        class="relative mb-4 rounded-2xl border border-[#909299] bg-white dark:border-white dark:bg-dark-200">
+        class="relative mb-4 border border-[#909299] bg-white dark:border-white dark:bg-dark-200"
+        [ngClass]="{
+          'rounded-2xl': isExpanded(),
+          'rounded-full': !isExpanded(),
+        }">
         <div
           class="absolute -top-12 left-[50%] z-[1] -translate-x-[50%] transition-all duration-300 ease-in-out"
           [ngClass]="{
@@ -67,7 +71,7 @@
             <form
               [formGroup]="form"
               (ngSubmit)="submitMessage()"
-              class="flex min-h-[51px] w-full items-center px-4">
+              class="flex min-h-[51px] w-full items-center px-4 pr-2">
               <textarea
                 pTextarea
                 formControlName="topic"
@@ -99,29 +103,6 @@
               </div>
             </form>
           </div>
-        </div>
-        <div
-          class="chip-btn-group flex w-full items-center gap-2 pb-2 pt-1 xs:hidden">
-          <p-carousel
-            [value]="buttons"
-            [responsiveOptions]="responsiveOptions"
-            [showIndicators]="false"
-            [circular]="true"
-            [numVisible]="2"
-            [numScroll]="1"
-            contentClass="w-[calc(100%-20px)]">
-            <ng-template #item let-button>
-              <button
-                type="button"
-                class="chip-btn border border-[#dde1eb] bg-transparent hover:!bg-[#f0f1f1] dark:text-[#e6e6e6] dark:hover:!bg-dark-400"
-                [disabled]="disabledSendButton()"
-                (click)="handleChipClick(button.title)">
-                <span class="line-clamp-1">
-                  Tạo bài giảng về {{ button.title }}
-                </span>
-              </button>
-            </ng-template>
-          </p-carousel>
         </div>
       </div>
     </div>

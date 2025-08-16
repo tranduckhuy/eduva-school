@@ -13,6 +13,8 @@ import { LoadingService } from '../../services/core/loading/loading.service';
 import { GlobalModalService } from '../../services/layout/global-modal/global-modal.service';
 import { FolderManagementService } from '../../services/api/folder/folder-management.service';
 
+import { noOnlySpacesValidator } from '../../utils/form-validators';
+
 import { MODAL_DATA } from '../../tokens/injection/modal-data.token';
 
 import { FolderOwnerType } from '../../models/enum/folder-owner-type.enum';
@@ -42,7 +44,7 @@ export class AddLessonModalComponent {
 
   readonly isLoading = this.loadingService.is('create-folder');
   readonly form: FormGroup = this.fb.group({
-    name: ['', Validators.required],
+    name: ['', Validators.required, noOnlySpacesValidator],
   });
 
   get name() {
@@ -78,7 +80,12 @@ export class AddLessonModalComponent {
 
   getErrorMessage(controlName: string): string {
     const control = this.form.get(controlName);
+
     if (control?.hasError('required')) return 'Trường này không được để trống';
+
+    if (control?.hasError('onlySpaces'))
+      return 'Trường này không được chỉ chứa khoảng trắng';
+
     return '';
   }
 

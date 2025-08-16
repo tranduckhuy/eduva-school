@@ -34,24 +34,26 @@
           class="absolute right-0 top-[40px] z-[1] flex w-auto min-w-[180px] max-w-[200px] origin-top-right animate-scaleIn flex-col overflow-hidden rounded bg-[#f0f4f9] dark:bg-dark-400 sm:left-auto sm:right-0 sm:origin-top-right"
           clickOutsideSubmenu
           (clickOutside)="toggleMenu(classModel().id)">
-          <button
-            class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-200"
-            (click)="copyClassCode()">
-            <span
-              class="pi"
-              style="font-size: 14px"
-              [ngClass]="{
-                'pi-clipboard': !isCopied(),
-                'pi-check': isCopied(),
-              }"></span>
-            <span>{{ isCopied() ? 'Đã sao chép' : 'Sao chép mã lớp' }}</span>
-          </button>
-          <button
-            class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-200"
-            (click)="openEditClassModal()">
-            <span class="pi pi-pencil" style="font-size: 14px"></span>
-            <span>Chỉnh sửa</span>
-          </button>
+          @if (classModel().status === EntityStatus.Active) {
+            <button
+              class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-200"
+              (click)="copyClassCode()">
+              <span
+                class="pi"
+                style="font-size: 14px"
+                [ngClass]="{
+                  'pi-clipboard': !isCopied(),
+                  'pi-check': isCopied(),
+                }"></span>
+              <span>{{ isCopied() ? 'Đã sao chép' : 'Sao chép mã lớp' }}</span>
+            </button>
+            <button
+              class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-200"
+              (click)="openEditClassModal()">
+              <span class="pi pi-pencil" style="font-size: 14px"></span>
+              <span>Chỉnh sửa</span>
+            </button>
+          }
           <button
             class="flex h-10 items-center gap-2 px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-200"
             [ngClass]="{

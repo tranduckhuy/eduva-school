@@ -18,10 +18,13 @@
           mode="advanced"
           accept="video/*, audio/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           previewWidth="60"
+          fileLimit="10"
           invalidFileSizeMessageSummary="Tệp quá lớn."
           invalidFileSizeMessageDetail="Kích thước tệp vượt quá giới hạn cho phép (200MB)."
           invalidFileTypeMessageSummary="Định dạng tệp không hợp lệ."
           invalidFileTypeMessageDetail="Chỉ chấp nhận Video, Audio, PDF, DOC hoặc DOCX."
+          invalidFileLimitMessageSummary="Quá số lượng tệp cho phép"
+          invalidFileLimitMessageDetail="Bạn chỉ có thể tải lên 10 tệp mỗi lần."
           [multiple]="true"
           [maxFileSize]="maxUploadFileSize"
           (onSelect)="onSelectFile($event)"
@@ -119,7 +122,9 @@
       icon="pi pi-plus"
       size="small"
       [loading]="isLoading()"
-      [disabled]="selectedFiles().length === 0 || isLoading()"
+      [disabled]="
+        isLoading() || selectedFiles().length === 0 || isFileCountExceeded()
+      "
       (onClick)="onSubmit()" />
   </footer>
 </div>
