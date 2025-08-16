@@ -28,6 +28,7 @@ import { ContentType } from '../../../../../../shared/models/enum/lesson-materia
 
 import { VideoPreviewPlayerComponent } from './video-preview-player/video-preview-player.component';
 
+import { type AiJob } from '../../../../../../shared/models/entities/ai-job.model';
 import { type ConfirmCreateContent } from '../../models/request/command/confirm-create-content-request.model';
 import {
   type CreateLessonMaterialRequest,
@@ -58,6 +59,8 @@ export class VideoPreviewComponent implements OnInit {
   private readonly aiJobService = inject(AiJobsService);
   private readonly aiSocketService = inject(AiSocketService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
+
+  user = this.userService.currentUser;
 
   job = this.aiJobService.job;
   jobId = this.aiJobService.jobId;
@@ -96,6 +99,21 @@ export class VideoPreviewComponent implements OnInit {
       !this.hasPreviewContentSuccessfully() ||
       (this.totalCheckedSources() === 0 && !this.hasInteracted())
     );
+  });
+
+  readonly isSubscriptionExpired = computed(() => {
+    const user = this.user();
+    if (!user?.userSubscriptionResponse) return true;
+
+    const { isSubscriptionActive, subscriptionEndDate } =
+      user.userSubscriptionResponse;
+
+    if (!isSubscriptionActive) return true;
+
+    const currentDate = new Date();
+    const endDate = new Date(subscriptionEndDate);
+
+    return endDate < currentDate;
   });
 
   constructor() {
@@ -150,27 +168,7 @@ export class VideoPreviewComponent implements OnInit {
     const job = this.job();
     if (!job) return;
 
-    if (job.videoOutputBlobName) {
-      this.resourcesStateService.setVideoState('generated');
-      this.resourcesStateService.setVideoUrl(job.videoOutputBlobName);
-      this.resourcesStateService.markGeneratedSuccess();
-      this.resourcesStateService.setAiGeneratedMetadata(
-        LessonGenerationType.Video,
-        {
-          title: job.topic,
-          contentType: ContentType.Video,
-          duration: 0,
-          fileSize: 1,
-          blobName: job.videoOutputBlobName,
-        }
-      );
-      // ? Mark video as already saved if it exists from job
-      this.resourcesStateService.addSavedContentType(
-        LessonGenerationType.Video
-      );
-    } else {
-      this.resourcesStateService.setVideoState('no-content');
-    }
+    this.handleExistingVideoJob(job);
   }
 
   // ? Confirm Generate
@@ -247,6 +245,11 @@ export class VideoPreviewComponent implements OnInit {
     const currentGenerated = this.currentGeneratedType();
 
     if (currentGenerated === type) return;
+
+    if (this.isSubscriptionExpired()) {
+      this.confirmGenerationRequest(type);
+      return;
+    }
 
     // ? If have any type generated then popup confirmation for user decide to save content or not
     if (currentGenerated !== null && currentGenerated !== type) {
@@ -331,6 +334,68 @@ export class VideoPreviewComponent implements OnInit {
       },
       accept: onAccept,
       reject: onReject,
+    });
+  }
+
+  private handleExistingVideoJob(job: AiJob): void {
+    if (job.videoOutputBlobName) {
+      this.resourcesStateService.setVideoState('generated');
+      this.resourcesStateService.setVideoUrl(job.videoOutputBlobName);
+      this.resourcesStateService.markGeneratedSuccess();
+
+      // ? Set metadata immediately with default values to avoid timing issues
+      this.resourcesStateService.setAiGeneratedMetadata(
+        LessonGenerationType.Video,
+        {
+          title: job.topic,
+          contentType: ContentType.Video,
+          duration: 0,
+          fileSize: 1,
+          blobName: job.videoOutputBlobName,
+        }
+      );
+
+      // ? Get file size and duration from the video blob and update metadata
+      this.getVideoMetadata(job.videoOutputBlobName, job.topic);
+    } else {
+      this.resourcesStateService.setVideoState('no-content');
+    }
+  }
+
+  private getVideoMetadata(blobName: string, title: string): void {
+    this.aiJobService.getFileSizeByBlobNameUrl(blobName).subscribe(fileSize => {
+      // ? Create video element to get duration
+      const video = document.createElement('video');
+      video.src = blobName;
+      video.addEventListener('loadedmetadata', () => {
+        const duration = Math.round(video.duration);
+
+        // ? Update existing metadata with real values
+        this.resourcesStateService.setAiGeneratedMetadata(
+          LessonGenerationType.Video,
+          {
+            title: title,
+            contentType: ContentType.Video,
+            duration: duration,
+            fileSize: fileSize,
+            blobName: blobName,
+          }
+        );
+      });
+
+      video.addEventListener('error', () => {
+        // ? Update metadata with fileSize but keep duration as 0 if video loading fails
+        this.resourcesStateService.setAiGeneratedMetadata(
+          LessonGenerationType.Video,
+          {
+            title: title,
+            contentType: ContentType.Video,
+            duration: 0,
+            fileSize: fileSize,
+            blobName: blobName,
+          }
+        );
+      });
     });
   }
 

@@ -3,6 +3,7 @@ import {
   Component,
   inject,
   signal,
+  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -70,6 +71,11 @@ export class AddFileModalComponent {
   isLoading = signal(false);
   selectedFiles = signal<File[]>([]);
 
+  // ? Check if file count exceeds limit
+  readonly isFileCountExceeded = computed(
+    () => this.selectedFiles().length > 10
+  );
+
   onSelectFile(event: FileSelectEvent) {
     const currentFiles = this.selectedFiles();
     const newFiles = event.files;
@@ -129,11 +135,20 @@ export class AddFileModalComponent {
     );
 
     if (totalSize > MAX_TOTAL_UPLOAD_FILE_SIZE) {
-      this.toastHandlingService.error(
-        'Lỗi',
+      this.toastHandlingService.warn(
+        'Cảnh báo',
         `Tổng dung lượng tệp không được vượt quá ${(MAX_TOTAL_UPLOAD_FILE_SIZE / 1024 / 1024).toFixed(0)}MB.`
       );
       return;
+    }
+
+    // ? Check file count limit - still add files but show warning
+    const newTotalCount = currentFiles.length + validFiles.length;
+    if (newTotalCount > 10) {
+      this.toastHandlingService.warn(
+        'Cảnh báo',
+        `Số lượng tệp vượt quá giới hạn 10 tệp. Hiện tại có ${newTotalCount} tệp. Vui lòng xóa bớt tệp để có thể lưu.`
+      );
     }
 
     // ? All checks passed, update selected file list with valid files

@@ -117,7 +117,7 @@
 </div>
 
 <div class="mt-4">
-  @if (!hasGeneratedSuccessfully()) {
+  @if (!isSubscriptionExpired()) {
     <p-button
       label="Lưu nội dung"
       size="small"

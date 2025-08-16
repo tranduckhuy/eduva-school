@@ -28,6 +28,7 @@ import { ContentType } from '../../../../../../shared/models/enum/lesson-materia
 
 import { AudioPreviewPlayerComponent } from './audio-preview-player/audio-preview-player.component';
 
+import { type AiJob } from '../../../../../../shared/models/entities/ai-job.model';
 import { type ConfirmCreateContent } from '../../models/request/command/confirm-create-content-request.model';
 import {
   type CreateLessonMaterialRequest,
@@ -58,6 +59,8 @@ export class AudioPreviewComponent implements OnInit {
   private readonly aiJobService = inject(AiJobsService);
   private readonly aiSocketService = inject(AiSocketService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
+
+  user = this.userService.currentUser;
 
   job = this.aiJobService.job;
   jobId = this.aiJobService.jobId;
@@ -96,6 +99,21 @@ export class AudioPreviewComponent implements OnInit {
       !this.hasPreviewContentSuccessfully() ||
       (this.totalCheckedSources() === 0 && !this.hasInteracted())
     );
+  });
+
+  readonly isSubscriptionExpired = computed(() => {
+    const user = this.user();
+    if (!user?.userSubscriptionResponse) return true;
+
+    const { isSubscriptionActive, subscriptionEndDate } =
+      user.userSubscriptionResponse;
+
+    if (!isSubscriptionActive) return true;
+
+    const currentDate = new Date();
+    const endDate = new Date(subscriptionEndDate);
+
+    return endDate < currentDate;
   });
 
   constructor() {
@@ -150,23 +168,7 @@ export class AudioPreviewComponent implements OnInit {
     const job = this.job();
     if (!job) return;
 
-    if (job.audioOutputBlobName) {
-      this.resourcesStateService.setAudioState('generated');
-      this.resourcesStateService.setAudioUrl(job.audioOutputBlobName);
-      this.resourcesStateService.markGeneratedSuccess();
-      this.resourcesStateService.setAiGeneratedMetadata(
-        LessonGenerationType.Audio,
-        {
-          title: job.topic,
-          contentType: ContentType.Audio,
-          duration: 0,
-          fileSize: 1,
-          blobName: job.audioOutputBlobName,
-        }
-      );
-    } else {
-      this.resourcesStateService.setAudioState('no-content');
-    }
+    this.handleExistingAudioJob(job);
   }
 
   // ? Confirm Generate
@@ -243,6 +245,11 @@ export class AudioPreviewComponent implements OnInit {
     const currentGenerated = this.currentGeneratedType();
 
     if (currentGenerated === type) return;
+
+    if (this.isSubscriptionExpired()) {
+      this.confirmGenerationRequest(type);
+      return;
+    }
 
     // ? If have any type generated then popup confirmation for user decide to save content or not
     if (currentGenerated !== null && currentGenerated !== type) {
@@ -327,6 +334,67 @@ export class AudioPreviewComponent implements OnInit {
       },
       accept: onAccept,
       reject: onReject,
+    });
+  }
+
+  private handleExistingAudioJob(job: AiJob): void {
+    if (job.audioOutputBlobName) {
+      this.resourcesStateService.setAudioState('generated');
+      this.resourcesStateService.setAudioUrl(job.audioOutputBlobName);
+      this.resourcesStateService.markGeneratedSuccess();
+
+      // ? Set metadata immediately with default values to avoid timing issues
+      this.resourcesStateService.setAiGeneratedMetadata(
+        LessonGenerationType.Audio,
+        {
+          title: job.topic,
+          contentType: ContentType.Audio,
+          duration: 0,
+          fileSize: 1,
+          blobName: job.audioOutputBlobName,
+        }
+      );
+
+      // ? Get file size and duration from the audio blob and update metadata
+      this.getAudioMetadata(job.audioOutputBlobName, job.topic);
+    } else {
+      this.resourcesStateService.setAudioState('no-content');
+    }
+  }
+
+  private getAudioMetadata(blobName: string, title: string): void {
+    this.aiJobService.getFileSizeByBlobNameUrl(blobName).subscribe(fileSize => {
+      // ? Create audio element to get duration
+      const audio = new Audio(blobName);
+      audio.addEventListener('loadedmetadata', () => {
+        const duration = Math.round(audio.duration);
+
+        // ? Update existing metadata with real values
+        this.resourcesStateService.setAiGeneratedMetadata(
+          LessonGenerationType.Audio,
+          {
+            title: title,
+            contentType: ContentType.Audio,
+            duration: duration,
+            fileSize: fileSize,
+            blobName: blobName,
+          }
+        );
+      });
+
+      audio.addEventListener('error', () => {
+        // ? Update metadata with fileSize but keep duration as 0 if audio loading fails
+        this.resourcesStateService.setAiGeneratedMetadata(
+          LessonGenerationType.Audio,
+          {
+            title: title,
+            contentType: ContentType.Audio,
+            duration: 0,
+            fileSize: fileSize,
+            blobName: blobName,
+          }
+        );
+      });
     });
   }
 

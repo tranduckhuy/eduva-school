@@ -19,7 +19,10 @@ import { GlobalModalService } from '../../../../shared/services/layout/global-mo
 import { ClassManagementService } from '../services/class-management.service';
 import { UploadFileService } from '../../../../shared/services/api/file/upload-file.service';
 
+import { noOnlySpacesValidator } from '../../../../shared/utils/form-validators';
+
 import { MODAL_DATA } from '../../../../shared/tokens/injection/modal-data.token';
+
 import { BASE_BG_CLASS_IMAGE_URL } from '../../../../shared/constants/common.constant';
 
 import { type CreateClassRequest } from '../models/request/command/create-class-request.model';
@@ -52,7 +55,7 @@ export class AddClassModalComponent {
 
   constructor() {
     this.form = this.fb.group({
-      name: ['', Validators.required],
+      name: ['', Validators.required, noOnlySpacesValidator],
       backgroundImageUrl: [''],
     });
   }
@@ -94,9 +97,12 @@ export class AddClassModalComponent {
 
   getErrorMessage(controlName: string): string {
     const control = this.form.get(controlName);
-    if (control?.hasError('required')) {
-      return 'Trường này không được để trống';
-    }
+
+    if (control?.hasError('required')) return 'Trường này không được để trống';
+
+    if (control?.hasError('onlySpaces'))
+      return 'Trường này không được chỉ chứa khoảng trắng';
+
     return '';
   }
 
