@@ -68,6 +68,7 @@ export class SubscriptionPlanComponent implements OnInit {
 
     const request: GetSubscriptionPlanRequest = {
       activeOnly: true,
+      sortBy: 'monthly',
     };
 
     forkJoin({
