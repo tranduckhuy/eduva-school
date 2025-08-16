@@ -58,7 +58,7 @@
           }"></span>
         <span>Tải xuống bản xem trước</span>
       </button>
-      @if (!hasGeneratedSuccessfully()) {
+      @if (!isSubscriptionExpired()) {
         <button
           class="flex h-10 items-center gap-2 rounded-bl rounded-br px-4 text-primary transition-colors ease-in hover:bg-[#dee8f6] dark:hover:bg-dark-300"
           tooltipPosition="bottom"

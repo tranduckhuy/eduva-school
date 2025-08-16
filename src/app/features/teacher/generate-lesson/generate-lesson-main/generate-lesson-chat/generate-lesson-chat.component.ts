@@ -70,6 +70,7 @@ interface AiResponseMessage {
 })
 export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   private readonly scrollContainer = viewChild<ElementRef>('scrollContainer');
+
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
   private readonly resourcesStateService = inject(ResourcesStateService);
@@ -97,19 +98,6 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
   form: FormGroup = this.fb.group({
     topic: ['', Validators.required],
   });
-
-  readonly buttons = [
-    { title: 'Bài học tế bào sinh vật' },
-    { title: 'Người lính trong Tây Tiến' },
-    { title: 'Phương trình hai ẩn' },
-  ];
-
-  readonly responsiveOptions = [
-    { breakpoint: '1400px', numVisible: 2, numScroll: 1 },
-    { breakpoint: '1199px', numVisible: 3, numScroll: 1 },
-    { breakpoint: '767px', numVisible: 2, numScroll: 1 },
-    { breakpoint: '575px', numVisible: 1, numScroll: 1 },
-  ];
 
   readonly disabledSendButton = computed(
     () =>
@@ -162,15 +150,9 @@ export class GenerateLessonChatComponent implements OnInit, AfterViewInit {
     this.form.reset();
   }
 
-  handleChipClick(title: string): void {
-    const content = `Tạo bài giảng về ${title}`;
-    this.form.patchValue({ topic: content });
-
-    if (this.shouldBlockSend()) return;
-
-    this.addUserMessage(content);
-    this.handleJobSend();
-    this.form.reset();
+  isExpanded(): boolean {
+    const topicValue = this.form.get('topic')?.value;
+    return topicValue && topicValue.length > 100;
   }
 
   onEnterKey(event: Event): void {

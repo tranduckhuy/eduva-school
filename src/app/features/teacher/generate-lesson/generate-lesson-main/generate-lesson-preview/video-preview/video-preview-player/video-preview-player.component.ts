@@ -24,9 +24,10 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ResourcesStateService } from '../../../services/utils/resources-state.service';
 import { GenerateSettingsSelectionService } from '../../../services/utils/generate-settings-selection.service';
 import { LoadingService } from '../../../../../../../shared/services/core/loading/loading.service';
-import { LessonMaterialsService } from '../../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
 import { AiJobsService } from '../../../services/api/ai-jobs.service';
+import { UserService } from '../../../../../../../shared/services/api/user/user.service';
 import { DownloadGeneratedContentService } from '../../../services/api/download-generated-content.service';
+import { LessonMaterialsService } from '../../../../../../../shared/services/api/lesson-materials/lesson-materials.service';
 
 import { LessonGenerationType } from '../../../../../../../shared/models/enum/lesson-generation-type.enum';
 
@@ -65,6 +66,7 @@ export class VideoPreviewPlayerComponent {
   private readonly generateSettingsService = inject(
     GenerateSettingsSelectionService
   );
+  private readonly userService = inject(UserService);
   private readonly loadingService = inject(LoadingService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
   private readonly aiJobService = inject(AiJobsService);
@@ -73,6 +75,8 @@ export class VideoPreviewPlayerComponent {
   );
 
   videoUrl = input<string>('');
+
+  user = this.userService.currentUser;
 
   isLoadingCreateMaterial = this.loadingService.is('create-lesson-materials');
   isLoadingDownload = this.loadingService.is('download-generated-content');
@@ -114,6 +118,21 @@ export class VideoPreviewPlayerComponent {
       return 'Video đã được lưu';
     }
     return '';
+  });
+
+  isSubscriptionExpired = computed(() => {
+    const user = this.user();
+    if (!user?.userSubscriptionResponse) return true;
+
+    const { isSubscriptionActive, subscriptionEndDate } =
+      user.userSubscriptionResponse;
+
+    if (!isSubscriptionActive) return true;
+
+    const currentDate = new Date();
+    const endDate = new Date(subscriptionEndDate);
+
+    return endDate < currentDate;
   });
 
   onPlayerReady(api: VgApiService) {
