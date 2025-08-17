@@ -46,9 +46,7 @@ export class ClassManagementService {
       .pipe(
         tap(res => this.handleCreateTeacherClassResponse(res)),
         map(res => this.extractClassFromResponse(res)),
-        catchError((err: HttpErrorResponse) =>
-          this.handleCreateTeacherClassError(err)
-        )
+        catchError((err: HttpErrorResponse) => this.handleError(err))
       );
   }
 
@@ -60,20 +58,7 @@ export class ClassManagementService {
       .pipe(
         tap(res => this.handleSuccess(res)),
         map(() => null),
-        catchError((err: HttpErrorResponse) => {
-          if (
-            err.error.statusCode ===
-            StatusCode.CLASS_NAME_ALREADY_EXISTS_FOR_TEACHER
-          ) {
-            this.toastHandlingService.error(
-              'Tên lớp học đã tồn tại',
-              'Vui lòng chọn một tên khác cho lớp học này.'
-            );
-          } else {
-            this.toastHandlingService.errorGeneral();
-          }
-          return throwError(() => err);
-        })
+        catchError((err: HttpErrorResponse) => this.handleError(err))
       );
   }
 
@@ -197,28 +182,6 @@ export class ClassManagementService {
     return null;
   }
 
-  private handleCreateTeacherClassError(
-    err: HttpErrorResponse
-  ): Observable<null> {
-    switch (err.error.statusCode) {
-      case StatusCode.PROVIDED_INFORMATION_IS_INVALID:
-        this.toastHandlingService.warn(
-          'Tên lớp học không hợp lệ',
-          'Tên lớp học đã tồn tại. Vui lòng chọn một tên khác và thử lại.'
-        );
-        break;
-      case StatusCode.CLASS_CREATE_FAILED:
-        this.toastHandlingService.error(
-          'Không thể tạo lớp học',
-          'Hệ thống gặp sự cố khi tạo lớp. Vui lòng thử lại sau.'
-        );
-        break;
-      default:
-        this.toastHandlingService.errorGeneral();
-    }
-    return throwError(() => err);
-  }
-
   private handleGetTeacherClassesResponse(res: any): void {
     if (res.statusCode === StatusCode.SUCCESS && res.data) {
       let classes;
@@ -289,7 +252,23 @@ export class ClassManagementService {
   }
 
   private handleError(err: HttpErrorResponse): Observable<null> {
-    this.toastHandlingService.errorGeneral();
+    switch (err.error?.statusCode) {
+      case StatusCode.PROVIDED_INFORMATION_IS_INVALID:
+      case StatusCode.CLASS_NAME_ALREADY_EXISTS_FOR_TEACHER:
+        this.toastHandlingService.warn(
+          'Tên lớp học không tồn tại',
+          'Tên lớp học đã tồn tại. Vui lòng chọn một tên khác và thử lại.'
+        );
+        break;
+      case StatusCode.CLASS_CREATE_FAILED:
+        this.toastHandlingService.error(
+          'Không thể tạo lớp học',
+          'Hệ thống gặp sự cố khi tạo lớp. Vui lòng thử lại sau.'
+        );
+        break;
+      default:
+        this.toastHandlingService.errorGeneral();
+    }
     return throwError(() => err);
   }
 }

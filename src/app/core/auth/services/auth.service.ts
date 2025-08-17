@@ -205,7 +205,7 @@ export class AuthService {
       case StatusCode.INVALID_CREDENTIALS:
         this.toastHandlingService.warn(
           'Đăng nhập thất bại',
-          'Tên đăng nhập hoặc mật khẩu chưa chính xác.'
+          'Địa chỉ email hoặc mật khẩu chưa chính xác.'
         );
         break;
 

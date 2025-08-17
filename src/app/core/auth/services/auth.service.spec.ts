@@ -192,7 +192,7 @@ describe('AuthService', () => {
           expect(result).toBeNull();
           expect(toastHandlingService.warn).toHaveBeenCalledWith(
             'Đăng nhập thất bại',
-            'Tên đăng nhập hoặc mật khẩu chưa chính xác.'
+            'Địa chỉ email hoặc mật khẩu chưa chính xác.'
           );
           resolve();
         });
@@ -213,7 +213,7 @@ describe('AuthService', () => {
           expect(result).toBeNull();
           expect(toastHandlingService.warn).toHaveBeenCalledWith(
             'Đăng nhập thất bại',
-            'Tên đăng nhập hoặc mật khẩu chưa chính xác.'
+            'Địa chỉ email hoặc mật khẩu chưa chính xác.'
           );
           resolve();
         });

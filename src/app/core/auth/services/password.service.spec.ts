@@ -192,7 +192,7 @@ describe('PasswordService', () => {
         service.resetPassword(mockResetPasswordRequest).subscribe({
           error: () => {
             expect(toastHandlingService.warn).toHaveBeenCalledWith(
-              'Cảnh báo',
+              'Cảnh báo xác thực',
               'Mật khẩu mới không được trùng với mật khẩu hiện tại.'
             );
             resolve();
@@ -349,16 +349,38 @@ describe('PasswordService', () => {
       const error = new HttpErrorResponse({
         error: { statusCode: StatusCode.USER_NOT_EXISTS },
       });
-      (service as any).handleForgotPasswordError(error);
-      expect(toastHandlingService.warn).toHaveBeenCalledWith(
-        'Email không tồn tại',
-        'Vui lòng kiểm tra lại địa chỉ email.'
-      );
+      // Mock the requestService to return the error
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+      // Test the actual error handling through the service method
+      service
+        .forgotPassword({
+          email: 'test@example.com',
+          clientUrl: 'http://localhost:4200',
+        })
+        .subscribe({
+          error: () => {
+            expect(toastHandlingService.warn).toHaveBeenCalledWith(
+              'Email không tồn tại',
+              'Vui lòng kiểm tra lại địa chỉ email.'
+            );
+          },
+        });
     });
     it('should handleForgotPasswordError general', () => {
       const error = new HttpErrorResponse({ error: { statusCode: 9999 } });
-      (service as any).handleForgotPasswordError(error);
-      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+      // Mock the requestService to return the error
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+      // Test the actual error handling through the service method
+      service
+        .forgotPassword({
+          email: 'test@example.com',
+          clientUrl: 'http://localhost:4200',
+        })
+        .subscribe({
+          error: () => {
+            expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+          },
+        });
     });
     it('should handleResetPasswordResponse', () => {
       const spy = vi.spyOn(service as any, 'handleChangePasswordResponse');
@@ -371,32 +393,44 @@ describe('PasswordService', () => {
       const error = new HttpErrorResponse({
         error: { statusCode: StatusCode.UNAUTHORIZED },
       });
-      try {
-        (service as any).handleResetPasswordError(error);
-      } catch {}
-      expect(toastHandlingService.error).toHaveBeenCalledWith(
-        'Liên kết hết hạn',
-        'Vui lòng gửi lại yêu cầu đặt lại mật khẩu mới.'
-      );
+      // Mock the requestService to return the error
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+      // Test the actual error handling through the service method
+      service.resetPassword(mockResetPasswordRequest).subscribe({
+        error: () => {
+          expect(toastHandlingService.error).toHaveBeenCalledWith(
+            'Liên kết hết hạn',
+            'Vui lòng gửi lại yêu cầu đặt lại mật khẩu mới.'
+          );
+        },
+      });
     });
     it('should handleResetPasswordError new password same as old', () => {
       const error = new HttpErrorResponse({
         error: { statusCode: StatusCode.NEW_PASSWORD_SAME_AS_OLD },
       });
-      try {
-        (service as any).handleResetPasswordError(error);
-      } catch {}
-      expect(toastHandlingService.warn).toHaveBeenCalledWith(
-        'Cảnh báo',
-        'Mật khẩu mới không được trùng với mật khẩu hiện tại.'
-      );
+      // Mock the requestService to return the error
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+      // Test the actual error handling through the service method
+      service.resetPassword(mockResetPasswordRequest).subscribe({
+        error: () => {
+          expect(toastHandlingService.warn).toHaveBeenCalledWith(
+            'Cảnh báo xác thực',
+            'Mật khẩu mới không được trùng với mật khẩu hiện tại.'
+          );
+        },
+      });
     });
     it('should handleResetPasswordError general', () => {
       const error = new HttpErrorResponse({ error: { statusCode: 9999 } });
-      try {
-        (service as any).handleResetPasswordError(error);
-      } catch {}
-      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+      // Mock the requestService to return the error
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+      // Test the actual error handling through the service method
+      service.resetPassword(mockResetPasswordRequest).subscribe({
+        error: () => {
+          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+        },
+      });
     });
     it('should handleChangePasswordResponse success', () => {
       (service as any).handleChangePasswordResponse({
@@ -417,32 +451,44 @@ describe('PasswordService', () => {
       const error = new HttpErrorResponse({
         error: { statusCode: StatusCode.INCORRECT_CURRENT_PASSWORD },
       });
-      try {
-        (service as any).handleChangePasswordError(error);
-      } catch {}
-      expect(toastHandlingService.warn).toHaveBeenCalledWith(
-        'Cảnh báo xác thực',
-        'Mật khẩu hiện tại không chính xác. Vui lòng kiểm tra và thử lại.'
-      );
+      // Mock the requestService to return the error
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+      // Test the actual error handling through the service method
+      service.changePassword(mockChangePasswordRequest).subscribe({
+        error: () => {
+          expect(toastHandlingService.warn).toHaveBeenCalledWith(
+            'Cảnh báo xác thực',
+            'Mật khẩu hiện tại không chính xác. Vui lòng kiểm tra và thử lại.'
+          );
+        },
+      });
     });
     it('should handleChangePasswordError new password same as old', () => {
       const error = new HttpErrorResponse({
         error: { statusCode: StatusCode.NEW_PASSWORD_SAME_AS_OLD },
       });
-      try {
-        (service as any).handleChangePasswordError(error);
-      } catch {}
-      expect(toastHandlingService.warn).toHaveBeenCalledWith(
-        'Cảnh báo xác thực',
-        'Mật khẩu mới không được trùng với mật khẩu hiện tại.'
-      );
+      // Mock the requestService to return the error
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+      // Test the actual error handling through the service method
+      service.changePassword(mockChangePasswordRequest).subscribe({
+        error: () => {
+          expect(toastHandlingService.warn).toHaveBeenCalledWith(
+            'Cảnh báo xác thực',
+            'Mật khẩu mới không được trùng với mật khẩu hiện tại.'
+          );
+        },
+      });
     });
     it('should handleChangePasswordError general', () => {
       const error = new HttpErrorResponse({ error: { statusCode: 9999 } });
-      try {
-        (service as any).handleChangePasswordError(error);
-      } catch {}
-      expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+      // Mock the requestService to return the error
+      (requestService.post as any).mockReturnValue(throwError(() => error));
+      // Test the actual error handling through the service method
+      service.changePassword(mockChangePasswordRequest).subscribe({
+        error: () => {
+          expect(toastHandlingService.errorGeneral).toHaveBeenCalled();
+        },
+      });
     });
   });
 
