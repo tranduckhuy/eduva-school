@@ -33,7 +33,7 @@ export class PasswordService {
     return this.requestService.post(this.FORGOT_PASSWORD_API_URL, payload).pipe(
       tap(res => this.handleForgotPasswordResponse(res)),
       map(() => void 0),
-      catchError(err => this.handleForgotPasswordError(err))
+      catchError(err => this.handleError(err))
     );
   }
 
@@ -45,7 +45,7 @@ export class PasswordService {
       .pipe(
         tap(res => this.handleResetPasswordResponse(res)),
         map(() => void 0),
-        catchError(err => this.handleResetPasswordError(err))
+        catchError(err => this.handleError(err))
       );
   }
 
@@ -57,7 +57,7 @@ export class PasswordService {
       .pipe(
         tap(res => this.handleChangePasswordResponse(res)),
         map(() => void 0),
-        catchError(err => this.handleChangePasswordError(err))
+        catchError(err => this.handleError(err))
       );
   }
 
@@ -79,40 +79,8 @@ export class PasswordService {
     }
   }
 
-  private handleForgotPasswordError(err: HttpErrorResponse): Observable<void> {
-    if (err.error?.statusCode === StatusCode.USER_NOT_EXISTS) {
-      this.toastHandlingService.warn(
-        'Email không tồn tại',
-        'Vui lòng kiểm tra lại địa chỉ email.'
-      );
-    } else {
-      this.toastHandlingService.errorGeneral();
-    }
-    return of(void 0);
-  }
-
   private handleResetPasswordResponse(res: any): void {
     this.handleChangePasswordResponse(res);
-  }
-
-  private handleResetPasswordError(err: HttpErrorResponse): Observable<void> {
-    switch (err.error?.statusCode) {
-      case StatusCode.UNAUTHORIZED:
-        this.toastHandlingService.error(
-          'Liên kết hết hạn',
-          'Vui lòng gửi lại yêu cầu đặt lại mật khẩu mới.'
-        );
-        break;
-      case StatusCode.NEW_PASSWORD_SAME_AS_OLD:
-        this.toastHandlingService.warn(
-          'Cảnh báo',
-          'Mật khẩu mới không được trùng với mật khẩu hiện tại.'
-        );
-        break;
-      default:
-        this.toastHandlingService.errorGeneral();
-    }
-    return throwError(() => err);
   }
 
   private handleChangePasswordResponse(res: any): void {
@@ -126,8 +94,14 @@ export class PasswordService {
     }
   }
 
-  private handleChangePasswordError(err: HttpErrorResponse): Observable<void> {
+  private handleError(err: HttpErrorResponse): Observable<void> {
     switch (err.error?.statusCode) {
+      case StatusCode.UNAUTHORIZED:
+        this.toastHandlingService.error(
+          'Liên kết hết hạn',
+          'Vui lòng gửi lại yêu cầu đặt lại mật khẩu mới.'
+        );
+        break;
       case StatusCode.INCORRECT_CURRENT_PASSWORD:
         this.toastHandlingService.warn(
           'Cảnh báo xác thực',
@@ -138,6 +112,12 @@ export class PasswordService {
         this.toastHandlingService.warn(
           'Cảnh báo xác thực',
           'Mật khẩu mới không được trùng với mật khẩu hiện tại.'
+        );
+        break;
+      case StatusCode.USER_NOT_EXISTS:
+        this.toastHandlingService.warn(
+          'Email không tồn tại',
+          'Vui lòng kiểm tra lại địa chỉ email.'
         );
         break;
       default:

@@ -199,9 +199,9 @@ export class TwoFactorService {
         );
         break;
       case StatusCode.USER_NOT_EXISTS:
-        this.toastHandlingService.error(
+        this.toastHandlingService.warn(
           'Email không tồn tại',
-          'Không tìm thấy tài khoản nào tương ứng với địa chỉ email của bạn.'
+          'Vui lòng kiểm tra lại địa chỉ email.'
         );
         break;
       default:

@@ -150,7 +150,7 @@ export class ImportAccountModalsComponent {
     if (!fileExtension || !ALLOWED_IMPORT_EXTENSIONS.includes(fileExtension)) {
       this.toastHandlingService.info(
         'Thông tin',
-        'Vui lòng chọn file Excel (.xlsx, .xls) hoặc CSV (.csv)'
+        'Vui lòng chọn file Excel (.xlsx)'
       );
       return;
     }
