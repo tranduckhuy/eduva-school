@@ -74,6 +74,9 @@ describe('PasswordService', () => {
               expect.objectContaining({
                 email: mockEmailLinkRequest.email,
                 clientUrl: expect.any(String),
+              }),
+              expect.objectContaining({
+                bypassNotFoundError: true,
               })
             );
             expect(toastHandlingService.success).toHaveBeenCalledWith(
@@ -591,6 +594,9 @@ describe('PasswordService', () => {
                 expect.objectContaining({
                   email: request.email,
                   clientUrl: expect.stringContaining('/auth/reset-password'),
+                }),
+                expect.objectContaining({
+                  bypassNotFoundError: true,
                 })
               );
               resolve();
