@@ -173,7 +173,7 @@ export class UserService {
       this.requestService.put<void>(`${this.USER_API_URL}/${id}/lock`, '', {
         loadingKey: 'archive-user',
       }),
-      'Vô hiệu người dùng thành công!'
+      'Vô hiệu hóa người dùng thành công!'
     );
   }
 

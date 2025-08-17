@@ -148,30 +148,32 @@
       </div>
 
       <!-- ? Folder -->
-      <div class="mt-5 flex flex-col">
-        <span class="text-base font-semibold dark:text-white">
-          Thư mục bài giảng
-        </span>
-        <div class="mt-2 flex gap-3">
-          <p-select
-            formControlName="folderId"
-            name="folderId"
-            inputId="folderId"
-            placeholder="Chọn thư mục bạn muốn lưu trữ"
-            filterPlaceholder="Tìm kiếm..."
-            emptyFilterMessage="Không có kết quả tìm thấy"
-            emptyMessage="Chưa có thư mục nào. Vui lòng tạo thư mục mới để bắt đầu."
-            class="w-full"
-            optionLabel="name"
-            optionValue="id"
-            [checkmark]="true"
-            [filter]="true"
-            [resetFilterOnHide]="true"
-            [showClear]="true"
-            [options]="folderList()"
-            [loading]="isFolderLoading()" />
+      @if (!isSubscriptionExpired()) {
+        <div class="mt-5 flex flex-col">
+          <span class="text-base font-semibold dark:text-white">
+            Thư mục bài giảng
+          </span>
+          <div class="mt-2 flex gap-3">
+            <p-select
+              formControlName="folderId"
+              name="folderId"
+              inputId="folderId"
+              placeholder="Chọn thư mục bạn muốn lưu trữ"
+              filterPlaceholder="Tìm kiếm..."
+              emptyFilterMessage="Không có kết quả tìm thấy"
+              emptyMessage="Chưa có thư mục nào. Vui lòng tạo thư mục mới để bắt đầu."
+              class="w-full"
+              optionLabel="name"
+              optionValue="id"
+              [checkmark]="true"
+              [filter]="true"
+              [resetFilterOnHide]="true"
+              [showClear]="true"
+              [options]="folderList()"
+              [loading]="isFolderLoading()" />
+          </div>
         </div>
-      </div>
+      }
     </form>
   </div>
 

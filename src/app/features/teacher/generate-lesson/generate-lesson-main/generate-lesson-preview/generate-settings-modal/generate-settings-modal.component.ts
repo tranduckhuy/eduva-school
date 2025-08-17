@@ -5,6 +5,7 @@ import {
   OnInit,
   inject,
   signal,
+  computed,
 } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -12,8 +13,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 
-import { GlobalModalService } from '../../../../../../shared/services/layout/global-modal/global-modal.service';
+import { UserService } from '../../../../../../shared/services/api/user/user.service';
 import { LoadingService } from '../../../../../../shared/services/core/loading/loading.service';
+import { GlobalModalService } from '../../../../../../shared/services/layout/global-modal/global-modal.service';
 import { FolderManagementService } from '../../../../../../shared/services/api/folder/folder-management.service';
 import {
   GenerateSettingsSelectionService,
@@ -51,9 +53,11 @@ export class GenerateSettingsModalComponent implements OnInit {
   private readonly settingsSelectionService = inject(
     GenerateSettingsSelectionService
   );
+  private readonly userService = inject(UserService);
   private readonly folderService = inject(FolderManagementService);
 
   // ? External data signals
+  readonly user = this.userService.currentUser;
   readonly folderList = this.folderService.folderList;
   readonly isFolderLoading = this.loadingService.is('get-folders');
 
@@ -72,8 +76,22 @@ export class GenerateSettingsModalComponent implements OnInit {
   );
 
   // ? Voice options for the current language
-  private readonly voiceOptionsSignal = signal<VoiceOption[]>([]);
-  readonly voiceOptions = this.voiceOptionsSignal.asReadonly();
+  readonly voiceOptions = signal<VoiceOption[]>([]);
+
+  isSubscriptionExpired = computed(() => {
+    const user = this.user();
+    if (!user?.userSubscriptionResponse) return true;
+
+    const { isSubscriptionActive, subscriptionEndDate } =
+      user.userSubscriptionResponse;
+
+    if (!isSubscriptionActive) return true;
+
+    const currentDate = new Date();
+    const endDate = new Date(subscriptionEndDate);
+
+    return endDate < currentDate;
+  });
 
   // ? Form group for user inputs
   readonly form = this.fb.group({
@@ -91,7 +109,9 @@ export class GenerateSettingsModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.synchronizeFormWithService();
-    this.loadFolders();
+    if (!this.isSubscriptionExpired()) {
+      this.loadFolders();
+    }
   }
 
   save(): void {
@@ -154,7 +174,7 @@ export class GenerateSettingsModalComponent implements OnInit {
   private updateVoiceOptions(language: LanguageCode): void {
     // ? Now using centralized helper
     const options = VoiceConfigHelper.getVoiceOptionsForLanguage(language);
-    this.voiceOptionsSignal.set(options);
+    this.voiceOptions.set(options);
   }
 
   private updateVoiceForLanguage(newLanguage: LanguageCode): void {

@@ -307,6 +307,12 @@ export class LessonMaterialsService {
 
   private handleError(err: HttpErrorResponse): Observable<null> {
     switch (err.error?.statusCode) {
+      case StatusCode.AI_LESSON_MATERIAL_ALREADY_SAVED:
+        this.toastHandlingService.warn(
+          'Bài giảng đã tồn tại',
+          'Nội dung AI này đã được lưu trước đó, vui lòng kiểm tra lại trong thư mục cá nhân.'
+        );
+        break;
       case StatusCode.SCHOOL_SUBSCRIPTION_NOT_FOUND:
         // ? Redirect to home page
         setTimeout(() => {
