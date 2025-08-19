@@ -10,9 +10,11 @@ import { ToastHandlingService } from '../../../../shared/services/core/toast/toa
 
 import { StatusCode } from '../../../../shared/constants/status-code.constant';
 
-import { type CreditTransaction } from '../models/response/query/get-credit-transaction-response.model';
-import { type GetCreditPacksRequest } from '../models/request/query/get-credit-packs-request.model';
-import { type GetCreditPacksResponse } from '../models/response/query/get-credit-packs-response.model';
+import { type GetCreditTransactionRequest } from '../models/request/query/get-credit-transaction-request.model';
+import {
+  type CreditTransaction,
+  type GetCreditTransactionResponse,
+} from '../models/response/query/get-credit-transaction-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -31,14 +33,15 @@ export class CreditPackTransactionService {
   totalRecords = this.totalRecordsSignal.asReadonly();
 
   getCreditTransactions(
-    request: GetCreditPacksRequest
+    request: GetCreditTransactionRequest
   ): Observable<CreditTransaction[] | null> {
     return this.requestService
-      .get<GetCreditPacksResponse>(
+      .get<GetCreditTransactionResponse>(
         this.GET_PACK_TRANSACTIONS_API_URL,
         request,
         {
           loadingKey: 'load-transactions',
+          bypassCache: true,
         }
       )
       .pipe(

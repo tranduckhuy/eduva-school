@@ -3,28 +3,23 @@ import {
   Component,
   OnInit,
   inject,
-  signal,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { CreditPackService } from './services/credit-pack.service';
-import { CreditPackTransactionService } from './services/credit-pack-transaction.service';
+import { finalize, map, of, switchMap } from 'rxjs';
+
 import { UserService } from '../../../shared/services/api/user/user.service';
 import { PaymentService } from '../../../shared/services/api/payment/payment.service';
+import { CreditPackTransactionService } from './services/credit-pack-transaction.service';
+
+import { clearQueryParams } from '../../../shared/utils/util-functions';
 
 import { PAGE_SIZE } from '../../../shared/constants/common.constant';
 
 import { ListCreditPackComponent } from './list-credit-pack/list-credit-pack.component';
 import { TransactionHistoryComponent } from './transaction-history/transaction-history.component';
 
-import { type GetCreditPacksRequest } from './models/request/query/get-credit-packs-request.model';
-import { type GetCreditTransactionRequest } from './models/request/query/get-credit-transaction-request.model';
 import { type ConfirmPaymentReturnRequest } from '../../../shared/models/api/request/query/confirm-payment-return-request.model';
-
-type PageChangeValue = {
-  currentPage: number;
-  pageSize?: number;
-};
 
 @Component({
   selector: 'app-credit-pack',
@@ -35,65 +30,59 @@ type PageChangeValue = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreditPackComponent implements OnInit {
+  private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
-  private readonly creditPackService = inject(CreditPackService);
+  private readonly userService = inject(UserService);
+  private readonly paymentService = inject(PaymentService);
   private readonly creditTransactionService = inject(
     CreditPackTransactionService
   );
-  private readonly userService = inject(UserService);
-  private readonly paymentService = inject(PaymentService);
-
-  creditPacks = this.creditPackService.creditPacks;
-  creditTransactions = this.creditTransactionService.creditTransactions;
-  totalRecords = this.creditTransactionService.totalRecords;
-
-  currentPage = signal<number>(1);
-  pageSize = signal<number>(PAGE_SIZE);
-  firstRecordIndex = signal<number>(0);
-  shouldStopRequest = signal<boolean>(false);
 
   ngOnInit(): void {
-    this.activatedRoute.queryParams.subscribe(params => {
-      const { code, id, status, orderCode } = params;
-      if (code && id && status && orderCode) {
-        const confirmRequest: ConfirmPaymentReturnRequest = {
-          code,
-          id,
-          status,
-          orderCode: +orderCode,
-        };
-        this.paymentService.confirmPaymentReturn(confirmRequest).subscribe({
-          complete: () => {
-            this.userService.getCurrentProfile().subscribe();
-            this.loadCreditTransactions({ currentPage: 1 });
-          },
-        });
-      }
-    });
-
-    this.loadCreditPacks();
-    this.loadCreditTransactions();
+    this.handleRouteQueryParams();
   }
 
-  loadCreditPacks() {
-    const request: GetCreditPacksRequest = {
-      activeOnly: true,
-      sortBy: 'price',
-    };
-    this.creditPackService.getCreditPacks(request).subscribe();
-  }
+  private handleRouteQueryParams() {
+    this.activatedRoute.queryParams
+      .pipe(
+        map(params => {
+          const { code, id, status, orderCode } = params ?? {};
+          if (!code || !id || !status || !orderCode) return null;
+          const req: ConfirmPaymentReturnRequest = {
+            code,
+            id,
+            status,
+            orderCode: +orderCode,
+          };
+          return req;
+        }),
+        switchMap(req => {
+          if (!req) {
+            return of(null);
+          }
 
-  loadCreditTransactions(pageChangeValue?: PageChangeValue) {
-    if (this.shouldStopRequest()) return;
-
-    const request: GetCreditTransactionRequest = {
-      pageIndex: pageChangeValue?.currentPage ?? this.currentPage(),
-      pageSize: pageChangeValue?.pageSize ?? this.pageSize(),
-      sortBy: 'createdAt',
-      sortDirection: 'desc',
-    };
-    this.creditTransactionService.getCreditTransactions(request).subscribe({
-      error: () => this.shouldStopRequest.set(true),
-    });
+          return this.paymentService.confirmPaymentReturn(req).pipe(
+            switchMap(() => this.userService.getCurrentProfile()),
+            switchMap(() =>
+              this.creditTransactionService.getCreditTransactions({
+                pageIndex: 1,
+                pageSize: PAGE_SIZE,
+                sortBy: 'createdAt',
+                sortDirection: 'desc',
+              })
+            )
+          );
+        }),
+        finalize(() => {
+          clearQueryParams(this.router, this.activatedRoute, [
+            'code',
+            'id',
+            'cancel',
+            'status',
+            'orderCode',
+          ]);
+        })
+      )
+      .subscribe();
   }
 }

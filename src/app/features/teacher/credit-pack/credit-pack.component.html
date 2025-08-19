@@ -18,15 +18,12 @@
   <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">
     Nạp Ecoin
   </h3>
-  <list-credit-pack [creditPacks]="creditPacks()" />
+  <list-credit-pack />
 </div>
 
-<div class="mt-10">
+<div class="mt-10 pb-7">
   <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">
     Lịch sử giao dịch
   </h3>
-  <credit-transaction-history
-    [creditTransactions]="creditTransactions()"
-    [totalRecords]="totalRecords()"
-    (pageChange)="loadCreditTransactions($event)" />
+  <credit-transaction-history />
 </div>
