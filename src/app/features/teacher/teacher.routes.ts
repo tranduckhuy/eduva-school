@@ -108,6 +108,9 @@ export const teacherRoutes: Routes = [
       },
       {
         path: 'credit-pack',
+        data: {
+          title: 'Nạp Ecoin',
+        },
         loadComponent: () =>
           import('./credit-pack/credit-pack.component').then(
             mod => mod.CreditPackComponent

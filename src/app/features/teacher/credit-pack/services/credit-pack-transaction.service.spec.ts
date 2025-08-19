@@ -11,7 +11,7 @@ import {
   CreditTransaction,
   GetCreditTransactionResponse,
 } from '../models/response/query/get-credit-transaction-response.model';
-import { GetCreditPacksRequest } from '../models/request/query/get-credit-packs-request.model';
+import { GetCreditTransactionRequest } from '../models/request/query/get-credit-transaction-request.model';
 
 describe('CreditPackTransactionService', () => {
   let service: CreditPackTransactionService;
@@ -74,8 +74,7 @@ describe('CreditPackTransactionService', () => {
     data: mockCreditTransactions,
   };
 
-  const mockRequest: GetCreditPacksRequest = {
-    activeOnly: true,
+  const mockRequest: GetCreditTransactionRequest = {
     pageIndex: 0,
     pageSize: 10,
     sortBy: 'createdAt',
@@ -160,7 +159,7 @@ describe('CreditPackTransactionService', () => {
       expect(requestService).toHaveBeenCalledWith(
         expect.stringContaining('/credit-transactions'),
         mockRequest,
-        { loadingKey: 'load-transactions' }
+        { loadingKey: 'load-transactions', bypassCache: true }
       );
     });
 
@@ -303,12 +302,12 @@ describe('CreditPackTransactionService', () => {
       expect(requestService).toHaveBeenCalledWith(
         expect.stringContaining('/credit-transactions'),
         mockRequest,
-        { loadingKey: 'load-transactions' }
+        { loadingKey: 'load-transactions', bypassCache: true }
       );
     });
 
     it('should handle request with minimal parameters', async () => {
-      const minimalRequest: GetCreditPacksRequest = {};
+      const minimalRequest: GetCreditTransactionRequest = {} as any;
       const successResponse = {
         statusCode: StatusCode.SUCCESS,
         data: mockSuccessResponse,
@@ -325,7 +324,7 @@ describe('CreditPackTransactionService', () => {
       expect(requestService).toHaveBeenCalledWith(
         expect.stringContaining('/credit-transactions'),
         minimalRequest,
-        { loadingKey: 'load-transactions' }
+        { loadingKey: 'load-transactions', bypassCache: true }
       );
     });
   });

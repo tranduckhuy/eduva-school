@@ -6,5 +6,6 @@ export const BYPASS_PAYMENT_ERROR = new HttpContextToken<boolean>(() => false);
 export const BYPASS_NOT_FOUND_ERROR = new HttpContextToken<boolean>(
   () => false
 );
+export const BYPASS_CACHE = new HttpContextToken<boolean>(() => false);
 export const SHOW_LOADING = new HttpContextToken<boolean>(() => true);
 export const LOADING_KEY = new HttpContextToken<string>(() => 'default');

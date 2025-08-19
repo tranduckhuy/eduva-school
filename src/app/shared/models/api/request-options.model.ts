@@ -3,6 +3,7 @@ export interface RequestOptions {
   bypassAuthError?: boolean;
   bypassPaymentError?: boolean;
   bypassNotFoundError?: boolean;
+  bypassCache?: boolean;
   showLoading?: boolean;
   loadingKey?: string;
 }
