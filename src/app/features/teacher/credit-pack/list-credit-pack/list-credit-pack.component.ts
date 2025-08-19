@@ -3,7 +3,6 @@ import {
   Component,
   OnInit,
   inject,
-  input,
 } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import {
@@ -21,9 +20,8 @@ import { CreditPackService } from '../services/credit-pack.service';
 import { PaymentService } from '../../../../shared/services/api/payment/payment.service';
 import { LoadingService } from '../../../../shared/services/core/loading/loading.service';
 
-import { type CreditPack } from '../../../../shared/models/entities/credit-pack.model';
+import { type GetCreditPacksRequest } from '../models/request/query/get-credit-packs-request.model';
 import { type CreateCreditPaymentLinkRequest } from '../../../../shared/models/api/request/command/create-credit-payment-link-request.model';
-import { GetCreditPacksRequest } from '../models/request/query/get-credit-packs-request.model';
 
 @Component({
   selector: 'list-credit-pack',
