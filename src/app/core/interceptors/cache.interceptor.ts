@@ -4,11 +4,14 @@ import { inject } from '@angular/core';
 import { of, tap } from 'rxjs';
 
 import { CacheService } from '../../shared/services/core/cache/cache.service';
+import { BYPASS_CACHE } from '../../shared/tokens/context/http-context.token';
 
 export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
   const cache = inject(CacheService);
 
-  if (req.method !== 'GET') {
+  const isBypass = req.context.get(BYPASS_CACHE);
+
+  if (req.method !== 'GET' || isBypass) {
     cache.clear();
     return next(req);
   }
