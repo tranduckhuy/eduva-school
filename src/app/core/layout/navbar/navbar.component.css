@@ -4,3 +4,12 @@
   width: 100%;
   height: 100%;
 }
+
+navbar-accordion-item {
+  display: block;
+  width: 100%;
+}
+
+navbar-accordion-item + navbar-accordion-item {
+  margin-top: 4px;
+}

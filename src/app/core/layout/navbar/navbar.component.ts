@@ -1,18 +1,15 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
-  OnInit,
   inject,
   input,
   output,
   effect,
+  signal,
   computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, NavigationEnd } from '@angular/router';
-
-import { filter } from 'rxjs';
+import { RouterLink } from '@angular/router';
 
 import { UserService } from '../../../shared/services/api/user/user.service';
 
@@ -27,12 +24,11 @@ type NavItem = {
   icon: string;
   type: 'link' | 'accordion' | 'button';
   link?: string;
-  isActive: boolean;
   isDisabled?: boolean;
+  suppressActive?: boolean;
   submenuItems: {
     label: string;
     link: string;
-    active?: boolean;
     isDisabled?: boolean;
   }[];
 };
@@ -50,9 +46,7 @@ type NavbarConfig = {
   styleUrl: './navbar.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NavbarComponent implements OnInit {
-  private readonly router = inject(Router);
-  private readonly cdr = inject(ChangeDetectorRef);
+export class NavbarComponent {
   private readonly userService = inject(UserService);
 
   isSidebarCollapsed = input();
@@ -73,7 +67,7 @@ export class NavbarComponent implements OnInit {
     return !isActive || (endDate && new Date(endDate) < new Date());
   });
 
-  navConfigs: NavbarConfig[] = [];
+  navConfigs = signal<NavbarConfig[]>([]);
 
   constructor() {
     effect(
@@ -81,63 +75,19 @@ export class NavbarComponent implements OnInit {
         const user = this.user();
         const userRole = user?.roles?.[0] as UserRoleType;
 
-        this.navConfigs = this.getNavbarConfigByRole(userRole);
-
-        this.setActiveNavItems(this.router.url);
+        this.navConfigs.set(this.getNavbarConfigByRole(userRole));
       },
       { allowSignalWrites: true }
     );
   }
 
-  ngOnInit(): void {
-    this.setActiveNavItems(this.router.url);
-
-    // ? Listen to router events to update active states
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        this.setActiveNavItems(event.urlAfterRedirects);
-      });
+  get navConfigsArray(): NavbarConfig[] {
+    return this.navConfigs();
   }
 
   get routerLinkRole() {
     const link = this.isSchoolAdmin() ? '/school-admin' : '/teacher';
     return link;
-  }
-
-  private setActiveNavItems(url: string) {
-    const path = url.split('?')[0]; // ? Just get path name
-
-    if (path === '/school-admin/subscription-plans') {
-      this.navConfigs.forEach(section => {
-        section.navItems.forEach(item => {
-          if (
-            item.link === '/school-admin' ||
-            item.link === '/school-admin/settings' ||
-            item.type === 'button'
-          ) {
-            item.isActive = item.link === path;
-          } else {
-            item.isActive = false;
-          }
-          item.submenuItems.forEach(sub => (sub.active = false));
-        });
-      });
-      this.cdr.markForCheck();
-      return;
-    }
-
-    this.navConfigs.forEach(section => {
-      section.navItems.forEach(item => {
-        item.isActive = item.link === path;
-        item.submenuItems.forEach(sub => {
-          sub.active = sub.link === path;
-          if (sub.active) item.isActive = true;
-        });
-      });
-    });
-
-    this.cdr.markForCheck();
   }
 
   private getNavbarConfigByRole(role: UserRoleType): NavbarConfig[] {
@@ -181,7 +131,6 @@ export class NavbarComponent implements OnInit {
             label: 'Đăng xuất',
             icon: 'logout',
             type: 'button',
-            isActive: false,
             submenuItems: [],
           },
         ],
@@ -202,7 +151,6 @@ export class NavbarComponent implements OnInit {
       icon,
       type: 'link',
       link,
-      isActive: false,
       isDisabled,
       submenuItems: [],
     };
@@ -304,7 +252,6 @@ export class NavbarComponent implements OnInit {
       label: 'Quản lý học tập',
       icon: 'auto_stories',
       type: 'accordion',
-      isActive: false,
       submenuItems: submenu,
     };
   }

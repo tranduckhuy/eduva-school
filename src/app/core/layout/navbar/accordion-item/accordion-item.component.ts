@@ -5,8 +5,8 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AuthService } from '../../../auth/services/auth.service';
 
@@ -20,7 +20,7 @@ type Item = {
 @Component({
   selector: 'navbar-accordion-item',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, RouterLinkActive, CommonModule],
   templateUrl: './accordion-item.component.html',
   styleUrl: './accordion-item.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,8 +35,8 @@ export class AccordionItemComponent {
   type = input.required<'link' | 'accordion' | 'button'>();
   link = input<string>('#!');
   submenuItems = input<Item[]>([]);
-  isActive = input<boolean>(false);
   isDisabled = input<boolean>(false);
+  suppressActive = input<boolean>(false);
 
   // ? State Management
   isOpen = signal<boolean>(false);
