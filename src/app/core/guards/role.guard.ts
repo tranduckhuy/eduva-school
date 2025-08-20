@@ -19,7 +19,7 @@ export const roleGuard: CanMatchFn = route => {
   const isLoggedIn =
     !!user && Array.isArray(user.roles) && user.roles.length > 0;
   if (!isLoggedIn) {
-    router.navigate(['/auth/login']);
+    router.navigateByUrl('/auth/login');
     return false;
   }
 
@@ -36,14 +36,14 @@ export const roleGuard: CanMatchFn = route => {
     user.roles.includes(UserRoles.TEACHER) ||
     user.roles.includes(UserRoles.CONTENT_MODERATOR)
   ) {
-    router.navigate(['/teacher']);
+    router.navigateByUrl('/teacher');
   } else if (
     user.roles.includes(UserRoles.SCHOOL_ADMIN) ||
     user.roles.includes(UserRoles.SYSTEM_ADMIN)
   ) {
-    router.navigate(['/school-admin']);
+    router.navigateByUrl('/school-admin');
   } else {
-    router.navigate(['/unauthorized']);
+    router.navigateByUrl('/errors/403');
   }
 
   return false;
