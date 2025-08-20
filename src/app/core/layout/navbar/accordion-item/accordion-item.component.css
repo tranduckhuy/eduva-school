@@ -3,23 +3,25 @@
   width: 100%;
 }
 
-.accordion-item + .accordion-item,
-.accordion-collapse li + li {
-  margin-top: 4px;
-}
-
 .accordion-item i {
   transition: color 0.2s ease;
 }
 
 .accordion-item.active > .accordion-button,
+.accordion-button.active,
 .accordion-button:hover {
+  color: var(--color-primary-500);
   background-color: var(--color-hover-primary);
 }
 
-.accordion-item.active i,
+.accordion-item.active > .accordion-button i,
+.accordion-button.active i,
 .accordion-button:hover i {
   color: var(--color-primary-500);
+}
+
+.accordion-collapse li + li {
+  margin-top: 4px;
 }
 
 .submenu-link {

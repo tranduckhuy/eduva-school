@@ -21,7 +21,7 @@
     'flex flex-col items-center pl-5 pr-4': isSidebarCollapsed(),
     'pb-[80px]': isSchoolAdmin(),
   }">
-  @for (section of navConfigs; track $index) {
+  @for (section of navConfigsArray; track $index) {
     @if (isSidebarCollapsed()) {
       <div>
         <span
@@ -43,9 +43,9 @@
         [link]="item.link || '#!'"
         [icon]="item.icon"
         [type]="item.type"
-        [isActive]="item.isActive"
         [submenuItems]="item.submenuItems"
         [isDisabled]="item.isDisabled ?? false"
+        [suppressActive]="item.suppressActive ?? false"
         [isSidebarCollapsed]="isSidebarCollapsed()" />
     }
   }
