@@ -36,7 +36,7 @@
 @if (type() === 'accordion') {
   <div
     class="accordion-item whitespace-nowrap text-textBlack dark:text-white"
-    [routerLinkActive]="['active']">
+    [routerLinkActive]="suppressActive() ? [] : ['active']">
     <button
       class="accordion-button flex w-full select-none items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors duration-200 ease-linear"
       (click)="toggleAccordion()">
@@ -64,7 +64,7 @@
             <a
               class="submenu-link flex w-full select-none items-center gap-2 rounded-md px-4 py-[10px] font-medium transition-colors duration-200 ease-linear"
               [routerLink]="!item.isDisabled ? item.link : null"
-              [routerLinkActive]="['active']"
+              [routerLinkActive]="item.suppressActive ? [] : ['active']"
               [routerLinkActiveOptions]="{ exact: true }"
               [tabindex]="isDisabled() ? -1 : 0">
               <i class="material-symbols-rounded" style="font-size: 12px">

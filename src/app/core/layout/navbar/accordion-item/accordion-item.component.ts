@@ -15,6 +15,7 @@ type Item = {
   link: string;
   active?: boolean;
   isDisabled?: boolean;
+  suppressActive?: boolean;
 };
 
 @Component({
