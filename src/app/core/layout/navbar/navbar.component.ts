@@ -30,6 +30,7 @@ type NavItem = {
     label: string;
     link: string;
     isDisabled?: boolean;
+    suppressActive?: boolean;
   }[];
 };
 
@@ -144,7 +145,8 @@ export class NavbarComponent {
     label: string,
     icon: string,
     link: string,
-    isDisabled = false
+    isDisabled = false,
+    suppressActive = false
   ): NavItem {
     return {
       label,
@@ -152,6 +154,7 @@ export class NavbarComponent {
       type: 'link',
       link,
       isDisabled,
+      suppressActive,
       submenuItems: [],
     };
   }
@@ -193,7 +196,9 @@ export class NavbarComponent {
       this.buildNavItem(
         item.label,
         item.icon,
-        schoolMissing ? fallback : item.path
+        schoolMissing ? fallback : item.path,
+        false, // isDisabled
+        schoolMissing // suppressActive khi schoolMissing
       )
     );
   }
@@ -227,7 +232,12 @@ export class NavbarComponent {
     const submenu: NavItem['submenuItems'] = [];
 
     const push = (label: string, link: string, isDisabled?: boolean) => {
-      submenu.push({ label, link, isDisabled });
+      submenu.push({
+        label,
+        link,
+        isDisabled,
+        suppressActive: schoolMissing,
+      });
     };
 
     if (isAdmin) {
@@ -253,6 +263,7 @@ export class NavbarComponent {
       icon: 'auto_stories',
       type: 'accordion',
       submenuItems: submenu,
+      suppressActive: schoolMissing,
     };
   }
 
