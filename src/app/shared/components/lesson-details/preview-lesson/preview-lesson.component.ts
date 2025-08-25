@@ -7,6 +7,7 @@ import {
   signal,
   input,
   effect,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -80,6 +81,7 @@ export class PreviewLessonComponent implements OnInit {
   // ? Injected Services
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly userService = inject(UserService);
   private readonly lessonMaterialService = inject(LessonMaterialsService);
   private readonly downloadMaterialService = inject(
@@ -255,19 +257,18 @@ export class PreviewLessonComponent implements OnInit {
 
   private handleRouteQueryParams() {
     this.activatedRoute.queryParamMap.subscribe(params => {
-      const page = Number(params.get('page'));
-      const size = Number(params.get('pageSize'));
       const questionId = params.get('questionId');
       const isLinkedFromNotification = params.has('isLinkedFromNotification');
 
-      this.currentPage.set(!isNaN(page) && page > 0 ? page : 1);
-      this.pageSize.set(!isNaN(size) && size > 0 ? size : PAGE_SIZE);
-
       if (isLinkedFromNotification) {
         this.isCommentModalOpen = true;
+        this.cdr.markForCheck();
+
         if (questionId) {
           this.questionIdFromNotification.set(questionId);
         }
+
+        // ? Clear query params immediately upon arrival
         clearQueryParams(this.router, this.activatedRoute, [
           'isLinkedFromNotification',
           'questionId',
