@@ -170,8 +170,8 @@
     <ng-template #headless>
       <comment-modal
         [isOpen]="isCommentModalOpen"
-        [materialId]="lessonMaterial()!.id"
-        [materialTitle]="lessonMaterial()!.title"
+        [materialId]="lessonMaterial()?.id ?? ''"
+        [materialTitle]="lessonMaterial()?.title ?? ''"
         [questionIdFromNotification]="questionIdFromNotification()"
         (closeCommentDrawer)="isCommentModalOpen = false" />
     </ng-template>
