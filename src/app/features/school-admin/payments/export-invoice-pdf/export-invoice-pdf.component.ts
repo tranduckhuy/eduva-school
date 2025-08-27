@@ -216,7 +216,7 @@ export class ExportInvoicePdfComponent {
       { text: 'EDUVA', font: 'bold' },
       { text: 'Địa chỉ: Đại học FPT Quy Nhơn, Tỉnh Gia Lai', font: 'normal' },
       { text: 'Số điện thoại: 01234543234', font: 'normal' },
-      { text: 'Email: eduva@contact.com', font: 'normal' },
+      { text: 'Email: support@eduva.tech', font: 'normal' },
     ];
   }
 
