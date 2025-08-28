@@ -23,6 +23,7 @@ import { SchoolSubscriptionPlanService } from './services/school-subscription-pl
 import { SubscriptionPlanCardComponent } from './subscription-plan-card/subscription-plan-card.component';
 
 import { BillingCycle } from '../../../shared/models/api/request/command/create-plan-payment-link-request.model';
+import { SubscriptionStatus } from '../../../shared/models/enum/subscription-status.enum';
 
 import { type SubscriptionPlan } from '../../../shared/models/entities/subscription-plan.model';
 import { type SchoolSubscriptionPlan } from '../../../shared/models/entities/school-subscription-plan.model';
@@ -87,6 +88,11 @@ export class SubscriptionPlanComponent implements OnInit {
     const current = this.currentSchoolPlan();
     if (!current) return false;
 
+    // ? Do not mark as current if the subscription is expired
+    if (current.subscriptionStatus === SubscriptionStatus.Expired) {
+      return false;
+    }
+
     // ? Compare billing cycle (Yearly/Monthly)
     const planBillingCycle = isYearly
       ? BillingCycle.Yearly
@@ -109,10 +115,8 @@ export class SubscriptionPlanComponent implements OnInit {
     const current = this.currentSchoolPlan();
     if (!current) return false;
 
-    // ? If current user's plan have been expired then do not disabled anything
-    const subscriptionEnd =
-      this.user()?.userSubscriptionResponse?.subscriptionEndDate;
-    if (subscriptionEnd && new Date(subscriptionEnd) < new Date()) {
+    // ? If current subscription is expired, do not disable any plan
+    if (current.subscriptionStatus === SubscriptionStatus.Expired) {
       return false;
     }
 
