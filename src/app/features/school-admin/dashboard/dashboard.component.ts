@@ -9,7 +9,7 @@ import {
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 
-import { finalize, forkJoin, map, of, switchMap, take } from 'rxjs';
+import { catchError, finalize, forkJoin, map, of, switchMap, take } from 'rxjs';
 
 import { UserService } from '../../../shared/services/api/user/user.service';
 import { PaymentService } from '../../../shared/services/api/payment/payment.service';
@@ -280,21 +280,19 @@ export class DashboardComponent implements OnInit {
             this.loadData();
             return of(null);
           }
+          const dashboardReq: DashboardRequest = {
+            lessonActivityPeriod: this.currentLessonCreationPeriod(),
+            lessonStatusPeriod: this.currentLessonStatusPeriod(),
+          };
+          const loadDashboard$ =
+            this.dashboardService.getDashboardSchoolAdminData(dashboardReq);
 
           return this.paymentService.confirmPaymentReturn(req).pipe(
-            switchMap(() => {
-              return this.paymentService.refreshTokenAfterConfirm();
-            }),
-            switchMap(() => {
-              const dashboardReq: DashboardRequest = {
-                lessonActivityPeriod: this.currentLessonCreationPeriod(),
-                lessonStatusPeriod: this.currentLessonStatusPeriod(),
-              };
-              return forkJoin([
-                this.dashboardService.getDashboardSchoolAdminData(dashboardReq),
-                this.userService.getCurrentProfile(),
-              ]);
-            })
+            switchMap(() => this.paymentService.refreshTokenAfterConfirm()),
+            switchMap(() =>
+              forkJoin([loadDashboard$, this.userService.getCurrentProfile()])
+            ),
+            catchError(() => loadDashboard$)
           );
         }),
         finalize(() => {

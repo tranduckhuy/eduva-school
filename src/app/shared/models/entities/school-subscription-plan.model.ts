@@ -1,11 +1,5 @@
-import { BillingCycle } from '../api/request/command/create-plan-payment-link-request.model';
-
-enum SubscriptionStatus {
-  Active = 0,
-  Pending = 1,
-  Expired = 2,
-  Canceled = 3,
-}
+import { type BillingCycle } from '../api/request/command/create-plan-payment-link-request.model';
+import { type SubscriptionStatus } from '../enum/subscription-status.enum';
 
 export interface SchoolSubscriptionPlan {
   planName: string;
